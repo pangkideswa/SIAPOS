@@ -1,0 +1,330 @@
+# TASK
+
+## Sprint 1
+
+Status : Done
+
+### Todo
+
+- [x] Setup Laravel
+- [x] Setup Next.js
+- [x] Setup PostgreSQL
+- [x] Install Sanctum
+- [x] Install Spatie Permission
+- [x] Install shadcn/ui
+- [x] Landing Page
+- [x] Login (/masuk)
+- [x] Register (/daftar)
+- [x] Dashboard Layout (Sidebar, TopBar, BottomNav)
+- [x] Backend Foundation & Frontend Auth Connection
+
+---
+
+### Done
+
+- [x] Setup Laravel (Backend)
+- [x] Setup Next.js (Frontend)
+- [x] Setup PostgreSQL (Database)
+- [x] Install Sanctum (Auth)
+- [x] Install Spatie Permission (RBAC)
+- [x] Install shadcn/ui (UI Components)
+- [x] Landing Page - Modern, Mobile First, Responsive, SIAPOS Colors, shadcn/ui, Framer Motion, Bahasa Indonesia
+- [x] Login (/masuk) - Email/NIP/NISN, Password, Ingat Saya, Lupa Password, RHF+Zod, Framer Motion
+- [x] Register (/daftar) - Role Guru/Siswa/Wali, Form Dinamis, Validasi Frontend, RHF+Zod, Framer Motion
+- [x] Dashboard Layout - Sidebar (Desktop), BottomNav (Mobile), TopBar (Search, Notifikasi, Profil), Role-based navigation (Admin, Guru, Siswa, Wali), Framer Motion page transitions
+- [x] Backend Foundation & Frontend Auth Connection
+  - [x] PostgreSQL configuration in backend .env
+  - [x] Migration: nip/nisn columns on users table
+  - [x] RoleSeeder (idempotent, delete-then-create) with all 5 roles
+  - [x] SuperAdminSeeder (idempotent, updateOrCreate)
+  - [x] DatabaseSeeder refactored: idempotent (updateOrCreate/firstOrCreate), wali role, NIP/NISN data
+  - [x] LoginRequest updated: accepts `identifier` (email/NIP/NISN) instead of `email`
+  - [x] AuthController::login() updated: finds user by email, nip, or nisn
+  - [x] StoreUserRequest updated: accepts `wali` role + nip/nisn fields
+  - [x] User model + UserResource: added nip/nisn to fillable/output
+  - [x] Frontend types updated: User includes nip/nisn, LoginRequest uses `identifier`, RegisterRequest includes role+nip+nisn
+  - [x] apiClient fixed: unwraps backend `{message, data}` response format, sends `identifier`
+  - [x] auth-context updated: passes `identifier` to login, unwrapped getUser response
+  - [x] Register form wired to backend API
+
+---
+
+### Blocked
+
+Belum ada.
+
+---
+
+## Sprint 2
+
+Status : In Progress
+
+### Todo
+
+- [x] Manajemen Pengguna (Frontend + Backend)
+- [x] Master Data Jurusan (Frontend + Backend)
+- [x] Data Guru (Frontend + Backend)
+- [x] Data Siswa (Frontend + Backend)
+- [x] Pengaturan Sekolah (Frontend)
+- [ ] CRUD Kelas
+- [ ] CRUD Mata Pelajaran
+- [ ] Penugasan Guru
+- [ ] Manajemen Materi
+- [ ] Manajemen Tugas
+- [ ] Penilaian
+- [ ] Pengaturan Sekolah
+
+---
+
+### Done - Sprint 2.1: Manajemen Pengguna
+
+- [x] Backend: UserRepository + UserRepositoryInterface (Repository Pattern)
+- [x] Backend: UserService refactored to use UserRepository via DI
+- [x] Backend: AppServiceProvider binds UserRepositoryInterface → UserRepository
+- [x] Backend: UpdateUserRequest added wali role + nip/nisn unique validation
+- [x] Frontend: Feature-based architecture `features/users/` structure
+  - [x] constants/user.constants.ts (ROLE_LABELS, ROLE_COLORS, ALL_ROLES, etc.)
+  - [x] dummy/users.data.ts (12 dummy users across all roles)
+- [x] Frontend: UserListPage — search by name/email/NIP/NISN, role filter, DataTable with pagination, row click → detail
+- [x] Frontend: UserDetailPage — avatar, profile card, info rows (NIP/NISN conditional), edit/delete actions, back navigation
+- [x] Frontend: UserFormDialog — create/edit with dynamic NIP (guru/wali) / NISN (siswa) fields, role select (admin/guru/siswa/wali)
+- [x] Frontend: UserDeleteDialog — confirmation dialog with loading state
+- [x] Frontend: Page routes wired up — `/admin/users` (list), `/admin/users/[id]` (detail)
+- [x] Frontend: TopBar updated with detail page title routing
+- [x] All dummy data operations work client-side (ready for backend integration)
+- [x] TypeScript check passed — no errors
+- [x] Backend PHP syntax check passed — no errors
+
+### Done - Sprint 2.2: Master Data Jurusan
+
+- [x] Backend: Migration `create_jurusans_table` (name, code, is_active, description, timestamps)
+- [x] Backend: Jurusan Model with fillable, casts (is_active → boolean)
+- [x] Backend: JurusanRepositoryInterface + JurusanRepository (search by name/code/description, filter by is_active, getActive)
+- [x] Backend: JurusanService (DI with JurusanRepositoryInterface)
+- [x] Backend: JurusanController (index, active, store, show, update, destroy)
+- [x] Backend: StoreJurusanRequest (name required, code unique, is_active boolean, description nullable)
+- [x] Backend: JurusanResource (id, name, code, is_active, description, timestamps)
+- [x] Backend: JurusanSeeder (idempotent updateOrCreate — TKJ, TBSM, BDP)
+- [x] Backend: Routes — `GET /api/jurusans/active` + `apiResource('jurusans')`
+- [x] Backend: AppServiceProvider binds JurusanRepositoryInterface → JurusanRepository
+- [x] Backend: DatabaseSeeder calls JurusanSeeder
+- [x] Frontend: Feature-based `features/jurusan/` (types, constants, dummy data, components)
+- [x] Frontend: Dummy data — 3 jurusan sesuai data nyata SMK Wahana Bakti (TKJ aktif, TBSM aktif, BDP tidak aktif)
+- [x] Frontend: JurusanListPage — search by name/code, status filter, DataTable, row click → detail
+- [x] Frontend: JurusanDetailPage — code badge, name, status, description, timestamps, edit/delete actions
+- [x] Frontend: JurusanFormDialog — name, code (auto-uppercase), is_active select, description textarea
+- [x] Frontend: JurusanDeleteDialog — confirmation with jurusan name and code
+- [x] Frontend: Page routes — `/admin/jurusan` (list), `/admin/jurusan/[id]` (detail)
+- [x] Frontend: Sidebar + BottomNav + TopBar updated with Jurusan navigation (Layers icon)
+- [x] TypeScript check passed — no errors
+- [x] Backend PHP syntax check passed — no errors
+
+### Done - Sprint 2.3: Data Guru
+
+- [x] Backend: Migration `create_teachers_table` (foto, nama_lengkap, nip unique, nuptk nullable, jenis_kelamin enum, tempat_lahir, tanggal_lahir, no_hp nullable, email unique, alamat nullable, pendidikan_terakhir, status_kepegawaian enum, mata_pelajaran json, timestamps, soft deletes)
+- [x] Backend: Teacher Model with fillable, casts (tanggal_lahir → date, mata_pelajaran → array), soft deletes
+- [x] Backend: TeacherRepositoryInterface + TeacherRepository (search by nama/nip/nuptk/email/no_hp, filter by jenis_kelamin/status_kepegawaian/pendidikan_terakhir)
+- [x] Backend: TeacherService (DI with TeacherRepositoryInterface)
+- [x] Backend: TeacherController (index, store, show, update, destroy)
+- [x] Backend: StoreTeacherRequest (all fields validated, nip/email unique, mata_pelajaran required array min 1, Bahasa Indonesia messages)
+- [x] Backend: TeacherResource (all fields output)
+- [x] Backend: TeacherSeeder (idempotent updateOrCreate — 3 guru: Budi, Siti, Andi)
+- [x] Backend: Routes — `apiResource('teachers')`
+- [x] Backend: AppServiceProvider binds TeacherRepositoryInterface → TeacherRepository
+- [x] Backend: DatabaseSeeder calls TeacherSeeder
+- [x] Frontend: Feature-based `features/guru/` (types, constants, dummy data, components)
+- [x] Frontend: Types — Guru interface with all fields, GuruFormData type
+- [x] Frontend: Constants — JENIS_KELAMIN_OPTIONS, STATUS_KEPEGAWAIAN_OPTIONS, PENDIDIKAN_OPTIONS, MATA_PELAJARAN_OPTIONS, STATUS_KEPEGAWAIAN_COLORS, EMPTY_GURU_FORM
+- [x] Frontend: Dummy data — 3 guru sesuai data nyata (Budi S2/PNS, Siti S1/PPPK, Andi S1/Honorer)
+- [x] Frontend: GuruListPage — search by name/NIP/NUPTK/email/mapel, filter by jenis kelamin & status kepegawaian, DataTable with avatar initials, badge, pagination
+- [x] Frontend: GuruDetailPage — avatar, profile card, info rows (all 14 fields), mata pelajaran badges, age calculator, edit/delete actions
+- [x] Frontend: GuruFormSheet — full-page slide-over, 4 sections (Data Diri, Kontak, Kepegawaian & Pendidikan, Mata Pelajaran checkboxes), all fields, validation
+- [x] Frontend: GuruDeleteDialog — confirmation with nama and NIP
+- [x] Frontend: Page routes — `/admin/guru` (list), `/admin/guru/[id]` (detail)
+- [x] Frontend: Sidebar + BottomNav + TopBar updated with Guru navigation (GraduationCap icon)
+- [x] TypeScript check passed — no errors
+- [x] Backend PHP syntax check passed — no errors
+
+### Done - Sprint 2.4: Data Siswa
+
+- [x] Backend: Migration `create_students_table` (foto, nis unique, nisn unique, nama_lengkap, jenis_kelamin enum, tempat_lahir, tanggal_lahir, agama, alamat, jurusan_id FK, kelas, tahun_masuk, tahun_ajaran, status enum, nama_ayah, nama_ibu, no_hp_ortu, alamat_ortu, timestamps, soft deletes)
+- [x] Backend: Student Model with fillable, casts (tanggal_lahir → date), BelongsTo Jurusan relation
+- [x] Backend: StudentRepositoryInterface + StudentRepository (search by nama/nis/nisn/kelas, filter by jurusan_id/kelas/status, eager load jurusan)
+- [x] Backend: StudentService (DI with StudentRepositoryInterface)
+- [x] Backend: StudentController (index, store, show, update, destroy)
+- [x] Backend: StoreStudentRequest (all fields validated, nis/nisn unique, jurusan_id exists, Bahasa Indonesia messages)
+- [x] Backend: StudentResource (all fields output with jurusan relation)
+- [x] Backend: StudentSeeder (idempotent updateOrCreate — 5 siswa: Rizki, Dewi, Fajar, Ahmad, Putri)
+- [x] Backend: Routes — `apiResource('students')`
+- [x] Backend: AppServiceProvider binds StudentRepositoryInterface → StudentRepository
+- [x] Backend: DatabaseSeeder calls StudentSeeder
+- [x] Frontend: Feature-based `features/siswa/` (types, constants, dummy data, components)
+- [x] Frontend: Types — Siswa interface (18 fields), SiswaFormData type
+- [x] Frontend: Constants — JENIS_KELAMIN_OPTIONS, AGAMA_OPTIONS, STATUS_SISWA_OPTIONS, KELAS_OPTIONS (18 kelas), TAHUN_AJARAN_OPTIONS, JURUSAN_OPTIONS (3 jurusan), STATUS_SISWA_COLORS, EMPTY_SISWA_FORM
+- [x] Frontend: Dummy data — 5 siswa across 2 jurusan, 3 kelas, all Aktif status
+- [x] Frontend: SiswaListPage — search by name/NIS/NISN/kelas, filter by jurusan/kelas/status, avatar initials, badge, pagination, Import Excel button, Export CSV button (responsive)
+- [x] Frontend: SiswaDetailPage — profile card, 3 info sections (Identitas, Akademik, Orang Tua), all 18 fields, timestamps, edit/delete actions
+- [x] Frontend: SiswaFormSheet — full-page slide-over, 3 sections (Identitas, Akademik, Orang Tua), all fields, validation, Jurusan select with code+name
+- [x] Frontend: SiswaDeleteDialog — confirmation with nama and NIS
+- [x] Frontend: Page routes — `/admin/siswa` (list), `/admin/siswa/[id]` (detail)
+- [x] Frontend: Sidebar + BottomNav + TopBar updated with Siswa navigation (Users icon)
+- [x] TypeScript check passed — no errors
+- [x] Backend PHP syntax check passed — no errors
+
+### Done - Sprint 2.5: Pengaturan Sekolah
+
+- [x] Frontend: Feature-based `features/pengaturan-sekolah/` (types, constants, dummy data, components)
+- [x] Frontend: Types — SekolahSettings interface (6 groups: informasi_sekolah, kontak, logo, tahun_akademik, pengaturan_sistem, sosial_media) + SekolahFormData type alias
+- [x] Frontend: Constants — JENJANG_OPTIONS, STATUS_SEKOLAH_OPTIONS, AKREDITASI_OPTIONS, SEMESTER_OPTIONS, BAHASA_OPTIONS, ZONA_WAKTU_OPTIONS, TAHUN_AJARAN_OPTIONS, EMPTY_SEKOLAH_FORM
+- [x] Frontend: Dummy data — DUMMY_SEKOLAH_SETTINGS (SMK Wahana Bakti with realistic data)
+- [x] Frontend: PengaturanSekolahPage — 6 sections with Cards, responsive grid layout, all fields with save button
+  - [x] Section 1: Informasi Sekolah — Nama, NPSN, NSS, Jenjang/Status/Akreditasi selects
+  - [x] Section 2: Kontak — Email, Telepon, Website, Alamat textarea
+  - [x] Section 3: Logo — ImageUpload with preview for Logo Sekolah, Logo SIAPOS, Favicon (2MB limit, remove button)
+  - [x] Section 4: Tahun Akademik — Tahun Ajaran Aktif select, Semester Aktif select
+  - [x] Section 5: Pengaturan Sistem — Nama Aplikasi, Bahasa, Zona Waktu selects
+  - [x] Section 6: Sosial Media — Facebook, Instagram, YouTube inputs
+- [x] Frontend: ImageUpload component — file input with preview, 2MB validation, remove button
+- [x] Frontend: SectionHeader component — icon + title + description with primary background
+- [x] Frontend: Page route — `/admin/pengaturan` (settings page)
+- [x] Frontend: TopBar updated — getPageTitle returns "Pengaturan Sekolah" for `/admin/pengaturan`
+- [x] Sidebar already had "Pengaturan" link to `/admin/pengaturan` — no change needed
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+---
+
+### Blocked
+
+Belum ada.
+
+---
+
+## Sprint 3
+
+Status : In Progress
+
+### Todo
+
+- [x] Kelas Mengajar (Frontend)
+- [x] Materi (Frontend)
+- [x] Tugas (Frontend)
+- [x] Pengumpulan Tugas (Frontend)
+- [x] Penilaian (Frontend)
+- [x] Dashboard Admin (Frontend)
+- [ ] Quiz (Frontend)
+- [ ] Pengumuman (Frontend)
+- [ ] Absensi (Frontend)
+- [ ] Nilai (Frontend)
+
+---
+
+### Done - Sprint 3.1: Kelas Mengajar
+
+- [x] Frontend: Feature-based `features/kelas-mengajar/` (types, constants, dummy data, components)
+- [x] Frontend: Types — KelasMengajar interface (guru_nama, mata_pelajaran, kelas, tahun_ajaran, semester, status) + KelasMengajarFormData type
+- [x] Frontend: Constants — GURU_OPTIONS, MATA_PELAJARAN_OPTIONS, KELAS_OPTIONS, TAHUN_AJARAN_OPTIONS, SEMESTER_OPTIONS, STATUS_OPTIONS, SEMESTER_COLORS, STATUS_COLORS, EMPTY_KELAS_MENGAJAR_FORM
+- [x] Frontend: Dummy data — 6 records (3 guru, 4 mata pelajaran, 4 kelas, 2 tahun ajaran, 2 semester)
+- [x] Frontend: KelasMengajarListPage — search by guru/mapel/kelas, filter by guru/kelas/tahun, DataTable with avatar initials, badges, pagination, edit/delete actions
+- [x] Frontend: KelasMengajarFormSheet — 6 fields (Guru, Mata Pelajaran, Kelas, Tahun Ajaran, Semester, Status), all Select components
+- [x] Frontend: KelasMengajarDeleteDialog — confirmation with mata pelajaran and kelas name
+- [x] Frontend: Page route — `/admin/kelas-mengajar`
+- [x] Frontend: Sidebar updated — "Kelas Mengajar" nav item with BookOpenCheck icon (after Penugasan Guru)
+- [x] Frontend: TopBar updated — getPageTitle returns "Kelas Mengajar" for `/admin/kelas-mengajar`
+- [x] Frontend: BottomNav updated — "Kls Mengajar" item for mobile
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 3.2: Materi Pembelajaran
+
+- [x] Frontend: Feature-based `features/materi/` (types, constants, dummy data, components)
+- [x] Frontend: Types — Materi interface (judul, deskripsi, kelas_mengajar_id, guru_nama, mata_pelajaran, kelas, thumbnail_url, lampiran[], video_url, isi_materi, status) + Lampiran interface + MateriFormData type
+- [x] Frontend: Constants — STATUS_MATERI_OPTIONS (Draft/Publish), STATUS_MATERI_COLORS, ALLOWED_FILE_TYPES, EMPTY_MATERI_FORM
+- [x] Frontend: Dummy data — 6 records referencing kelas-mengajar data, with realistic HTML content, lampiran, and video URLs
+- [x] Frontend: MateriListPage — search by judul/guru/mapel, filter by guru/kelas/status, DataTable with judul+deskripsi, guru, mapel, kelas badge, status badge, date, actions (view/edit/delete), pagination, row click → detail
+- [x] Frontend: MateriFormSheet — 5 sections: Informasi Umum (judul, deskripsi), Kelas Mengajar (select with auto-fill), Media & Lampiran (thumbnail upload, multi-file upload, YouTube URL), Isi Materi (HTML textarea with live preview), Pengaturan (status select)
+- [x] Frontend: MateriDeleteDialog — confirmation with judul
+- [x] Frontend: MateriDetailPage — 3-column layout: info sidebar (guru, mapel, kelas, dates, status) + main content (deskripsi, rendered HTML isi materi, embedded YouTube iframe, lampiran list with download)
+- [x] Frontend: Page routes — `/guru/materi` (list), `/guru/materi/[id]` (detail)
+- [x] Frontend: Sidebar updated — "Materi Pembelajaran" nav item for guru role
+- [x] Frontend: BottomNav updated — "Materi" item for guru mobile
+- [x] Frontend: TopBar updated — getPageTitle for `/guru/materi` routes
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 3.3: Tugas
+
+- [x] Installed `sonner` for toast notifications
+- [x] Added `<Toaster />` to dashboard layout
+- [x] Frontend: Feature-based `features/tugas/` (types, constants, dummy data, components)
+- [x] Frontend: Types — Tugas interface (judul, deskripsi, kelas_mengajar_id, guru_nama, mata_pelajaran, kelas, lampiran[], tanggal_dibuka, tenggat_waktu, nilai_maksimal, status) + TugasLampiran interface + TugasFormData type
+- [x] Frontend: Constants — STATUS_TUGAS_OPTIONS (Draft/Dipublikasikan/Ditutup), STATUS_TUGAS_COLORS, ALLOWED_TUGAS_FILE_TYPES, ALLOWED_TUGAS_FILE_EXTENSIONS, EMPTY_TUGAS_FORM
+- [x] Frontend: Dummy data — 6 records across 3 guru, 4 mata pelajaran, 3 kelas, all 3 statuses
+- [x] Frontend: TugasListPage — search by judul/guru/mapel/kelas, filter by guru/mapel/kelas/status, DataTable with judul+subtitle, mapel, kelas badge, guru, tenggat date, status badge, actions, pagination, row click → detail, toast on CRUD
+- [x] Frontend: TugasFormSheet — 5 sections: Informasi Umum (judul wajib, deskripsi), Kelas Mengajar (select wajib with auto-fill), Lampiran (multi-file upload), Jadwal & Penilaian (tanggal dibuka date picker, tenggat waktu date picker with min, nilai maksimal number input), Pengaturan (status select)
+- [x] Frontend: Validation — judul wajib, kelas wajib, tenggat >= tanggal dibuka, nilai maksimal >= 1, error messages with red border + toast
+- [x] Frontend: TugasDeleteDialog — confirmation with judul and AlertTriangle icon
+- [x] Frontend: TugasDetailPage — 3-column layout: info sidebar (guru, mapel, kelas, tanggal dibuka, tenggat, created, updated, status, nilai maksimal) + main content (deskripsi, lampiran list with download), action buttons (Back, Edit, Hapus, Lihat Pengumpulan)
+- [x] Frontend: "Lihat Pengumpulan" button — navigates to `/guru/pengumpulan/[tugasId]`
+- [x] Frontend: Page routes — `/guru/tugas` (list), `/guru/tugas/[id]` (detail)
+- [x] Frontend: Sidebar updated — "Tugas" nav item with ClipboardList icon for guru role
+- [x] Frontend: BottomNav updated — "Tugas" item for guru mobile
+- [x] Frontend: TopBar updated — getPageTitle for `/guru/tugas` routes
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 3.4: Pengumpulan Tugas
+
+- [x] Frontend: Feature-based `features/pengumpulan/` (types, constants, dummy data, components)
+- [x] Frontend: Types — PengumpulanTugas interface (tugas_id, siswa_id, siswa_nama, siswa_kelas, file_jawaban, catatan, waktu_pengumpulan, status, nilai) + PengumpulanFile interface + PengumpulanTugasFormData type
+- [x] Frontend: Constants — STATUS_PENGUMPULAN_OPTIONS (Belum Mengumpulkan/Sudah Mengumpulkan/Terlambat), STATUS_PENGUMPULAN_COLORS, ALLOWED_PENGUMPULAN_EXTENSIONS, EMPTY_PENGUMPULAN_FORM
+- [x] Frontend: Dummy data — 9 submissions across 4 tugas, 4 siswa, all 3 statuses
+- [x] Frontend: PengumpulanListPage — guru view showing all tugas with jumlah_pengumpul counts, search, filter by guru/kelas/status, DataTable, row click → detail
+- [x] Frontend: PengumpulanDetailPage — 3-column layout: tugas info sidebar + submissions DataTable (nama siswa with avatar, waktu kirim, status badge, nilai, actions), JawabanDetailDialog
+- [x] Frontend: JawabanDetailDialog — shows siswa info, file jawaban with download, catatan, waktu upload, status badge, Beri Nilai form with input + save button, validation (0-nilaiMaksimal), toast on save
+- [x] Frontend: SimulasiSiswaPage — siswa simulation: list Dipublikasikan tugas with submission status, click to open upload form, file upload (dummy, 5MB limit, format validation), catatan textarea, Kirim Tugas button with toast "Tugas berhasil dikirim."
+- [x] Frontend: Upload validation — file wajib, max 5MB, format PDF/DOCX/PPTX/ZIP, tidak boleh upload setelah deadline
+- [x] Frontend: Page routes — `/guru/pengumpulan` (list), `/guru/pengumpulan/[id]` (detail), `/siswa/simulasi` (student simulation)
+- [x] Frontend: Sidebar updated — "Pengumpulan" nav item for guru role, "Simulasi" for siswa role
+- [x] Frontend: BottomNav updated — "Kumpul" for guru mobile, "Simulasi" for siswa mobile
+- [x] Frontend: TopBar updated — getPageTitle for `/guru/pengumpulan` and `/siswa/simulasi` routes
+- [x] Frontend: TugasDetailPage updated — "Lihat Pengumpulan" button now navigates to pengumpulan detail
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 3.5: Penilaian
+
+- [x] Frontend: Feature-based `features/penilaian/` (types, constants, dummy data, components)
+- [x] Frontend: Types — Penilaian interface (pengumpulan_id, tugas_id, siswa_nama, siswa_kelas, mata_pelajaran, guru_nama, tugas_judul, tenggat_waktu, nilai, feedback_guru, status_penilaian) + PenilaianFormData type
+- [x] Frontend: Constants — STATUS_PENILAIAN_OPTIONS (Belum Dinilai/Sudah Dinilai/Revisi), STATUS_PENILAIAN_COLORS, EMPTY_PENILAIAN_FORM
+- [x] Frontend: Dummy data — 9 penilaian records across 6 tugas, 4 siswa, 3 mapel, 3 guru, mix of graded/ungraded
+- [x] Frontend: PenilaianListPage — 4 summary cards (Total Penilaian, Sudah Dinilai, Belum Dinilai, Rata-rata Nilai), DataTable (siswa with avatar, mapel+guru, tugas+deadline, nilai, status badge, aksi), search + 4 filters (guru/kelas/mapel/status), pagination
+- [x] Frontend: PenilaianDetailPage — 3-column layout: info siswa sidebar + info tugas + jawaban siswa + form penilaian (nilai, status select, feedback textarea, simpan button), validation, toast on save
+- [x] Frontend: Page routes — `/guru/penilaian` (list), `/guru/penilaian/[id]` (detail)
+- [x] Frontend: Sidebar updated — "Penilaian" nav item for guru role with Award icon
+- [x] Frontend: BottomNav updated — "Nilai" for guru mobile with Award icon
+- [x] Frontend: TopBar updated — getPageTitle for `/guru/penilaian` and `/guru/penilaian/[id]` routes
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 3.6: Dashboard Admin
+
+- [x] Frontend: Feature-based `features/dashboard/` (dummy data, components)
+- [x] Frontend: Dummy data — DUMMY_ACTIVITIES (8 activities across 3 guru, 3 siswa, 1 admin, with timestamps and icons), DUMMY_ANNOUNCEMENTS (4 announcements with info/warning/urgent types)
+- [x] Frontend: AdminDashboardPage — 6 sections:
+  - [x] Section 1: Welcome — "Halo, [User] 👋" + "Selamat datang di SIAPOS" + system tagline
+  - [x] Section 2: Statistik — 6 summary cards (Total Guru, Total Siswa, Total Kelas, Mata Pelajaran, Total Materi, Total Tugas) with dynamic counts from dummy data, Lucide icons
+  - [x] Section 3: Aktivitas Terbaru — timeline with user name, action, relative time, icon per activity type
+  - [x] Section 4: Status Akademik — 3 info cards (Tahun Ajaran Aktif, Semester Aktif, Jumlah Kelas Aktif) with badges
+  - [x] Section 5: Pengumuman — announcement list with type-based icons and badges (Info/Peringatan/Penting), date
+  - [x] Section 6: Quick Action — 5 shortcut buttons (Guru, Siswa, Kelas, Materi, Tugas) linking to admin routes
+- [x] Frontend: Page route — `/admin` now delegates to AdminDashboardPage via thin wrapper
+- [x] Responsive layout — grid adapts: 2 cols mobile, 3 cols tablet, 6 cols desktop for stats; 3-col grid for middle/bottom sections
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+---
+
+### Blocked
+
+Belum ada.
