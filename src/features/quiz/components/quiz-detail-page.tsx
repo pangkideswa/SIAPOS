@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable, type Column } from "@/components/ui/data-table"
-import { ArrowLeft, Pencil, Clock, Users, Calendar } from "lucide-react"
+import { ArrowLeft, Clock, Users, Calendar } from "lucide-react"
 import {
   STATUS_QUIZ_COLORS, STATUS_PARTISIPAN_COLORS,
 } from "../constants/quiz.constants"
@@ -94,10 +94,6 @@ export function QuizDetailPage({ id }: QuizDetailPageProps) {
             <Button variant="outline" size="sm" onClick={() => router.push("/guru/quiz")}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => router.push("/guru/quiz")}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
             </Button>
           </div>
         }

@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/ui/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Pencil, Clock, FileText } from "lucide-react"
+import { ArrowLeft, Clock, FileText } from "lucide-react"
 import {
   STATUS_PAKET_SOAL_COLORS,
 } from "../constants/paket-soal.constants"
@@ -47,10 +47,6 @@ export function PaketSoalDetailPage({ id }: PaketSoalDetailPageProps) {
             <Button variant="outline" size="sm" onClick={() => router.push("/admin/paket-soal")}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => router.push("/admin/paket-soal")}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
             </Button>
           </div>
         }

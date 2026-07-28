@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -108,11 +108,13 @@ export function HasilUjianDetailPage({
     (h) => h.id === Number(id)
   )
 
-  if (hasil && !initialized) {
-    setCatatanEvaluasi(hasil.catatan_evaluasi)
-    setStatusHasil(hasil.status)
-    setInitialized(true)
-  }
+  useEffect(() => {
+    if (hasil && !initialized) {
+      setCatatanEvaluasi(hasil.catatan_evaluasi)
+      setStatusHasil(hasil.status)
+      setInitialized(true)
+    }
+  }, [hasil, initialized])
 
   async function handleSave() {
     if (!hasil) return
@@ -164,8 +166,7 @@ export function HasilUjianDetailPage({
     )
   }
 
-  const persentaseNilai =
-    hasil.nilai !== null ? Math.round((hasil.nilai / 100) * 100) : 0
+  const persentaseNilai = hasil.nilai !== null ? hasil.nilai : 0
   const backHref = isSiswa ? "/siswa/hasil-ujian" : "/guru/hasil-ujian"
 
   return (

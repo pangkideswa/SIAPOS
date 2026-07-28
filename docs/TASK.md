@@ -403,6 +403,115 @@ Status : In Progress
 
 ---
 
+## Sprint 4
+
+Status : Done
+
+### Todo
+
+- [x] Bank Soal (Frontend)
+- [x] Paket Soal (Frontend)
+- [x] Quiz (Frontend)
+- [x] CBT (Frontend)
+- [x] Hasil Ujian (Frontend)
+- [x] Analitik (Frontend)
+- [x] QA & Stabilization
+
+---
+
+### Done - Sprint 4.1: Bank Soal
+
+- [x] Frontend: Feature-based `features/bank-soal/` (types, constants, dummy data, components)
+- [x] Frontend: BankSoalListPage — search, 4 filters, DataTable, CRUD actions
+- [x] Frontend: BankSoalFormSheet — 7 fields dengan tipe soal dynamic form
+- [x] Frontend: BankSoalDetailPage — soal info, pilihan jawaban, jawaban benar highlight
+- [x] Frontend: Page routes — `/admin/bank-soal` (list), `/admin/bank-soal/[id]` (detail)
+- [x] Frontend: Sidebar + BottomNav + TopBar updated
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 4.2: Paket Soal
+
+- [x] Frontend: Feature-based `features/paket-soal/` (types, constants, dummy data, components)
+- [x] Frontend: PaketSoalListPage — search, 3 filters, DataTable, CRUD actions
+- [x] Frontend: PaketSoalFormSheet — soal picker dengan multi-select, auto-fill
+- [x] Frontend: PaketSoalDetailPage — paket info, daftar soal terpilih
+- [x] Frontend: Page routes — `/admin/paket-soal` (list), `/admin/paket-soal/[id]` (detail)
+- [x] Frontend: Sidebar + BottomNav + TopBar updated
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 4.3: Quiz
+
+- [x] Frontend: Feature-based `features/quiz/` (types, constants, dummy data, components)
+- [x] Frontend: QuizListPage — search, 4 filters, DataTable, CRUD actions
+- [x] Frontend: QuizFormSheet — 10 fields dengan toggle switches
+- [x] Frontend: QuizDetailPage — quiz info, pengaturan, aksi
+- [x] Frontend: QuizTakePage — timer, navigasi soal, submit dialog
+- [x] Frontend: QuizResultPage — hasil, skor, review jawaban
+- [x] Frontend: Page routes — `/guru/quiz/*`, `/siswa/quiz/*`
+- [x] Frontend: Sidebar + BottomNav + TopBar updated
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 4.4: CBT
+
+- [x] Frontend: Feature-based `features/cbt/` (types, constants, dummy data, components)
+- [x] Frontend: CBTListPage — search, 3 filters, DataTable, CRUD actions
+- [x] Frontend: CBTFormSheet — 14 fields dengan toggle switches
+- [x] Frontend: CBTDetailPage — CBT info, pengaturan, aksi
+- [x] Frontend: CBTExamPage — timer, navigasi soal, tandai soal, submit dialog
+- [x] Frontend: CBTResultPage — hasil, skor, status kelulusan
+- [x] Frontend: Page routes — `/guru/cbt/*`, `/siswa/cbt/*`
+- [x] Frontend: Sidebar + BottomNav + TopBar updated
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 4.5: Hasil Ujian
+
+- [x] Frontend: Feature-based `features/hasil-ujian/` (types, constants, dummy data, components)
+- [x] Frontend: HasilUjianListPage — 5 summary cards, search, 5 filters, DataTable, pagination
+- [x] Frontend: HasilUjianDetailPage — detail info, review jawaban accordion, catatan evaluasi form
+- [x] Frontend: Custom Accordion component created
+- [x] Frontend: Page routes — `/guru/hasil-ujian/*`, `/siswa/hasil-ujian/*`
+- [x] Frontend: Sidebar + BottomNav + TopBar updated
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 4.6: Analitik
+
+- [x] Installed Recharts for charting library
+- [x] Frontend: Feature-based `features/analitik/` (types, constants, dummy data, components)
+- [x] Frontend: 5 Recharts visualizations — Bar, Pie, Line, Horizontal Bar, Grouped Bar
+- [x] Frontend: Filter bar — Kelas, Mapel, Jenis Ujian, Rentang Tanggal
+- [x] Frontend: Insight & Rekomendasi panel
+- [x] Frontend: Page route — `/guru/analitik`
+- [x] Frontend: Sidebar + BottomNav + TopBar updated
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 4.7: QA & Stabilization
+
+- [x] Navigation fixes:
+  - [x] Added missing `/siswa/quiz` sidebar nav item
+  - [x] Added `React` import to `data-table.tsx`
+- [x] CBT fixes:
+  - [x] Fixed timer dead-end when `auto_submit=false`
+  - [x] Removed unused `totalTidakDijawab` variable
+- [x] Hasil Ujian fixes:
+  - [x] Fixed state-setting-during-render anti-pattern
+  - [x] Removed redundant calculation
+- [x] Detail page fixes:
+  - [x] Replaced misleading "Edit" buttons with "Kembali" buttons
+- [x] Accessibility:
+  - [x] Added `aria-label` to 15+ icon-only buttons
+- [x] Dead code cleanup:
+  - [x] Removed unused exports across modules
+- [x] Build: zero errors, zero new warnings
+- [x] Full audit: 6 assessment modules verified
+
+---
+
 ### Blocked
 
 Belum ada.

@@ -10,8 +10,8 @@ Roadmap pengembangan SIAPOS — Education Operating System.
 |------|-------|--------|
 | 1 | Foundation | ✅ Selesai |
 | 2 | Learning Module | ✅ Selesai |
-| 3 | Assessment | ⬜ Akan Datang |
-| 4 | CBT & Quiz | ⬜ Akan Datang |
+| 3 | Assessment | ✅ Selesai |
+| 4 | CBT & Quiz | ✅ Selesai |
 | 5 | Communication | ⬜ Akan Datang |
 | 6 | Academic Admin | ⬜ Akan Datang |
 | 7 | AI Features | ⬜ Akan Datang |
@@ -51,14 +51,17 @@ Roadmap pengembangan SIAPOS — Education Operating System.
 
 ---
 
-## Phase 3 — Assessment ⬜
+## Phase 3 — Assessment ✅
 
-> v0.3.0
+> Sprint 4 | v0.3.0
 
-- [ ] Quiz Online
-- [ ] Bank Soal
-- [ ] Analisis Hasil
-- [ ] Rekap Nilai
+- [x] Bank Soal
+- [x] Paket Soal
+- [x] Quiz Online
+- [x] Computer-Based Testing (CBT)
+- [x] Hasil Ujian
+- [x] Analitik Penilaian
+- [x] QA & Stabilization
 
 ---
 
@@ -112,7 +115,7 @@ Roadmap pengembangan SIAPOS — Education Operating System.
 |-------|---------|-----------|
 | v0.1.0 | Jul 2026 | Initial Setup |
 | v0.2.0 | Jul 2026 | Prototype — Learning Module |
-| v0.3.0 | TBD | Assessment Module |
+| v0.3.0 | Jul 2026 | Assessment Module |
 | v0.4.0 | TBD | CBT & Quiz |
 | v0.5.0 | TBD | Communication |
 | v0.6.0 | TBD | Academic Admin |

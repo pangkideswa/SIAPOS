@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable, type Column } from "@/components/ui/data-table"
-import { ArrowLeft, Pencil, Clock, Users, Calendar } from "lucide-react"
+import { ArrowLeft, Clock, Users, Calendar } from "lucide-react"
 import {
   STATUS_CBT_COLORS, STATUS_PARTISIPAN_CBT_COLORS,
 } from "../constants/cbt.constants"
@@ -94,10 +94,6 @@ export function CBTDetailPage({ id }: CBTDetailPageProps) {
             <Button variant="outline" size="sm" onClick={() => router.push("/guru/cbt")}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => router.push("/guru/cbt")}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
             </Button>
           </div>
         }

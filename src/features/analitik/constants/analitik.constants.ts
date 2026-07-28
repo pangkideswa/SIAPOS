@@ -45,16 +45,6 @@ export const CHART_COLORS = {
   primary: "#2563EB",
   secondary: "#F97316",
   success: "#22C55E",
-  danger: "#EF4444",
-  warning: "#EAB308",
-  muted: "#94A3B8",
-  blue: "#3B82F6",
-  green: "#22C55E",
-  orange: "#F97316",
-  red: "#EF4444",
-  purple: "#A855F7",
-  cyan: "#06B6D4",
-  pink: "#EC4899",
 }
 
 export const STATUS_DISTRIBUTION_COLORS: Record<string, string> = {

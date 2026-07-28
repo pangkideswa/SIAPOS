@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/ui/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Pencil, CheckCircle } from "lucide-react"
+import { ArrowLeft, CheckCircle } from "lucide-react"
 import {
   TIPE_SOAL_COLORS, KESULITAN_COLORS, STATUS_BANK_SOAL_COLORS,
 } from "../constants/bank-soal.constants"
@@ -41,10 +41,6 @@ export function BankSoalDetailPage({ id }: BankSoalDetailPageProps) {
             <Button variant="outline" size="sm" onClick={() => router.push("/admin/bank-soal")}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => router.push("/admin/bank-soal")}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
             </Button>
           </div>
         }

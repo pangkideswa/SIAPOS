@@ -30,8 +30,6 @@ export const JENIS_UJIAN_COLORS: Record<string, string> = {
   "Try Out": "bg-indigo-100 text-indigo-800",
 }
 
-export const NILAI_MINIMUM_LULUS = 70
-
 export const MATA_PELAJARAN_OPTIONS = [
   "Dasar Jaringan",
   "Administrasi Sistem Jaringan",

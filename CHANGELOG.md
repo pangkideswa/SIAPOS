@@ -6,6 +6,66 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/id/1.1.0/).
 
 ---
 
+## [0.3.0] - 2026-07-28
+
+### Sprint 4 — Assessment Module
+
+**Added**
+- **Sprint 4.1: Bank Soal**
+  - BankSoalListPage — search, 4 filters, DataTable, CRUD actions, pagination
+  - BankSoalFormSheet — 7 fields (kode soal, tipe soal, pertanyaan, pilihan, jawaban benar, bobot, mapel)
+  - BankSoalDetailPage — soal info, pilihan jawaban, jawaban benar highlight
+  - 16 dummy records across 6 mata pelajaran
+
+- **Sprint 4.2: Paket Soal**
+  - PaketSoalListPage — search, 3 filters, DataTable, CRUD actions, pagination
+  - PaketSoalFormSheet — soal picker dengan multi-select, auto-fill info
+  - PaketSoalDetailPage — paket info, daftar soal terpilih
+  - 8 dummy records across 4 kelas
+
+- **Sprint 4.3: Quiz**
+  - QuizListPage — search, 4 filters, DataTable, CRUD actions
+  - QuizFormSheet — 10 fields dengan toggle switches (acak soal, acak jawaban, tampilkan nilai)
+  - QuizDetailPage — quiz info, pengaturan, aksi
+  - QuizTakePage — timer, navigasi soal, submit dialog
+  - QuizResultPage — hasil, skor, review jawaban
+  - 4 dummy quizzes, 8 quiz participants
+
+- **Sprint 4.4: CBT**
+  - CBTListPage — search, 3 filters, DataTable, CRUD actions
+  - CBTFormSheet — 14 fields dengan toggle switches (acak soal, auto-submit, izinkan kembali)
+  - CBTDetailPage — CBT info, pengaturan, aksi
+  - CBTExamPage — timer, navigasi soal, tandai soal, submit dialog
+  - CBTResultPage — hasil, skor, status kelulusan
+  - 3 dummy CBT exams, 6 CBT results
+
+- **Sprint 4.5: Hasil Ujian**
+  - HasilUjianListPage — 5 summary cards, search, 5 filters, DataTable, pagination
+  - HasilUjianDetailPage — detail info, review jawaban accordion, catatan evaluasi form
+  - 16 dummy records across 6 siswa, 6 jenis ujian
+
+- **Sprint 4.6: Analitik**
+  - Recharts installed as charting library
+  - AnalyticsPage — dashboard dengan 8 summary cards, 5 charts, 3 analysis tables, insight panel
+  - Charts: Bar per Mapel, Pie Status Kelulusan, Line Tren Nilai, Horizontal Bar Kelas, Grouped Bar per Jenis Ujian
+  - Filter bar (Kelas, Mapel, Jenis Ujian, Rentang Tanggal)
+  - Analisis per Jenis Ujian, Top Siswa Berprestasi, Siswa Perlu Perhatian
+  - Insight & Rekomendasi panel (peringatan/informasi/rekomendasi)
+
+- **Sprint 4.7: QA & Stabilization**
+  - Navigation: added missing `/siswa/quiz` sidebar link
+  - Navigation: added `React` import to `data-table.tsx` for type safety
+  - CBT: fixed timer dead-end when `auto_submit=false` — now allows manual submit
+  - CBT: removed unused `totalTidakDijawab` variable
+  - Hasil Ujian: fixed state-setting-during-render anti-pattern (now uses `useEffect`)
+  - Hasil Ujian: removed redundant `/ 100 * 100` calculation
+  - Detail pages: replaced misleading "Edit" buttons with "Kembali" (Back) buttons
+  - Accessibility: added `aria-label` to 15+ icon-only buttons across all 6 modules
+  - Dead code: removed unused exports (`NILAI_MINIMUM_LULUS`, `GURU_CBT_OPTIONS`, 10 unused `CHART_COLORS`)
+  - Build: zero errors, zero warnings (except pre-existing CBT eslint suppression)
+
+---
+
 ## [0.2.0] - 2026-07-28
 
 ### Sprint 1 — Foundation

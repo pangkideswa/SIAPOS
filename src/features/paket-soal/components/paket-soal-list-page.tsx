@@ -88,16 +88,16 @@ export function PaketSoalListPage() {
       className: "w-[120px]",
       render: (item) => (
         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" onClick={() => router.push(`/admin/paket-soal/${item.id}`)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" aria-label="Lihat" onClick={() => router.push(`/admin/paket-soal/${item.id}`)}>
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" onClick={() => { setEditingItem(item as unknown as PaketSoal); setFormSheetOpen(true) }}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as PaketSoal); setFormSheetOpen(true) }}>
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Duplikat" onClick={() => toast.success(`Paket soal ${String(item.nama_paket)} berhasil diduplikat`)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Duplikat" aria-label="Duplikat" onClick={() => toast.success(`Paket soal ${String(item.nama_paket)} berhasil diduplikat`)}>
             <Copy className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" title="Hapus" onClick={() => { setDeletingItem(item as unknown as PaketSoal); setDeleteDialogOpen(true) }}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" title="Hapus" aria-label="Hapus" onClick={() => { setDeletingItem(item as unknown as PaketSoal); setDeleteDialogOpen(true) }}>
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>

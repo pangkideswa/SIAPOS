@@ -21,14 +21,6 @@ export const MATA_PELAJARAN_OPTIONS = [
   "Geografi",
 ] as const
 
-export const GURU_CBT_OPTIONS = [
-  "Pak Ahmad Hidayat",
-  "Bu Siti Nurhaliza",
-  "Pak Budi Santoso",
-  "Bu Dewi Lestari",
-  "Pak Eko Prasetyo",
-] as const
-
 export const KELAS_OPTIONS = [
   "X RPL 1",
   "X RPL 2",

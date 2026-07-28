@@ -277,6 +277,7 @@ export function HasilUjianListPage() {
             variant="ghost"
             size="icon-sm"
             title="Lihat Detail"
+            aria-label="Lihat Detail"
             onClick={() => {
               const prefix = isSiswa ? "siswa" : "guru"
               router.push(`/${prefix}/hasil-ujian/${String(item.id)}`)

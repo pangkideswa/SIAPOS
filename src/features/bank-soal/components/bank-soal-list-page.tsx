@@ -91,16 +91,16 @@ export function BankSoalListPage() {
       className: "w-[120px]",
       render: (item) => (
         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" onClick={() => router.push(`/admin/bank-soal/${item.id}`)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" aria-label="Lihat" onClick={() => router.push(`/admin/bank-soal/${item.id}`)}>
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" onClick={() => { setEditingItem(item as unknown as BankSoal); setFormSheetOpen(true) }}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as BankSoal); setFormSheetOpen(true) }}>
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Salin" onClick={() => toast.success(`Soal ${String(item.kode_soal)} berhasil disalin`)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Salin" aria-label="Salin" onClick={() => toast.success(`Soal ${String(item.kode_soal)} berhasil disalin`)}>
             <Copy className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" title="Hapus" onClick={() => { setDeletingItem(item as unknown as BankSoal); setDeleteDialogOpen(true) }}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" title="Hapus" aria-label="Hapus" onClick={() => { setDeletingItem(item as unknown as BankSoal); setDeleteDialogOpen(true) }}>
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>

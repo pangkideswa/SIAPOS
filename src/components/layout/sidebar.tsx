@@ -184,6 +184,12 @@ const navItems: NavItem[] = [
     roles: ["siswa"],
   },
   {
+    label: "Quiz",
+    href: "/siswa/quiz",
+    icon: FileQuestion,
+    roles: ["siswa"],
+  },
+  {
     label: "Simulasi",
     href: "/siswa/simulasi",
     icon: ClipboardList,

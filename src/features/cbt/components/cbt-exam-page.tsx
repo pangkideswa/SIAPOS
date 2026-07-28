@@ -53,7 +53,8 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
       })
     }, 1000)
     return () => clearInterval(timer)
-  }, [timeLeft, cbt?.auto_submit])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeLeft])
 
   const currentSoal = soalList[currentIndex]
   const progress = soalList.length > 0 ? ((currentIndex + 1) / soalList.length) * 100 : 0
@@ -120,7 +121,6 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
       const soal = soalList.find((s) => s.id === a.soal_id)
       return soal && a.jawaban && soal.jawaban_benar !== a.jawaban
     }).length
-    const totalTidakDijawab = soalList.length - totalBenar - totalSalah
     const nilai = Math.round((totalBenar / soalList.length) * 100)
     const lulus = nilai >= cbt.nilai_minimum_lulus
 
