@@ -192,6 +192,23 @@ Status : In Progress
 - [x] TypeScript check passed — no errors
 - [x] Build passed — no errors
 
+### Done - Sprint 3.7: Dashboard Guru
+
+- [x] Frontend: Feature-based `features/dashboard/` extended with guru-specific data and component
+- [x] Frontend: Dummy data — DUMMY_GURU_JADWAL (10 records across 3 guru, 2 hari), DUMMY_GURU_ACTIVITIES (12 records across 3 guru with action icons and timestamps)
+- [x] Frontend: GuruDashboardPage — 7 sections:
+  - [x] Section 1: Header — "Halo, [Guru Name] 👋" + "Selamat datang kembali di SIAPOS" + tanggal Indonesia
+  - [x] Section 2: Ringkasan — 6 stat cards (Kelas Mengajar, Mata Pelajaran, Materi Dibuat, Tugas Aktif, Belum Dinilai, Total Siswa) with dynamic counts from dummy data
+  - [x] Section 3: Kelas Mengajar — clickable cards showing kelas and mata_pelajaran, links to `/guru/kelas`
+  - [x] Section 4: Tugas yang Perlu Dinilai — table with judul, kelas, jumlah pengumpulan, deadline, Nilai button → `/guru/pengumpulan/[id]`
+  - [x] Section 5: Aktivitas Terbaru — timeline with action text, relative time, icons per activity type
+  - [x] Section 6: Jadwal Hari Ini — time-based cards showing kelas, mata_pelajaran, waktu_mulai/selesai, filtered by day
+  - [x] Section 7: Quick Action + Pengumuman — 4 shortcut buttons (Tambah Materi, Buat Tugas, Lihat Penilaian, Lihat Kelas Mengajar) + announcements with type badges
+- [x] Frontend: Page route — `/guru` now delegates to GuruDashboardPage via thin wrapper
+- [x] Frontend: Responsive layout — grid adapts: 2 cols mobile, 3 cols tablet, 6 cols desktop for stats; 3-col grid for middle/bottom sections
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
 ---
 
 ### Blocked
@@ -212,6 +229,7 @@ Status : In Progress
 - [x] Pengumpulan Tugas (Frontend)
 - [x] Penilaian (Frontend)
 - [x] Dashboard Admin (Frontend)
+- [x] Dashboard Guru (Frontend)
 - [ ] Quiz (Frontend)
 - [ ] Pengumuman (Frontend)
 - [ ] Absensi (Frontend)
