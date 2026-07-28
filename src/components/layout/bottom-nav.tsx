@@ -17,6 +17,7 @@ import {
   UserCog,
   ListChecks,
   FileQuestion,
+  Monitor,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -103,6 +104,12 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["super_admin", "admin", "guru"],
   },
   {
+    label: "CBT",
+    href: "/guru/cbt",
+    icon: Monitor,
+    roles: ["super_admin", "admin", "guru"],
+  },
+  {
     label: "Beranda",
     href: "/guru",
     icon: LayoutDashboard,
@@ -160,6 +167,12 @@ const bottomNavItems: BottomNavItem[] = [
     label: "Quiz",
     href: "/siswa/quiz",
     icon: FileQuestion,
+    roles: ["siswa"],
+  },
+  {
+    label: "CBT",
+    href: "/siswa/cbt",
+    icon: Monitor,
     roles: ["siswa"],
   },
   {
