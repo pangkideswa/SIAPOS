@@ -24,6 +24,7 @@ import {
   Monitor,
   ClipboardCheck,
   BarChart3,
+  CalendarCheck,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -106,6 +107,12 @@ const navItems: NavItem[] = [
     roles: ["super_admin", "admin"],
   },
   {
+    label: "Absensi",
+    href: "/admin/absensi",
+    icon: CalendarCheck,
+    roles: ["super_admin", "admin"],
+  },
+  {
     label: "Quiz",
     href: "/guru/quiz",
     icon: FileQuestion,
@@ -127,6 +134,12 @@ const navItems: NavItem[] = [
     label: "Analitik",
     href: "/guru/analitik",
     icon: BarChart3,
+    roles: ["super_admin", "admin", "guru"],
+  },
+  {
+    label: "Absensi",
+    href: "/guru/absensi",
+    icon: CalendarCheck,
     roles: ["super_admin", "admin", "guru"],
   },
   {
@@ -205,6 +218,12 @@ const navItems: NavItem[] = [
     label: "Hasil Ujian",
     href: "/siswa/hasil-ujian",
     icon: ClipboardCheck,
+    roles: ["siswa"],
+  },
+  {
+    label: "Absensi",
+    href: "/siswa/absensi",
+    icon: CalendarCheck,
     roles: ["siswa"],
   },
   {
