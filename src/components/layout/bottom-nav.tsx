@@ -15,6 +15,7 @@ import {
   BookOpenCheck,
   Award,
   UserCog,
+  ListChecks,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -80,6 +81,12 @@ const bottomNavItems: BottomNavItem[] = [
     label: "Kls Mengajar",
     href: "/admin/kelas-mengajar",
     icon: BookOpenCheck,
+    roles: ["super_admin", "admin"],
+  },
+  {
+    label: "Bank Soal",
+    href: "/admin/bank-soal",
+    icon: ListChecks,
     roles: ["super_admin", "admin"],
   },
   {
