@@ -22,6 +22,7 @@ import {
   ListChecks,
   FileQuestion,
   Monitor,
+  ClipboardCheck,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -116,6 +117,12 @@ const navItems: NavItem[] = [
     roles: ["super_admin", "admin", "guru"],
   },
   {
+    label: "Hasil Ujian",
+    href: "/guru/hasil-ujian",
+    icon: ClipboardCheck,
+    roles: ["super_admin", "admin", "guru"],
+  },
+  {
     label: "Beranda",
     href: "/guru",
     icon: LayoutDashboard,
@@ -179,6 +186,12 @@ const navItems: NavItem[] = [
     label: "CBT",
     href: "/siswa/cbt",
     icon: Monitor,
+    roles: ["siswa"],
+  },
+  {
+    label: "Hasil Ujian",
+    href: "/siswa/hasil-ujian",
+    icon: ClipboardCheck,
     roles: ["siswa"],
   },
   {
