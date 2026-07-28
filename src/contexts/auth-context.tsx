@@ -46,6 +46,14 @@ function getInitialUser(): User | null {
   }
 }
 
+function setDemoCookie(value: string) {
+  document.cookie = `demo_token=${value}; path=/; max-age=86400; SameSite=Lax`
+}
+
+function removeDemoCookie() {
+  document.cookie = "demo_token=; path=/; max-age=0"
+}
+
 function getDashboardPath(role: UserRole): string {
   switch (role) {
     case "super_admin":
@@ -104,6 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       localStorage.setItem("demo_user", JSON.stringify(foundUser))
+      setDemoCookie("demo-authenticated")
       setUser(foundUser)
 
       const dashboard = getDashboardPath(foundUser.role)
@@ -134,6 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       localStorage.setItem("demo_user", JSON.stringify(newUser))
+      setDemoCookie("demo-authenticated")
       setUser(newUser)
 
       const dashboard = getDashboardPath(newUser.role)
@@ -144,6 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     localStorage.removeItem("demo_user")
+    removeDemoCookie()
     setUser(null)
     router.push("/masuk")
   }, [router])
