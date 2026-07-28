@@ -280,6 +280,85 @@ export const DUMMY_GURU_ACTIVITIES: GuruActivity[] = [
   },
 ]
 
+export interface SiswaJadwal {
+  id: number
+  kelas: string
+  mata_pelajaran: string
+  guru_nama: string
+  waktu_mulai: string
+  waktu_selesai: string
+  hari: string
+}
+
+export interface SiswaTugasStatus {
+  tugas_id: number
+  siswa_nama: string
+  kelas: string
+  status: "Belum Dikerjakan" | "Sudah Dikerjakan" | "Terlambat"
+}
+
+export const DUMMY_SISWA_JADWAL: SiswaJadwal[] = [
+  {
+    id: 1,
+    kelas: "XI TKJ 1",
+    mata_pelajaran: "Administrasi Sistem Jaringan",
+    guru_nama: "Rina Wulandari",
+    waktu_mulai: "07:30",
+    waktu_selesai: "09:00",
+    hari: "Senin",
+  },
+  {
+    id: 2,
+    kelas: "XI TKJ 1",
+    mata_pelajaran: "Pemrograman Web",
+    guru_nama: "Rina Wulandari",
+    waktu_mulai: "09:30",
+    waktu_selesai: "11:00",
+    hari: "Senin",
+  },
+  {
+    id: 3,
+    kelas: "XI TKJ 1",
+    mata_pelajaran: "Basis Data",
+    guru_nama: "Budi Santoso",
+    waktu_mulai: "12:30",
+    waktu_selesai: "14:00",
+    hari: "Senin",
+  },
+  {
+    id: 4,
+    kelas: "XI TKJ 1",
+    mata_pelajaran: "Informatika",
+    guru_nama: "Asep Nugraha",
+    waktu_mulai: "07:30",
+    waktu_selesai: "09:00",
+    hari: "Selasa",
+  },
+  {
+    id: 5,
+    kelas: "XI TKJ 1",
+    mata_pelajaran: "Administrasi Sistem Jaringan",
+    guru_nama: "Rina Wulandari",
+    waktu_mulai: "09:30",
+    waktu_selesai: "11:00",
+    hari: "Selasa",
+  },
+  {
+    id: 6,
+    kelas: "XI TKJ 1",
+    mata_pelajaran: "Sistem Operasi",
+    guru_nama: "Siti Rahayu",
+    waktu_mulai: "13:00",
+    waktu_selesai: "14:30",
+    hari: "Selasa",
+  },
+]
+
+export const DUMMY_SISWA_TUGAS_STATUS: SiswaTugasStatus[] = [
+  { tugas_id: 2, siswa_nama: "Rizki Pratama", kelas: "XI TKJ 1", status: "Sudah Dikerjakan" },
+  { tugas_id: 3, siswa_nama: "Rizki Pratama", kelas: "XI TKJ 1", status: "Sudah Dikerjakan" },
+]
+
 export const DUMMY_ANNOUNCEMENTS: DashboardAnnouncement[] = [
   {
     id: 1,

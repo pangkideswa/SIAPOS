@@ -230,6 +230,7 @@ Status : In Progress
 - [x] Penilaian (Frontend)
 - [x] Dashboard Admin (Frontend)
 - [x] Dashboard Guru (Frontend)
+- [x] Dashboard Siswa (Frontend)
 - [ ] Quiz (Frontend)
 - [ ] Pengumuman (Frontend)
 - [ ] Absensi (Frontend)
@@ -338,6 +339,40 @@ Status : In Progress
   - [x] Section 6: Quick Action — 5 shortcut buttons (Guru, Siswa, Kelas, Materi, Tugas) linking to admin routes
 - [x] Frontend: Page route — `/admin` now delegates to AdminDashboardPage via thin wrapper
 - [x] Responsive layout — grid adapts: 2 cols mobile, 3 cols tablet, 6 cols desktop for stats; 3-col grid for middle/bottom sections
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 3.7: Dashboard Guru
+
+- [x] Frontend: Feature-based `features/dashboard/` extended with guru-specific data and component
+- [x] Frontend: Dummy data — DUMMY_GURU_JADWAL (10 records across 3 guru, 2 hari), DUMMY_GURU_ACTIVITIES (12 records across 3 guru with action icons and timestamps)
+- [x] Frontend: GuruDashboardPage — 7 sections:
+  - [x] Section 1: Header — "Halo, [Guru Name] 👋" + "Selamat datang kembali di SIAPOS" + tanggal Indonesia
+  - [x] Section 2: Ringkasan — 6 stat cards (Kelas Mengajar, Mata Pelajaran, Materi Dibuat, Tugas Aktif, Belum Dinilai, Total Siswa) with dynamic counts from dummy data
+  - [x] Section 3: Kelas Mengajar — clickable cards showing kelas and mata_pelajaran, links to `/guru/kelas`
+  - [x] Section 4: Tugas yang Perlu Dinilai — table with judul, kelas, jumlah pengumpulan, deadline, Nilai button → `/guru/pengumpulan/[id]`
+  - [x] Section 5: Aktivitas Terbaru — timeline with action text, relative time, icons per activity type
+  - [x] Section 6: Jadwal Hari Ini — time-based cards showing kelas, mata_pelajaran, waktu_mulai/selesai, filtered by day
+  - [x] Section 7: Quick Action + Pengumuman — 4 shortcut buttons (Tambah Materi, Buat Tugas, Lihat Penilaian, Lihat Kelas Mengajar) + announcements with type badges
+- [x] Frontend: Page route — `/guru` now delegates to GuruDashboardPage via thin wrapper
+- [x] Frontend: Responsive layout — grid adapts: 2 cols mobile, 3 cols tablet, 6 cols desktop for stats; 3-col grid for middle/bottom sections
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no errors
+
+### Done - Sprint 3.8: Dashboard Siswa
+
+- [x] Frontend: Feature-based `features/dashboard/` extended with siswa-specific data and component
+- [x] Frontend: Dummy data — DUMMY_SISWA_JADWAL (6 records for kelas XI TKJ 1, 2 hari), DUMMY_SISWA_TUGAS_STATUS (2 records)
+- [x] Frontend: SiswaDashboardPage — 7 sections:
+  - [x] Section 1: Header — "Halo, [Nama Siswa] 👋" + "Selamat datang kembali di SIAPOS" + tanggal Indonesia + kelas badge
+  - [x] Section 2: Ringkasan — 5 stat cards (Materi Baru, Tugas Aktif, Tugas Selesai, Nilai Terbaru, Pengumuman Baru) with dynamic counts from dummy data
+  - [x] Section 3: Tugas yang Harus Dikerjakan — DataTable with judul, mata pelajaran, guru, deadline, status badge (Belum Dikerjakan/Sudah Dikerjakan/Terlambat), aksi button (Kerjakan/Lihat)
+  - [x] Section 4: Materi Terbaru — Card list with thumbnail icon, judul, mata pelajaran, guru, tanggal publish, "Lihat Materi" button → detail
+  - [x] Section 5: Nilai Terbaru — DataTable with mata pelajaran, tugas, nilai (highlighted), feedback guru
+  - [x] Section 6: Jadwal Hari Ini — Time-based cards with waktu, mata pelajaran, guru, filtered by day
+  - [x] Section 7: Pengumuman + Quick Action — Announcements with type badges (Info/Peringatan/Penting) + 4 shortcuts (Lihat Materi, Kerjakan Tugas, Lihat Nilai, Profil Saya)
+- [x] Frontend: Page route — `/siswa` now delegates to SiswaDashboardPage via thin wrapper
+- [x] Frontend: Responsive layout — grid adapts: 2 cols mobile, 3 cols tablet, 5 cols desktop for stats; 3-col grid for middle/bottom sections
 - [x] TypeScript check passed — no errors
 - [x] Build passed — no errors
 
