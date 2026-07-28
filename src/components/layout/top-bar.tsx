@@ -89,6 +89,7 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith("/wali/siswa")) return "Siswa"
   if (pathname.startsWith("/wali/laporan")) return "Laporan"
   if (pathname.startsWith("/wali")) return "Beranda"
+  if (pathname === "/forbidden") return "Akses Ditolak"
   return "Beranda"
 }
 
