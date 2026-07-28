@@ -90,6 +90,12 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["super_admin", "admin"],
   },
   {
+    label: "Paket Soal",
+    href: "/admin/paket-soal",
+    icon: ClipboardList,
+    roles: ["super_admin", "admin"],
+  },
+  {
     label: "Beranda",
     href: "/guru",
     icon: LayoutDashboard,

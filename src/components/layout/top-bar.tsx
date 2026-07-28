@@ -52,6 +52,8 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith("/admin/kelas-mengajar")) return "Kelas Mengajar"
   if (pathname.match(/^\/admin\/bank-soal\/\d+$/)) return "Detail Soal"
   if (pathname.startsWith("/admin/bank-soal")) return "Bank Soal"
+  if (pathname.match(/^\/admin\/paket-soal\/\d+$/)) return "Detail Paket Soal"
+  if (pathname.startsWith("/admin/paket-soal")) return "Paket Soal"
   if (pathname.startsWith("/admin/pengaturan")) return "Pengaturan Sekolah"
   if (pathname.startsWith("/admin")) return "Beranda"
   if (pathname.match(/^\/guru\/materi\/\d+$/)) return "Detail Materi"
