@@ -376,6 +376,31 @@ Status : In Progress
 - [x] TypeScript check passed — no errors
 - [x] Build passed — no errors
 
+### Done - Sprint 3.9: QA & Stabilization
+
+- [x] Error checking — removed 7 unused imports/warnings across codebase:
+  - [x] `guru-detail-page.tsx` — removed unused `EMPTY_GURU_FORM`, `Guru` type
+  - [x] `guru-list-page.tsx` — removed unused `EMPTY_GURU_FORM`
+  - [x] `jurusan-detail-page.tsx` — removed unused `Jurusan` type
+  - [x] `user-detail-page.tsx` — removed unused `UserType` alias
+  - [x] `user-form-dialog.tsx` — removed unused `DUMMY_USERS` import
+  - [x] `client.ts` — removed unused `ApiResponse` type
+  - [x] `materi-form-sheet.tsx` — suppressed `<img>` ESLint warning (blob preview URL)
+- [x] Branding fixes:
+  - [x] Created SIAPOS favicon SVG (`public/favicon.svg`) — blue rounded square with "S" lettermark
+  - [x] Added `icons` metadata to root layout
+  - [x] Fixed `manifest.json` — removed broken PNG icon refs, uses SVG icon
+  - [x] Removed default Next.js starter files from `public/` (file.svg, globe.svg, next.svg, vercel.svg, window.svg, empty icons/)
+- [x] Navigation fixes:
+  - [x] Added missing `/admin/assignments` (Penugasan Guru) route to bottom-nav
+  - [x] Added `UserCog` icon import to bottom-nav
+- [x] Empty state normalization — standardized all DataTable `emptyMessage` props:
+  - [x] Format: "Tidak ada [item] ditemukan" (no "data" prefix, no trailing period)
+  - [x] Fixed pengumpulan empty message (was "tugas", now "pengumpulan")
+- [x] Full audit: all 13 modules verified (Auth, 3 Dashboards, 5 Master Data, 4 Learning)
+- [x] TypeScript check passed — no errors
+- [x] Build passed — no warnings, no errors
+
 ---
 
 ### Blocked
