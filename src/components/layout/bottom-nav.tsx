@@ -19,6 +19,7 @@ import {
   FileQuestion,
   Monitor,
   ClipboardCheck,
+  BarChart3,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -114,6 +115,12 @@ const bottomNavItems: BottomNavItem[] = [
     label: "Hasil Ujian",
     href: "/guru/hasil-ujian",
     icon: ClipboardCheck,
+    roles: ["super_admin", "admin", "guru"],
+  },
+  {
+    label: "Analitik",
+    href: "/guru/analitik",
+    icon: BarChart3,
     roles: ["super_admin", "admin", "guru"],
   },
   {
