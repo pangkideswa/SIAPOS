@@ -16,6 +16,7 @@ import {
   Award,
   UserCog,
   ListChecks,
+  FileQuestion,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -96,6 +97,12 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["super_admin", "admin"],
   },
   {
+    label: "Quiz",
+    href: "/guru/quiz",
+    icon: FileQuestion,
+    roles: ["super_admin", "admin", "guru"],
+  },
+  {
     label: "Beranda",
     href: "/guru",
     icon: LayoutDashboard,
@@ -147,6 +154,12 @@ const bottomNavItems: BottomNavItem[] = [
     label: "Tugas",
     href: "/siswa/tugas",
     icon: ClipboardList,
+    roles: ["siswa"],
+  },
+  {
+    label: "Quiz",
+    href: "/siswa/quiz",
+    icon: FileQuestion,
     roles: ["siswa"],
   },
   {

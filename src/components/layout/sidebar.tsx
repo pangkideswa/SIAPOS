@@ -20,6 +20,7 @@ import {
   BookOpenCheck,
   Award,
   ListChecks,
+  FileQuestion,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -100,6 +101,12 @@ const navItems: NavItem[] = [
     href: "/admin/paket-soal",
     icon: ClipboardList,
     roles: ["super_admin", "admin"],
+  },
+  {
+    label: "Quiz",
+    href: "/guru/quiz",
+    icon: FileQuestion,
+    roles: ["super_admin", "admin", "guru"],
   },
   {
     label: "Beranda",
