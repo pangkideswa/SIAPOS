@@ -22,6 +22,7 @@ import {
   BarChart3,
   CalendarCheck,
   Calendar,
+  CalendarDays,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -114,6 +115,12 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["super_admin", "admin"],
   },
   {
+    label: "Kalender",
+    href: "/admin/kalender-akademik",
+    icon: CalendarDays,
+    roles: ["super_admin", "admin"],
+  },
+  {
     label: "Quiz",
     href: "/guru/quiz",
     icon: FileQuestion,
@@ -148,6 +155,12 @@ const bottomNavItems: BottomNavItem[] = [
     href: "/guru/absensi",
     icon: CalendarCheck,
     roles: ["super_admin", "admin", "guru"],
+  },
+  {
+    label: "Kalender",
+    href: "/guru/kalender-akademik",
+    icon: CalendarDays,
+    roles: ["guru"],
   },
   {
     label: "Beranda",
@@ -225,6 +238,12 @@ const bottomNavItems: BottomNavItem[] = [
     label: "Absensi",
     href: "/siswa/absensi",
     icon: CalendarCheck,
+    roles: ["siswa"],
+  },
+  {
+    label: "Kalender",
+    href: "/siswa/kalender-akademik",
+    icon: CalendarDays,
     roles: ["siswa"],
   },
   {

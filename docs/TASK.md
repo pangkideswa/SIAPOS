@@ -529,6 +529,29 @@ Status : Done
 - [x] Build: zero errors, zero warnings
 - [x] Integration: Absensi terhubung dengan Jadwal Pelajaran via guru_nama, kelas, mata_pelajaran
 
+### Done - Sprint 4.3: Kalender Akademik
+
+- [x] Created Kalender Akademik feature module:
+  - [x] `features/kalender-akademik/types/` — KalenderEvent interface with 13 kategori events
+  - [x] `features/kalender-akademik/constants/` — KATEGORI_OPTIONS, STATUS_EVENT_OPTIONS, colors for all kategori/status, BULAN_OPTIONS
+  - [x] `features/kalender-akademik/dummy/` — 33 events across 2 tahun ajaran, 2 semester, covering all kategori
+  - [x] `features/kalender-akademik/components/kalender-helpers.ts` — date formatting, month/week/day utilities
+  - [x] `features/kalender-akademik/components/kalender-summary-cards.tsx` — 4 summary cards (Total Event, Event Bulan Ini, Libur, Ujian)
+  - [x] `features/kalender-akademik/components/kalender-month-view.tsx` — Month view with grid layout, event badges, navigation
+  - [x] `features/kalender-akademik/components/kalender-week-view.tsx` — Week view (7 columns) with event badges
+  - [x] `features/kalender-akademik/components/kalender-agenda-view.tsx` — Agenda view grouped by date
+  - [x] `features/kalender-akademik/components/kalender-event-form-dialog.tsx` — Create/Edit form with all fields (nama, deskripsi, kategori, tanggal, TA, semester, status) + validation
+  - [x] `features/kalender-akademik/components/kalender-event-detail-dialog.tsx` — Detail view showing all event info
+  - [x] `features/kalender-akademik/components/kalender-akademik-admin-page.tsx` — Full CRUD: DataTable with search + 5 filters + pagination, 3 calendar views via Tabs, summary cards
+  - [x] `features/kalender-akademik/components/kalender-akademik-guru-page.tsx` — Read-only: 3 calendar views, filter by kategori/semester/TA/bulan
+  - [x] `features/kalender-akademik/components/kalender-akademik-siswa-page.tsx` — Read-only: 3 calendar views, filter by kategori/bulan
+- [x] Added `components/ui/tabs.tsx` — Tabs component wrapping base-ui tabs
+- [x] Page routes: `/admin/kalender-akademik`, `/guru/kalender-akademik`, `/siswa/kalender-akademik`
+- [x] Updated navigation:
+  - [x] Sidebar: Added "Kalender Akademik" to Academic section for admin/guru/siswa
+  - [x] BottomNav: Added "Kalender" item for admin/guru/siswa
+- [x] Build: zero errors, zero warnings
+
 ---
 
 ### Blocked
