@@ -552,6 +552,24 @@ Status : Done
   - [x] BottomNav: Added "Kalender" item for admin/guru/siswa
 - [x] Build: zero errors, zero warnings
 
+### Done - Sprint 4.4: Pengumuman
+
+- [x] Created Pengumuman feature module:
+  - [x] `features/pengumuman/types/` — Pengumuman interface with 8 kategori, 3 status, 8 target options
+  - [x] `features/pengumuman/constants/` — KATEGORI_PENGUMUMAN_OPTIONS, STATUS_PENGUMUMAN_OPTIONS, TARGET_OPTIONS, colors for all kategori/status/target
+  - [x] `features/pengumuman/dummy/` — 25 pengumuman across all kategori, status, target types, 3 pengumuman penting (pinned)
+  - [x] `features/pengumuman/components/pengumuman-summary-cards.tsx` — 5 summary cards (Total, Draft, Dipublikasikan, Diarsipkan, Penting)
+  - [x] `features/pengumuman/components/pengumuman-form-dialog.tsx` — Create/Edit form with all fields (judul, ringkasan, isi, kategori, target, status, penulis, tanggal_publish, pinned) + validation
+  - [x] `features/pengumuman/components/pengumuman-detail-dialog.tsx` — Detail view with judul, penulis, tanggal, kategori, target, isi, status, pinned badge
+  - [x] `features/pengumuman/components/pengumuman-admin-page.tsx` — Full CRUD: DataTable with search + 3 filters + pagination, summary cards
+  - [x] `features/pengumuman/components/pengumuman-guru-page.tsx` — CRUD hanya milik sendiri (GURU_PENULIS), melihat semua, edit/hapus terbatas
+  - [x] `features/pengumuman/components/pengumuman-siswa-page.tsx` — Read-only: hanya melihat yang Dipublikasikan dengan target Semua Pengguna/Siswa
+- [x] Page routes: `/admin/pengumuman`, `/guru/pengumuman`, `/siswa/pengumuman`
+- [x] Updated navigation:
+  - [x] Sidebar: Added "Pengumuman" to Academic section for admin/guru/siswa
+  - [x] BottomNav: Added "Pengumuman" item for admin/guru/siswa
+- [x] Build: zero errors, zero warnings
+
 ---
 
 ### Blocked

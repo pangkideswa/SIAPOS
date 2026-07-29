@@ -23,6 +23,7 @@ import {
   CalendarCheck,
   Calendar,
   CalendarDays,
+  Megaphone,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -121,6 +122,12 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["super_admin", "admin"],
   },
   {
+    label: "Pengumuman",
+    href: "/admin/pengumuman",
+    icon: Megaphone,
+    roles: ["super_admin", "admin"],
+  },
+  {
     label: "Quiz",
     href: "/guru/quiz",
     icon: FileQuestion,
@@ -160,6 +167,12 @@ const bottomNavItems: BottomNavItem[] = [
     label: "Kalender",
     href: "/guru/kalender-akademik",
     icon: CalendarDays,
+    roles: ["guru"],
+  },
+  {
+    label: "Pengumuman",
+    href: "/guru/pengumuman",
+    icon: Megaphone,
     roles: ["guru"],
   },
   {
@@ -244,6 +257,12 @@ const bottomNavItems: BottomNavItem[] = [
     label: "Kalender",
     href: "/siswa/kalender-akademik",
     icon: CalendarDays,
+    roles: ["siswa"],
+  },
+  {
+    label: "Pengumuman",
+    href: "/siswa/pengumuman",
+    icon: Megaphone,
     roles: ["siswa"],
   },
   {
