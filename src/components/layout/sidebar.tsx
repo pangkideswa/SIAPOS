@@ -25,6 +25,7 @@ import {
   ClipboardCheck,
   BarChart3,
   CalendarCheck,
+  Calendar,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -32,218 +33,50 @@ import { Separator } from "@/components/ui/separator"
 import { useState } from "react"
 import type { UserRole } from "@/types/auth"
 
-interface NavItem {
-  label: string
-  href: string
-  icon: React.ComponentType<{ className?: string }>
-  roles: UserRole[]
-}
+type NavEntry =
+  | { type: "item"; label: string; href: string; icon: React.ComponentType<{ className?: string }>; roles: UserRole[] }
+  | { type: "label"; label: string }
 
-const navItems: NavItem[] = [
-  {
-    label: "Beranda",
-    href: "/admin",
-    icon: LayoutDashboard,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Pengguna",
-    href: "/admin/users",
-    icon: Users,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Jurusan",
-    href: "/admin/jurusan",
-    icon: Layers,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Guru",
-    href: "/admin/guru",
-    icon: GraduationCap,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Siswa",
-    href: "/admin/siswa",
-    icon: Users,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Kelas",
-    href: "/admin/classes",
-    icon: School,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Mata Pelajaran",
-    href: "/admin/subjects",
-    icon: BookMarked,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Penugasan Guru",
-    href: "/admin/assignments",
-    icon: UserCog,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Kelas Mengajar",
-    href: "/admin/kelas-mengajar",
-    icon: BookOpenCheck,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Bank Soal",
-    href: "/admin/bank-soal",
-    icon: ListChecks,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Paket Soal",
-    href: "/admin/paket-soal",
-    icon: ClipboardList,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Absensi",
-    href: "/admin/absensi",
-    icon: CalendarCheck,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Quiz",
-    href: "/guru/quiz",
-    icon: FileQuestion,
-    roles: ["super_admin", "admin", "guru"],
-  },
-  {
-    label: "CBT",
-    href: "/guru/cbt",
-    icon: Monitor,
-    roles: ["super_admin", "admin", "guru"],
-  },
-  {
-    label: "Hasil Ujian",
-    href: "/guru/hasil-ujian",
-    icon: ClipboardCheck,
-    roles: ["super_admin", "admin", "guru"],
-  },
-  {
-    label: "Analitik",
-    href: "/guru/analitik",
-    icon: BarChart3,
-    roles: ["super_admin", "admin", "guru"],
-  },
-  {
-    label: "Absensi",
-    href: "/guru/absensi",
-    icon: CalendarCheck,
-    roles: ["super_admin", "admin", "guru"],
-  },
-  {
-    label: "Beranda",
-    href: "/guru",
-    icon: LayoutDashboard,
-    roles: ["guru"],
-  },
-  {
-    label: "Kelas Saya",
-    href: "/guru/kelas",
-    icon: BookOpen,
-    roles: ["guru"],
-  },
-  {
-    label: "Materi Pembelajaran",
-    href: "/guru/materi",
-    icon: BookMarked,
-    roles: ["guru"],
-  },
-  {
-    label: "Tugas",
-    href: "/guru/tugas",
-    icon: ClipboardList,
-    roles: ["guru"],
-  },
-  {
-    label: "Pengumpulan",
-    href: "/guru/pengumpulan",
-    icon: ClipboardList,
-    roles: ["guru"],
-  },
-  {
-    label: "Penilaian",
-    href: "/guru/penilaian",
-    icon: Award,
-    roles: ["guru"],
-  },
-  {
-    label: "Beranda",
-    href: "/siswa",
-    icon: LayoutDashboard,
-    roles: ["siswa"],
-  },
-  {
-    label: "Pelajaran",
-    href: "/siswa/pelajaran",
-    icon: GraduationCap,
-    roles: ["siswa"],
-  },
-  {
-    label: "Tugas",
-    href: "/siswa/tugas",
-    icon: ClipboardList,
-    roles: ["siswa"],
-  },
-  {
-    label: "Quiz",
-    href: "/siswa/quiz",
-    icon: FileQuestion,
-    roles: ["siswa"],
-  },
-  {
-    label: "Simulasi",
-    href: "/siswa/simulasi",
-    icon: ClipboardList,
-    roles: ["siswa"],
-  },
-  {
-    label: "CBT",
-    href: "/siswa/cbt",
-    icon: Monitor,
-    roles: ["siswa"],
-  },
-  {
-    label: "Hasil Ujian",
-    href: "/siswa/hasil-ujian",
-    icon: ClipboardCheck,
-    roles: ["siswa"],
-  },
-  {
-    label: "Absensi",
-    href: "/siswa/absensi",
-    icon: CalendarCheck,
-    roles: ["siswa"],
-  },
-  {
-    label: "Beranda",
-    href: "/wali",
-    icon: LayoutDashboard,
-    roles: ["wali"],
-  },
-  {
-    label: "Siswa",
-    href: "/wali/siswa",
-    icon: Users,
-    roles: ["wali"],
-  },
-  {
-    label: "Laporan",
-    href: "/wali/laporan",
-    icon: BookOpen,
-    roles: ["wali"],
-  },
+const navItems: NavEntry[] = [
+  { type: "item", label: "Beranda", href: "/admin", icon: LayoutDashboard, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Pengguna", href: "/admin/users", icon: Users, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Jurusan", href: "/admin/jurusan", icon: Layers, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Guru", href: "/admin/guru", icon: GraduationCap, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Siswa", href: "/admin/siswa", icon: Users, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Kelas", href: "/admin/classes", icon: School, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Mata Pelajaran", href: "/admin/subjects", icon: BookMarked, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Penugasan Guru", href: "/admin/assignments", icon: UserCog, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Kelas Mengajar", href: "/admin/kelas-mengajar", icon: BookOpenCheck, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Bank Soal", href: "/admin/bank-soal", icon: ListChecks, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Paket Soal", href: "/admin/paket-soal", icon: ClipboardList, roles: ["super_admin", "admin"] },
+  { type: "label", label: "Academic" },
+  { type: "item", label: "Jadwal Pelajaran", href: "/admin/jadwal-pelajaran", icon: Calendar, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Absensi", href: "/admin/absensi", icon: CalendarCheck, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Quiz", href: "/guru/quiz", icon: FileQuestion, roles: ["super_admin", "admin", "guru"] },
+  { type: "item", label: "CBT", href: "/guru/cbt", icon: Monitor, roles: ["super_admin", "admin", "guru"] },
+  { type: "item", label: "Hasil Ujian", href: "/guru/hasil-ujian", icon: ClipboardCheck, roles: ["super_admin", "admin", "guru"] },
+  { type: "item", label: "Analitik", href: "/guru/analitik", icon: BarChart3, roles: ["super_admin", "admin", "guru"] },
+  { type: "label", label: "Academic" },
+  { type: "item", label: "Jadwal Pelajaran", href: "/guru/jadwal-pelajaran", icon: Calendar, roles: ["guru"] },
+  { type: "item", label: "Absensi", href: "/guru/absensi", icon: CalendarCheck, roles: ["super_admin", "admin", "guru"] },
+  { type: "item", label: "Beranda", href: "/guru", icon: LayoutDashboard, roles: ["guru"] },
+  { type: "item", label: "Kelas Saya", href: "/guru/kelas", icon: BookOpen, roles: ["guru"] },
+  { type: "item", label: "Materi Pembelajaran", href: "/guru/materi", icon: BookMarked, roles: ["guru"] },
+  { type: "item", label: "Tugas", href: "/guru/tugas", icon: ClipboardList, roles: ["guru"] },
+  { type: "item", label: "Pengumpulan", href: "/guru/pengumpulan", icon: ClipboardList, roles: ["guru"] },
+  { type: "item", label: "Penilaian", href: "/guru/penilaian", icon: Award, roles: ["guru"] },
+  { type: "item", label: "Beranda", href: "/siswa", icon: LayoutDashboard, roles: ["siswa"] },
+  { type: "item", label: "Pelajaran", href: "/siswa/pelajaran", icon: GraduationCap, roles: ["siswa"] },
+  { type: "item", label: "Tugas", href: "/siswa/tugas", icon: ClipboardList, roles: ["siswa"] },
+  { type: "item", label: "Quiz", href: "/siswa/quiz", icon: FileQuestion, roles: ["siswa"] },
+  { type: "item", label: "Simulasi", href: "/siswa/simulasi", icon: ClipboardList, roles: ["siswa"] },
+  { type: "item", label: "CBT", href: "/siswa/cbt", icon: Monitor, roles: ["siswa"] },
+  { type: "item", label: "Hasil Ujian", href: "/siswa/hasil-ujian", icon: ClipboardCheck, roles: ["siswa"] },
+  { type: "label", label: "Academic" },
+  { type: "item", label: "Absensi", href: "/siswa/absensi", icon: CalendarCheck, roles: ["siswa"] },
+  { type: "item", label: "Beranda", href: "/wali", icon: LayoutDashboard, roles: ["wali"] },
+  { type: "item", label: "Siswa", href: "/wali/siswa", icon: Users, roles: ["wali"] },
+  { type: "item", label: "Laporan", href: "/wali/laporan", icon: BookOpen, roles: ["wali"] },
 ]
 
 const roleLabels: Record<UserRole, string> = {
@@ -259,10 +92,13 @@ export function Sidebar() {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
 
-  const filteredNav = navItems.filter((item) => hasRole(...item.roles))
-
   const userRole = user?.role ?? "admin"
   const roleLabel = roleLabels[userRole] ?? "Admin"
+
+  const filteredNav = navItems.filter((entry) => {
+    if (entry.type === "label") return true
+    return hasRole(...entry.roles)
+  })
 
   return (
     <aside
@@ -288,13 +124,23 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-        {filteredNav.map((item) => {
+        {filteredNav.map((entry) => {
+          if (entry.type === "label") {
+            if (collapsed) return null
+            return (
+              <div key={entry.label} className="px-3 pt-4 pb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+                  {entry.label}
+                </span>
+              </div>
+            )
+          }
           const isActive =
-            pathname === item.href || pathname.startsWith(item.href + "/")
+            pathname === entry.href || pathname.startsWith(entry.href + "/")
           return (
             <Link
-              key={item.href}
-              href={item.href}
+              key={entry.href}
+              href={entry.href}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
                 isActive
@@ -302,8 +148,8 @@ export function Sidebar() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              <item.icon className="h-5 w-5 shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
+              <entry.icon className="h-5 w-5 shrink-0" />
+              {!collapsed && <span>{entry.label}</span>}
             </Link>
           )
         })}

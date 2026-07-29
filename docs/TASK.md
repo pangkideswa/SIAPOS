@@ -233,7 +233,7 @@ Status : In Progress
 - [x] Dashboard Siswa (Frontend)
 - [ ] Quiz (Frontend)
 - [ ] Pengumuman (Frontend)
-- [ ] Absensi (Frontend)
+- [x] Absensi (Frontend)
 - [ ] Nilai (Frontend)
 
 ---
@@ -509,6 +509,25 @@ Status : Done
   - [x] Removed unused exports across modules
 - [x] Build: zero errors, zero new warnings
 - [x] Full audit: 6 assessment modules verified
+
+### Done - Sprint 4.8: Modul Absensi & Jadwal Pelajaran
+
+- [x] Created Jadwal Pelajaran feature module:
+  - [x] `features/jadwal-pelajaran/types/` — JadwalPelajaran interface
+  - [x] `features/jadwal-pelajaran/constants/` — HARI_OPTIONS, JAM_OPTIONS, colors
+  - [x] `features/jadwal-pelajaran/dummy/` — 36 schedule records for 6 teachers, 4 classes, 6 days
+  - [x] `features/jadwal-pelajaran/components/jadwal-pelajaran-list-page.tsx` — grouped by day, search + 3 filters
+- [x] Page routes: `/admin/jadwal-pelajaran`, `/guru/jadwal-pelajaran`
+- [x] Updated absensi data:
+  - [x] Added 6th teacher "Dewi Sartika" to GURU_OPTIONS
+  - [x] Added 3 sesi absensi for Dewi Sartika (sessions 28-30)
+  - [x] Added corresponding student attendance records
+- [x] Updated navigation:
+  - [x] Sidebar: Added "Academic" section with Jadwal Pelajaran + Absensi for admin/guru/siswa
+  - [x] BottomNav: Added "Jadwal" item for admin and guru
+- [x] Fixed DataTable Column render interface — now passes `index` parameter for row numbering
+- [x] Build: zero errors, zero warnings
+- [x] Integration: Absensi terhubung dengan Jadwal Pelajaran via guru_nama, kelas, mata_pelajaran
 
 ---
 

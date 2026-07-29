@@ -200,6 +200,28 @@ export const DUMMY_SESI_ABSENSI: SesiAbsensi[] = [
     hadir: 8, izin: 0, sakit: 0, alpha: 0, terlambat: 0, status: "Selesai",
     created_at: "2026-07-25T10:15:00Z", updated_at: "2026-07-25T11:45:00Z",
   },
+  // Dewi Sartika sessions
+  {
+    id: 28, tanggal: "2026-07-21", jam_mulai: "10:15", jam_selesai: "11:45",
+    mata_pelajaran: "Sistem Operasi", guru_nama: "Dewi Sartika", kelas: "X TBSM 2",
+    tahun_ajaran: "2025/2026", semester: "Genap", total_siswa: 7,
+    hadir: 6, izin: 0, sakit: 0, alpha: 1, terlambat: 0, status: "Selesai",
+    created_at: "2026-07-21T10:15:00Z", updated_at: "2026-07-21T11:45:00Z",
+  },
+  {
+    id: 29, tanggal: "2026-07-25", jam_mulai: "10:15", jam_selesai: "11:45",
+    mata_pelajaran: "Sistem Operasi", guru_nama: "Dewi Sartika", kelas: "X TBSM 2",
+    tahun_ajaran: "2025/2026", semester: "Genap", total_siswa: 7,
+    hadir: 7, izin: 0, sakit: 0, alpha: 0, terlambat: 0, status: "Selesai",
+    created_at: "2026-07-25T10:15:00Z", updated_at: "2026-07-25T11:45:00Z",
+  },
+  {
+    id: 30, tanggal: "2026-07-25", jam_mulai: "07:00", jam_selesai: "08:30",
+    mata_pelajaran: "Sistem Operasi", guru_nama: "Dewi Sartika", kelas: "X TKJ 1",
+    tahun_ajaran: "2025/2026", semester: "Genap", total_siswa: 8,
+    hadir: 7, izin: 0, sakit: 0, alpha: 0, terlambat: 1, status: "Selesai",
+    created_at: "2026-07-25T07:00:00Z", updated_at: "2026-07-25T08:30:00Z",
+  },
 ]
 
 // Siswa data for attendance - 30 siswa aktif across 4 kelas
@@ -333,6 +355,12 @@ export const DUMMY_ABSENSI_SISWA: AbsensiSiswa[] = [
   ...generateSesiAbsensi(26, SISWA_X_TKJ_1, 7, [], [], [102], []),
   // Sesi 27: X TBSM 1 - Informatika - 25 Juli
   ...generateSesiAbsensi(27, SISWA_X_TBSM_1, 8, [], [], [], []),
+  // Sesi 28: X TBSM 2 - Sistem Operasi - Dewi Sartika - 21 Juli
+  ...generateSesiAbsensi(28, SISWA_X_TBSM_2, 6, [], [], [401], []),
+  // Sesi 29: X TBSM 2 - Sistem Operasi - Dewi Sartika - 25 Juli
+  ...generateSesiAbsensi(29, SISWA_X_TBSM_2, 7, [], [], [], []),
+  // Sesi 30: X TKJ 1 - Sistem Operasi - Dewi Sartika - 25 Juli
+  ...generateSesiAbsensi(30, SISWA_X_TKJ_1, 7, [], [], [], [108]),
 ]
 
 export function getRekapAbsensi(): RekapAbsensi[] {

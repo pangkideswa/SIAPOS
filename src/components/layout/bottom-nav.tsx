@@ -21,6 +21,7 @@ import {
   ClipboardCheck,
   BarChart3,
   CalendarCheck,
+  Calendar,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -101,6 +102,12 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["super_admin", "admin"],
   },
   {
+    label: "Jadwal",
+    href: "/admin/jadwal-pelajaran",
+    icon: Calendar,
+    roles: ["super_admin", "admin"],
+  },
+  {
     label: "Absensi",
     href: "/admin/absensi",
     icon: CalendarCheck,
@@ -129,6 +136,12 @@ const bottomNavItems: BottomNavItem[] = [
     href: "/guru/analitik",
     icon: BarChart3,
     roles: ["super_admin", "admin", "guru"],
+  },
+  {
+    label: "Jadwal",
+    href: "/guru/jadwal-pelajaran",
+    icon: Calendar,
+    roles: ["guru"],
   },
   {
     label: "Absensi",

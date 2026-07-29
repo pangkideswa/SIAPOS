@@ -14,7 +14,7 @@ export interface Column<T> {
   key: string
   header: string
   className?: string
-  render?: (item: T) => React.ReactNode
+  render?: (item: T, index: number) => React.ReactNode
 }
 
 interface DataTableProps<T> {
@@ -75,7 +75,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 {columns.map((col) => (
                   <TableCell key={col.key} className={col.className}>
                     {col.render
-                      ? col.render(item)
+                      ? col.render(item, i)
                       : String(item[col.key] ?? "-")}
                   </TableCell>
                 ))}
