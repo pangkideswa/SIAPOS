@@ -64,6 +64,22 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/id/1.1.0/).
   - Dead code: removed unused exports (`NILAI_MINIMUM_LULUS`, `GURU_CBT_OPTIONS`, 10 unused `CHART_COLORS`)
   - Build: zero errors, zero warnings (except pre-existing CBT eslint suppression)
 
+### Sprint 5 — Module Integration
+
+**Added**
+- **Sprint 5.1: Shared Data Layer**
+  - Created `src/lib/demo-data/` — centralized dummy data directory (24 files)
+  - Unified `DEMO_ACTIVITIES` (14 entries across all roles) and `DEMO_ANNOUNCEMENTS` (6 entries with `targetRole` filtering)
+  - 20 bridge files re-exporting from feature dummies (`users.ts`, `siswa.ts`, `guru.ts`, `jurusan.ts`, `kelas-mengajar.ts`, `jadwal-pelajaran.ts`, `materi.ts`, `tugas.ts`, `pengumpulan.ts`, `penilaian.ts`, `nilai-akademik.ts`, `quiz.ts`, `cbt.ts`, `hasil-ujian.ts`, `pengumuman.ts`, `absensi.ts`, `bank-soal.ts`, `paket-soal.ts`, `kalender-akademik.ts`, `analitik.ts`, `pengaturan-sekolah.ts`)
+  - Removed duplicate/redundant bridge files for non-existent feature directories
+
+- **Sprint 5.2: Dashboard Integration**
+  - Refactored `features/dashboard/dummy/dashboard.data.ts` to re-export activity/announcement types from `@/lib/demo-data/`
+  - All three dashboards (admin, guru, siswa) now import from shared data layer
+  - `getAdminCounters()`, `getGuruCounters()`, `getSiswaCounters()` computed from unified data
+  - `getAnnouncementsByRole()` filtering announcements by `targetRole`
+  - Empty states: "Belum ada data" displayed when arrays are empty
+
 ---
 
 ## [0.2.0] - 2026-07-28

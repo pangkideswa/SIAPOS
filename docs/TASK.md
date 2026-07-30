@@ -572,6 +572,39 @@ Status : Done
 
 ---
 
+## Sprint 5 — Integrasi Modul Pembelajaran
+
+Status : Done
+
+### Todo
+
+- [x] Shared data layer `src/lib/demo-data/`
+- [x] Unified activity feed across all dashboards
+- [x] Role-filtered announcements
+- [x] Dashboard counters computed from shared data
+- [x] All modules import from centralized data layer
+
+---
+
+### Done
+
+- [x] Created `src/lib/demo-data/` — 24 shared files:
+  - [x] `index.ts` — barrel export for all demo data
+  - [x] `activity.ts` — `DemoActivity` type + `DEMO_ACTIVITIES` (14 entries)
+  - [x] `announcements.ts` — `DemoAnnouncement` type + `DEMO_ANNOUNCEMENTS` (6 entries) + `getAnnouncementsByRole()`
+  - [x] `dashboard.ts` — `getAdminCounters()`, `getGuruCounters()`, `getSiswaCounters()`, `getRecentActivities()`
+  - [x] 20 bridge files: `users.ts`, `siswa.ts`, `guru.ts`, `jurusan.ts`, `kelas-mengajar.ts`, `jadwal-pelajaran.ts`, `materi.ts`, `tugas.ts`, `pengumpulan.ts`, `penilaian.ts`, `nilai-akademik.ts`, `quiz.ts`, `cbt.ts`, `hasil-ujian.ts`, `pengumuman.ts`, `absensi.ts`, `bank-soal.ts`, `paket-soal.ts`, `kalender-akademik.ts`, `analitik.ts`, `pengaturan-sekolah.ts`
+- [x] Removed duplicate bridge files (`kelas.ts`, `mapel.ts`)
+- [x] Refactored `features/dashboard/dummy/dashboard.data.ts` — re-exports activity/announcement types from shared layer, keeps dashboard-specific types (GuruJadwal, SiswaJadwal, etc.) locally
+- [x] Updated `admin-dashboard-page.tsx` — imports from `@/lib/demo-data/`
+- [x] Updated `guru-dashboard-page.tsx` — imports from `@/lib/demo-data/`
+- [x] Updated `siswa-dashboard-page.tsx` — imports from `@/lib/demo-data/`
+- [x] Empty states: all dashboard lists/cards show "Belum ada data" when arrays are empty
+- [x] TypeScript strict mode — zero `any`, zero build warnings/errors
+- [x] Build passed — 61 pages, 0 errors, 0 warnings
+
+---
+
 ### Blocked
 
 Belum ada.

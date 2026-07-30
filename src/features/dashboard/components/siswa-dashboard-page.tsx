@@ -29,15 +29,15 @@ import {
   FileSpreadsheet,
   Monitor,
 } from "lucide-react"
-import { DUMMY_MATERI } from "@/features/materi/dummy/materi.data"
-import { DUMMY_TUGAS } from "@/features/tugas/dummy/tugas.data"
-import { DUMMY_PENGUMPULAN } from "@/features/pengumpulan/dummy/pengumpulan.data"
-import { DUMMY_PENILAIAN } from "@/features/penilaian/dummy/penilaian.data"
+import { DUMMY_MATERI } from "@/lib/demo-data/materi"
+import { DUMMY_TUGAS } from "@/lib/demo-data/tugas"
+import { DUMMY_PENGUMPULAN } from "@/lib/demo-data/pengumpulan"
+import { DUMMY_PENILAIAN } from "@/lib/demo-data/penilaian"
 import {
   DUMMY_SISWA_JADWAL,
-  DUMMY_ANNOUNCEMENTS,
 } from "@/features/dashboard/dummy/dashboard.data"
-import { DUMMY_NILAI_AKADEMIK } from "@/features/nilai-akademik/dummy/nilai-akademik.data"
+import { DEMO_ANNOUNCEMENTS as DUMMY_ANNOUNCEMENTS } from "@/lib/demo-data/announcements"
+import { DUMMY_NILAI_AKADEMIK } from "@/lib/demo-data/nilai-akademik"
 
 const SISWA_KELAS = "XI TKJ 1"
 

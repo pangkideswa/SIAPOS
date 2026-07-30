@@ -31,27 +31,34 @@ SIAPOS adalah platform pendidikan digital yang mengintegrasikan seluruh aktivita
 
 ## Fitur Utama
 
-### Sudah Dibangun (v0.2.0)
+### Sudah Dibangun (v0.3.1)
 
 | Modul | Fitur |
 |-------|-------|
 | **Authentication** | Login (Email/NIP/NISN), Register, Role-based Access |
-| **Dashboard** | Admin, Guru, Siswa — ringkasan data, jadwal, pengumuman, quick action |
+| **Dashboard** | Admin, Guru, Siswa — integrated counters, activity feed, announcements |
 | **Manajemen Pengguna** | CRUD Pengguna, role management (Admin/Guru/Siswa/Wali) |
 | **Master Data** | Jurusan, Guru, Siswa — lengkap dengan CRUD dan detail |
 | **Pengaturan Sekolah** | Informasi sekolah, kontak, logo, tahun akademik, pengaturan sistem |
 | **Kelas Mengajar** | Penugasan guru per kelas dan mata pelajaran |
+| **Jadwal Pelajaran** | View per hari/guru/kelas, absensi-linked |
+| **Absensi** | CRUD kehadiran siswa, terhubung jadwal |
 | **Materi Pembelajaran** | CRUD materi dengan HTML content, lampiran, video |
 | **Tugas** | CRUD tugas dengan deadline, lampiran, status |
 | **Pengumpulan Tugas** | Siswa mengumpulkan tugas, guru melihat & menilai |
 | **Penilaian** | Sistem penilaian dengan feedback guru |
 | **Simulasi Siswa** | Simulasi pengumpulan tugas dari sisi siswa |
+| **Bank Soal** | CRUD soal dengan 4 tipe soal, 6 mapel |
+| **Paket Soal** | Multi-soal selection, auto-fill info |
+| **Quiz** | Full CRUD, timer, navigasi, hasil, review |
+| **CBT** | Ujian dengan timer, tandai soal, auto-submit |
+| **Hasil Ujian** | Review jawaban, catatan evaluasi |
+| **Analitik** | 5 charts, 8 summary cards, insight panel |
+| **Kalender Akademik** | 3 views (Month/Week/Agenda), 13 kategori events |
+| **Pengumuman** | CRUD, role-targeted, pinned, multi-kategori |
 
 ### Akan Datang
 
-- Quiz & CBT
-- Pengumuman
-- Absensi
 - Nilai & Rapor
 - AI Assistant
 
@@ -231,7 +238,8 @@ siapos/
 Lihat [ROADMAP.md](./ROADMAP.md) untuk detail lengkap.
 
 - **v0.2.0** — Prototype (Sprint 1-3) ✅
-- **v0.3.0** — Assessment Module
+- **v0.3.0** — Assessment Module ✅
+- **v0.3.1** — Module Integration ✅
 - **v0.4.0** — CBT & Quiz
 - **v0.5.0** — Communication & Notifications
 - **v1.0.0** — Production Release

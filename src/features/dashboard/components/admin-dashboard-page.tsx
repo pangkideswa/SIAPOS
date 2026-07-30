@@ -27,16 +27,14 @@ import {
   BookOpenCheck,
   FileSpreadsheet,
 } from "lucide-react"
-import { DUMMY_GURU } from "@/features/guru/dummy/guru.data"
-import { DUMMY_SISWA } from "@/features/siswa/dummy/siswa.data"
-import { DUMMY_MATERI } from "@/features/materi/dummy/materi.data"
-import { DUMMY_TUGAS } from "@/features/tugas/dummy/tugas.data"
-import { DUMMY_KELAS_MENGAJAR } from "@/features/kelas-mengajar/dummy/kelas-mengajar.data"
-import {
-  DUMMY_ACTIVITIES,
-  DUMMY_ANNOUNCEMENTS,
-} from "@/features/dashboard/dummy/dashboard.data"
-import { DUMMY_NILAI_AKADEMIK } from "@/features/nilai-akademik/dummy/nilai-akademik.data"
+import { DUMMY_GURU } from "@/lib/demo-data/guru"
+import { DUMMY_SISWA } from "@/lib/demo-data/siswa"
+import { DUMMY_MATERI } from "@/lib/demo-data/materi"
+import { DUMMY_TUGAS } from "@/lib/demo-data/tugas"
+import { DUMMY_KELAS_MENGAJAR } from "@/lib/demo-data/kelas-mengajar"
+import { DEMO_ACTIVITIES as DUMMY_ACTIVITIES } from "@/lib/demo-data/activity"
+import { DEMO_ANNOUNCEMENTS as DUMMY_ANNOUNCEMENTS } from "@/lib/demo-data/announcements"
+import { DUMMY_NILAI_AKADEMIK } from "@/lib/demo-data/nilai-akademik"
 
 function getUniqueCount<T>(items: T[], key: keyof T): number {
   return new Set(items.map((item) => item[key])).size

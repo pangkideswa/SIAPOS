@@ -12,7 +12,8 @@ Roadmap pengembangan SIAPOS — Education Operating System.
 | 2 | Learning Module | ✅ Selesai |
 | 3 | Assessment | ✅ Selesai |
 | 4 | CBT & Quiz | ✅ Selesai |
-| 5 | Communication | ⬜ Akan Datang |
+| 5 | Module Integration | ✅ Selesai |
+| 6 | Communication | ⬜ Akan Datang |
 | 6 | Academic Admin | ⬜ Akan Datang |
 | 7 | AI Features | ⬜ Akan Datang |
 
@@ -76,7 +77,19 @@ Roadmap pengembangan SIAPOS — Education Operating System.
 
 ---
 
-## Phase 5 — Communication ⬜
+## Phase 5 — Module Integration ✅
+
+> Sprint 4.6 | v0.3.1
+
+- [x] Shared data layer `src/lib/demo-data/`
+- [x] Unified activity feed across all dashboards
+- [x] Role-filtered announcements
+- [x] Dashboard counters computed from shared data
+- [x] All modules import from centralized data layer
+
+---
+
+## Phase 6 — Communication ⬜
 
 > v0.5.0
 
@@ -116,6 +129,7 @@ Roadmap pengembangan SIAPOS — Education Operating System.
 | v0.1.0 | Jul 2026 | Initial Setup |
 | v0.2.0 | Jul 2026 | Prototype — Learning Module |
 | v0.3.0 | Jul 2026 | Assessment Module |
+| v0.3.1 | Jul 2026 | Module Integration |
 | v0.4.0 | TBD | CBT & Quiz |
 | v0.5.0 | TBD | Communication |
 | v0.6.0 | TBD | Academic Admin |
