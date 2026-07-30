@@ -148,7 +148,7 @@ export function TopBar() {
 
         <Button variant="ghost" size="icon-sm" className="relative">
           <Bell className="h-4 w-4 text-muted-foreground" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-orange rounded-full border-2 border-white" />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full border-2 border-white" />
         </Button>
 
         <span className="hidden lg:block text-xs text-muted-foreground px-2 py-1 rounded-lg bg-muted">

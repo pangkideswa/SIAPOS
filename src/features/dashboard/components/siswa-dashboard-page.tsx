@@ -27,6 +27,7 @@ import {
   AlertTriangle,
   Send,
   FileSpreadsheet,
+  Monitor,
 } from "lucide-react"
 import { DUMMY_MATERI } from "@/features/materi/dummy/materi.data"
 import { DUMMY_TUGAS } from "@/features/tugas/dummy/tugas.data"
@@ -348,7 +349,7 @@ export function SiswaDashboardPage() {
                         <StatusBadge status={tugas.status} />
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <Link href={`/guru/tugas/${tugas.id}`}>
+                        <Link href="/siswa/tugas">
                           <Button variant="ghost" size="sm">
                             {tugas.status === "Belum Dikerjakan"
                               ? "Kerjakan"
@@ -640,27 +641,27 @@ export function SiswaDashboardPage() {
             <div className="space-y-2">
               {[
                 {
-                  label: "Lihat Materi",
-                  href: "/guru/materi",
+                  label: "Lihat Pelajaran",
+                  href: "/siswa/pelajaran",
                   icon: BookOpen,
                   color: "bg-primary/10 text-primary hover:bg-primary/20",
                 },
                 {
                   label: "Kerjakan Tugas",
-                  href: "/guru/tugas",
+                  href: "/siswa/tugas",
                   icon: ClipboardList,
                   color: "bg-primary/10 text-primary hover:bg-primary/20",
                 },
                 {
                   label: "Lihat Nilai",
-                  href: "/guru/penilaian",
+                  href: "/siswa/nilai-akademik",
                   icon: Trophy,
                   color: "bg-orange-50 text-orange-500 hover:bg-orange-100",
                 },
                 {
-                  label: "Profil Saya",
-                  href: "/admin/siswa/1",
-                  icon: User,
+                  label: "CBT",
+                  href: "/siswa/cbt",
+                  icon: Monitor,
                   color: "bg-orange-50 text-orange-500 hover:bg-orange-100",
                 },
               ].map((action) => (

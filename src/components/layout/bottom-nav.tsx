@@ -11,19 +11,12 @@ import {
   School,
   BookMarked,
   ClipboardList,
-  Layers,
-  BookOpenCheck,
   Award,
-  UserCog,
-  ListChecks,
   FileQuestion,
   Monitor,
   ClipboardCheck,
-  BarChart3,
   CalendarCheck,
-  Calendar,
   CalendarDays,
-  Megaphone,
   FileSpreadsheet,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -51,12 +44,6 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["super_admin", "admin"],
   },
   {
-    label: "Jurusan",
-    href: "/admin/jurusan",
-    icon: Layers,
-    roles: ["super_admin", "admin"],
-  },
-  {
     label: "Guru",
     href: "/admin/guru",
     icon: GraduationCap,
@@ -81,51 +68,15 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["super_admin", "admin"],
   },
   {
-    label: "Penugasan",
-    href: "/admin/assignments",
-    icon: UserCog,
+    label: "Quiz",
+    href: "/guru/quiz",
+    icon: FileQuestion,
     roles: ["super_admin", "admin"],
   },
   {
-    label: "Kls Mengajar",
-    href: "/admin/kelas-mengajar",
-    icon: BookOpenCheck,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Bank Soal",
-    href: "/admin/bank-soal",
-    icon: ListChecks,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Paket Soal",
-    href: "/admin/paket-soal",
-    icon: ClipboardList,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Jadwal",
-    href: "/admin/jadwal-pelajaran",
-    icon: Calendar,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Absensi",
-    href: "/admin/absensi",
-    icon: CalendarCheck,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Kalender",
-    href: "/admin/kalender-akademik",
-    icon: CalendarDays,
-    roles: ["super_admin", "admin"],
-  },
-  {
-    label: "Pengumuman",
-    href: "/admin/pengumuman",
-    icon: Megaphone,
+    label: "CBT",
+    href: "/guru/cbt",
+    icon: Monitor,
     roles: ["super_admin", "admin"],
   },
   {
@@ -135,59 +86,12 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["super_admin", "admin"],
   },
   {
-    label: "Quiz",
-    href: "/guru/quiz",
-    icon: FileQuestion,
-    roles: ["super_admin", "admin", "guru"],
-  },
-  {
-    label: "CBT",
-    href: "/guru/cbt",
-    icon: Monitor,
-    roles: ["super_admin", "admin", "guru"],
-  },
-  {
-    label: "Hasil Ujian",
-    href: "/guru/hasil-ujian",
-    icon: ClipboardCheck,
-    roles: ["super_admin", "admin", "guru"],
-  },
-  {
-    label: "Analitik",
-    href: "/guru/analitik",
-    icon: BarChart3,
-    roles: ["super_admin", "admin", "guru"],
-  },
-  {
-    label: "Jadwal",
-    href: "/guru/jadwal-pelajaran",
-    icon: Calendar,
-    roles: ["guru"],
-  },
-  {
-    label: "Absensi",
-    href: "/guru/absensi",
-    icon: CalendarCheck,
-    roles: ["super_admin", "admin", "guru"],
-  },
-  {
     label: "Kalender",
-    href: "/guru/kalender-akademik",
+    href: "/admin/kalender-akademik",
     icon: CalendarDays,
-    roles: ["guru"],
+    roles: ["super_admin", "admin"],
   },
-  {
-    label: "Pengumuman",
-    href: "/guru/pengumuman",
-    icon: Megaphone,
-    roles: ["guru"],
-  },
-  {
-    label: "Nilai",
-    href: "/guru/nilai-akademik",
-    icon: FileSpreadsheet,
-    roles: ["guru"],
-  },
+
   {
     label: "Beranda",
     href: "/guru",
@@ -213,9 +117,15 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["guru"],
   },
   {
-    label: "Kumpul",
-    href: "/guru/pengumpulan",
-    icon: ClipboardList,
+    label: "Quiz",
+    href: "/guru/quiz",
+    icon: FileQuestion,
+    roles: ["guru"],
+  },
+  {
+    label: "CBT",
+    href: "/guru/cbt",
+    icon: Monitor,
     roles: ["guru"],
   },
   {
@@ -225,15 +135,16 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["guru"],
   },
   {
+    label: "Absensi",
+    href: "/guru/absensi",
+    icon: CalendarCheck,
+    roles: ["guru"],
+  },
+
+  {
     label: "Beranda",
     href: "/siswa",
     icon: LayoutDashboard,
-    roles: ["siswa"],
-  },
-  {
-    label: "Pelajaran",
-    href: "/siswa/pelajaran",
-    icon: GraduationCap,
     roles: ["siswa"],
   },
   {
@@ -261,21 +172,15 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["siswa"],
   },
   {
+    label: "Simulasi",
+    href: "/siswa/simulasi",
+    icon: ClipboardList,
+    roles: ["siswa"],
+  },
+  {
     label: "Absensi",
     href: "/siswa/absensi",
     icon: CalendarCheck,
-    roles: ["siswa"],
-  },
-  {
-    label: "Kalender",
-    href: "/siswa/kalender-akademik",
-    icon: CalendarDays,
-    roles: ["siswa"],
-  },
-  {
-    label: "Pengumuman",
-    href: "/siswa/pengumuman",
-    icon: Megaphone,
     roles: ["siswa"],
   },
   {
@@ -284,12 +189,7 @@ const bottomNavItems: BottomNavItem[] = [
     icon: FileSpreadsheet,
     roles: ["siswa"],
   },
-  {
-    label: "Simulasi",
-    href: "/siswa/simulasi",
-    icon: ClipboardList,
-    roles: ["siswa"],
-  },
+
   {
     label: "Beranda",
     href: "/wali",
