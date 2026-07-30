@@ -25,6 +25,7 @@ import {
   Info,
   ChevronRight,
   BookOpenCheck,
+  FileSpreadsheet,
 } from "lucide-react"
 import { DUMMY_GURU } from "@/features/guru/dummy/guru.data"
 import { DUMMY_SISWA } from "@/features/siswa/dummy/siswa.data"
@@ -35,6 +36,7 @@ import {
   DUMMY_ACTIVITIES,
   DUMMY_ANNOUNCEMENTS,
 } from "@/features/dashboard/dummy/dashboard.data"
+import { DUMMY_NILAI_AKADEMIK } from "@/features/nilai-akademik/dummy/nilai-akademik.data"
 
 function getUniqueCount<T>(items: T[], key: keyof T): number {
   return new Set(items.map((item) => item[key])).size
@@ -205,6 +207,54 @@ export function AdminDashboardPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Statistik Input Nilai */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <Card size="sm">
+          <CardContent className="flex items-center gap-3 p-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-100 text-blue-600 shrink-0">
+              <FileSpreadsheet className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Total Nilai</p>
+              <p className="text-lg font-bold">{DUMMY_NILAI_AKADEMIK.length}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card size="sm">
+          <CardContent className="flex items-center gap-3 p-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-green-100 text-green-600 shrink-0">
+              <FileSpreadsheet className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Data Lengkap</p>
+              <p className="text-lg font-bold">{DUMMY_NILAI_AKADEMIK.filter((n) => n.status === "Lengkap").length}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card size="sm">
+          <CardContent className="flex items-center gap-3 p-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-yellow-100 text-yellow-600 shrink-0">
+              <FileSpreadsheet className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Belum Lengkap</p>
+              <p className="text-lg font-bold">{DUMMY_NILAI_AKADEMIK.filter((n) => n.status === "Belum Lengkap").length}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card size="sm">
+          <CardContent className="flex items-center gap-3 p-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-purple-100 text-purple-600 shrink-0">
+              <FileSpreadsheet className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Guru Penginput</p>
+              <p className="text-lg font-bold">{new Set(DUMMY_NILAI_AKADEMIK.map((n) => n.guru_nama)).size}</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Section 3 & 4: Aktivitas Terbaru + Status Akademik */}

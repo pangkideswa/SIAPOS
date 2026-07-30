@@ -24,6 +24,7 @@ import {
   Calendar,
   CalendarDays,
   Megaphone,
+  FileSpreadsheet,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -128,6 +129,12 @@ const bottomNavItems: BottomNavItem[] = [
     roles: ["super_admin", "admin"],
   },
   {
+    label: "Nilai",
+    href: "/admin/nilai-akademik",
+    icon: FileSpreadsheet,
+    roles: ["super_admin", "admin"],
+  },
+  {
     label: "Quiz",
     href: "/guru/quiz",
     icon: FileQuestion,
@@ -173,6 +180,12 @@ const bottomNavItems: BottomNavItem[] = [
     label: "Pengumuman",
     href: "/guru/pengumuman",
     icon: Megaphone,
+    roles: ["guru"],
+  },
+  {
+    label: "Nilai",
+    href: "/guru/nilai-akademik",
+    icon: FileSpreadsheet,
     roles: ["guru"],
   },
   {
@@ -263,6 +276,12 @@ const bottomNavItems: BottomNavItem[] = [
     label: "Pengumuman",
     href: "/siswa/pengumuman",
     icon: Megaphone,
+    roles: ["siswa"],
+  },
+  {
+    label: "Nilai",
+    href: "/siswa/nilai-akademik",
+    icon: FileSpreadsheet,
     roles: ["siswa"],
   },
   {

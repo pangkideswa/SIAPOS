@@ -26,6 +26,7 @@ import {
   AlertTriangle,
   Info,
   Bell,
+  FileSpreadsheet,
 } from "lucide-react"
 import { DUMMY_KELAS_MENGAJAR } from "@/features/kelas-mengajar/dummy/kelas-mengajar.data"
 import { DUMMY_MATERI } from "@/features/materi/dummy/materi.data"
@@ -36,6 +37,7 @@ import {
   DUMMY_GURU_ACTIVITIES,
   DUMMY_ANNOUNCEMENTS,
 } from "@/features/dashboard/dummy/dashboard.data"
+import { DUMMY_NILAI_AKADEMIK } from "@/features/nilai-akademik/dummy/nilai-akademik.data"
 
 const GURU_NAME = "Asep Nugraha"
 
@@ -277,6 +279,49 @@ export function GuruDashboardPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Nilai Akademik Widget */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Card size="sm">
+          <CardContent className="flex items-center gap-3 p-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-100 text-blue-600 shrink-0">
+              <FileSpreadsheet className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Total Nilai Akademik</p>
+              <p className="text-lg font-bold">
+                {DUMMY_NILAI_AKADEMIK.filter((n) => n.guru_nama === guruName).length}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card size="sm">
+          <CardContent className="flex items-center gap-3 p-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-green-100 text-green-600 shrink-0">
+              <FileSpreadsheet className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Nilai Lengkap</p>
+              <p className="text-lg font-bold">
+                {DUMMY_NILAI_AKADEMIK.filter((n) => n.guru_nama === guruName && n.status === "Lengkap").length}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card size="sm">
+          <CardContent className="flex items-center gap-3 p-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-yellow-100 text-yellow-600 shrink-0">
+              <FileSpreadsheet className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Nilai Belum Diinput</p>
+              <p className="text-lg font-bold">
+                {DUMMY_NILAI_AKADEMIK.filter((n) => n.guru_nama === guruName && n.status === "Belum Lengkap").length}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Section 2 & 3: Kelas Mengajar + Tugas Perlu Dinilai */}

@@ -26,6 +26,7 @@ import {
   Info,
   AlertTriangle,
   Send,
+  FileSpreadsheet,
 } from "lucide-react"
 import { DUMMY_MATERI } from "@/features/materi/dummy/materi.data"
 import { DUMMY_TUGAS } from "@/features/tugas/dummy/tugas.data"
@@ -35,6 +36,7 @@ import {
   DUMMY_SISWA_JADWAL,
   DUMMY_ANNOUNCEMENTS,
 } from "@/features/dashboard/dummy/dashboard.data"
+import { DUMMY_NILAI_AKADEMIK } from "@/features/nilai-akademik/dummy/nilai-akademik.data"
 
 const SISWA_KELAS = "XI TKJ 1"
 
@@ -234,6 +236,36 @@ export function SiswaDashboardPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Nilai Akademik Widget */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Card size="sm">
+          <CardContent className="flex items-center gap-3 p-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-100 text-blue-600 shrink-0">
+              <FileSpreadsheet className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Total Nilai Akademik</p>
+              <p className="text-lg font-bold">
+                {DUMMY_NILAI_AKADEMIK.filter((n) => n.siswa_nama === siswaName).length}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card size="sm">
+          <CardContent className="flex items-center gap-3 p-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-green-100 text-green-600 shrink-0">
+              <FileSpreadsheet className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Nilai Lengkap</p>
+              <p className="text-lg font-bold">
+                {DUMMY_NILAI_AKADEMIK.filter((n) => n.siswa_nama === siswaName && n.status === "Lengkap").length}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Section 2 & 3: Tugas + Materi */}

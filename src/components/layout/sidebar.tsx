@@ -28,6 +28,7 @@ import {
   Calendar,
   CalendarDays,
   Megaphone,
+  FileSpreadsheet,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
@@ -56,6 +57,7 @@ const navItems: NavEntry[] = [
   { type: "item", label: "Absensi", href: "/admin/absensi", icon: CalendarCheck, roles: ["super_admin", "admin"] },
   { type: "item", label: "Kalender Akademik", href: "/admin/kalender-akademik", icon: CalendarDays, roles: ["super_admin", "admin"] },
   { type: "item", label: "Pengumuman", href: "/admin/pengumuman", icon: Megaphone, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Nilai Akademik", href: "/admin/nilai-akademik", icon: FileSpreadsheet, roles: ["super_admin", "admin"] },
   { type: "item", label: "Quiz", href: "/guru/quiz", icon: FileQuestion, roles: ["super_admin", "admin", "guru"] },
   { type: "item", label: "CBT", href: "/guru/cbt", icon: Monitor, roles: ["super_admin", "admin", "guru"] },
   { type: "item", label: "Hasil Ujian", href: "/guru/hasil-ujian", icon: ClipboardCheck, roles: ["super_admin", "admin", "guru"] },
@@ -65,6 +67,7 @@ const navItems: NavEntry[] = [
   { type: "item", label: "Absensi", href: "/guru/absensi", icon: CalendarCheck, roles: ["super_admin", "admin", "guru"] },
   { type: "item", label: "Kalender Akademik", href: "/guru/kalender-akademik", icon: CalendarDays, roles: ["guru"] },
   { type: "item", label: "Pengumuman", href: "/guru/pengumuman", icon: Megaphone, roles: ["guru"] },
+  { type: "item", label: "Nilai Akademik", href: "/guru/nilai-akademik", icon: FileSpreadsheet, roles: ["guru"] },
   { type: "item", label: "Beranda", href: "/guru", icon: LayoutDashboard, roles: ["guru"] },
   { type: "item", label: "Kelas Saya", href: "/guru/kelas", icon: BookOpen, roles: ["guru"] },
   { type: "item", label: "Materi Pembelajaran", href: "/guru/materi", icon: BookMarked, roles: ["guru"] },
@@ -82,6 +85,7 @@ const navItems: NavEntry[] = [
   { type: "item", label: "Absensi", href: "/siswa/absensi", icon: CalendarCheck, roles: ["siswa"] },
   { type: "item", label: "Kalender Akademik", href: "/siswa/kalender-akademik", icon: CalendarDays, roles: ["siswa"] },
   { type: "item", label: "Pengumuman", href: "/siswa/pengumuman", icon: Megaphone, roles: ["siswa"] },
+  { type: "item", label: "Nilai Akademik", href: "/siswa/nilai-akademik", icon: FileSpreadsheet, roles: ["siswa"] },
   { type: "item", label: "Beranda", href: "/wali", icon: LayoutDashboard, roles: ["wali"] },
   { type: "item", label: "Siswa", href: "/wali/siswa", icon: Users, roles: ["wali"] },
   { type: "item", label: "Laporan", href: "/wali/laporan", icon: BookOpen, roles: ["wali"] },
