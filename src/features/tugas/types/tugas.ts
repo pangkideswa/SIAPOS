@@ -16,6 +16,7 @@ export interface Tugas {
   lampiran: TugasLampiran[]
   tanggal_dibuka: string
   tenggat_waktu: string
+  tenggat_jam: string | null
   nilai_maksimal: number
   status: "Draft" | "Dipublikasikan" | "Ditutup"
   created_at: string

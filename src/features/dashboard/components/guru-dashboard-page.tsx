@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   Card,
@@ -11,33 +12,26 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import {
   BookOpen,
-  Users,
   ClipboardList,
-  GraduationCap,
   Calendar,
-  Clock,
   ChevronRight,
-  BookMarked,
   Award,
   Megaphone,
-  AlertTriangle,
-  Info,
-  Bell,
-  FileSpreadsheet,
+  Send,
+  GraduationCap,
+  Pin,
 } from "lucide-react"
-import { DUMMY_KELAS_MENGAJAR } from "@/lib/demo-data/kelas-mengajar"
-import { DUMMY_MATERI } from "@/lib/demo-data/materi"
-import { DUMMY_TUGAS } from "@/lib/demo-data/tugas"
-import { DUMMY_PENGUMPULAN } from "@/lib/demo-data/pengumpulan"
-import {
-  DUMMY_GURU_JADWAL,
-  DUMMY_GURU_ACTIVITIES,
-} from "@/features/dashboard/dummy/dashboard.data"
-import { DEMO_ANNOUNCEMENTS as DUMMY_ANNOUNCEMENTS } from "@/lib/demo-data/announcements"
-import { DUMMY_NILAI_AKADEMIK } from "@/lib/demo-data/nilai-akademik"
+import { classroomService } from "@/features/kelas-saya/lib/classroom.service"
+import { materialService } from "@/features/materi/lib/material.service"
+import { assignmentService } from "@/features/tugas/lib/assignment.service"
+import { pengumpulanService } from "@/features/pengumpulan/lib/pengumpulan.service"
+import { DUMMY_GURU_JADWAL } from "@/features/dashboard/dummy/dashboard.data"
+import { getRolePengumuman } from "@/features/pengumuman/lib/pengumuman-helpers"
+import { KATEGORI_PENGUMUMAN_COLORS } from "@/features/pengumuman/constants/pengumuman.constants"
+import { formatDateID } from "@/features/kalender-akademik/components/kalender-helpers"
+import { PengumumanBaruBadge } from "@/features/pengumuman/components/pengumuman-baru-badge"
 
 const GURU_NAME = "Asep Nugraha"
 
@@ -54,14 +48,6 @@ function formatRelativeTime(timestamp: string): string {
   if (diffHour < 24) return `${diffHour} jam lalu`
   if (diffDay < 7) return `${diffDay} hari lalu`
   return time.toLocaleDateString("id-ID", { day: "numeric", month: "short" })
-}
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  })
 }
 
 function formatDateShort(dateStr: string): string {
@@ -81,169 +67,124 @@ function getTodayIndonesian(): string {
   })
 }
 
-function ActivityIcon({ icon }: { icon: string }) {
-  const iconMap: Record<string, React.ReactNode> = {
-    book: <BookOpen className="h-4 w-4" />,
-    clipboard: <ClipboardList className="h-4 w-4" />,
-    send: <ClipboardList className="h-4 w-4" />,
-    calendar: <Calendar className="h-4 w-4" />,
-    user: <Users className="h-4 w-4" />,
-    award: <Award className="h-4 w-4" />,
+function SubmissionStatusBadge({ status }: { status: string }) {
+  const variants: Record<string, string> = {
+    "Sudah Mengumpulkan": "bg-green-50 text-green-600 border-green-200",
+    Terlambat: "bg-red-50 text-red-600 border-red-200",
   }
-  return <>{iconMap[icon] ?? <Info className="h-4 w-4" />}</>
-}
-
-function AnnouncementIcon({ type }: { type: string }) {
-  if (type === "warning")
-    return <AlertTriangle className="h-4 w-4 text-yellow-500" />
-  if (type === "urgent")
-    return <Megaphone className="h-4 w-4 text-red-500" />
-  return <Info className="h-4 w-4 text-primary" />
+  return (
+    <span
+      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium shrink-0 ${variants[status] ?? "bg-muted text-muted-foreground"}`}
+    >
+      {status}
+    </span>
+  )
 }
 
 export function GuruDashboardPage() {
   const { user } = useAuth()
+  const router = useRouter()
   const guruName = user?.name ?? GURU_NAME
 
-  const kelasMengajar = DUMMY_KELAS_MENGAJAR.filter(
-    (k) => k.guru_nama === guruName && k.status === "Aktif"
-  )
-  const uniqueMapel = new Set(kelasMengajar.map((k) => k.mata_pelajaran))
-  const tugasByGuru = DUMMY_TUGAS.filter((t) => t.guru_nama === guruName)
+  const kelasMengajar = classroomService.getKelasSayaByGuru(guruName)
+  const materiByGuru = materialService
+    .getAll()
+    .filter((m) => m.guru_nama === guruName && m.status === "Publish")
+  const tugasByGuru = assignmentService
+    .getAll()
+    .filter((t) => t.guru_nama === guruName)
   const tugasAktif = tugasByGuru.filter((t) => t.status === "Dipublikasikan")
-  const tugasBelumDinilai = DUMMY_PENGUMPULAN.filter(
-    (p) =>
-      tugasByGuru.some((t) => t.id === p.tugas_id) &&
-      p.nilai === null &&
-      p.status === "Sudah Mengumpulkan"
-  )
-  const materiByGuru = DUMMY_MATERI.filter((m) => m.guru_nama === guruName)
-  const allSiswaInKelas = new Set(
-    kelasMengajar.flatMap((k) => {
-      const siswaList: string[] = []
-      if (k.kelas === "X TKJ 1") siswaList.push("Rizki", "Dewi", "Fajar")
-      if (k.kelas === "X TKJ 2") siswaList.push("Ahmad", "Putri", "Andi")
-      return siswaList
-    })
-  )
+
+  const pengumpulanTugas = pengumpulanService
+    .getAll()
+    .filter(
+      (p) =>
+        tugasByGuru.some((t) => t.id === p.tugas_id) &&
+        (p.status === "Sudah Mengumpulkan" || p.status === "Terlambat")
+    )
+  const belumDinilai = pengumpulanTugas.filter((p) => p.nilai === null)
 
   const stats = [
     {
-      title: "Kelas Mengajar",
+      title: "Total Kelas",
       value: kelasMengajar.length,
+      icon: GraduationCap,
+      color: "text-primary",
+      bg: "bg-primary/10",
+      href: "/guru/kelas",
+    },
+    {
+      title: "Total Materi",
+      value: materiByGuru.length,
       icon: BookOpen,
       color: "text-primary",
       bg: "bg-primary/10",
+      href: "/guru/materi",
     },
     {
-      title: "Mata Pelajaran",
-      value: uniqueMapel.size,
-      icon: BookMarked,
-      color: "text-primary",
-      bg: "bg-primary/10",
-    },
-    {
-      title: "Materi Dibuat",
-      value: materiByGuru.length,
-      icon: GraduationCap,
-      color: "text-orange-500",
-      bg: "bg-orange-50",
-    },
-    {
-      title: "Tugas Aktif",
+      title: "Total Tugas",
       value: tugasAktif.length,
       icon: ClipboardList,
       color: "text-orange-500",
       bg: "bg-orange-50",
+      href: "/guru/tugas",
     },
     {
-      title: "Belum Dinilai",
-      value: tugasBelumDinilai.length,
+      title: "Perlu Dinilai",
+      value: belumDinilai.length,
       icon: Award,
-      color: "text-red-500",
-      bg: "bg-red-50",
-    },
-    {
-      title: "Total Siswa",
-      value: allSiswaInKelas.size,
-      icon: Users,
       color: "text-orange-500",
       bg: "bg-orange-50",
+      href: "/guru/pengumpulan",
     },
   ]
-
-  const guruActivities = DUMMY_GURU_ACTIVITIES.filter(
-    (a) => a.guru_nama === guruName
-  )
 
   const todayHari = new Date().toLocaleDateString("id-ID", { weekday: "long" })
   const jadwalHariIni = DUMMY_GURU_JADWAL.filter(
     (j) => j.guru_nama === guruName && j.hari === todayHari
   )
 
+  const pengumpulanTerbaru = [...pengumpulanTugas]
+    .sort(
+      (a, b) =>
+        new Date(b.waktu_pengumpulan ?? 0).getTime() -
+        new Date(a.waktu_pengumpulan ?? 0).getTime()
+    )
+    .slice(0, 5)
+    .map((p) => ({
+      ...p,
+      judul_tugas: tugasByGuru.find((t) => t.id === p.tugas_id)?.judul ?? "-",
+    }))
+
   const tugasUntukDinilai = tugasByGuru
     .filter((t) => t.status === "Dipublikasikan" || t.status === "Ditutup")
     .map((t) => {
-      const pengumpulan = DUMMY_PENGUMPULAN.filter((p) => p.tugas_id === t.id)
+      const pengumpulan = pengumpulanService.getAll().filter((p) => p.tugas_id === t.id)
       const sudahMengumpulkan = pengumpulan.filter(
         (p) => p.status === "Sudah Mengumpulkan" || p.status === "Terlambat"
+      ).length
+      const belumDinilaiCount = pengumpulan.filter(
+        (p) =>
+          p.nilai === null &&
+          (p.status === "Sudah Mengumpulkan" || p.status === "Terlambat")
       ).length
       return {
         id: t.id,
         judul: t.judul,
         kelas: t.kelas,
         jumlah_pengumpulan: `${sudahMengumpulkan}/${pengumpulan.length}`,
+        belum_dinilai: belumDinilaiCount,
         deadline: t.tenggat_waktu,
         status: t.status,
       }
     })
+    .filter((t) => t.belum_dinilai > 0)
 
-  const quickActions = [
-    {
-      label: "Tambah Materi",
-      href: "/guru/materi",
-      icon: BookOpen,
-      color: "bg-primary/10 text-primary hover:bg-primary/20",
-    },
-    {
-      label: "Buat Tugas",
-      href: "/guru/tugas",
-      icon: ClipboardList,
-      color: "bg-primary/10 text-primary hover:bg-primary/20",
-    },
-    {
-      label: "Lihat Penilaian",
-      href: "/guru/penilaian",
-      icon: Award,
-      color: "bg-orange-50 text-orange-500 hover:bg-orange-100",
-    },
-    {
-      label: "Lihat Kelas Mengajar",
-      href: "/guru/kelas",
-      icon: GraduationCap,
-      color: "bg-orange-50 text-orange-500 hover:bg-orange-100",
-    },
-  ]
-
-  const announcementTypeColors: Record<string, string> = {
-    info: "bg-primary/10 text-primary",
-    warning: "bg-yellow-50 text-yellow-600",
-    urgent: "bg-red-50 text-red-600",
-  }
-
-  const announcementBadgeVariants: Record<
-    string,
-    "default" | "secondary" | "outline" | "destructive"
-  > = {
-    info: "default",
-    warning: "secondary",
-    urgent: "destructive",
-  }
+  const announcements = getRolePengumuman("guru").slice(0, 5)
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between flex-wrap gap-2">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
             Halo, {guruName} 👋
@@ -256,256 +197,37 @@ export function GuruDashboardPage() {
             Hari ini adalah {getTodayIndonesian()}.
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
-          <Bell className="h-4 w-4" />
-          <span>{DUMMY_ANNOUNCEMENTS.length} pengumuman</span>
-        </div>
+        <PengumumanBaruBadge role="guru" />
       </div>
 
-      {/* Section 1: Ringkasan */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardContent>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-muted-foreground">
-                  {stat.title}
-                </span>
-                <div className={`p-2 rounded-lg ${stat.bg}`}>
-                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
+          <Link key={stat.title} href={stat.href} className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xl">
+            <Card className="h-full transition-colors hover:border-primary/40">
+              <CardContent>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {stat.title}
+                  </span>
+                  <div className={`p-2 rounded-lg ${stat.bg}`}>
+                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                  </div>
                 </div>
-              </div>
-              <div className="text-2xl font-bold">{stat.value}</div>
-            </CardContent>
-          </Card>
+                <div className="text-2xl font-bold">{stat.value}</div>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
 
-      {/* Nilai Akademik Widget */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Card size="sm">
-          <CardContent className="flex items-center gap-3 p-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-100 text-blue-600 shrink-0">
-              <FileSpreadsheet className="h-4 w-4" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Total Nilai Akademik</p>
-              <p className="text-lg font-bold">
-                {DUMMY_NILAI_AKADEMIK.filter((n) => n.guru_nama === guruName).length}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card size="sm">
-          <CardContent className="flex items-center gap-3 p-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-green-100 text-green-600 shrink-0">
-              <FileSpreadsheet className="h-4 w-4" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Nilai Lengkap</p>
-              <p className="text-lg font-bold">
-                {DUMMY_NILAI_AKADEMIK.filter((n) => n.guru_nama === guruName && n.status === "Lengkap").length}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card size="sm">
-          <CardContent className="flex items-center gap-3 p-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-yellow-100 text-yellow-600 shrink-0">
-              <FileSpreadsheet className="h-4 w-4" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Nilai Belum Diinput</p>
-              <p className="text-lg font-bold">
-                {DUMMY_NILAI_AKADEMIK.filter((n) => n.guru_nama === guruName && n.status === "Belum Lengkap").length}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Section 2 & 3: Kelas Mengajar + Tugas Perlu Dinilai */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Section 2: Kelas Mengajar */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5" />
-                  Kelas Mengajar
-                </CardTitle>
-                <CardDescription>Daftar kelas yang Anda ampu</CardDescription>
-              </div>
-              <Badge variant="secondary">{kelasMengajar.length} kelas</Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {kelasMengajar.map((kelas) => (
-                <Link key={kelas.id} href="/guru/kelas">
-                  <div className="p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer">
-                    <p className="text-sm font-semibold">{kelas.kelas}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {kelas.mata_pelajaran}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Section 3: Tugas yang Perlu Dinilai */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="h-5 w-5" />
-                  Tugas yang Perlu Dinilai
-                </CardTitle>
-                <CardDescription>
-                  Pengumpulan tugas dari siswa
-                </CardDescription>
-              </div>
-              <Badge variant="secondary">
-                {tugasBelumDinilai.length} belum dinilai
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-lg border border-border overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-muted/50">
-                    <th className="text-left px-4 py-3 font-medium text-muted-foreground">
-                      Judul Tugas
-                    </th>
-                    <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden sm:table-cell">
-                      Kelas
-                    </th>
-                    <th className="text-left px-4 py-3 font-medium text-muted-foreground">
-                      Pengumpulan
-                    </th>
-                    <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden md:table-cell">
-                      Deadline
-                    </th>
-                    <th className="text-right px-4 py-3 font-medium text-muted-foreground">
-                      Aksi
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tugasUntukDinilai.map((tugas, index) => (
-                    <tr
-                      key={tugas.id}
-                      className={
-                        index < tugasUntukDinilai.length - 1
-                          ? "border-b border-border"
-                          : ""
-                      }
-                    >
-                      <td className="px-4 py-3">
-                        <p className="font-medium">{tugas.judul}</p>
-                        <p className="text-xs text-muted-foreground sm:hidden">
-                          {tugas.kelas}
-                        </p>
-                      </td>
-                      <td className="px-4 py-3 hidden sm:table-cell">
-                        <Badge variant="outline">{tugas.kelas}</Badge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="font-medium">
-                          {tugas.jumlah_pengumpulan}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 hidden md:table-cell">
-                        <span className="text-muted-foreground">
-                          {formatDateShort(tugas.deadline)}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <Link href={`/guru/pengumpulan/${tugas.id}`}>
-                          <Button variant="ghost" size="sm">
-                            Nilai
-                            <ChevronRight className="h-4 w-4 ml-1" />
-                          </Button>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                  {tugasUntukDinilai.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="px-4 py-8 text-center text-muted-foreground"
-                      >
-                        Tidak ada tugas yang perlu dinilai
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Section 4 & 5: Aktivitas Terbaru + Jadwal Hari Ini */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Section 4: Aktivitas Terbaru */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Aktivitas Terbaru
-                </CardTitle>
-                <CardDescription>Riwayat aktivitas Anda</CardDescription>
-              </div>
-              <Badge variant="secondary">
-                {guruActivities.length} aktivitas
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-0">
-              {guruActivities.map((activity, index) => (
-                <div key={activity.id}>
-                  <div className="flex items-start gap-3 py-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted shrink-0 mt-0.5">
-                      <ActivityIcon icon={activity.icon} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">
-                          {activity.action}
-                        </span>
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {formatRelativeTime(activity.timestamp)}
-                      </p>
-                    </div>
-                  </div>
-                  {index < guruActivities.length - 1 && <Separator />}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Section 5: Jadwal Hari Ini */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
               Jadwal Hari Ini
             </CardTitle>
-            <CardDescription>
-              {todayHari}, {getTodayIndonesian()}
-            </CardDescription>
+            <CardDescription>{getTodayIndonesian()}</CardDescription>
           </CardHeader>
           <CardContent>
             {jadwalHariIni.length > 0 ? (
@@ -540,98 +262,260 @@ export function GuruDashboardPage() {
             )}
           </CardContent>
         </Card>
-      </div>
 
-      {/* Section 6 & 7: Quick Action + Pengumuman */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Section 6: Quick Action */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ClipboardList className="h-5 w-5" />
-              Quick Action
-            </CardTitle>
-            <CardDescription>Akses cepat ke menu utama</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="h-5 w-5" />
+                  Aktivitas Pengumpulan
+                </CardTitle>
+                <CardDescription>Pengumpulan tugas oleh siswa</CardDescription>
+              </div>
+              <Badge variant="secondary">{pengumpulanTerbaru.length}</Badge>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {quickActions.map((action) => (
-                <Link key={action.label} href={action.href}>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-between h-auto py-3"
+            {pengumpulanTerbaru.length > 0 ? (
+              <div className="space-y-3">
+                {pengumpulanTerbaru.map((p) => (
+                  <div
+                    key={p.id}
+                    className="flex items-center gap-3 p-3 rounded-lg border border-border"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${action.color}`}>
-                        <action.icon className="h-4 w-4" />
-                      </div>
-                      <span className="font-medium">{action.label}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate">
+                        {p.siswa_nama}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {p.judul_tugas}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {p.waktu_pengumpulan
+                          ? formatRelativeTime(p.waktu_pengumpulan)
+                          : "-"}
+                      </p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </Link>
-              ))}
+                    <SubmissionStatusBadge status={p.status} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-sm text-muted-foreground">
+                Belum ada pengumpulan tugas
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Award className="h-5 w-5" />
+                Tugas Menunggu Penilaian
+              </CardTitle>
+              <CardDescription>
+                Tugas dengan pengumpulan yang belum dinilai
+              </CardDescription>
             </div>
+            <Badge variant="secondary">{belumDinilai.length} belum dinilai</Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-lg border border-border overflow-x-auto">
+            <table className="w-full text-sm min-w-[560px]">
+              <thead>
+                <tr className="bg-muted/50">
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                    Judul Tugas
+                  </th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden sm:table-cell">
+                    Kelas
+                  </th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                    Pengumpulan
+                  </th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden md:table-cell">
+                    Deadline
+                  </th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                    Aksi
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {tugasUntukDinilai.map((tugas, index) => (
+                  <tr
+                    key={tugas.id}
+                    className={
+                      index < tugasUntukDinilai.length - 1
+                        ? "border-b border-border"
+                        : ""
+                    }
+                  >
+                    <td className="px-4 py-3">
+                      <p className="font-medium">{tugas.judul}</p>
+                      <p className="text-xs text-muted-foreground sm:hidden">
+                        {tugas.kelas}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <Badge variant="outline">{tugas.kelas}</Badge>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="font-medium">
+                        {tugas.jumlah_pengumpulan}
+                      </span>
+                      <span className="text-xs text-muted-foreground ml-1">
+                        ({tugas.belum_dinilai} belum dinilai)
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      <span className="text-muted-foreground">
+                        {formatDateShort(tugas.deadline)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Link href={`/guru/pengumpulan/${tugas.id}`}>
+                        <Button variant="ghost" size="sm">
+                          Nilai
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+                {tugasUntukDinilai.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-4 py-8 text-center text-muted-foreground"
+                    >
+                      Tidak ada tugas yang menunggu penilaian
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <GraduationCap className="h-5 w-5" />
+                  Kelas Aktif
+                </CardTitle>
+                <CardDescription>Kelas yang Anda ajar tahun ini</CardDescription>
+              </div>
+              <Link href="/guru/kelas">
+                <Button variant="ghost" size="sm">
+                  Lihat semua
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {kelasMengajar.length > 0 ? (
+              <div className="space-y-3">
+                {kelasMengajar.map((kelas) => (
+                  <div
+                    key={kelas.id}
+                    className="flex items-center gap-3 p-3 rounded-lg border border-border"
+                  >
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 shrink-0">
+                      <GraduationCap className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold">{kelas.kelas}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {kelas.mata_pelajaran}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="shrink-0">
+                      {kelas.semester}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-sm text-muted-foreground">
+                Tidak ada kelas mengajar aktif
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Section 7: Pengumuman */}
-        <Card className="lg:col-span-2">
+        <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <Megaphone className="h-5 w-5" />
-                  Pengumuman
+                  Pengumuman Terbaru
                 </CardTitle>
-                <CardDescription>
-                  Informasi dan pengumuman terbaru dari sekolah
-                </CardDescription>
+                <CardDescription>Informasi terbaru untuk Anda</CardDescription>
               </div>
-              <Badge variant="secondary">
-                {DUMMY_ANNOUNCEMENTS.length} pengumuman
-              </Badge>
+              <Link href="/guru/pengumuman">
+                <Button variant="ghost" size="sm">
+                  Lihat semua
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </Link>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-0">
-              {DUMMY_ANNOUNCEMENTS.map((announcement, index) => (
-                <div key={announcement.id}>
-                  <div className="flex items-start gap-3 py-3">
-                    <div
-                      className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 mt-0.5 ${announcementTypeColors[announcement.type]}`}
-                    >
-                      <AnnouncementIcon type={announcement.type} />
-                    </div>
+              {announcements.map((announcement, index) => (
+                <button
+                  key={announcement.id}
+                  type="button"
+                  onClick={() => router.push(`/guru/pengumuman/${announcement.id}`)}
+                  className="w-full text-left group"
+                >
+                  <div className="flex items-start gap-3 py-3 group-hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-colors">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <p className="text-sm font-semibold">
-                          {announcement.title}
+                      <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                        {announcement.pinned && (
+                          <Pin className="h-3.5 w-3.5 text-red-500 shrink-0" />
+                        )}
+                        <p className="text-sm font-semibold truncate">
+                          {announcement.judul}
                         </p>
-                        <Badge
-                          variant={
-                            announcementBadgeVariants[announcement.type]
-                          }
-                          className="text-[10px] px-1.5"
-                        >
-                          {announcement.type === "info"
-                            ? "Info"
-                            : announcement.type === "warning"
-                              ? "Peringatan"
-                              : "Penting"}
-                        </Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground mb-1">
-                        {announcement.description}
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-1">
+                        {announcement.ringkasan}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDate(announcement.date)}
-                      </p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                        <span
+                          className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium ${KATEGORI_PENGUMUMAN_COLORS[announcement.kategori]}`}
+                        >
+                          {announcement.kategori}
+                        </span>
+                        <span>{announcement.penulis}</span>
+                        <span>{formatDateID(announcement.tanggal_publish)}</span>
+                      </div>
                     </div>
                   </div>
-                  {index < DUMMY_ANNOUNCEMENTS.length - 1 && <Separator />}
-                </div>
+                  {index < announcements.length - 1 && (
+                    <div className="border-t border-border" />
+                  )}
+                </button>
               ))}
+              {announcements.length === 0 && (
+                <p className="text-center py-6 text-sm text-muted-foreground">
+                  Belum ada pengumuman
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>

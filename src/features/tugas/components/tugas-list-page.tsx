@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select"
 import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react"
 import { toast } from "sonner"
-import { TugasFormSheet } from "./tugas-form-sheet"
+import { TugasFormDialog } from "./tugas-form-dialog"
 import { TugasDeleteDialog } from "./tugas-delete-dialog"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
 import {
@@ -24,7 +24,7 @@ import {
   MATA_PELAJARAN_OPTIONS,
   KELAS_OPTIONS,
 } from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
-import { DUMMY_TUGAS } from "@/features/tugas/dummy/tugas.data"
+import { assignmentService } from "@/features/tugas/lib/assignment.service"
 import type { Tugas, TugasFormData } from "@/features/tugas/types/tugas"
 
 export function TugasListPage() {
@@ -35,7 +35,7 @@ export function TugasListPage() {
   const [kelasFilter, setKelasFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [formDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<Tugas | null>(null)
   const [deletingItem, setDeletingItem] = useState<Tugas | null>(null)
@@ -43,7 +43,7 @@ export function TugasListPage() {
 
   const perPage = 10
 
-  const filteredData = DUMMY_TUGAS.filter((item) => {
+  const filteredData = assignmentService.getAll().filter((item) => {
     const matchesSearch =
       !search ||
       item.judul.toLowerCase().includes(search.toLowerCase()) ||
@@ -157,7 +157,7 @@ export function TugasListPage() {
             title="Edit"
             onClick={() =>
               openEdit(
-                DUMMY_TUGAS.find((t) => t.id === Number(item.id)) ?? null
+                assignmentService.getById(Number(item.id)) ?? null
               )
             }
           >
@@ -169,7 +169,7 @@ export function TugasListPage() {
             title="Hapus"
             onClick={() =>
               openDelete(
-                DUMMY_TUGAS.find((t) => t.id === Number(item.id)) ?? null
+                assignmentService.getById(Number(item.id)) ?? null
               )
             }
           >
@@ -182,12 +182,12 @@ export function TugasListPage() {
 
   function openCreate() {
     setEditingItem(null)
-    setFormSheetOpen(true)
+    setFormDialogOpen(true)
   }
 
   function openEdit(item: Tugas | null) {
     setEditingItem(item)
-    setFormSheetOpen(true)
+    setFormDialogOpen(true)
   }
 
   function openDelete(item: Tugas | null) {
@@ -200,29 +200,15 @@ export function TugasListPage() {
     await new Promise((r) => setTimeout(r, 500))
 
     if (editingItem) {
-      const idx = DUMMY_TUGAS.findIndex((t) => t.id === editingItem.id)
-      if (idx !== -1) {
-        DUMMY_TUGAS[idx] = {
-          ...DUMMY_TUGAS[idx],
-          ...data,
-          updated_at: new Date().toISOString(),
-        }
-      }
+      assignmentService.update(editingItem.id, data)
       toast.success("Tugas berhasil diperbarui.")
     } else {
-      const newId = Math.max(...DUMMY_TUGAS.map((t) => t.id), 0) + 1
-      const now = new Date().toISOString()
-      DUMMY_TUGAS.push({
-        ...data,
-        id: newId,
-        created_at: now,
-        updated_at: now,
-      })
+      assignmentService.create(data)
       toast.success("Tugas berhasil ditambahkan.")
     }
 
     setIsLoading(false)
-    setFormSheetOpen(false)
+    setFormDialogOpen(false)
     setEditingItem(null)
   }
 
@@ -230,8 +216,7 @@ export function TugasListPage() {
     if (!deletingItem) return
     setIsLoading(true)
     await new Promise((r) => setTimeout(r, 500))
-    const idx = DUMMY_TUGAS.findIndex((t) => t.id === deletingItem.id)
-    if (idx !== -1) DUMMY_TUGAS.splice(idx, 1)
+    assignmentService.remove(deletingItem.id)
     setIsLoading(false)
     setDeleteDialogOpen(false)
     setDeletingItem(null)
@@ -379,9 +364,9 @@ export function TugasListPage() {
         </div>
       )}
 
-      <TugasFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <TugasFormDialog
+        open={formDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingItem={editingItem}
         onSubmit={handleFormSubmit}
         isLoading={isLoading}

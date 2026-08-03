@@ -15,14 +15,14 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react"
-import { MateriFormSheet } from "./materi-form-sheet"
+import { MateriFormDialog } from "./materi-form-dialog"
 import { MateriDeleteDialog } from "./materi-delete-dialog"
 import { STATUS_MATERI_COLORS } from "@/features/materi/constants/materi.constants"
 import {
   GURU_OPTIONS,
   KELAS_OPTIONS,
 } from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
-import { DUMMY_MATERI } from "@/features/materi/dummy/materi.data"
+import { materialService } from "@/features/materi/lib/material.service"
 import type { Materi, MateriFormData } from "@/features/materi/types/materi"
 
 export function MateriListPage() {
@@ -32,7 +32,7 @@ export function MateriListPage() {
   const [kelasFilter, setKelasFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [formDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<Materi | null>(null)
   const [deletingItem, setDeletingItem] = useState<Materi | null>(null)
@@ -40,7 +40,7 @@ export function MateriListPage() {
 
   const perPage = 10
 
-  const filteredData = DUMMY_MATERI.filter((item) => {
+  const filteredData = materialService.getAll().filter((item) => {
     const matchesSearch =
       !search ||
       item.judul.toLowerCase().includes(search.toLowerCase()) ||
@@ -136,7 +136,7 @@ export function MateriListPage() {
             size="icon-sm"
             title="Edit"
             onClick={() =>
-              openEdit(DUMMY_MATERI.find((m) => m.id === Number(item.id)) ?? null)
+              openEdit(materialService.getById(Number(item.id)) ?? null)
             }
           >
             <Pencil className="h-4 w-4" />
@@ -146,7 +146,7 @@ export function MateriListPage() {
             size="icon-sm"
             title="Hapus"
             onClick={() =>
-              openDelete(DUMMY_MATERI.find((m) => m.id === Number(item.id)) ?? null)
+              openDelete(materialService.getById(Number(item.id)) ?? null)
             }
           >
             <Trash2 className="h-4 w-4 text-destructive" />
@@ -158,12 +158,12 @@ export function MateriListPage() {
 
   function openCreate() {
     setEditingItem(null)
-    setFormSheetOpen(true)
+    setFormDialogOpen(true)
   }
 
   function openEdit(item: Materi | null) {
     setEditingItem(item)
-    setFormSheetOpen(true)
+    setFormDialogOpen(true)
   }
 
   function openDelete(item: Materi | null) {
@@ -176,27 +176,13 @@ export function MateriListPage() {
     await new Promise((r) => setTimeout(r, 500))
 
     if (editingItem) {
-      const idx = DUMMY_MATERI.findIndex((m) => m.id === editingItem.id)
-      if (idx !== -1) {
-        DUMMY_MATERI[idx] = {
-          ...DUMMY_MATERI[idx],
-          ...data,
-          updated_at: new Date().toISOString(),
-        }
-      }
+      materialService.update(editingItem.id, data)
     } else {
-      const newId = Math.max(...DUMMY_MATERI.map((m) => m.id), 0) + 1
-      const now = new Date().toISOString()
-      DUMMY_MATERI.push({
-        ...data,
-        id: newId,
-        created_at: now,
-        updated_at: now,
-      })
+      materialService.create(data)
     }
 
     setIsLoading(false)
-    setFormSheetOpen(false)
+    setFormDialogOpen(false)
     setEditingItem(null)
   }
 
@@ -204,8 +190,7 @@ export function MateriListPage() {
     if (!deletingItem) return
     setIsLoading(true)
     await new Promise((r) => setTimeout(r, 500))
-    const idx = DUMMY_MATERI.findIndex((m) => m.id === deletingItem.id)
-    if (idx !== -1) DUMMY_MATERI.splice(idx, 1)
+    materialService.remove(deletingItem.id)
     setIsLoading(false)
     setDeleteDialogOpen(false)
     setDeletingItem(null)
@@ -329,9 +314,9 @@ export function MateriListPage() {
         </div>
       )}
 
-      <MateriFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <MateriFormDialog
+        open={formDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingItem={editingItem}
         onSubmit={handleFormSubmit}
         isLoading={isLoading}

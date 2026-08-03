@@ -21,20 +21,21 @@ import {
   ClipboardList,
   Bell,
   Megaphone,
-  AlertTriangle,
   Info,
   ChevronRight,
   BookOpenCheck,
   FileSpreadsheet,
 } from "lucide-react"
-import { DUMMY_GURU } from "@/lib/demo-data/guru"
-import { DUMMY_SISWA } from "@/lib/demo-data/siswa"
-import { DUMMY_MATERI } from "@/lib/demo-data/materi"
-import { DUMMY_TUGAS } from "@/lib/demo-data/tugas"
-import { DUMMY_KELAS_MENGAJAR } from "@/lib/demo-data/kelas-mengajar"
-import { DEMO_ACTIVITIES as DUMMY_ACTIVITIES } from "@/lib/demo-data/activity"
-import { DEMO_ANNOUNCEMENTS as DUMMY_ANNOUNCEMENTS } from "@/lib/demo-data/announcements"
-import { DUMMY_NILAI_AKADEMIK } from "@/lib/demo-data/nilai-akademik"
+import { guruService } from "@/features/guru/lib/guru.service"
+import { siswaService } from "@/features/siswa/lib/siswa.service"
+import { materialService } from "@/features/materi/lib/material.service"
+import { assignmentService } from "@/features/tugas/lib/assignment.service"
+import { classroomService } from "@/features/kelas-saya/lib/classroom.service"
+import { announcementService } from "@/features/pengumuman/lib/announcement.service"
+import { nilaiAkademikService } from "@/features/nilai-akademik/lib/nilai-akademik.service"
+import { dashboardService } from "@/features/dashboard/lib/dashboard.service"
+import { KATEGORI_PENGUMUMAN_COLORS } from "@/features/pengumuman/constants/pengumuman.constants"
+import { PengumumanBaruBadge } from "@/features/pengumuman/components/pengumuman-baru-badge"
 
 function getUniqueCount<T>(items: T[], key: keyof T): number {
   return new Set(items.map((item) => item[key])).size
@@ -78,10 +79,9 @@ function ActivityIcon({ icon }: { icon: string }) {
   return <>{iconMap[icon] ?? <Info className="h-4 w-4" />}</>
 }
 
-function AnnouncementIcon({ type }: { type: string }) {
-  if (type === "warning")
-    return <AlertTriangle className="h-4 w-4 text-yellow-500" />
-  if (type === "urgent")
+function AnnouncementIcon({ kategori }: { kategori: string }) {
+  const pinCategories = new Set(["Kegiatan Sekolah", "PKL", "Informasi Umum"])
+  if (pinCategories.has(kategori))
     return <Megaphone className="h-4 w-4 text-red-500" />
   return <Info className="h-4 w-4 text-primary" />
 }
@@ -89,12 +89,13 @@ function AnnouncementIcon({ type }: { type: string }) {
 export function AdminDashboardPage() {
   const { user } = useAuth()
 
-  const totalGuru = getUniqueCount(DUMMY_GURU, "id")
-  const totalSiswa = DUMMY_SISWA.filter((s) => s.status === "Aktif").length
-  const totalKelas = getUniqueCount(DUMMY_KELAS_MENGAJAR, "kelas")
-  const totalMapel = getUniqueCount(DUMMY_KELAS_MENGAJAR, "mata_pelajaran")
-  const totalMateri = DUMMY_MATERI.length
-  const totalTugas = DUMMY_TUGAS.length
+  const allKelasMengajar = classroomService.getAll()
+  const totalGuru = guruService.getAll().length
+  const totalSiswa = siswaService.getAll().filter((s) => s.status === "Aktif").length
+  const totalKelas = getUniqueCount(allKelasMengajar, "kelas")
+  const totalMapel = getUniqueCount(allKelasMengajar, "mata_pelajaran")
+  const totalMateri = materialService.getAll().length
+  const totalTugas = assignmentService.getAll().length
 
   const stats = [
     {
@@ -103,6 +104,7 @@ export function AdminDashboardPage() {
       icon: GraduationCap,
       color: "text-primary",
       bg: "bg-primary/10",
+      href: "/admin/guru",
     },
     {
       title: "Total Siswa",
@@ -110,6 +112,7 @@ export function AdminDashboardPage() {
       icon: Users,
       color: "text-primary",
       bg: "bg-primary/10",
+      href: "/admin/siswa",
     },
     {
       title: "Total Kelas",
@@ -117,6 +120,7 @@ export function AdminDashboardPage() {
       icon: School,
       color: "text-primary",
       bg: "bg-primary/10",
+      href: "/admin/classes",
     },
     {
       title: "Mata Pelajaran",
@@ -124,6 +128,7 @@ export function AdminDashboardPage() {
       icon: BookMarked,
       color: "text-orange-500",
       bg: "bg-orange-50",
+      href: "/admin/kelas-mengajar",
     },
     {
       title: "Total Materi",
@@ -131,6 +136,7 @@ export function AdminDashboardPage() {
       icon: BookOpen,
       color: "text-orange-500",
       bg: "bg-orange-50",
+      href: "/admin/kelas-mengajar",
     },
     {
       title: "Total Tugas",
@@ -138,11 +144,16 @@ export function AdminDashboardPage() {
       icon: ClipboardList,
       color: "text-orange-500",
       bg: "bg-orange-50",
+      href: "/admin/kelas-mengajar",
     },
   ]
 
-  const kelasAktif = DUMMY_KELAS_MENGAJAR.filter((k) => k.status === "Aktif")
+  const kelasAktif = classroomService.getAktifKelasMengajar()
   const kelasAktifNames = new Set(kelasAktif.map((k) => k.kelas)).size
+
+  const activities = dashboardService.getActivities()
+  const announcements = announcementService.getAll()
+  const semuaNilai = nilaiAkademikService.getAll()
 
   const quickActions = [
     { label: "Guru", href: "/admin/guru", icon: GraduationCap, color: "bg-primary/10 text-primary hover:bg-primary/20" },
@@ -151,18 +162,6 @@ export function AdminDashboardPage() {
     { label: "Materi", href: "/admin/kelas-mengajar", icon: BookOpen, color: "bg-orange-50 text-orange-500 hover:bg-orange-100" },
     { label: "Tugas", href: "/admin/kelas-mengajar", icon: ClipboardList, color: "bg-primary/10 text-primary hover:bg-primary/20" },
   ]
-
-  const announcementTypeColors: Record<string, string> = {
-    info: "bg-primary/10 text-primary",
-    warning: "bg-yellow-50 text-yellow-600",
-    urgent: "bg-red-50 text-red-600",
-  }
-
-  const announcementBadgeVariants: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
-    info: "default",
-    warning: "secondary",
-    urgent: "destructive",
-  }
 
   return (
     <div className="space-y-6">
@@ -183,27 +182,30 @@ export function AdminDashboardPage() {
         <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
           <Bell className="h-4 w-4" />
           <span>
-            {DUMMY_ANNOUNCEMENTS.length} pengumuman
+            {announcements.length} pengumuman
           </span>
         </div>
+        <PengumumanBaruBadge role="admin" />
       </div>
 
       {/* Section 2: Statistik */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardContent>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-muted-foreground">
-                  {stat.title}
-                </span>
-                <div className={`p-2 rounded-lg ${stat.bg}`}>
-                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
+          <Link key={stat.title} href={stat.href} className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xl">
+            <Card className="h-full transition-colors hover:border-primary/40">
+              <CardContent>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {stat.title}
+                  </span>
+                  <div className={`p-2 rounded-lg ${stat.bg}`}>
+                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                  </div>
                 </div>
-              </div>
-              <div className="text-2xl font-bold">{stat.value}</div>
-            </CardContent>
-          </Card>
+                <div className="text-2xl font-bold">{stat.value}</div>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
 
@@ -216,7 +218,7 @@ export function AdminDashboardPage() {
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Total Nilai</p>
-              <p className="text-lg font-bold">{DUMMY_NILAI_AKADEMIK.length}</p>
+              <p className="text-lg font-bold">{semuaNilai.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -227,7 +229,7 @@ export function AdminDashboardPage() {
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Data Lengkap</p>
-              <p className="text-lg font-bold">{DUMMY_NILAI_AKADEMIK.filter((n) => n.status === "Lengkap").length}</p>
+              <p className="text-lg font-bold">{semuaNilai.filter((n) => n.status === "Lengkap").length}</p>
             </div>
           </CardContent>
         </Card>
@@ -238,7 +240,7 @@ export function AdminDashboardPage() {
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Belum Lengkap</p>
-              <p className="text-lg font-bold">{DUMMY_NILAI_AKADEMIK.filter((n) => n.status === "Belum Lengkap").length}</p>
+              <p className="text-lg font-bold">{semuaNilai.filter((n) => n.status === "Belum Lengkap").length}</p>
             </div>
           </CardContent>
         </Card>
@@ -249,7 +251,7 @@ export function AdminDashboardPage() {
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Guru Penginput</p>
-              <p className="text-lg font-bold">{new Set(DUMMY_NILAI_AKADEMIK.map((n) => n.guru_nama)).size}</p>
+              <p className="text-lg font-bold">{new Set(semuaNilai.map((n) => n.guru_nama)).size}</p>
             </div>
           </CardContent>
         </Card>
@@ -271,13 +273,13 @@ export function AdminDashboardPage() {
                 </CardDescription>
               </div>
               <Badge variant="secondary">
-                {DUMMY_ACTIVITIES.length} aktivitas
+                {activities.length} aktivitas
               </Badge>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-0">
-              {DUMMY_ACTIVITIES.map((activity, index) => (
+              {activities.map((activity, index) => (
                 <div key={activity.id}>
                   <div className="flex items-start gap-3 py-3">
                     <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted shrink-0 mt-0.5">
@@ -297,7 +299,7 @@ export function AdminDashboardPage() {
                       </p>
                     </div>
                   </div>
-                  {index < DUMMY_ACTIVITIES.length - 1 && <Separator />}
+                  {index < activities.length - 1 && <Separator />}
                 </div>
               ))}
             </div>
@@ -344,7 +346,7 @@ export function AdminDashboardPage() {
                 </p>
               </div>
               <Badge variant="outline">
-                {DUMMY_KELAS_MENGAJAR.length} penugasan
+                {allKelasMengajar.length} penugasan
               </Badge>
             </div>
           </CardContent>
@@ -367,47 +369,42 @@ export function AdminDashboardPage() {
                 </CardDescription>
               </div>
               <Badge variant="secondary">
-                {DUMMY_ANNOUNCEMENTS.length} pengumuman
+                {announcements.length} pengumuman
               </Badge>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-0">
-              {DUMMY_ANNOUNCEMENTS.map((announcement, index) => (
+              {announcements.map((announcement, index) => (
                 <div key={announcement.id}>
                   <div className="flex items-start gap-3 py-3">
                     <div
-                      className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 mt-0.5 ${announcementTypeColors[announcement.type]}`}
+                      className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 mt-0.5 ${KATEGORI_PENGUMUMAN_COLORS[announcement.kategori]}`}
                     >
-                      <AnnouncementIcon type={announcement.type} />
+                      <AnnouncementIcon kategori={announcement.kategori} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
+                      <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                         <p className="text-sm font-semibold">
-                          {announcement.title}
+                          {announcement.judul}
                         </p>
                         <Badge
-                          variant={
-                            announcementBadgeVariants[announcement.type]
-                          }
+                          variant="outline"
                           className="text-[10px] px-1.5"
                         >
-                          {announcement.type === "info"
-                            ? "Info"
-                            : announcement.type === "warning"
-                              ? "Peringatan"
-                              : "Penting"}
+                          {announcement.kategori}
                         </Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mb-1">
-                        {announcement.description}
+                        {announcement.ringkasan}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {formatDate(announcement.date)}
+                        {announcement.penulis} &middot;{" "}
+                        {formatDate(announcement.tanggal_publish)}
                       </p>
                     </div>
                   </div>
-                  {index < DUMMY_ANNOUNCEMENTS.length - 1 && <Separator />}
+                  {index < announcements.length - 1 && <Separator />}
                 </div>
               ))}
             </div>

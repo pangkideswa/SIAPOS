@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/contexts/auth-context"
+import { NotificationBell } from "@/features/notifications/components/notification-bell"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -12,8 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { LogOut, User, Bell, Search, Settings } from "lucide-react"
-import { useState } from "react"
+import { LogOut, User, Search, Settings, Menu, Clock } from "lucide-react"
+import { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 import type { UserRole } from "@/types/auth"
 
@@ -59,9 +60,11 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith("/admin/absensi")) return "Absensi"
   if (pathname.startsWith("/admin/pengaturan")) return "Pengaturan Sekolah"
   if (pathname.startsWith("/admin/nilai-akademik")) return "Nilai Akademik"
+  if (pathname.match(/^\/admin\/pengumuman\/\d+$/)) return "Detail Pengumuman"
+  if (pathname.startsWith("/admin/pengumuman")) return "Pengumuman"
   if (pathname.startsWith("/admin")) return "Beranda"
   if (pathname.match(/^\/guru\/materi\/\d+$/)) return "Detail Materi"
-  if (pathname.startsWith("/guru/materi")) return "Materi Pembelajaran"
+  if (pathname.startsWith("/guru/materi")) return "Pembelajaran"
   if (pathname.match(/^\/guru\/tugas\/\d+$/)) return "Detail Tugas"
   if (pathname.startsWith("/guru/tugas")) return "Tugas"
   if (pathname.match(/^\/guru\/pengumpulan\/\d+$/)) return "Detail Pengumpulan"
@@ -79,8 +82,11 @@ function getPageTitle(pathname: string): string {
   if (pathname.match(/^\/guru\/absensi\/\d+$/)) return "Input Absensi"
   if (pathname.startsWith("/guru/absensi")) return "Riwayat Absensi"
   if (pathname.startsWith("/guru/nilai-akademik")) return "Nilai Akademik"
+  if (pathname.match(/^\/guru\/pengumuman\/\d+$/)) return "Detail Pengumuman"
+  if (pathname.startsWith("/guru/pengumuman")) return "Pengumuman"
   if (pathname.startsWith("/guru")) return "Beranda"
   if (pathname.startsWith("/siswa/pelajaran")) return "Pelajaran"
+  if (pathname.startsWith("/siswa/jadwal-pelajaran")) return "Jadwal Pelajaran"
   if (pathname.startsWith("/siswa/tugas")) return "Tugas"
   if (pathname.match(/^\/siswa\/quiz\/\d+\/kerjakan$/)) return "Mengerjakan Quiz"
   if (pathname.match(/^\/siswa\/quiz\/\d+\/hasil$/)) return "Hasil Quiz"
@@ -94,6 +100,8 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith("/siswa/simulasi")) return "Simulasi Kirim Tugas"
   if (pathname.startsWith("/siswa/absensi")) return "Absensi Saya"
   if (pathname.startsWith("/siswa/nilai-akademik")) return "Nilai Akademik"
+  if (pathname.match(/^\/siswa\/pengumuman\/\d+$/)) return "Detail Pengumuman"
+  if (pathname.startsWith("/siswa/pengumuman")) return "Pengumuman"
   if (pathname.startsWith("/siswa")) return "Beranda"
   if (pathname.startsWith("/wali/siswa")) return "Siswa"
   if (pathname.startsWith("/wali/laporan")) return "Laporan"
@@ -102,17 +110,42 @@ function getPageTitle(pathname: string): string {
   return "Beranda"
 }
 
-export function TopBar() {
+export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, logout } = useAuth()
   const pathname = usePathname()
   const [searchOpen, setSearchOpen] = useState(false)
+  const [now, setNow] = useState(() => new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
 
   const pageTitle = getPageTitle(pathname)
+
+  const dateLabel = now.toLocaleDateString("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  })
+  const timeLabel = now.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })
 
   return (
     <header className="h-16 border-b border-border bg-white flex items-center justify-between px-4 md:px-6 shrink-0">
       <div className="flex items-center gap-3">
         <div className="md:hidden flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={onMenuClick}
+            aria-label="Buka menu"
+            className="-ml-1"
+          >
+            <Menu className="h-5 w-5 text-muted-foreground" />
+          </Button>
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white font-bold text-sm shadow-sm shadow-primary/20">
             SI
           </div>
@@ -124,6 +157,12 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-2">
+        <div className="hidden xl:flex items-center gap-2 text-xs text-muted-foreground px-2.5 py-1.5 rounded-lg bg-muted whitespace-nowrap">
+          <Clock className="h-4 w-4" />
+          <span>
+            {dateLabel}, {timeLabel}
+          </span>
+        </div>
         <div className="hidden sm:flex items-center gap-2">
           {searchOpen ? (
             <div className="flex items-center">
@@ -146,10 +185,7 @@ export function TopBar() {
           )}
         </div>
 
-        <Button variant="ghost" size="icon-sm" className="relative">
-          <Bell className="h-4 w-4 text-muted-foreground" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full border-2 border-white" />
-        </Button>
+        <NotificationBell />
 
         <span className="hidden lg:block text-xs text-muted-foreground px-2 py-1 rounded-lg bg-muted">
           {getRoleLabel(user?.role ?? "admin" as UserRole)}

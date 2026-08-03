@@ -22,7 +22,7 @@ import {
   Phone,
   Home,
 } from "lucide-react"
-import { SiswaFormSheet } from "./siswa-form-sheet"
+import { SiswaFormDialog } from "./siswa-form-dialog"
 import { SiswaDeleteDialog } from "./siswa-delete-dialog"
 import { STATUS_SISWA_COLORS } from "@/features/siswa/constants/siswa.constants"
 import { DUMMY_SISWA } from "@/features/siswa/dummy/siswa.data"
@@ -91,7 +91,7 @@ export function SiswaDetailPage({
 }) {
   const resolvedParams = use(params)
   const router = useRouter()
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -135,7 +135,7 @@ export function SiswaDetailPage({
           updated_at: new Date().toISOString(),
         }
       }
-      setFormSheetOpen(false)
+      setFormDialogOpen(false)
     } finally {
       setIsLoading(false)
     }
@@ -169,7 +169,7 @@ export function SiswaDetailPage({
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali
             </Button>
-            <Button variant="outline" onClick={() => setFormSheetOpen(true)}>
+            <Button variant="outline" onClick={() => setFormDialogOpen(true)}>
               <Pencil className="mr-2 h-4 w-4" />
               Edit
             </Button>
@@ -318,9 +318,9 @@ export function SiswaDetailPage({
         </div>
       </div>
 
-      <SiswaFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <SiswaFormDialog
+        open={FormDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingSiswa={siswa}
         onSubmit={handleEditSubmit}
         isLoading={isLoading}

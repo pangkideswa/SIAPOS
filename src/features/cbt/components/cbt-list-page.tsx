@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select"
 import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react"
 import { toast } from "sonner"
-import { CBTFormSheet } from "./cbt-form-sheet"
+import { CBTFormDialog } from "./cbt-form-dialog"
 import { CBTDeleteDialog } from "./cbt-delete-dialog"
 import {
   STATUS_CBT_COLORS,
@@ -31,7 +31,7 @@ export function CBTListPage() {
   const [kelasFilter, setKelasFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<CBTExam | null>(null)
   const [deletingItem, setDeletingItem] = useState<CBTExam | null>(null)
@@ -119,7 +119,7 @@ export function CBTListPage() {
           <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" aria-label="Lihat" onClick={() => router.push(`/guru/cbt/${item.id}`)}>
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as CBTExam); setFormSheetOpen(true) }}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as CBTExam); setFormDialogOpen(true) }}>
             <Pencil className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" title="Hapus" aria-label="Hapus" onClick={() => { setDeletingItem(item as unknown as CBTExam); setDeleteDialogOpen(true) }}>
@@ -147,7 +147,7 @@ export function CBTListPage() {
       toast.success("CBT berhasil ditambahkan")
     }
     setIsLoading(false)
-    setFormSheetOpen(false)
+    setFormDialogOpen(false)
     setEditingItem(null)
   }
 
@@ -168,7 +168,7 @@ export function CBTListPage() {
         title="CBT (Computer Based Test)"
         description="Kelola ujian berbasis komputer"
         action={
-          <Button onClick={() => { setEditingItem(null); setFormSheetOpen(true) }}>
+          <Button onClick={() => { setEditingItem(null); setFormDialogOpen(true) }}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah CBT
           </Button>
@@ -210,9 +210,9 @@ export function CBTListPage() {
         onRowClick={(row) => router.push(`/guru/cbt/${(row as unknown as CBTExam).id}`)}
       />
 
-      <CBTFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <CBTFormDialog
+        open={FormDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingItem={editingItem}
         onSubmit={handleSubmit}
         isLoading={isLoading}

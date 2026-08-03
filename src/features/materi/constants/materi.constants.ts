@@ -1,4 +1,4 @@
-import type { MateriFormData } from "../types/materi"
+import type { JenisMateri, MateriFormData } from "../types/materi"
 
 export const STATUS_MATERI_OPTIONS = ["Draft", "Publish"] as const
 
@@ -6,6 +6,17 @@ export const STATUS_MATERI_COLORS: Record<string, string> = {
   Draft: "bg-yellow-100 text-yellow-800",
   Publish: "bg-green-100 text-green-800",
 }
+
+export const JENIS_MATERI_OPTIONS: JenisMateri[] = [
+  "PDF",
+  "DOCX",
+  "PPTX",
+  "Gambar",
+  "Video",
+  "Drive",
+  "URL",
+  "Lainnya",
+]
 
 export const ALLOWED_FILE_TYPES = [
   "application/pdf",
@@ -17,7 +28,8 @@ export const ALLOWED_FILE_TYPES = [
   "image/png",
 ]
 
-export const ALLOWED_FILE_EXTENSIONS = ".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png"
+export const ALLOWED_FILE_EXTENSIONS =
+  ".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png"
 
 export const EMPTY_MATERI_FORM: MateriFormData = {
   judul: "",
@@ -26,9 +38,13 @@ export const EMPTY_MATERI_FORM: MateriFormData = {
   guru_nama: "",
   mata_pelajaran: "",
   kelas: "",
+  pertemuan: null,
+  jenis_materi: "Lainnya",
   thumbnail_url: null,
   lampiran: [],
   video_url: null,
+  link_drive: null,
+  link_eksternal: null,
   isi_materi: "",
   status: "Draft",
 }

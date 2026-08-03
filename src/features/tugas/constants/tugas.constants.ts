@@ -33,6 +33,7 @@ export const EMPTY_TUGAS_FORM: TugasFormData = {
   lampiran: [],
   tanggal_dibuka: "",
   tenggat_waktu: "",
+  tenggat_jam: null,
   nilai_maksimal: 100,
   status: "Draft",
 }

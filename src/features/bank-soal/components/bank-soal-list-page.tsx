@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select"
 import { Plus, Pencil, Trash2, Eye, Copy, Search } from "lucide-react"
 import { toast } from "sonner"
-import { BankSoalFormSheet } from "./bank-soal-form-sheet"
+import { BankSoalFormDialog } from "./bank-soal-form-dialog"
 import { BankSoalDeleteDialog } from "./bank-soal-delete-dialog"
 import {
   TIPE_SOAL_COLORS, KESULITAN_COLORS, STATUS_BANK_SOAL_COLORS,
@@ -31,7 +31,7 @@ export function BankSoalListPage() {
   const [kesulitanFilter, setKesulitanFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<BankSoal | null>(null)
   const [deletingItem, setDeletingItem] = useState<BankSoal | null>(null)
@@ -94,7 +94,7 @@ export function BankSoalListPage() {
           <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" aria-label="Lihat" onClick={() => router.push(`/admin/bank-soal/${item.id}`)}>
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as BankSoal); setFormSheetOpen(true) }}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as BankSoal); setFormDialogOpen(true) }}>
             <Pencil className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" title="Salin" aria-label="Salin" onClick={() => toast.success(`Soal ${String(item.kode_soal)} berhasil disalin`)}>
@@ -125,7 +125,7 @@ export function BankSoalListPage() {
       toast.success("Soal berhasil ditambahkan")
     }
     setIsLoading(false)
-    setFormSheetOpen(false)
+    setFormDialogOpen(false)
     setEditingItem(null)
   }
 
@@ -146,7 +146,7 @@ export function BankSoalListPage() {
         title="Bank Soal"
         description="Kelola soal-soal untuk ujian dan penilaian"
         action={
-          <Button onClick={() => { setEditingItem(null); setFormSheetOpen(true) }}>
+          <Button onClick={() => { setEditingItem(null); setFormDialogOpen(true) }}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah Soal
           </Button>
@@ -202,9 +202,9 @@ export function BankSoalListPage() {
         onRowClick={(row) => router.push(`/admin/bank-soal/${(row as unknown as BankSoal).id}`)}
       />
 
-      <BankSoalFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <BankSoalFormDialog
+        open={FormDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingItem={editingItem}
         onSubmit={handleSubmit}
         isLoading={isLoading}

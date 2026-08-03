@@ -10,11 +10,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Eye, EyeOff, Loader2, Shield, GraduationCap, BookOpen, User } from "lucide-react"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { motion } from "framer-motion"
-import { cn } from "@/lib/utils"
-import { DEMO_ACCOUNTS } from "@/lib/demo-users"
-import type { UserRole } from "@/types/auth"
 
 const loginSchema = z.object({
   identifier: z
@@ -27,30 +24,6 @@ const loginSchema = z.object({
 })
 
 type LoginValues = z.infer<typeof loginSchema>
-
-const roleIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  admin: Shield,
-  guru: BookOpen,
-  siswa: GraduationCap,
-}
-
-const roleLabels: Record<string, string> = {
-  admin: "Admin",
-  guru: "Guru",
-  siswa: "Siswa",
-}
-
-const roleColors: Record<string, string> = {
-  admin: "border-primary/30 bg-primary/5 hover:border-primary/50",
-  guru: "border-orange/30 bg-orange/5 hover:border-orange/50",
-  siswa: "border-emerald-300 bg-emerald-50 hover:border-emerald-400",
-}
-
-const roleIconColors: Record<string, string> = {
-  admin: "text-primary",
-  guru: "text-orange",
-  siswa: "text-emerald-600",
-}
 
 export function LoginForm() {
   const { login } = useAuth()
@@ -84,18 +57,11 @@ export function LoginForm() {
     }
   }
 
-  const handleDemoLogin = async (role: UserRole) => {
+  const handleGoogleLogin = () => {
     setServerError("")
-    const account = DEMO_ACCOUNTS.find((a) => a.role === role)
-    if (!account) return
-    setValue("identifier", account.email)
-    setValue("password", account.password)
-    try {
-      await login(account.email, account.password)
-    } catch (err: unknown) {
-      const apiErr = err as { message?: string }
-      setServerError(apiErr.message ?? "Gagal login demo")
-    }
+    window.alert(
+      "Login dengan Google belum tersedia. Gunakan email dan kata sandi untuk masuk."
+    )
   }
 
   return (
@@ -210,46 +176,49 @@ export function LoginForm() {
             )}
           </Button>
         </form>
-      </div>
 
-      <div className="mt-6">
-        <div className="relative">
+        <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="bg-gradient-to-br from-primary/5 via-white to-orange/5 px-3 text-muted-foreground">
-              Atau masuk dengan akun demo
+            <span className="bg-white px-3 text-muted-foreground">
+              Atau masuk dengan
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mt-4">
-          {DEMO_ACCOUNTS.map((account) => {
-            const Icon = roleIcons[account.role] ?? User
-            return (
-              <button
-                key={account.role}
-                type="button"
-                onClick={() => handleDemoLogin(account.role)}
-                disabled={isSubmitting}
-                className={cn(
-                  "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200",
-                  roleColors[account.role],
-                  isSubmitting && "opacity-50 pointer-events-none"
-                )}
-              >
-                <Icon className={cn("h-5 w-5", roleIconColors[account.role])} />
-                <span className="text-xs font-semibold text-foreground">
-                  {roleLabels[account.role]}
-                </span>
-                <span className="text-[10px] text-muted-foreground leading-tight text-center">
-                  {account.email}
-                </span>
-              </button>
-            )
-          })}
-        </div>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleGoogleLogin}
+          className="w-full h-11 text-sm font-semibold gap-3"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className="h-5 w-5"
+            aria-hidden="true"
+          >
+            <path
+              fill="#4285F4"
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+            />
+          </svg>
+          Login dengan Google
+        </Button>
       </div>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">

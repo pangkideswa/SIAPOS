@@ -20,6 +20,13 @@ export type TargetPengumuman =
   | "TBSM"
   | "BDP"
 
+export interface LampiranPengumuman {
+  id: number
+  nama: string
+  ukuran: string
+  tipe: string
+}
+
 export interface Pengumuman {
   id: number
   judul: string
@@ -27,9 +34,11 @@ export interface Pengumuman {
   isi: string
   kategori: KategoriPengumuman
   target: TargetPengumuman
+  kelas?: string
   status: StatusPengumuman
   penulis: string
   pinned: boolean
+  lampiran: LampiranPengumuman[]
   tanggal_publish: string
   created_at: string
   updated_at: string

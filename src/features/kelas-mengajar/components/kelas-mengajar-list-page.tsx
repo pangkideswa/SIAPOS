@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus, Pencil, Trash2, Search } from "lucide-react"
-import { KelasMengajarFormSheet } from "./kelas-mengajar-form-sheet"
+import { KelasMengajarFormDialog } from "./kelas-mengajar-form-dialog"
 import { KelasMengajarDeleteDialog } from "./kelas-mengajar-delete-dialog"
 import {
   STATUS_COLORS,
@@ -32,7 +32,7 @@ export function KelasMengajarListPage() {
   const [kelasFilter, setKelasFilter] = useState<string>("all")
   const [tahunFilter, setTahunFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<KelasMengajar | null>(null)
   const [deletingItem, setDeletingItem] = useState<KelasMengajar | null>(null)
@@ -167,12 +167,12 @@ export function KelasMengajarListPage() {
 
   function openCreate() {
     setEditingItem(null)
-    setFormSheetOpen(true)
+    setFormDialogOpen(true)
   }
 
   function openEdit(item: KelasMengajar) {
     setEditingItem(item)
-    setFormSheetOpen(true)
+    setFormDialogOpen(true)
   }
 
   const handleFormSubmit = useCallback(
@@ -201,7 +201,7 @@ export function KelasMengajarListPage() {
           }
           DUMMY_KELAS_MENGAJAR.push(newItem)
         }
-        setFormSheetOpen(false)
+        setFormDialogOpen(false)
       } finally {
         setIsLoading(false)
       }
@@ -343,9 +343,9 @@ export function KelasMengajarListPage() {
         </div>
       )}
 
-      <KelasMengajarFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <KelasMengajarFormDialog
+        open={FormDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingItem={editingItem}
         onSubmit={handleFormSubmit}
         isLoading={isLoading}

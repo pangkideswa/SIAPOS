@@ -18,7 +18,7 @@ export const DEMO_ACCOUNTS: DemoAccount[] = [
   },
   {
     id: 2,
-    name: "Siti Nurhaliza, S.Pd.",
+    name: "Asep Nugraha",
     email: "guru@siapos.id",
     password: "Guru123!",
     role: "guru",
@@ -29,7 +29,7 @@ export const DEMO_ACCOUNTS: DemoAccount[] = [
   },
   {
     id: 3,
-    name: "Ahmad Rizki Pratama",
+    name: "Rizki Pratama",
     email: "siswa@siapos.id",
     password: "Siswa123!",
     role: "siswa",

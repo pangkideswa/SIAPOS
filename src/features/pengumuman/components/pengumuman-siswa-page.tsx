@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Search, Pin } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Search } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
 import { Input } from "@/components/ui/input"
 import {
@@ -11,96 +12,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
 import type { Pengumuman } from "../types/pengumuman"
-import {
-  KATEGORI_PENGUMUMAN_OPTIONS,
-  KATEGORI_PENGUMUMAN_COLORS,
-  STATUS_PENGUMUMAN_COLORS,
-} from "../constants/pengumuman.constants"
+import { KATEGORI_PENGUMUMAN_OPTIONS } from "../constants/pengumuman.constants"
 import { DUMMY_PENGUMUMAN } from "../dummy/pengumuman.data"
-import { PengumumanDetailDialog } from "./pengumuman-detail-dialog"
-import { DataTable, type Column } from "@/components/ui/data-table"
-import { formatDateID } from "@/features/kalender-akademik/components/kalender-helpers"
-
-const PER_PAGE = 10
-
-type Row = Record<string, unknown> & {
-  id: number
-  judul: string
-  kategori: string
-  status: string
-  tanggal_publish: string
-  pinned: boolean
-}
+import { AnnouncementCard } from "./pengumuman-card"
 
 export function PengumumanSiswaPage() {
+  const router = useRouter()
   const [items] = useState<Pengumuman[]>(
     DUMMY_PENGUMUMAN.filter(
       (d) =>
         d.status === "Dipublikasikan" &&
-        (d.target === "Semua Pengguna" || d.target === "Siswa")
+        (d.target === "Semua Pengguna" ||
+          d.target === "Siswa" ||
+          d.target === "Kelas Tertentu")
     )
   )
   const [search, setSearch] = useState("")
   const [kategoriFilter, setKategoriFilter] = useState("all")
-  const [page, setPage] = useState(1)
-  const [detailOpen, setDetailOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<Pengumuman | null>(null)
 
   const filteredData = useMemo(() => {
     let data = [...items]
     if (search) {
       const q = search.toLowerCase()
-      data = data.filter((d) => d.judul.toLowerCase().includes(q))
+      data = data.filter(
+        (d) => d.judul.toLowerCase().includes(q) || d.ringkasan.toLowerCase().includes(q)
+      )
     }
     if (kategoriFilter !== "all") data = data.filter((d) => d.kategori === kategoriFilter)
-    return data
+    return data.sort(
+      (a, b) =>
+        Number(b.pinned) - Number(a.pinned) ||
+        b.tanggal_publish.localeCompare(a.tanggal_publish)
+    )
   }, [items, search, kategoriFilter])
 
-  const totalPages = Math.ceil(filteredData.length / PER_PAGE)
-  const paginatedData = filteredData.slice((page - 1) * PER_PAGE, page * PER_PAGE)
-
-  const handleDetail = (item: Pengumuman) => {
-    setSelectedItem(item)
-    setDetailOpen(true)
+  const openDetail = (id: number) => {
+    router.push(`/siswa/pengumuman/${id}`)
   }
-
-  const columns: Column<Row>[] = [
-    {
-      key: "judul",
-      header: "Judul",
-      render: (item) => (
-        <div className="flex items-center gap-2">
-          {item.pinned && <Pin className="h-3.5 w-3.5 text-red-500 shrink-0" />}
-          <span className="font-medium">{item.judul}</span>
-        </div>
-      ),
-    },
-    {
-      key: "kategori",
-      header: "Kategori",
-      render: (item) => (
-        <Badge className={KATEGORI_PENGUMUMAN_COLORS[item.kategori as keyof typeof KATEGORI_PENGUMUMAN_COLORS] ?? ""}>
-          {item.kategori}
-        </Badge>
-      ),
-    },
-    {
-      key: "status",
-      header: "Status",
-      render: (item) => (
-        <Badge className={STATUS_PENGUMUMAN_COLORS[item.status as keyof typeof STATUS_PENGUMUMAN_COLORS] ?? ""}>
-          {item.status}
-        </Badge>
-      ),
-    },
-    {
-      key: "tanggal_publish",
-      header: "Tanggal",
-      render: (item) => formatDateID(item.tanggal_publish),
-    },
-  ]
 
   return (
     <div className="space-y-6">
@@ -115,11 +64,11 @@ export function PengumumanSiswaPage() {
           <Input
             placeholder="Cari pengumuman..."
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+            onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
           />
         </div>
-        <Select value={kategoriFilter} onValueChange={(v) => { setKategoriFilter(v ?? "all"); setPage(1) }}>
+        <Select value={kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "all")}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Kategori" />
           </SelectTrigger>
@@ -132,42 +81,21 @@ export function PengumumanSiswaPage() {
         </Select>
       </div>
 
-      <DataTable<Row>
-        columns={columns}
-        data={paginatedData as unknown as Row[]}
-        emptyMessage="Tidak ada pengumuman"
-        onRowClick={(item) => handleDetail(items.find((d) => d.id === item.id)!)}
-      />
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4">
-          <p className="text-sm text-muted-foreground">
-            Menampilkan {(page - 1) * PER_PAGE + 1}-
-            {Math.min(page * PER_PAGE, filteredData.length)} dari {filteredData.length} data
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="px-3 py-1 text-sm rounded-md border border-border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
-            >
-              Sebelumnya
-            </button>
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="px-3 py-1 text-sm rounded-md border border-border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted"
-            >
-              Selanjutnya
-            </button>
-          </div>
+      {filteredData.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filteredData.map((item) => (
+            <AnnouncementCard
+              key={item.id}
+              data={item}
+              onClick={() => openDetail(item.id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-lg border border-border bg-card py-16 text-center text-muted-foreground">
+          Tidak ada pengumuman
         </div>
       )}
-
-      <PengumumanDetailDialog
-        open={detailOpen}
-        onOpenChange={setDetailOpen}
-        data={selectedItem}
-      />
     </div>
   )
 }

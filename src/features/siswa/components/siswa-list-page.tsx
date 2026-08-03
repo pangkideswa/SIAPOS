@@ -23,7 +23,7 @@ import {
   Upload,
   Download,
 } from "lucide-react"
-import { SiswaFormSheet } from "./siswa-form-sheet"
+import { SiswaFormDialog } from "./siswa-form-dialog"
 import { SiswaDeleteDialog } from "./siswa-delete-dialog"
 import {
   STATUS_SISWA_COLORS,
@@ -42,7 +42,7 @@ export function SiswaListPage() {
   const [kelasFilter, setKelasFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [editingSiswa, setEditingSiswa] = useState<Siswa | null>(null)
   const [deletingSiswa, setDeletingSiswa] = useState<Siswa | null>(null)
@@ -175,12 +175,12 @@ export function SiswaListPage() {
 
   function openCreate() {
     setEditingSiswa(null)
-    setFormSheetOpen(true)
+    setFormDialogOpen(true)
   }
 
   function openEdit(siswa: Siswa) {
     setEditingSiswa(siswa)
-    setFormSheetOpen(true)
+    setFormDialogOpen(true)
   }
 
   function handleImport() {
@@ -259,7 +259,7 @@ export function SiswaListPage() {
           }
           DUMMY_SISWA.push(newSiswa)
         }
-        setFormSheetOpen(false)
+        setFormDialogOpen(false)
       } finally {
         setIsLoading(false)
       }
@@ -450,9 +450,9 @@ export function SiswaListPage() {
         </div>
       )}
 
-      <SiswaFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <SiswaFormDialog
+        open={FormDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingSiswa={editingSiswa}
         onSubmit={handleFormSubmit}
         isLoading={isLoading}

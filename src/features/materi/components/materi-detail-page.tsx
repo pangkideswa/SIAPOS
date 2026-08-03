@@ -19,10 +19,10 @@ import {
   School,
   Download,
 } from "lucide-react"
-import { MateriFormSheet } from "./materi-form-sheet"
+import { MateriFormDialog } from "./materi-form-dialog"
 import { MateriDeleteDialog } from "./materi-delete-dialog"
 import { STATUS_MATERI_COLORS } from "@/features/materi/constants/materi.constants"
-import { DUMMY_MATERI } from "@/features/materi/dummy/materi.data"
+import { materialService } from "@/features/materi/lib/material.service"
 import type { MateriFormData } from "@/features/materi/types/materi"
 
 function formatDate(dateStr: string) {
@@ -77,30 +77,21 @@ export function MateriDetailPage({
 }) {
   const resolvedParams = use(params)
   const router = useRouter()
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [formDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const materi = DUMMY_MATERI.find(
-    (m) => m.id === Number(resolvedParams.id)
-  )
+  const materi = materialService.getById(Number(resolvedParams.id))
 
   function handleEditSubmit(data: MateriFormData) {
     return new Promise<void>(async (resolve) => {
       setIsLoading(true)
       await new Promise((r) => setTimeout(r, 500))
       if (materi) {
-        const idx = DUMMY_MATERI.findIndex((m) => m.id === materi.id)
-        if (idx !== -1) {
-          DUMMY_MATERI[idx] = {
-            ...DUMMY_MATERI[idx],
-            ...data,
-            updated_at: new Date().toISOString(),
-          }
-        }
+        materialService.update(materi.id, data)
       }
       setIsLoading(false)
-      setFormSheetOpen(false)
+      setFormDialogOpen(false)
       resolve()
     })
   }
@@ -109,8 +100,7 @@ export function MateriDetailPage({
     if (!materi) return
     setIsLoading(true)
     setTimeout(() => {
-      const idx = DUMMY_MATERI.findIndex((m) => m.id === materi.id)
-      if (idx !== -1) DUMMY_MATERI.splice(idx, 1)
+      materialService.remove(materi.id)
       setIsLoading(false)
       setDeleteDialogOpen(false)
       router.push("/guru/materi")
@@ -162,7 +152,7 @@ export function MateriDetailPage({
             </Button>
             <Button
               variant="outline"
-              onClick={() => setFormSheetOpen(true)}
+              onClick={() => setFormDialogOpen(true)}
             >
               <Pencil className="mr-2 h-4 w-4" />
               Edit
@@ -325,9 +315,9 @@ export function MateriDetailPage({
         </div>
       </div>
 
-      <MateriFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <MateriFormDialog
+        open={formDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingItem={materi}
         onSubmit={handleEditSubmit}
         isLoading={isLoading}

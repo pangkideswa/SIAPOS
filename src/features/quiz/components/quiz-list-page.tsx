@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select"
 import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react"
 import { toast } from "sonner"
-import { QuizFormSheet } from "./quiz-form-sheet"
+import { QuizFormDialog } from "./quiz-form-dialog"
 import { QuizDeleteDialog } from "./quiz-delete-dialog"
 import {
   STATUS_QUIZ_COLORS,
@@ -33,7 +33,7 @@ export function QuizListPage() {
   const [kelasFilter, setKelasFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<Quiz | null>(null)
   const [deletingItem, setDeletingItem] = useState<Quiz | null>(null)
@@ -111,7 +111,7 @@ export function QuizListPage() {
           <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" aria-label="Lihat" onClick={() => router.push(`/guru/quiz/${item.id}`)}>
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as Quiz); setFormSheetOpen(true) }}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as Quiz); setFormDialogOpen(true) }}>
             <Pencil className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" title="Hapus" aria-label="Hapus" onClick={() => { setDeletingItem(item as unknown as Quiz); setDeleteDialogOpen(true) }}>
@@ -139,7 +139,7 @@ export function QuizListPage() {
       toast.success("Quiz berhasil ditambahkan")
     }
     setIsLoading(false)
-    setFormSheetOpen(false)
+    setFormDialogOpen(false)
     setEditingItem(null)
   }
 
@@ -160,7 +160,7 @@ export function QuizListPage() {
         title="Quiz"
         description="Kelola quiz untuk siswa"
         action={
-          <Button onClick={() => { setEditingItem(null); setFormSheetOpen(true) }}>
+          <Button onClick={() => { setEditingItem(null); setFormDialogOpen(true) }}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah Quiz
           </Button>
@@ -209,9 +209,9 @@ export function QuizListPage() {
         onRowClick={(row) => router.push(`/guru/quiz/${(row as unknown as Quiz).id}`)}
       />
 
-      <QuizFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <QuizFormDialog
+        open={FormDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingItem={editingItem}
         onSubmit={handleSubmit}
         isLoading={isLoading}

@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Plus, Search, Pin } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Plus, Search, Pin, Eye, Pencil, Trash2 } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select,
   SelectContent,
@@ -15,21 +17,23 @@ import {
 import { Badge } from "@/components/ui/badge"
 import type { Pengumuman } from "../types/pengumuman"
 import {
+  GURU_PENULIS,
   KATEGORI_PENGUMUMAN_OPTIONS,
   STATUS_PENGUMUMAN_OPTIONS,
   KATEGORI_PENGUMUMAN_COLORS,
   STATUS_PENGUMUMAN_COLORS,
 } from "../constants/pengumuman.constants"
 import { DUMMY_PENGUMUMAN } from "../dummy/pengumuman.data"
+import { getPengumumanTargetRoles } from "../lib/pengumuman-helpers"
+import { pushNotifikasi } from "@/features/notifications/lib/notifikasi-service"
 import { PengumumanSummaryCards } from "./pengumuman-summary-cards"
 import { PengumumanFormDialog } from "./pengumuman-form-dialog"
-import { PengumumanDetailDialog } from "./pengumuman-detail-dialog"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { formatDateID } from "@/features/kalender-akademik/components/kalender-helpers"
 
 const PER_PAGE = 10
-const GURU_PENULIS = "Asep Nugraha"
+const TEACHER_KELAS = ["X TKJ 1", "X TKJ 2"]
 
 type Row = Record<string, unknown> & {
   id: number
@@ -42,20 +46,21 @@ type Row = Record<string, unknown> & {
 }
 
 export function PengumumanGuruPage() {
+  const router = useRouter()
   const [items, setItems] = useState<Pengumuman[]>(DUMMY_PENGUMUMAN)
   const [search, setSearch] = useState("")
   const [kategoriFilter, setKategoriFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [mineOnly, setMineOnly] = useState(false)
   const [page, setPage] = useState(1)
   const [formOpen, setFormOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<Pengumuman | null>(null)
-  const [detailOpen, setDetailOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<Pengumuman | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
 
   const filteredData = useMemo(() => {
     let data = [...items]
+    if (mineOnly) data = data.filter((d) => d.penulis === GURU_PENULIS)
     if (search) {
       const q = search.toLowerCase()
       data = data.filter((d) => d.judul.toLowerCase().includes(q))
@@ -63,7 +68,7 @@ export function PengumumanGuruPage() {
     if (kategoriFilter !== "all") data = data.filter((d) => d.kategori === kategoriFilter)
     if (statusFilter !== "all") data = data.filter((d) => d.status === statusFilter)
     return data
-  }, [items, search, kategoriFilter, statusFilter])
+  }, [items, search, kategoriFilter, statusFilter, mineOnly])
 
   const totalPages = Math.ceil(filteredData.length / PER_PAGE)
   const paginatedData = filteredData.slice((page - 1) * PER_PAGE, page * PER_PAGE)
@@ -101,11 +106,19 @@ export function PengumumanGuruPage() {
     } else {
       setItems((prev) => [{ ...data, penulis: GURU_PENULIS }, ...prev])
     }
+    if (data.status === "Dipublikasikan") {
+      pushNotifikasi({
+        tipe: "pengumuman",
+        judul: `Pengumuman Baru: ${data.judul}`,
+        pesan: `Pengumuman "${data.judul}" telah dipublikasikan.`,
+        href: "/siswa/pengumuman",
+        target_roles: getPengumumanTargetRoles(data.target),
+      })
+    }
   }
 
-  const handleDetail = (item: Pengumuman) => {
-    setSelectedItem(item)
-    setDetailOpen(true)
+  const openDetail = (id: number) => {
+    router.push(`/guru/pengumuman/${id}`)
   }
 
   const columns: Column<Row>[] = [
@@ -146,17 +159,26 @@ export function PengumumanGuruPage() {
     {
       key: "aksi",
       header: "Aksi",
-      className: "w-[140px]",
+      className: "w-[180px]",
       render: (item) => {
         const isMyItem = item.penulis === GURU_PENULIS
         return (
-          <div className="flex gap-1">
+          <div className="flex gap-1 flex-wrap">
+            <Button
+              variant="ghost"
+              size="xs"
+              onClick={(e) => { e.stopPropagation(); openDetail(item.id) }}
+            >
+              <Eye className="h-3 w-3" />
+              Lihat
+            </Button>
             <Button
               variant="ghost"
               size="xs"
               disabled={!isMyItem}
               onClick={(e) => { e.stopPropagation(); if (isMyItem) handleEdit(items.find((d) => d.id === item.id)!) }}
             >
+              <Pencil className="h-3 w-3" />
               Edit
             </Button>
             <Button
@@ -166,6 +188,7 @@ export function PengumumanGuruPage() {
               disabled={!isMyItem}
               onClick={(e) => { e.stopPropagation(); if (isMyItem) handleDelete(item.id) }}
             >
+              <Trash2 className="h-3 w-3" />
               Hapus
             </Button>
           </div>
@@ -221,13 +244,20 @@ export function PengumumanGuruPage() {
             ))}
           </SelectContent>
         </Select>
+        <label className="flex items-center gap-2 self-center cursor-pointer">
+          <Checkbox
+            checked={mineOnly}
+            onCheckedChange={(checked) => { setMineOnly(checked); setPage(1) }}
+          />
+          <span className="text-sm">Milik Saya</span>
+        </label>
       </div>
 
       <DataTable<Row>
         columns={columns}
         data={paginatedData as unknown as Row[]}
         emptyMessage="Tidak ada data pengumuman"
-        onRowClick={(item) => handleDetail(items.find((d) => d.id === item.id)!)}
+        onRowClick={(item) => openDetail(item.id)}
       />
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-4">
@@ -259,12 +289,8 @@ export function PengumumanGuruPage() {
         onOpenChange={setFormOpen}
         data={editingItem}
         onSave={handleSave}
-      />
-
-      <PengumumanDetailDialog
-        open={detailOpen}
-        onOpenChange={setDetailOpen}
-        data={selectedItem}
+        teacherMode
+        allowedKelas={TEACHER_KELAS}
       />
 
       <ConfirmDialog

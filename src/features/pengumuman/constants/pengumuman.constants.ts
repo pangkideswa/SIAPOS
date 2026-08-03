@@ -32,6 +32,24 @@ export const TARGET_OPTIONS: TargetPengumuman[] = [
   "BDP",
 ]
 
+export const KELAS_PENGUMUMAN_OPTIONS = [
+  "X TKJ 1",
+  "X TKJ 2",
+  "XI TKJ 1",
+  "XI TKJ 2",
+  "XII TKJ 1",
+  "XII TKJ 2",
+  "X TBSM 1",
+  "X TBSM 2",
+  "XI TBSM 1",
+  "XI TBSM 2",
+] as const
+
+export const GURU_PENULIS = "Asep Nugraha"
+
+export const ALLOWED_ATTACHMENT_TYPES =
+  "application/pdf,.doc,.docx,image/jpeg,image/png,image/jpg,image/webp"
+
 export const KATEGORI_PENGUMUMAN_COLORS: Record<KategoriPengumuman, string> = {
   Akademik: "bg-blue-100 text-blue-800",
   Pembelajaran: "bg-green-100 text-green-800",
@@ -66,8 +84,17 @@ export const EMPTY_PENGUMUMAN_FORM = {
   isi: "",
   kategori: "Informasi Umum" as KategoriPengumuman,
   target: "Semua Pengguna" as TargetPengumuman,
+  kelas: "",
   status: "Draft" as StatusPengumuman,
   penulis: "",
   pinned: false,
+  lampiran: [] as {
+    id: number
+    nama: string
+    ukuran: string
+    tipe: string
+  }[],
   tanggal_publish: new Date().toISOString().split("T")[0],
 }
+
+export type PengumumanFormData = typeof EMPTY_PENGUMUMAN_FORM

@@ -20,10 +20,10 @@ import {
   ClipboardList,
 } from "lucide-react"
 import { toast } from "sonner"
-import { TugasFormSheet } from "./tugas-form-sheet"
+import { TugasFormDialog } from "./tugas-form-dialog"
 import { TugasDeleteDialog } from "./tugas-delete-dialog"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
-import { DUMMY_TUGAS } from "@/features/tugas/dummy/tugas.data"
+import { assignmentService } from "@/features/tugas/lib/assignment.service"
 import type { TugasFormData } from "@/features/tugas/types/tugas"
 
 function formatDate(dateStr: string) {
@@ -71,28 +71,21 @@ export function TugasDetailPage({
 }) {
   const resolvedParams = use(params)
   const router = useRouter()
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [formDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const tugas = DUMMY_TUGAS.find((t) => t.id === Number(resolvedParams.id))
+  const tugas = assignmentService.getById(Number(resolvedParams.id))
 
   function handleEditSubmit(data: TugasFormData) {
     return new Promise<void>(async (resolve) => {
       setIsLoading(true)
       await new Promise((r) => setTimeout(r, 500))
       if (tugas) {
-        const idx = DUMMY_TUGAS.findIndex((t) => t.id === tugas.id)
-        if (idx !== -1) {
-          DUMMY_TUGAS[idx] = {
-            ...DUMMY_TUGAS[idx],
-            ...data,
-            updated_at: new Date().toISOString(),
-          }
-        }
+        assignmentService.update(tugas.id, data)
       }
       setIsLoading(false)
-      setFormSheetOpen(false)
+      setFormDialogOpen(false)
       toast.success("Tugas berhasil diperbarui.")
       resolve()
     })
@@ -102,8 +95,7 @@ export function TugasDetailPage({
     if (!tugas) return
     setIsLoading(true)
     setTimeout(() => {
-      const idx = DUMMY_TUGAS.findIndex((t) => t.id === tugas.id)
-      if (idx !== -1) DUMMY_TUGAS.splice(idx, 1)
+      assignmentService.remove(tugas.id)
       setIsLoading(false)
       setDeleteDialogOpen(false)
       toast.success("Tugas berhasil dihapus.")
@@ -150,7 +142,7 @@ export function TugasDetailPage({
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali
             </Button>
-            <Button variant="outline" onClick={() => setFormSheetOpen(true)}>
+            <Button variant="outline" onClick={() => setFormDialogOpen(true)}>
               <Pencil className="mr-2 h-4 w-4" />
               Edit
             </Button>
@@ -196,7 +188,11 @@ export function TugasDetailPage({
               <InfoRow
                 icon={Clock}
                 label="Tenggat Waktu"
-                value={formatDate(tugas.tenggat_waktu)}
+                value={
+                  tugas.tenggat_jam
+                    ? `${formatDate(tugas.tenggat_waktu)} ${tugas.tenggat_jam} WIB`
+                    : formatDate(tugas.tenggat_waktu)
+                }
               />
               <InfoRow
                 icon={Calendar}
@@ -276,9 +272,9 @@ export function TugasDetailPage({
         </div>
       </div>
 
-      <TugasFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <TugasFormDialog
+        open={formDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingItem={tugas}
         onSubmit={handleEditSubmit}
         isLoading={isLoading}

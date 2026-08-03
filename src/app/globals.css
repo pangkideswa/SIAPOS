@@ -101,3 +101,39 @@
     @apply font-sans scroll-smooth;
   }
 }
+
+.rich-text-content:empty::before {
+  content: attr(data-placeholder);
+  color: var(--muted-foreground);
+  font-style: italic;
+  pointer-events: none;
+}
+
+.rich-text-content h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0.75rem 0 0.375rem;
+}
+
+.rich-text-content p {
+  margin: 0.375rem 0;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+  margin: 0.375rem 0;
+  padding-left: 1.5rem;
+}
+
+.rich-text-content ul {
+  list-style: disc;
+}
+
+.rich-text-content ol {
+  list-style: decimal;
+}
+
+.rich-text-content li {
+  margin: 0.125rem 0;
+}

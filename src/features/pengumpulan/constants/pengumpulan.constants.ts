@@ -14,6 +14,8 @@ export const STATUS_PENGUMPULAN_COLORS: Record<string, string> = {
 
 export const ALLOWED_PENGUMPULAN_EXTENSIONS = ".pdf,.doc,.docx,.ppt,.pptx,.zip"
 
+export const MAX_PENGUMPULAN_FILE_SIZE_MB = 20
+
 export const EMPTY_PENGUMPULAN_FORM: PengumpulanTugasFormData = {
   file_jawaban: null,
   catatan: "",

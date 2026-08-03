@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus, Pencil, Trash2, Search, Eye } from "lucide-react"
-import { GuruFormSheet } from "./guru-form-sheet"
+import { GuruFormDialog } from "./guru-form-dialog"
 import { GuruDeleteDialog } from "./guru-delete-dialog"
 import {
   STATUS_KEPEGAWAIAN_COLORS,
@@ -31,7 +31,7 @@ export function GuruListPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [jkFilter, setJkFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [editingGuru, setEditingGuru] = useState<Guru | null>(null)
   const [deletingGuru, setDeletingGuru] = useState<Guru | null>(null)
@@ -175,12 +175,12 @@ export function GuruListPage() {
 
   function openCreate() {
     setEditingGuru(null)
-    setFormSheetOpen(true)
+    setFormDialogOpen(true)
   }
 
   function openEdit(guru: Guru) {
     setEditingGuru(guru)
-    setFormSheetOpen(true)
+    setFormDialogOpen(true)
   }
 
   const handleFormSubmit = useCallback(
@@ -208,7 +208,7 @@ export function GuruListPage() {
           }
           DUMMY_GURU.push(newGuru)
         }
-        setFormSheetOpen(false)
+        setFormDialogOpen(false)
       } finally {
         setIsLoading(false)
       }
@@ -331,9 +331,9 @@ export function GuruListPage() {
         </div>
       )}
 
-      <GuruFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <GuruFormDialog
+        open={FormDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingGuru={editingGuru}
         onSubmit={handleFormSubmit}
         isLoading={isLoading}

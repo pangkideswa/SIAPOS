@@ -1,7 +1,17 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Plus, Search, Pin } from "lucide-react"
+import { useRouter } from "next/navigation"
+import {
+  Plus,
+  Search,
+  Pin,
+  PinOff,
+  Eye,
+  Pencil,
+  Trash2,
+  Send,
+} from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,9 +32,10 @@ import {
   STATUS_PENGUMUMAN_COLORS,
 } from "../constants/pengumuman.constants"
 import { DUMMY_PENGUMUMAN } from "../dummy/pengumuman.data"
+import { getPengumumanTargetRoles } from "../lib/pengumuman-helpers"
+import { pushNotifikasi } from "@/features/notifications/lib/notifikasi-service"
 import { PengumumanSummaryCards } from "./pengumuman-summary-cards"
 import { PengumumanFormDialog } from "./pengumuman-form-dialog"
-import { PengumumanDetailDialog } from "./pengumuman-detail-dialog"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { formatDateID } from "@/features/kalender-akademik/components/kalender-helpers"
@@ -43,16 +54,16 @@ type Row = Record<string, unknown> & {
 }
 
 export function PengumumanAdminPage() {
+  const router = useRouter()
   const [items, setItems] = useState<Pengumuman[]>(DUMMY_PENGUMUMAN)
   const [search, setSearch] = useState("")
   const [kategoriFilter, setKategoriFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [targetFilter, setTargetFilter] = useState("all")
+  const [pinnedFilter, setPinnedFilter] = useState("all")
   const [page, setPage] = useState(1)
   const [formOpen, setFormOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<Pengumuman | null>(null)
-  const [detailOpen, setDetailOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<Pengumuman | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
 
@@ -60,13 +71,24 @@ export function PengumumanAdminPage() {
     let data = [...items]
     if (search) {
       const q = search.toLowerCase()
-      data = data.filter((d) => d.judul.toLowerCase().includes(q))
+      data = data.filter(
+        (d) =>
+          d.judul.toLowerCase().includes(q) ||
+          d.kategori.toLowerCase().includes(q) ||
+          d.penulis.toLowerCase().includes(q)
+      )
     }
     if (kategoriFilter !== "all") data = data.filter((d) => d.kategori === kategoriFilter)
     if (statusFilter !== "all") data = data.filter((d) => d.status === statusFilter)
     if (targetFilter !== "all") data = data.filter((d) => d.target === targetFilter)
-    return data
-  }, [items, search, kategoriFilter, statusFilter, targetFilter])
+    if (pinnedFilter === "pinned") data = data.filter((d) => d.pinned)
+    if (pinnedFilter === "not-pinned") data = data.filter((d) => !d.pinned)
+    return data.sort(
+      (a, b) =>
+        Number(b.pinned) - Number(a.pinned) ||
+        b.tanggal_publish.localeCompare(a.tanggal_publish)
+    )
+  }, [items, search, kategoriFilter, statusFilter, targetFilter, pinnedFilter])
 
   const totalPages = Math.ceil(filteredData.length / PER_PAGE)
   const paginatedData = filteredData.slice((page - 1) * PER_PAGE, page * PER_PAGE)
@@ -100,11 +122,49 @@ export function PengumumanAdminPage() {
     } else {
       setItems((prev) => [data, ...prev])
     }
+    if (data.status === "Dipublikasikan") {
+      pushNotifikasi({
+        tipe: "pengumuman",
+        judul: `Pengumuman Baru: ${data.judul}`,
+        pesan: `Pengumuman "${data.judul}" telah dipublikasikan.`,
+        href: "/siswa/pengumuman",
+        target_roles: getPengumumanTargetRoles(data.target),
+      })
+    }
   }
 
-  const handleDetail = (item: Pengumuman) => {
-    setSelectedItem(item)
-    setDetailOpen(true)
+  const togglePin = (id: number) => {
+    setItems((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, pinned: !d.pinned } : d))
+    )
+  }
+
+  const togglePublish = (id: number) => {
+    const target = items.find((d) => d.id === id)
+    const nextStatus = target?.status === "Dipublikasikan" ? "Draft" : "Dipublikasikan"
+    setItems((prev) =>
+      prev.map((d) =>
+        d.id === id
+          ? {
+              ...d,
+              status: nextStatus,
+            }
+          : d
+      )
+    )
+    if (target && nextStatus === "Dipublikasikan") {
+      pushNotifikasi({
+        tipe: "pengumuman",
+        judul: `Pengumuman Baru: ${target.judul}`,
+        pesan: `Pengumuman "${target.judul}" telah dipublikasikan.`,
+        href: "/siswa/pengumuman",
+        target_roles: getPengumumanTargetRoles(target.target),
+      })
+    }
+  }
+
+  const openDetail = (id: number) => {
+    router.push(`/admin/pengumuman/${id}`)
   }
 
   const columns: Column<Row>[] = [
@@ -146,14 +206,40 @@ export function PengumumanAdminPage() {
     {
       key: "aksi",
       header: "Aksi",
-      className: "w-[140px]",
+      className: "w-[260px]",
       render: (item) => (
-        <div className="flex gap-1">
+        <div className="flex gap-1 flex-wrap">
+          <Button
+            variant="ghost"
+            size="xs"
+            onClick={(e) => { e.stopPropagation(); togglePin(item.id) }}
+            title={item.pinned ? "Lepas pin" : "Pin pengumuman"}
+          >
+            {item.pinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="xs"
+            onClick={(e) => { e.stopPropagation(); togglePublish(item.id) }}
+            title={item.status === "Dipublikasikan" ? "Tarik dari publikasi" : "Publikasikan"}
+          >
+            <Send className="h-3 w-3" />
+            {item.status === "Dipublikasikan" ? "Unpublish" : "Publish"}
+          </Button>
+          <Button
+            variant="ghost"
+            size="xs"
+            onClick={(e) => { e.stopPropagation(); openDetail(item.id) }}
+          >
+            <Eye className="h-3 w-3" />
+            Lihat
+          </Button>
           <Button
             variant="ghost"
             size="xs"
             onClick={(e) => { e.stopPropagation(); handleEdit(items.find((d) => d.id === item.id)!) }}
           >
+            <Pencil className="h-3 w-3" />
             Edit
           </Button>
           <Button
@@ -162,6 +248,7 @@ export function PengumumanAdminPage() {
             className="text-destructive"
             onClick={(e) => { e.stopPropagation(); handleDelete(item.id) }}
           >
+            <Trash2 className="h-3 w-3" />
             Hapus
           </Button>
         </div>
@@ -188,7 +275,7 @@ export function PengumumanAdminPage() {
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari pengumuman..."
+            placeholder="Cari judul, kategori, atau penulis..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1) }}
             className="pl-9"
@@ -227,13 +314,23 @@ export function PengumumanAdminPage() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={pinnedFilter} onValueChange={(v) => { setPinnedFilter(v ?? "all"); setPage(1) }}>
+          <SelectTrigger className="w-full sm:w-[140px]">
+            <SelectValue placeholder="Pin" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Semua Pin</SelectItem>
+            <SelectItem value="pinned">Dipin</SelectItem>
+            <SelectItem value="not-pinned">Tidak Dipin</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <DataTable<Row>
         columns={columns}
         data={paginatedData as unknown as Row[]}
         emptyMessage="Tidak ada data pengumuman"
-        onRowClick={(item) => handleDetail(items.find((d) => d.id === item.id)!)}
+        onRowClick={(item) => openDetail(item.id)}
       />
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-4">
@@ -266,12 +363,6 @@ export function PengumumanAdminPage() {
         onOpenChange={setFormOpen}
         data={editingItem}
         onSave={handleSave}
-      />
-
-      <PengumumanDetailDialog
-        open={detailOpen}
-        onOpenChange={setDetailOpen}
-        data={selectedItem}
       />
 
       <ConfirmDialog

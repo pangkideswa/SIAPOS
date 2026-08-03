@@ -19,6 +19,7 @@ import {
   GraduationCap,
   Loader2,
   Save,
+  Undo2,
 } from "lucide-react"
 import { toast } from "sonner"
 import { STATUS_PENGUMPULAN_COLORS } from "@/features/pengumpulan/constants/pengumpulan.constants"
@@ -30,6 +31,8 @@ interface JawabanDetailDialogProps {
   onOpenChange: (open: boolean) => void
   submission: PengumpulanTugas | null
   nilaiMaksimal: number
+  onGraded?: (submission: PengumpulanTugas) => void
+  onReturned?: (submission: PengumpulanTugas) => void
 }
 
 function formatDateTime(dateStr: string) {
@@ -47,13 +50,17 @@ export function JawabanDetailDialog({
   onOpenChange,
   submission,
   nilaiMaksimal,
+  onGraded,
+  onReturned,
 }: JawabanDetailDialogProps) {
   const [nilai, setNilai] = useState<string>("")
+  const [feedback, setFeedback] = useState("")
   const [isSaving, setIsSaving] = useState(false)
 
   function handleOpen(isOpen: boolean) {
     if (isOpen && submission) {
       setNilai(submission.nilai !== null ? String(submission.nilai) : "")
+      setFeedback(submission.feedback ?? "")
     }
     onOpenChange(isOpen)
   }
@@ -78,13 +85,39 @@ export function JawabanDetailDialog({
       DUMMY_PENGUMPULAN[idx] = {
         ...DUMMY_PENGUMPULAN[idx],
         nilai: parsed,
+        feedback: feedback.trim() || null,
         updated_at: new Date().toISOString(),
       }
+      onGraded?.(DUMMY_PENGUMPULAN[idx])
     }
 
     setIsSaving(false)
     onOpenChange(false)
     toast.success(`Nilai ${submission.siswa_nama} berhasil disimpan: ${parsed}`)
+  }
+
+  async function handleReturn() {
+    if (!submission) return
+    setIsSaving(true)
+    await new Promise((r) => setTimeout(r, 500))
+
+    const idx = DUMMY_PENGUMPULAN.findIndex(
+      (p) => p.id === submission.id
+    )
+    if (idx !== -1) {
+      DUMMY_PENGUMPULAN[idx] = {
+        ...DUMMY_PENGUMPULAN[idx],
+        feedback: feedback.trim() || null,
+        updated_at: new Date().toISOString(),
+      }
+      onReturned?.(DUMMY_PENGUMPULAN[idx])
+    }
+
+    setIsSaving(false)
+    onOpenChange(false)
+    toast.success(
+      `Tugas ${submission.siswa_nama} dikembalikan tanpa nilai`
+    )
   }
 
   if (!submission) return null
@@ -183,10 +216,10 @@ export function JawabanDetailDialog({
           </div>
 
           {/* Beri Nilai */}
-          <div className="space-y-2 p-4 rounded-lg border border-border bg-muted/30">
+          <div className="space-y-3 p-4 rounded-lg border border-border bg-muted/30">
             <div className="flex items-center gap-2 mb-3">
               <GraduationCap className="h-4 w-4 text-primary" />
-              <Label className="font-semibold">Beri Nilai</Label>
+              <Label className="font-semibold">Beri Nilai & Umpan Balik</Label>
             </div>
             <div className="flex items-center gap-3">
               <Input
@@ -201,11 +234,35 @@ export function JawabanDetailDialog({
               <span className="text-sm text-muted-foreground">
                 / {nilaiMaksimal}
               </span>
+            </div>
+            <Textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              placeholder="Tulis umpan balik untuk siswa (opsional)..."
+              rows={3}
+              disabled={isSaving}
+            />
+            <div className="flex items-center justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleReturn}
+                disabled={
+                  isSaving || submission.status === "Belum Mengumpulkan"
+                }
+              >
+                {isSaving ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Undo2 className="mr-2 h-4 w-4" />
+                )}
+                Kembalikan
+              </Button>
               <Button
                 size="sm"
                 onClick={handleSaveNilai}
                 disabled={isSaving || submission.status === "Belum Mengumpulkan"}
-                className="bg-primary hover:bg-primary/90 ml-auto"
+                className="bg-primary hover:bg-primary/90"
               >
                 {isSaving ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

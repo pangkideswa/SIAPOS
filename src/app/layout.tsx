@@ -17,8 +17,15 @@ export const metadata: Metadata = {
   description:
     "SIAPOS adalah Education Operating System yang mengintegrasikan pembelajaran, penilaian, administrasi akademik, dan komunikasi sekolah dalam satu platform.",
   keywords: ["education", "academic", "SIAPOS", "EduOS", "pembelajaran", "digital", "sekolah", "e-learning"],
+  manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
+    ],
+    shortcut: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
   },
 }
 

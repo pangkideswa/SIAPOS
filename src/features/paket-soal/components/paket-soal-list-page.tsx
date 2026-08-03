@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select"
 import { Plus, Pencil, Trash2, Eye, Copy, Search } from "lucide-react"
 import { toast } from "sonner"
-import { PaketSoalFormSheet } from "./paket-soal-form-sheet"
+import { PaketSoalFormDialog } from "./paket-soal-form-dialog"
 import { PaketSoalDeleteDialog } from "./paket-soal-delete-dialog"
 import {
   STATUS_PAKET_SOAL_COLORS,
@@ -30,7 +30,7 @@ export function PaketSoalListPage() {
   const [guruFilter, setGuruFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<PaketSoal | null>(null)
   const [deletingItem, setDeletingItem] = useState<PaketSoal | null>(null)
@@ -91,7 +91,7 @@ export function PaketSoalListPage() {
           <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" aria-label="Lihat" onClick={() => router.push(`/admin/paket-soal/${item.id}`)}>
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as PaketSoal); setFormSheetOpen(true) }}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as PaketSoal); setFormDialogOpen(true) }}>
             <Pencil className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" title="Duplikat" aria-label="Duplikat" onClick={() => toast.success(`Paket soal ${String(item.nama_paket)} berhasil diduplikat`)}>
@@ -122,7 +122,7 @@ export function PaketSoalListPage() {
       toast.success("Paket soal berhasil ditambahkan")
     }
     setIsLoading(false)
-    setFormSheetOpen(false)
+    setFormDialogOpen(false)
     setEditingItem(null)
   }
 
@@ -143,7 +143,7 @@ export function PaketSoalListPage() {
         title="Paket Soal"
         description="Kelola paket soal untuk ujian dan penilaian"
         action={
-          <Button onClick={() => { setEditingItem(null); setFormSheetOpen(true) }}>
+          <Button onClick={() => { setEditingItem(null); setFormDialogOpen(true) }}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah Paket
           </Button>
@@ -185,9 +185,9 @@ export function PaketSoalListPage() {
         onRowClick={(row) => router.push(`/admin/paket-soal/${(row as unknown as PaketSoal).id}`)}
       />
 
-      <PaketSoalFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <PaketSoalFormDialog
+        open={FormDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingItem={editingItem}
         onSubmit={handleSubmit}
         isLoading={isLoading}

@@ -23,7 +23,7 @@ import {
   Briefcase,
   User,
 } from "lucide-react"
-import { GuruFormSheet } from "./guru-form-sheet"
+import { GuruFormDialog } from "./guru-form-dialog"
 import { GuruDeleteDialog } from "./guru-delete-dialog"
 import {
   STATUS_KEPEGAWAIAN_COLORS,
@@ -94,7 +94,7 @@ export function GuruDetailPage({
 }) {
   const resolvedParams = use(params)
   const router = useRouter()
-  const [formSheetOpen, setFormSheetOpen] = useState(false)
+  const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -138,7 +138,7 @@ export function GuruDetailPage({
           updated_at: new Date().toISOString(),
         }
       }
-      setFormSheetOpen(false)
+      setFormDialogOpen(false)
     } finally {
       setIsLoading(false)
     }
@@ -172,7 +172,7 @@ export function GuruDetailPage({
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali
             </Button>
-            <Button variant="outline" onClick={() => setFormSheetOpen(true)}>
+            <Button variant="outline" onClick={() => setFormDialogOpen(true)}>
               <Pencil className="mr-2 h-4 w-4" />
               Edit
             </Button>
@@ -313,9 +313,9 @@ export function GuruDetailPage({
         </Card>
       </div>
 
-      <GuruFormSheet
-        open={formSheetOpen}
-        onOpenChange={setFormSheetOpen}
+      <GuruFormDialog
+        open={FormDialogOpen}
+        onOpenChange={setFormDialogOpen}
         editingGuru={guru}
         onSubmit={handleEditSubmit}
         isLoading={isLoading}

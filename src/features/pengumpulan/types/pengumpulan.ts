@@ -4,6 +4,13 @@ export interface PengumpulanFile {
   tipe: string
 }
 
+export interface PengumpulanRiwayat {
+  id: number
+  file_jawaban: PengumpulanFile | null
+  catatan: string
+  waktu_pengumpulan: string | null
+}
+
 export interface PengumpulanTugas {
   id: number
   tugas_id: number
@@ -15,6 +22,8 @@ export interface PengumpulanTugas {
   waktu_pengumpulan: string | null
   status: "Belum Mengumpulkan" | "Sudah Mengumpulkan" | "Terlambat"
   nilai: number | null
+  feedback?: string | null
+  riwayat_pengumpulan?: PengumpulanRiwayat[]
   created_at: string
   updated_at: string
 }
