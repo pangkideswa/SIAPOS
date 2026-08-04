@@ -12,21 +12,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import type { Pengumuman } from "../types/pengumuman"
 import { KATEGORI_PENGUMUMAN_OPTIONS } from "../constants/pengumuman.constants"
-import { DUMMY_PENGUMUMAN } from "../dummy/pengumuman.data"
 import { AnnouncementCard } from "./pengumuman-card"
+import { useAnnouncements } from "@/hooks/use-announcements"
 
 export function PengumumanSiswaPage() {
   const router = useRouter()
-  const [items] = useState<Pengumuman[]>(
-    DUMMY_PENGUMUMAN.filter(
-      (d) =>
-        d.status === "Dipublikasikan" &&
-        (d.target === "Semua Pengguna" ||
-          d.target === "Siswa" ||
-          d.target === "Kelas Tertentu")
-    )
+  const { data = [], isLoading, isError, refetch } = useAnnouncements()
+  const items = useMemo(
+    () =>
+      data.filter(
+        (d) =>
+          d.status === "Dipublikasikan" &&
+          (d.target === "Semua Pengguna" ||
+            d.target === "Siswa" ||
+            d.target === "Kelas Tertentu")
+      ),
+    [data]
   )
   const [search, setSearch] = useState("")
   const [kategoriFilter, setKategoriFilter] = useState("all")
@@ -81,7 +83,21 @@ export function PengumumanSiswaPage() {
         </Select>
       </div>
 
-      {filteredData.length > 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center py-16">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-muted-foreground">Memuat data...</p>
+          </div>
+        </div>
+      ) : isError ? (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-8 px-4 text-center text-sm text-destructive">
+          Terjadi kesalahan saat memuat data pengumuman.{" "}
+          <button onClick={() => refetch()} className="underline font-medium">
+            Muat ulang
+          </button>
+        </div>
+      ) : filteredData.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filteredData.map((item) => (
             <AnnouncementCard

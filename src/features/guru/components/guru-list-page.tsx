@@ -22,11 +22,25 @@ import {
   STATUS_KEPEGAWAIAN_OPTIONS,
   JENIS_KELAMIN_OPTIONS,
 } from "@/features/guru/constants/guru.constants"
-import { DUMMY_GURU } from "@/features/guru/dummy/guru.data"
+import {
+  useTeachers,
+  useCreateTeacher,
+  useUpdateTeacher,
+  useRemoveTeacher,
+} from "@/hooks/use-teachers"
 import type { Guru, GuruFormData } from "@/features/guru/types/guru"
 
 export function GuruListPage() {
   const router = useRouter()
+  const {
+    data: allGuru = [],
+    isLoading: isTableLoading,
+    isError,
+    refetch,
+  } = useTeachers()
+  const createGuru = useCreateTeacher()
+  const updateGuru = useUpdateTeacher()
+  const removeGuru = useRemoveTeacher()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [jkFilter, setJkFilter] = useState<string>("all")
@@ -39,7 +53,7 @@ export function GuruListPage() {
 
   const perPage = 10
 
-  const filteredGuru = DUMMY_GURU.filter((g) => {
+  const filteredGuru = allGuru.filter((g) => {
     if (statusFilter !== "all" && g.status_kepegawaian !== statusFilter)
       return false
     if (jkFilter !== "all" && g.jenis_kelamin !== jkFilter) return false
@@ -187,49 +201,33 @@ export function GuruListPage() {
     async (formData: GuruFormData) => {
       setIsLoading(true)
       try {
-        // TODO: Replace with backend API call
-        await new Promise((resolve) => setTimeout(resolve, 500))
-
         if (editingGuru) {
-          const idx = DUMMY_GURU.findIndex((g) => g.id === editingGuru.id)
-          if (idx !== -1) {
-            DUMMY_GURU[idx] = {
-              ...DUMMY_GURU[idx],
-              ...formData,
-              updated_at: new Date().toISOString(),
-            }
-          }
+          await updateGuru.mutateAsync({
+            id: editingGuru.id,
+            data: formData,
+          })
         } else {
-          const newGuru: Guru = {
-            id: Date.now(),
-            ...formData,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }
-          DUMMY_GURU.push(newGuru)
+          await createGuru.mutateAsync(formData)
         }
         setFormDialogOpen(false)
       } finally {
         setIsLoading(false)
       }
     },
-    [editingGuru]
+    [editingGuru, createGuru, updateGuru]
   )
 
   const handleDelete = useCallback(async () => {
     if (!deletingGuru) return
     setIsLoading(true)
     try {
-      // TODO: Replace with backend API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_GURU.findIndex((g) => g.id === deletingGuru.id)
-      if (idx !== -1) DUMMY_GURU.splice(idx, 1)
+      await removeGuru.mutateAsync(deletingGuru.id)
       setDeleteDialogOpen(false)
       setDeletingGuru(null)
     } finally {
       setIsLoading(false)
     }
-  }, [deletingGuru])
+  }, [deletingGuru, removeGuru])
 
   return (
     <div className="space-y-6">
@@ -300,10 +298,21 @@ export function GuruListPage() {
       <DataTable
         columns={columns}
         data={paginatedGuru as unknown as Record<string, unknown>[]}
-        loading={false}
-        emptyMessage="Tidak ada guru ditemukan"
+        loading={isTableLoading}
+        emptyMessage={
+          isError ? "Gagal memuat data guru" : "Tidak ada guru ditemukan"
+        }
         onRowClick={(item) => router.push(`/admin/guru/${item.id}`)}
       />
+
+      {isError && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive">
+          Terjadi kesalahan saat memuat data guru.{" "}
+          <button onClick={() => refetch()} className="underline font-medium">
+            Muat ulang
+          </button>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">

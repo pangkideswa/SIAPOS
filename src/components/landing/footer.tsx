@@ -60,7 +60,7 @@ export function Footer() {
 
         <div className="mt-10 pt-6 border-t border-border/60">
           <p className="text-xs text-muted-foreground text-center">
-            &copy; {new Date().getFullYear()} SIAPOS - SMK Wahana Bakti. Hak
+            &copy; {new Date().getFullYear()} SIAPOS - Tim IT SMK Wahana Bakti. Hak
             cipta dilindungi.
           </p>
         </div>

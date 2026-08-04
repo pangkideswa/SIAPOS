@@ -31,12 +31,26 @@ import {
   JURUSAN_OPTIONS,
   KELAS_OPTIONS,
 } from "@/features/siswa/constants/siswa.constants"
-import { DUMMY_SISWA } from "@/features/siswa/dummy/siswa.data"
+import {
+  useStudents,
+  useCreateStudent,
+  useUpdateStudent,
+  useRemoveStudent,
+} from "@/hooks/use-students"
 import type { Siswa, SiswaFormData } from "@/features/siswa/types/siswa"
 
 export function SiswaListPage() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const {
+    data: allSiswa = [],
+    isLoading: isTableLoading,
+    isError,
+    refetch,
+  } = useStudents()
+  const createSiswa = useCreateStudent()
+  const updateSiswa = useUpdateStudent()
+  const removeSiswa = useRemoveStudent()
   const [search, setSearch] = useState("")
   const [jurusanFilter, setJurusanFilter] = useState<string>("all")
   const [kelasFilter, setKelasFilter] = useState<string>("all")
@@ -50,7 +64,7 @@ export function SiswaListPage() {
 
   const perPage = 10
 
-  const filteredSiswa = DUMMY_SISWA.filter((s) => {
+  const filteredSiswa = allSiswa.filter((s) => {
     if (jurusanFilter !== "all" && s.jurusan_id !== Number(jurusanFilter))
       return false
     if (kelasFilter !== "all" && s.kelas !== kelasFilter) return false
@@ -232,55 +246,33 @@ export function SiswaListPage() {
     async (formData: SiswaFormData) => {
       setIsLoading(true)
       try {
-        // TODO: Replace with backend API call
-        await new Promise((resolve) => setTimeout(resolve, 500))
-
-        const jurusan = JURUSAN_OPTIONS.find(
-          (j) => j.id === formData.jurusan_id
-        )
-
         if (editingSiswa) {
-          const idx = DUMMY_SISWA.findIndex((s) => s.id === editingSiswa.id)
-          if (idx !== -1) {
-            DUMMY_SISWA[idx] = {
-              ...DUMMY_SISWA[idx],
-              ...formData,
-              jurusan_nama: jurusan?.name,
-              updated_at: new Date().toISOString(),
-            }
-          }
+          await updateSiswa.mutateAsync({
+            id: editingSiswa.id,
+            data: formData,
+          })
         } else {
-          const newSiswa: Siswa = {
-            id: Date.now(),
-            ...formData,
-            jurusan_nama: jurusan?.name,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }
-          DUMMY_SISWA.push(newSiswa)
+          await createSiswa.mutateAsync(formData)
         }
         setFormDialogOpen(false)
       } finally {
         setIsLoading(false)
       }
     },
-    [editingSiswa]
+    [editingSiswa, createSiswa, updateSiswa]
   )
 
   const handleDelete = useCallback(async () => {
     if (!deletingSiswa) return
     setIsLoading(true)
     try {
-      // TODO: Replace with backend API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_SISWA.findIndex((s) => s.id === deletingSiswa.id)
-      if (idx !== -1) DUMMY_SISWA.splice(idx, 1)
+      await removeSiswa.mutateAsync(deletingSiswa.id)
       setDeleteDialogOpen(false)
       setDeletingSiswa(null)
     } finally {
       setIsLoading(false)
     }
-  }, [deletingSiswa])
+  }, [deletingSiswa, removeSiswa])
 
   return (
     <div className="space-y-6">
@@ -419,10 +411,21 @@ export function SiswaListPage() {
       <DataTable
         columns={columns}
         data={paginatedSiswa as unknown as Record<string, unknown>[]}
-        loading={false}
-        emptyMessage="Tidak ada siswa ditemukan"
+        loading={isTableLoading}
+        emptyMessage={
+          isError ? "Gagal memuat data siswa" : "Tidak ada siswa ditemukan"
+        }
         onRowClick={(item) => router.push(`/admin/siswa/${item.id}`)}
       />
+
+      {isError && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive">
+          Terjadi kesalahan saat memuat data siswa.{" "}
+          <button onClick={() => refetch()} className="underline font-medium">
+            Muat ulang
+          </button>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">

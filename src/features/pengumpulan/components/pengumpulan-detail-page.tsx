@@ -18,8 +18,8 @@ import {
 import { JawabanDetailDialog } from "./jawaban-detail-dialog"
 import { STATUS_PENGUMPULAN_COLORS } from "@/features/pengumpulan/constants/pengumpulan.constants"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
-import { DUMMY_TUGAS } from "@/features/tugas/dummy/tugas.data"
-import { DUMMY_PENGUMPULAN } from "@/features/pengumpulan/dummy/pengumpulan.data"
+import { useAssignment } from "@/hooks/use-assignments"
+import { useSubmissions } from "@/hooks/use-submissions"
 import type { PengumpulanTugas } from "@/features/pengumpulan/types/pengumpulan"
 
 function formatDate(dateStr: string) {
@@ -71,13 +71,15 @@ export function PengumpulanDetailPage({
   const [selectedSubmission, setSelectedSubmission] =
     useState<PengumpulanTugas | null>(null)
 
-  const tugas = DUMMY_TUGAS.find(
-    (t) => t.id === Number(resolvedParams.id)
-  )
-
-  const submissions = DUMMY_PENGUMPULAN.filter(
-    (p) => p.tugas_id === Number(resolvedParams.id)
-  )
+  const assignmentId = Number(resolvedParams.id)
+  const {
+    data: tugas,
+    isLoading: isTugasLoading,
+    isError,
+    refetch,
+  } = useAssignment(assignmentId)
+  const { data: submissions = [], isLoading: isSubmissionsLoading } =
+    useSubmissions(assignmentId)
 
   const submittedCount = submissions.filter(
     (p) => p.status === "Sudah Mengumpulkan" || p.status === "Terlambat"
@@ -88,25 +90,45 @@ export function PengumpulanDetailPage({
     setJawabanDialogOpen(true)
   }
 
+  if (isTugasLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-muted-foreground">Memuat data...</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!tugas) {
     return (
       <div className="space-y-6">
         <PageHeader
           title="Pengumpulan Tugas"
-          description="Tugas tidak ditemukan."
+          description={isError ? "Terjadi kesalahan saat memuat tugas." : "Tugas tidak ditemukan."}
           action={
-            <Button
-              variant="outline"
-              onClick={() => router.push("/guru/pengumpulan")}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Kembali
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => router.push("/guru/pengumpulan")}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Kembali
+              </Button>
+              {isError && (
+                <Button variant="outline" onClick={() => refetch()}>
+                  Muat Ulang
+                </Button>
+              )}
+            </div>
           }
         />
         <Card>
           <CardContent className="pt-6 text-center text-muted-foreground py-12">
-            Tugas dengan ID {resolvedParams.id} tidak ditemukan.
+            {isError
+              ? `Terjadi kesalahan saat memuat tugas dengan ID ${resolvedParams.id}.`
+              : `Tugas dengan ID ${resolvedParams.id} tidak ditemukan.`}
           </CardContent>
         </Card>
       </div>
@@ -266,7 +288,7 @@ export function PengumpulanDetailPage({
               <DataTable
                 columns={columns}
                 data={submissions as unknown as Record<string, unknown>[]}
-                loading={false}
+                loading={isSubmissionsLoading}
                 emptyMessage="Belum ada pengumpulan."
               />
             </CardContent>

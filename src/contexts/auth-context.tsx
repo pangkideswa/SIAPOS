@@ -11,7 +11,8 @@ import {
 } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { findDemoUser } from "@/lib/demo-users"
-import type { User, UserRole } from "@/types/auth"
+import { apiFetch } from "@/lib/client-api"
+import type { User, UserRole, AuthResponse } from "@/types/auth"
 
 interface AuthContextType {
   user: User | null
@@ -70,6 +71,13 @@ function getDashboardPath(role: UserRole): string {
   }
 }
 
+function isServerError(error: unknown): boolean {
+  if (error && typeof error === "object" && "status" in error) {
+    return (error as { status: number }).status >= 500
+  }
+  return true
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(getInitialUser)
   const [isLoading, setIsLoading] = useState(true)
@@ -106,7 +114,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (identifier: string, password: string) => {
-      const foundUser = findDemoUser(identifier, password)
+      let foundUser: User | null = null
+
+      try {
+        const result = await apiFetch<AuthResponse>("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify({ identifier, password }),
+        })
+        foundUser = result.user
+      } catch {
+        foundUser = findDemoUser(identifier, password)
+      }
+
       if (!foundUser) {
         throw new Error("Email atau kata sandi salah")
       }
@@ -126,11 +145,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       name: string,
       email: string,
       password: string,
-      _passwordConfirmation: string,
+      passwordConfirmation: string,
       role: "guru" | "siswa" | "wali",
       nip?: string,
       nisn?: string
     ) => {
+      try {
+        const result = await apiFetch<AuthResponse>("/api/auth/register", {
+          method: "POST",
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+            password_confirmation: passwordConfirmation,
+            role,
+            nip,
+            nisn,
+          }),
+        })
+
+        localStorage.setItem("demo_user", JSON.stringify(result.user))
+        setDemoCookie("demo-authenticated")
+        setUser(result.user)
+        router.push(getDashboardPath(result.user.role))
+        return
+      } catch (error) {
+        if (!isServerError(error)) {
+          throw error
+        }
+      }
+
       const newUser: User = {
         id: Date.now(),
         name,
@@ -153,6 +197,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   const logout = useCallback(async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" })
+    } catch {
+      // ignore logout API errors
+    }
     localStorage.removeItem("demo_user")
     removeDemoCookie()
     setUser(null)

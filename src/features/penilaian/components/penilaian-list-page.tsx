@@ -31,10 +31,16 @@ import {
 import {
   STATUS_PENILAIAN_COLORS,
 } from "@/features/penilaian/constants/penilaian.constants"
-import { DUMMY_PENILAIAN } from "@/features/penilaian/dummy/penilaian.data"
+import { usePenilaian } from "@/hooks/use-penilaian"
 
 export function PenilaianListPage() {
   const router = useRouter()
+  const {
+    data: allPenilaian = [],
+    isLoading: isTableLoading,
+    isError,
+    refetch,
+  } = usePenilaian()
   const [search, setSearch] = useState("")
   const [guruFilter, setGuruFilter] = useState<string>("all")
   const [kelasFilter, setKelasFilter] = useState<string>("all")
@@ -45,14 +51,14 @@ export function PenilaianListPage() {
   const perPage = 10
 
   const summaryData = useMemo(() => {
-    const total = DUMMY_PENILAIAN.length
-    const sudahDinilai = DUMMY_PENILAIAN.filter(
+    const total = allPenilaian.length
+    const sudahDinilai = allPenilaian.filter(
       (p) => p.status_penilaian === "Sudah Dinilai"
     ).length
-    const belumDinilai = DUMMY_PENILAIAN.filter(
+    const belumDinilai = allPenilaian.filter(
       (p) => p.status_penilaian === "Belum Dinilai"
     ).length
-    const graded = DUMMY_PENILAIAN.filter(
+    const graded = allPenilaian.filter(
       (p) => p.status_penilaian === "Sudah Dinilai" && p.nilai !== null
     )
     const rataRata =
@@ -63,9 +69,9 @@ export function PenilaianListPage() {
           )
         : 0
     return { total, sudahDinilai, belumDinilai, rataRata }
-  }, [])
+  }, [allPenilaian])
 
-  const filteredData = DUMMY_PENILAIAN.filter((item) => {
+  const filteredData = allPenilaian.filter((item) => {
     const matchesSearch =
       !search ||
       item.siswa_nama.toLowerCase().includes(search.toLowerCase()) ||
@@ -347,12 +353,23 @@ export function PenilaianListPage() {
       <DataTable
         columns={columns}
         data={paginatedData as unknown as Record<string, unknown>[]}
-        loading={false}
-        emptyMessage="Tidak ada penilaian ditemukan"
+        loading={isTableLoading}
+        emptyMessage={
+          isError ? "Gagal memuat data penilaian" : "Tidak ada penilaian ditemukan"
+        }
         onRowClick={(item) =>
           router.push(`/guru/penilaian/${String(item.id)}`)
         }
       />
+
+      {isError && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive">
+          Terjadi kesalahan saat memuat data penilaian.{" "}
+          <button onClick={() => refetch()} className="underline font-medium">
+            Muat ulang
+          </button>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">

@@ -1,20 +1,33 @@
-import api from '@/lib/api/axios'
-import type { AuthResponse, ApiResponse, User } from '@/types'
+import { apiFetch } from '@/lib/client-api'
+import type { AuthResponse, User } from '@/types'
 
 export const authService = {
-  login: async (email: string, password: string) => {
-    const response = await api.post<AuthResponse>('/auth/login', { email, password })
-    return response.data
+  login: async (identifier: string, password: string) => {
+    return apiFetch<AuthResponse>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ identifier, password }),
+    })
   },
-  register: async (data: { name: string; email: string; password: string; password_confirmation: string }) => {
-    const response = await api.post<AuthResponse>('/auth/register', data)
-    return response.data
+  register: async (data: {
+    name: string
+    email: string
+    password: string
+    password_confirmation: string
+    role?: string
+    nip?: string | null
+    nisn?: string | null
+  }) => {
+    return apiFetch<AuthResponse>('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
   },
   logout: async () => {
-    await api.post('/auth/logout')
+    await apiFetch<null>('/api/auth/logout', {
+      method: 'POST',
+    })
   },
   getUser: async () => {
-    const response = await api.get<ApiResponse<User>>('/auth/user')
-    return response.data
+    return apiFetch<User>('/api/auth/user')
   },
 }

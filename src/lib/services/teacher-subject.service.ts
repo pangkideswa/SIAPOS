@@ -1,5 +1,5 @@
-import api from '@/lib/api/axios'
-import type { TeacherSubject, ApiResponse, ApiListResponse } from '@/types'
+import { apiFetch } from '@/lib/client-api'
+import type { TeacherSubject } from '@/types'
 
 interface TeacherSubjectFilters {
   teacher_id?: number
@@ -15,15 +15,32 @@ export const teacherSubjectService = {
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== '') params.append(key, String(value))
     })
-    const response = await api.get<ApiListResponse<TeacherSubject>>(`/teacher-subjects?${params.toString()}`)
-    return response.data
+    const list = await apiFetch<TeacherSubject[]>(
+      `/api/teacher-subjects?${params.toString()}`
+    )
+    return {
+      data: list,
+      meta: {
+        current_page: 1,
+        last_page: 1,
+        per_page: Math.max(1, list.length),
+        total: list.length,
+      },
+    }
   },
-  create: async (data: { teacher_id: number; subject_id: number; class_id: number }) => {
-    const response = await api.post<ApiResponse<TeacherSubject>>('/teacher-subjects', data)
-    return response.data
+  create: async (data: {
+    teacher_id: number
+    subject_id: number
+    class_id: number
+  }) => {
+    return apiFetch<TeacherSubject>('/api/teacher-subjects', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
   },
   delete: async (id: number) => {
-    const response = await api.delete<ApiResponse<null>>(`/teacher-subjects/${id}`)
-    return response.data
+    return apiFetch<null>(`/api/teacher-subjects/${id}`, {
+      method: 'DELETE',
+    })
   },
 }

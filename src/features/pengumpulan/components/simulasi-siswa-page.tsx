@@ -21,8 +21,8 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
-import { DUMMY_TUGAS } from "@/features/tugas/dummy/tugas.data"
-import { DUMMY_PENGUMPULAN } from "@/features/pengumpulan/dummy/pengumpulan.data"
+import { useAssignments } from "@/hooks/use-assignments"
+import { useCreateSubmission, useSubmissions } from "@/hooks/use-submissions"
 import type { Tugas } from "@/features/tugas/types/tugas"
 import type {
   PengumpulanTugas,
@@ -61,10 +61,18 @@ export function SimulasiSiswaPage() {
   const [selectedTugas, setSelectedTugas] = useState<Tugas | null>(null)
   const [file, setFile] = useState<PengumpulanFile | null>(null)
   const [catatan, setCatatan] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const siswaTugas = DUMMY_TUGAS.filter(
+  const {
+    data: allTugas = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useAssignments()
+  const { data: allSubmissions = [] } = useSubmissions()
+  const createSubmission = useCreateSubmission()
+
+  const siswaTugas = allTugas.filter(
     (t) =>
       t.status === "Dipublikasikan" &&
       (t.kelas === SISWA_SIMULASI.kelas ||
@@ -74,7 +82,7 @@ export function SimulasiSiswaPage() {
 
   function getSiswaSubmission(tugasId: number): PengumpulanTugas | null {
     return (
-      DUMMY_PENGUMPULAN.find(
+      allSubmissions.find(
         (p) =>
           p.tugas_id === tugasId &&
           (p.siswa_nama === SISWA_SIMULASI.nama ||
@@ -146,37 +154,18 @@ export function SimulasiSiswaPage() {
       return
     }
 
-    setIsSubmitting(true)
-    await new Promise((r) => setTimeout(r, 800))
+    await createSubmission.mutateAsync({
+      assignment_id: selectedTugas.id,
+      student_id: SISWA_SIMULASI.id,
+      data: {
+        file_jawaban: file ? { ...file } : null,
+        catatan: catatan.trim() || null,
+      },
+    })
 
-    const now = new Date().toISOString()
-    const isLate = isAfterDeadline(selectedTugas.tenggat_waktu)
-
-    const newSubmission: PengumpulanTugas = {
-      id: Math.max(...DUMMY_PENGUMPULAN.map((p) => p.id), 0) + 1,
-      tugas_id: selectedTugas.id,
-      siswa_id: SISWA_SIMULASI.id,
-      siswa_nama: SISWA_SIMULASI.nama,
-      siswa_kelas: SISWA_SIMULASI.kelas,
-      file_jawaban: file,
-      catatan,
-      waktu_pengumpulan: now,
-      status: isLate ? "Terlambat" : "Sudah Mengumpulkan",
-      nilai: null,
-      created_at: now,
-      updated_at: now,
-    }
-
-    DUMMY_PENGUMPULAN.push(newSubmission)
-
-    setIsSubmitting(false)
     setFile(null)
     setCatatan("")
     setSelectedTugas(null)
-
-    toast.success("Tugas berhasil dikirim.", {
-      description: "Jawaban Anda telah berhasil dikumpulkan.",
-    })
   }
 
   if (selectedTugas) {
@@ -315,10 +304,10 @@ export function SimulasiSiswaPage() {
               {/* Submit */}
               <Button
                 onClick={handleSubmit}
-                disabled={isSubmitting || deadline || !file}
+                disabled={createSubmission.isPending || deadline || !file}
                 className="w-full bg-primary hover:bg-primary/90"
               >
-                {isSubmitting ? (
+                {createSubmission.isPending ? (
                   <>
                     <Clock className="mr-2 h-4 w-4 animate-spin" />
                     Mengirim...
@@ -345,7 +334,24 @@ export function SimulasiSiswaPage() {
       />
 
       <div className="space-y-4">
-        {siswaTugas.length === 0 ? (
+        {isLoading ? (
+          <Card>
+            <CardContent className="pt-6 text-center text-muted-foreground py-12">
+              Memuat daftar tugas...
+            </CardContent>
+          </Card>
+        ) : isError ? (
+          <Card>
+            <CardContent className="pt-6 text-center py-12">
+              <p className="text-destructive mb-4">
+                Gagal memuat daftar tugas.
+              </p>
+              <Button variant="outline" onClick={() => refetch()}>
+                Coba Lagi
+              </Button>
+            </CardContent>
+          </Card>
+        ) : siswaTugas.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center text-muted-foreground py-12">
               Tidak ada tugas yang tersedia untuk kelas Anda.

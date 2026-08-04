@@ -39,7 +39,7 @@ import {
   ALLOWED_FILE_EXTENSIONS,
   EMPTY_MATERI_FORM,
 } from "@/features/materi/constants/materi.constants"
-import { classroomService } from "@/features/kelas-saya/lib/classroom.service"
+import { useTeachingClasses } from "@/hooks/use-teaching-classes"
 import { formatFileSize, validateFileSize } from "@/lib/file"
 import { cn } from "@/lib/utils"
 import type {
@@ -62,8 +62,6 @@ type MateriFormErrors = Partial<
   Record<"judul" | "kelas_mengajar_id" | "pertemuan" | "video_url" | "link_drive" | "link_eksternal", string>
 >
 
-const ACTIVE_KELAS_MENGAJAR = classroomService.getAktifKelasMengajar()
-
 export function MateriFormDialog({
   open,
   onOpenChange,
@@ -72,6 +70,7 @@ export function MateriFormDialog({
   isLoading = false,
   defaultKelasMengajarId,
 }: MateriFormDialogProps) {
+  const { data: activeKelasMengajar = [] } = useTeachingClasses()
   const [form, setForm] = useState<MateriFormData>(EMPTY_MATERI_FORM)
   const [errors, setErrors] = useState<MateriFormErrors>({})
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
@@ -99,7 +98,7 @@ export function MateriFormDialog({
     } else {
       const defaultKm =
         defaultKelasMengajarId !== undefined
-          ? classroomService.getById(defaultKelasMengajarId)
+          ? activeKelasMengajar.find((km) => km.id === defaultKelasMengajarId)
           : undefined
       if (defaultKm) {
         setForm({
@@ -115,6 +114,7 @@ export function MateriFormDialog({
       setThumbnailPreview(null)
     }
     setErrors({})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingItem, open, defaultKelasMengajarId])
 
   function handleChange(
@@ -133,7 +133,7 @@ export function MateriFormDialog({
 
   function handleKelasMengajarSelect(value: string | null) {
     const kmId = Number(value)
-    const km = classroomService.getById(kmId)
+    const km = activeKelasMengajar.find((k) => k.id === kmId)
     if (km) {
       setForm((prev) => ({
         ...prev,
@@ -369,7 +369,7 @@ export function MateriFormDialog({
                       <SelectValue placeholder="Pilih kelas mengajar" />
                     </SelectTrigger>
                     <SelectContent>
-                      {ACTIVE_KELAS_MENGAJAR.map((km) => (
+                      {activeKelasMengajar.map((km) => (
                         <SelectItem key={km.id} value={String(km.id)}>
                           {km.mata_pelajaran} — {km.kelas} ({km.guru_nama})
                         </SelectItem>

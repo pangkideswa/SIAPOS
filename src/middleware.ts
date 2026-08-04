@@ -8,7 +8,8 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get("token")?.value
   const demoToken = request.cookies.get("demo_token")?.value
-  const isAuthenticated = !!token || !!demoToken
+  const nextAuthToken = request.cookies.get("next-auth.session-token")?.value
+  const isAuthenticated = !!token || !!demoToken || !!nextAuthToken
 
   if (PUBLIC_ROUTES.some((route) => pathname === route)) {
     return NextResponse.next()

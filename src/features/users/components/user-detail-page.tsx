@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, use } from "react"
+import { useState, use, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,12 +17,14 @@ import {
   CreditCard,
   Calendar,
   Clock,
+  Loader2,
 } from "lucide-react"
 import { UserFormDialog } from "./user-form-dialog"
 import { UserDeleteDialog } from "./user-delete-dialog"
 import { ROLE_LABELS, ROLE_COLORS, EMPTY_USER_FORM } from "@/features/users/constants/user.constants"
-import { DUMMY_USERS } from "@/features/users/dummy/users.data"
+import { userService } from "@/lib/services/user.service"
 import type { UserRole } from "@/types/auth"
+import type { User as UserType } from "@/types/auth"
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -67,8 +69,39 @@ export function UserDetailPage({ params }: { params: Promise<{ id: string }> }) 
   const [formDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [user, setUser] = useState<UserType | null>(null)
+  const [isLoaded, setIsLoaded] = useState(false)
 
-  const user = DUMMY_USERS.find((u) => u.id === Number(resolvedParams.id))
+  const loadUser = useCallback(async () => {
+    const data = await userService.getById(Number(resolvedParams.id))
+    setUser(data)
+    setIsLoaded(true)
+  }, [resolvedParams.id])
+
+  useEffect(() => {
+    loadUser()
+  }, [loadUser])
+
+  if (!isLoaded) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title="Detail Pengguna"
+          action={
+            <Button variant="outline" onClick={() => router.push("/admin/users")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Kembali
+            </Button>
+          }
+        />
+        <Card>
+          <CardContent className="flex items-center justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   if (!user) {
     return (
@@ -99,21 +132,17 @@ export function UserDetailPage({ params }: { params: Promise<{ id: string }> }) 
     if (!user) return
     setIsLoading(true)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_USERS.findIndex((u) => u.id === user.id)
-      if (idx !== -1) {
-        DUMMY_USERS[idx] = {
-          ...DUMMY_USERS[idx],
-          name: formData.name,
-          username: formData.username,
-          email: formData.email,
-          role: formData.role as UserRole,
-          nip: formData.nip || null,
-          nisn: formData.nisn || null,
-          updated_at: new Date().toISOString(),
-        }
-      }
+      await userService.update(user.id, {
+        name: formData.name,
+        username: formData.username,
+        email: formData.email,
+        role: formData.role as UserRole,
+        nip: formData.nip || null,
+        nisn: formData.nisn || null,
+        password: formData.password || undefined,
+      })
       setFormDialogOpen(false)
+      await loadUser()
     } finally {
       setIsLoading(false)
     }
@@ -123,9 +152,7 @@ export function UserDetailPage({ params }: { params: Promise<{ id: string }> }) 
     if (!user) return
     setIsLoading(true)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_USERS.findIndex((u) => u.id === user.id)
-      if (idx !== -1) DUMMY_USERS.splice(idx, 1)
+      await userService.delete(user.id)
       setDeleteDialogOpen(false)
       router.push("/admin/users")
     } finally {

@@ -31,7 +31,6 @@ import {
   KATEGORI_PENGUMUMAN_COLORS,
   STATUS_PENGUMUMAN_COLORS,
 } from "../constants/pengumuman.constants"
-import { DUMMY_PENGUMUMAN } from "../dummy/pengumuman.data"
 import { getPengumumanTargetRoles } from "../lib/pengumuman-helpers"
 import { pushNotifikasi } from "@/features/notifications/lib/notifikasi-service"
 import { PengumumanSummaryCards } from "./pengumuman-summary-cards"
@@ -39,6 +38,13 @@ import { PengumumanFormDialog } from "./pengumuman-form-dialog"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { formatDateID } from "@/features/kalender-akademik/components/kalender-helpers"
+import {
+  useAnnouncements,
+  useCreateAnnouncement,
+  useUpdateAnnouncement,
+  useRemoveAnnouncement,
+} from "@/hooks/use-announcements"
+import type { AnnouncementFormData } from "@/lib/services/announcement.service"
 
 const PER_PAGE = 10
 
@@ -53,9 +59,22 @@ type Row = Record<string, unknown> & {
   pinned: boolean
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function toFormData({ id, created_at, updated_at, ...rest }: Pengumuman): AnnouncementFormData {
+  return rest
+}
+
 export function PengumumanAdminPage() {
   const router = useRouter()
-  const [items, setItems] = useState<Pengumuman[]>(DUMMY_PENGUMUMAN)
+  const {
+    data: items = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useAnnouncements()
+  const createMutation = useCreateAnnouncement()
+  const updateMutation = useUpdateAnnouncement()
+  const removeMutation = useRemoveAnnouncement()
   const [search, setSearch] = useState("")
   const [kategoriFilter, setKategoriFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -110,17 +129,32 @@ export function PengumumanAdminPage() {
 
   const confirmDelete = () => {
     if (deletingId !== null) {
-      setItems((prev) => prev.filter((d) => d.id !== deletingId))
-      setDeleteOpen(false)
-      setDeletingId(null)
+      removeMutation.mutate(deletingId, {
+        onSuccess: () => {
+          setDeleteOpen(false)
+          setDeletingId(null)
+        },
+      })
     }
   }
 
   const handleSave = (data: Pengumuman) => {
     if (editingItem) {
-      setItems((prev) => prev.map((d) => (d.id === data.id ? data : d)))
+      updateMutation.mutate(
+        { id: data.id, data: toFormData(data) },
+        {
+          onSuccess: () => {
+            setFormOpen(false)
+            setEditingItem(null)
+          },
+        }
+      )
     } else {
-      setItems((prev) => [data, ...prev])
+      createMutation.mutate(toFormData(data), {
+        onSuccess: () => {
+          setFormOpen(false)
+        },
+      })
     }
     if (data.status === "Dipublikasikan") {
       pushNotifikasi({
@@ -134,24 +168,23 @@ export function PengumumanAdminPage() {
   }
 
   const togglePin = (id: number) => {
-    setItems((prev) =>
-      prev.map((d) => (d.id === id ? { ...d, pinned: !d.pinned } : d))
-    )
+    const target = items.find((d) => d.id === id)
+    if (!target) return
+    updateMutation.mutate({
+      id,
+      data: toFormData({ ...target, pinned: !target.pinned }),
+    })
   }
 
   const togglePublish = (id: number) => {
     const target = items.find((d) => d.id === id)
-    const nextStatus = target?.status === "Dipublikasikan" ? "Draft" : "Dipublikasikan"
-    setItems((prev) =>
-      prev.map((d) =>
-        d.id === id
-          ? {
-              ...d,
-              status: nextStatus,
-            }
-          : d
-      )
-    )
+    if (!target) return
+    const nextStatus =
+      target.status === "Dipublikasikan" ? "Draft" : "Dipublikasikan"
+    updateMutation.mutate({
+      id,
+      data: toFormData({ ...target, status: nextStatus }),
+    })
     if (target && nextStatus === "Dipublikasikan") {
       pushNotifikasi({
         tipe: "pengumuman",
@@ -329,7 +362,12 @@ export function PengumumanAdminPage() {
       <DataTable<Row>
         columns={columns}
         data={paginatedData as unknown as Row[]}
-        emptyMessage="Tidak ada data pengumuman"
+        loading={isLoading}
+        emptyMessage={
+          isError
+            ? "Gagal memuat data pengumuman"
+            : "Tidak ada data pengumuman"
+        }
         onRowClick={(item) => openDetail(item.id)}
       />
       {totalPages > 1 && (
@@ -355,6 +393,15 @@ export function PengumumanAdminPage() {
               Selanjutnya
             </button>
           </div>
+        </div>
+      )}
+
+      {isError && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive">
+          Terjadi kesalahan saat memuat data pengumuman.{" "}
+          <button onClick={() => refetch()} className="underline font-medium">
+            Muat ulang
+          </button>
         </div>
       )}
 

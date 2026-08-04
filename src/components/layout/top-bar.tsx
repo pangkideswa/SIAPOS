@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { LogOut, User, Search, Settings, Menu, Clock } from "lucide-react"
 import { useEffect, useState } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import type { UserRole } from "@/types/auth"
 
 function getInitials(name: string): string {
@@ -63,13 +63,14 @@ function getPageTitle(pathname: string): string {
   if (pathname.match(/^\/admin\/pengumuman\/\d+$/)) return "Detail Pengumuman"
   if (pathname.startsWith("/admin/pengumuman")) return "Pengumuman"
   if (pathname.startsWith("/admin")) return "Beranda"
+  if (pathname.match(/^\/guru\/kelas\/\d+$/)) return "Detail Kelas"
+  if (pathname.startsWith("/guru/kelas")) return "Kelas Saya"
   if (pathname.match(/^\/guru\/materi\/\d+$/)) return "Detail Materi"
-  if (pathname.startsWith("/guru/materi")) return "Pembelajaran"
+  if (pathname.startsWith("/guru/materi")) return "Materi"
   if (pathname.match(/^\/guru\/tugas\/\d+$/)) return "Detail Tugas"
   if (pathname.startsWith("/guru/tugas")) return "Tugas"
   if (pathname.match(/^\/guru\/pengumpulan\/\d+$/)) return "Detail Pengumpulan"
-  if (pathname.startsWith("/guru/pengumpulan")) return "Pengumpulan Tugas"
-  if (pathname.startsWith("/guru/kelas")) return "Kelas Saya"
+  if (pathname.startsWith("/guru/pengumpulan")) return "Pengumpulan"
   if (pathname.match(/^\/guru\/penilaian\/\d+$/)) return "Detail Penilaian"
   if (pathname.startsWith("/guru/penilaian")) return "Penilaian"
   if (pathname.match(/^\/guru\/quiz\/\d+$/)) return "Detail Quiz"
@@ -84,8 +85,10 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith("/guru/nilai-akademik")) return "Nilai Akademik"
   if (pathname.match(/^\/guru\/pengumuman\/\d+$/)) return "Detail Pengumuman"
   if (pathname.startsWith("/guru/pengumuman")) return "Pengumuman"
-  if (pathname.startsWith("/guru")) return "Beranda"
-  if (pathname.startsWith("/siswa/pelajaran")) return "Pelajaran"
+  if (pathname.startsWith("/guru")) return "Dashboard"
+  if (pathname.match(/^\/siswa\/kelas\/\d+$/)) return "Detail Kelas"
+  if (pathname.startsWith("/siswa/kelas")) return "Pelajaran Saya"
+  if (pathname.startsWith("/siswa/pelajaran")) return "Pelajaran Saya"
   if (pathname.startsWith("/siswa/jadwal-pelajaran")) return "Jadwal Pelajaran"
   if (pathname.startsWith("/siswa/tugas")) return "Tugas"
   if (pathname.match(/^\/siswa\/quiz\/\d+\/kerjakan$/)) return "Mengerjakan Quiz"
@@ -102,7 +105,9 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith("/siswa/nilai-akademik")) return "Nilai Akademik"
   if (pathname.match(/^\/siswa\/pengumuman\/\d+$/)) return "Detail Pengumuman"
   if (pathname.startsWith("/siswa/pengumuman")) return "Pengumuman"
-  if (pathname.startsWith("/siswa")) return "Beranda"
+  if (pathname.startsWith("/siswa/profil")) return "Profil"
+  if (pathname.startsWith("/siswa/pengaturan")) return "Pengaturan"
+  if (pathname.startsWith("/siswa")) return "Dashboard"
   if (pathname.startsWith("/wali/siswa")) return "Siswa"
   if (pathname.startsWith("/wali/laporan")) return "Laporan"
   if (pathname.startsWith("/wali")) return "Beranda"
@@ -113,6 +118,7 @@ function getPageTitle(pathname: string): string {
 export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, logout } = useAuth()
   const pathname = usePathname()
+  const router = useRouter()
   const [searchOpen, setSearchOpen] = useState(false)
   const [now, setNow] = useState(() => new Date())
 
@@ -210,11 +216,11 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
               </span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(`/${user?.role === "guru" ? "guru" : user?.role === "siswa" ? "siswa" : user?.role === "wali" ? "wali" : "admin"}/profil`)}>
               <User className="mr-2 h-4 w-4" />
               Profil Saya
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(`/${user?.role === "guru" ? "guru" : user?.role === "siswa" ? "siswa" : user?.role === "wali" ? "wali" : "admin"}/pengaturan`)}>
               <Settings className="mr-2 h-4 w-4" />
               Pengaturan
             </DropdownMenuItem>

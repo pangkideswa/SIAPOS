@@ -22,7 +22,11 @@ import {
 import { MateriFormDialog } from "./materi-form-dialog"
 import { MateriDeleteDialog } from "./materi-delete-dialog"
 import { STATUS_MATERI_COLORS } from "@/features/materi/constants/materi.constants"
-import { materialService } from "@/features/materi/lib/material.service"
+import {
+  useMaterial,
+  useUpdateMaterial,
+  useRemoveMaterial,
+} from "@/hooks/use-materials"
 import type { MateriFormData } from "@/features/materi/types/materi"
 
 function formatDate(dateStr: string) {
@@ -81,30 +85,45 @@ export function MateriDetailPage({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const materi = materialService.getById(Number(resolvedParams.id))
+  const {
+    data: materi,
+    isLoading: isDetailLoading,
+    isError,
+    refetch,
+  } = useMaterial(Number(resolvedParams.id))
+  const updateMutation = useUpdateMaterial()
+  const removeMutation = useRemoveMaterial()
 
   function handleEditSubmit(data: MateriFormData) {
-    return new Promise<void>(async (resolve) => {
-      setIsLoading(true)
-      await new Promise((r) => setTimeout(r, 500))
-      if (materi) {
-        materialService.update(materi.id, data)
-      }
-      setIsLoading(false)
-      setFormDialogOpen(false)
-      resolve()
-    })
+    if (!materi) return Promise.resolve()
+    setIsLoading(true)
+    return updateMutation
+      .mutateAsync({ id: materi.id, data })
+      .then(() => setFormDialogOpen(false))
+      .finally(() => setIsLoading(false))
   }
 
   function handleDelete() {
     if (!materi) return
     setIsLoading(true)
-    setTimeout(() => {
-      materialService.remove(materi.id)
-      setIsLoading(false)
-      setDeleteDialogOpen(false)
-      router.push("/guru/materi")
-    }, 500)
+    removeMutation.mutate(materi.id, {
+      onSuccess: () => {
+        setDeleteDialogOpen(false)
+        router.push("/guru/materi")
+      },
+      onSettled: () => setIsLoading(false),
+    })
+  }
+
+  if (isDetailLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-muted-foreground">Memuat data...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!materi) {
@@ -112,20 +131,29 @@ export function MateriDetailPage({
       <div className="space-y-6">
         <PageHeader
           title="Detail Materi"
-          description="Materi tidak ditemukan."
+          description={isError ? "Terjadi kesalahan saat memuat materi." : "Materi tidak ditemukan."}
           action={
-            <Button
-              variant="outline"
-              onClick={() => router.push("/guru/materi")}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Kembali
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => router.push("/guru/materi")}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Kembali
+              </Button>
+              {isError && (
+                <Button variant="outline" onClick={() => refetch()}>
+                  Muat Ulang
+                </Button>
+              )}
+            </div>
           }
         />
         <Card>
           <CardContent className="pt-6 text-center text-muted-foreground py-12">
-            Materi dengan ID {resolvedParams.id} tidak ditemukan.
+            {isError
+              ? `Terjadi kesalahan saat memuat materi dengan ID ${resolvedParams.id}.`
+              : `Materi dengan ID ${resolvedParams.id} tidak ditemukan.`}
           </CardContent>
         </Card>
       </div>

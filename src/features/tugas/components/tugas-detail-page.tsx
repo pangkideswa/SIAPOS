@@ -19,11 +19,14 @@ import {
   Download,
   ClipboardList,
 } from "lucide-react"
-import { toast } from "sonner"
 import { TugasFormDialog } from "./tugas-form-dialog"
 import { TugasDeleteDialog } from "./tugas-delete-dialog"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
-import { assignmentService } from "@/features/tugas/lib/assignment.service"
+import {
+  useAssignment,
+  useUpdateAssignment,
+  useRemoveAssignment,
+} from "@/hooks/use-assignments"
 import type { TugasFormData } from "@/features/tugas/types/tugas"
 
 function formatDate(dateStr: string) {
@@ -75,32 +78,45 @@ export function TugasDetailPage({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const tugas = assignmentService.getById(Number(resolvedParams.id))
+  const {
+    data: tugas,
+    isLoading: isDetailLoading,
+    isError,
+    refetch,
+  } = useAssignment(Number(resolvedParams.id))
+  const updateMutation = useUpdateAssignment()
+  const removeMutation = useRemoveAssignment()
 
   function handleEditSubmit(data: TugasFormData) {
-    return new Promise<void>(async (resolve) => {
-      setIsLoading(true)
-      await new Promise((r) => setTimeout(r, 500))
-      if (tugas) {
-        assignmentService.update(tugas.id, data)
-      }
-      setIsLoading(false)
-      setFormDialogOpen(false)
-      toast.success("Tugas berhasil diperbarui.")
-      resolve()
-    })
+    if (!tugas) return Promise.resolve()
+    setIsLoading(true)
+    return updateMutation
+      .mutateAsync({ id: tugas.id, data })
+      .then(() => setFormDialogOpen(false))
+      .finally(() => setIsLoading(false))
   }
 
   function handleDelete() {
     if (!tugas) return
     setIsLoading(true)
-    setTimeout(() => {
-      assignmentService.remove(tugas.id)
-      setIsLoading(false)
-      setDeleteDialogOpen(false)
-      toast.success("Tugas berhasil dihapus.")
-      router.push("/guru/tugas")
-    }, 500)
+    removeMutation.mutate(tugas.id, {
+      onSuccess: () => {
+        setDeleteDialogOpen(false)
+        router.push("/guru/tugas")
+      },
+      onSettled: () => setIsLoading(false),
+    })
+  }
+
+  if (isDetailLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-muted-foreground">Memuat data...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!tugas) {
@@ -108,20 +124,29 @@ export function TugasDetailPage({
       <div className="space-y-6">
         <PageHeader
           title="Detail Tugas"
-          description="Tugas tidak ditemukan."
+          description={isError ? "Terjadi kesalahan saat memuat tugas." : "Tugas tidak ditemukan."}
           action={
-            <Button
-              variant="outline"
-              onClick={() => router.push("/guru/tugas")}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Kembali
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => router.push("/guru/tugas")}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Kembali
+              </Button>
+              {isError && (
+                <Button variant="outline" onClick={() => refetch()}>
+                  Muat Ulang
+                </Button>
+              )}
+            </div>
           }
         />
         <Card>
           <CardContent className="pt-6 text-center text-muted-foreground py-12">
-            Tugas dengan ID {resolvedParams.id} tidak ditemukan.
+            {isError
+              ? `Terjadi kesalahan saat memuat tugas dengan ID ${resolvedParams.id}.`
+              : `Tugas dengan ID ${resolvedParams.id} tidak ditemukan.`}
           </CardContent>
         </Card>
       </div>

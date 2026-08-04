@@ -15,7 +15,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react"
-import { toast } from "sonner"
 import { TugasFormDialog } from "./tugas-form-dialog"
 import { TugasDeleteDialog } from "./tugas-delete-dialog"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
@@ -24,11 +23,25 @@ import {
   MATA_PELAJARAN_OPTIONS,
   KELAS_OPTIONS,
 } from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
-import { assignmentService } from "@/features/tugas/lib/assignment.service"
+import {
+  useAssignments,
+  useCreateAssignment,
+  useUpdateAssignment,
+  useRemoveAssignment,
+} from "@/hooks/use-assignments"
 import type { Tugas, TugasFormData } from "@/features/tugas/types/tugas"
 
 export function TugasListPage() {
   const router = useRouter()
+  const {
+    data: allAssignments = [],
+    isLoading: isTableLoading,
+    isError,
+    refetch,
+  } = useAssignments()
+  const createMutation = useCreateAssignment()
+  const updateMutation = useUpdateAssignment()
+  const removeMutation = useRemoveAssignment()
   const [search, setSearch] = useState("")
   const [guruFilter, setGuruFilter] = useState<string>("all")
   const [mapelFilter, setMapelFilter] = useState<string>("all")
@@ -43,7 +56,7 @@ export function TugasListPage() {
 
   const perPage = 10
 
-  const filteredData = assignmentService.getAll().filter((item) => {
+  const filteredData = allAssignments.filter((item) => {
     const matchesSearch =
       !search ||
       item.judul.toLowerCase().includes(search.toLowerCase()) ||
@@ -157,7 +170,7 @@ export function TugasListPage() {
             title="Edit"
             onClick={() =>
               openEdit(
-                assignmentService.getById(Number(item.id)) ?? null
+                allAssignments.find((a) => a.id === Number(item.id)) ?? null
               )
             }
           >
@@ -169,7 +182,7 @@ export function TugasListPage() {
             title="Hapus"
             onClick={() =>
               openDelete(
-                assignmentService.getById(Number(item.id)) ?? null
+                allAssignments.find((a) => a.id === Number(item.id)) ?? null
               )
             }
           >
@@ -197,30 +210,29 @@ export function TugasListPage() {
 
   async function handleFormSubmit(data: TugasFormData) {
     setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 500))
-
-    if (editingItem) {
-      assignmentService.update(editingItem.id, data)
-      toast.success("Tugas berhasil diperbarui.")
-    } else {
-      assignmentService.create(data)
-      toast.success("Tugas berhasil ditambahkan.")
+    try {
+      if (editingItem) {
+        await updateMutation.mutateAsync({ id: editingItem.id, data })
+      } else {
+        await createMutation.mutateAsync(data)
+      }
+      setFormDialogOpen(false)
+      setEditingItem(null)
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
-    setFormDialogOpen(false)
-    setEditingItem(null)
   }
 
   async function handleDelete() {
     if (!deletingItem) return
     setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 500))
-    assignmentService.remove(deletingItem.id)
-    setIsLoading(false)
-    setDeleteDialogOpen(false)
-    setDeletingItem(null)
-    toast.success("Tugas berhasil dihapus.")
+    try {
+      await removeMutation.mutateAsync(deletingItem.id)
+      setDeleteDialogOpen(false)
+      setDeletingItem(null)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -331,12 +343,23 @@ export function TugasListPage() {
       <DataTable
         columns={columns}
         data={paginatedData as unknown as Record<string, unknown>[]}
-        loading={false}
-        emptyMessage="Tidak ada tugas ditemukan"
+        loading={isTableLoading}
+        emptyMessage={
+          isError ? "Gagal memuat data tugas" : "Tidak ada tugas ditemukan"
+        }
         onRowClick={(item) =>
           router.push(`/guru/tugas/${String(item.id)}`)
         }
       />
+
+      {isError && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive">
+          Terjadi kesalahan saat memuat data tugas.{" "}
+          <button onClick={() => refetch()} className="underline font-medium">
+            Muat ulang
+          </button>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">

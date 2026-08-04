@@ -23,7 +23,12 @@ import {
 import { RichTextContent } from "@/components/ui/rich-text-editor"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { PengumumanFormDialog } from "./pengumuman-form-dialog"
-import { DUMMY_PENGUMUMAN } from "../dummy/pengumuman.data"
+import {
+  useAnnouncement,
+  useUpdateAnnouncement,
+  useRemoveAnnouncement,
+} from "@/hooks/use-announcements"
+import type { AnnouncementFormData } from "@/lib/services/announcement.service"
 import type { Pengumuman } from "../types/pengumuman"
 import {
   GURU_PENULIS,
@@ -74,7 +79,14 @@ export function PengumumanDetailPage({
   const [formOpen, setFormOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
-  const item = DUMMY_PENGUMUMAN.find((d) => d.id === Number(resolvedParams.id))
+  const {
+    data: item,
+    isLoading,
+    isError,
+    refetch,
+  } = useAnnouncement(Number(resolvedParams.id))
+  const updateMutation = useUpdateAnnouncement()
+  const removeMutation = useRemoveAnnouncement()
   const listPath = `/${variant}/pengumuman`
 
   const isOwner = item?.penulis === GURU_PENULIS
@@ -82,23 +94,44 @@ export function PengumumanDetailPage({
 
   function handleEditSubmit(data: Pengumuman) {
     if (!item) return
-    const idx = DUMMY_PENGUMUMAN.findIndex((d) => d.id === item.id)
-    if (idx !== -1) {
-      DUMMY_PENGUMUMAN[idx] = {
-        ...data,
-        created_at: item.created_at,
-        updated_at: new Date().toISOString(),
-      }
+    const formData: AnnouncementFormData = {
+      judul: data.judul,
+      ringkasan: data.ringkasan,
+      isi: data.isi,
+      kategori: data.kategori,
+      target: data.target,
+      kelas: data.kelas,
+      status: data.status,
+      penulis: data.penulis,
+      pinned: data.pinned,
+      lampiran: data.lampiran,
+      tanggal_publish: data.tanggal_publish,
     }
-    setFormOpen(false)
+    updateMutation.mutate(
+      { id: item.id, data: formData },
+      { onSuccess: () => setFormOpen(false) }
+    )
   }
 
   function handleDelete() {
     if (!item) return
-    const idx = DUMMY_PENGUMUMAN.findIndex((d) => d.id === item.id)
-    if (idx !== -1) DUMMY_PENGUMUMAN.splice(idx, 1)
-    setDeleteOpen(false)
-    router.push(listPath)
+    removeMutation.mutate(item.id, {
+      onSuccess: () => {
+        setDeleteOpen(false)
+        router.push(listPath)
+      },
+    })
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-muted-foreground">Memuat data...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!item) {
@@ -106,17 +139,30 @@ export function PengumumanDetailPage({
       <div className="space-y-6">
         <PageHeader
           title="Detail Pengumuman"
-          description="Pengumuman tidak ditemukan."
+          description={
+            isError
+              ? "Terjadi kesalahan saat memuat pengumuman."
+              : "Pengumuman tidak ditemukan."
+          }
           action={
-            <Button variant="outline" onClick={() => router.push(listPath)}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Kembali
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => router.push(listPath)}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Kembali
+              </Button>
+              {isError && (
+                <Button variant="outline" onClick={() => refetch()}>
+                  Muat Ulang
+                </Button>
+              )}
+            </div>
           }
         />
         <Card>
           <CardContent className="pt-6 text-center text-muted-foreground py-12">
-            Pengumuman dengan ID {resolvedParams.id} tidak ditemukan.
+            {isError
+              ? `Terjadi kesalahan saat memuat pengumuman dengan ID ${resolvedParams.id}.`
+              : `Pengumuman dengan ID ${resolvedParams.id} tidak ditemukan.`}
           </CardContent>
         </Card>
       </div>

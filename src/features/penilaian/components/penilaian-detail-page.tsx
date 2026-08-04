@@ -32,8 +32,8 @@ import { toast } from "sonner"
 import {
   STATUS_PENILAIAN_COLORS,
 } from "@/features/penilaian/constants/penilaian.constants"
-import { DUMMY_PENILAIAN } from "@/features/penilaian/dummy/penilaian.data"
-import { DUMMY_PENGUMPULAN } from "@/features/pengumpulan/dummy/pengumpulan.data"
+import { usePenilaianDetail, useUpdatePenilaian } from "@/hooks/use-penilaian"
+import { useSubmission } from "@/hooks/use-submissions"
 import type { Penilaian } from "@/features/penilaian/types/penilaian"
 
 function formatDate(dateStr: string) {
@@ -88,13 +88,16 @@ export function PenilaianDetailPage({
   const [isSaving, setIsSaving] = useState(false)
   const [initialized, setInitialized] = useState(false)
 
-  const penilaian = DUMMY_PENILAIAN.find(
-    (p) => p.id === Number(resolvedParams.id)
+  const {
+    data: penilaian,
+    isLoading,
+    isError,
+    refetch,
+  } = usePenilaianDetail(Number(resolvedParams.id))
+  const { data: pengumpulan } = useSubmission(
+    penilaian?.pengumpulan_id ?? 0
   )
-
-  const pengumpulan = penilaian
-    ? DUMMY_PENGUMPULAN.find((p) => p.id === penilaian.pengumpulan_id)
-    : null
+  const updatePenilaian = useUpdatePenilaian()
 
   if (penilaian && !initialized) {
     setNilai(penilaian.nilai !== null ? String(penilaian.nilai) : "")
@@ -117,26 +120,49 @@ export function PenilaianDetailPage({
     }
 
     setIsSaving(true)
-    await new Promise((r) => setTimeout(r, 500))
-
-    const idx = DUMMY_PENILAIAN.findIndex((p) => p.id === penilaian.id)
-    if (idx !== -1) {
-      DUMMY_PENILAIAN[idx] = {
-        ...DUMMY_PENILAIAN[idx],
-        nilai: statusPenilaian === "Sudah Dinilai" ? Number(nilai) : null,
-        feedback_guru: feedback,
-        status_penilaian:
-          statusPenilaian as Penilaian["status_penilaian"],
-        updated_at: new Date().toISOString(),
-      }
+    try {
+      await updatePenilaian.mutateAsync({
+        id: penilaian.id,
+        data: {
+          nilai:
+            statusPenilaian === "Sudah Dinilai" ? Number(nilai) : null,
+          feedback: feedback,
+          status_penilaian:
+            statusPenilaian as Penilaian["status_penilaian"],
+        },
+      })
+      router.push("/guru/penilaian")
+    } finally {
+      setIsSaving(false)
     }
-
-    setIsSaving(false)
-    toast.success("Penilaian berhasil disimpan.")
-    router.push("/guru/penilaian")
   }
 
-  if (!penilaian) {
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title="Penilaian"
+          description="Memuat data penilaian..."
+          action={
+            <Button
+              variant="outline"
+              onClick={() => router.push("/guru/penilaian")}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Kembali
+            </Button>
+          }
+        />
+        <Card>
+          <CardContent className="pt-6 text-center text-muted-foreground py-12">
+            Memuat data penilaian...
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (isError || !penilaian) {
     return (
       <div className="space-y-6">
         <PageHeader
@@ -154,8 +180,17 @@ export function PenilaianDetailPage({
         />
         <Card>
           <CardContent className="pt-6 text-center text-muted-foreground py-12">
-            Data penilaian dengan ID {resolvedParams.id} tidak ditemukan.
+            {isError
+              ? "Gagal memuat data penilaian."
+              : `Data penilaian dengan ID ${resolvedParams.id} tidak ditemukan.`}
           </CardContent>
+          {isError && (
+            <CardContent className="pt-0 pb-6 text-center">
+              <Button variant="outline" onClick={() => refetch()}>
+                Muat Ulang
+              </Button>
+            </CardContent>
+          )}
         </Card>
       </div>
     )

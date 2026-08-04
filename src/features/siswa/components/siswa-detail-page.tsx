@@ -25,7 +25,7 @@ import {
 import { SiswaFormDialog } from "./siswa-form-dialog"
 import { SiswaDeleteDialog } from "./siswa-delete-dialog"
 import { STATUS_SISWA_COLORS } from "@/features/siswa/constants/siswa.constants"
-import { DUMMY_SISWA } from "@/features/siswa/dummy/siswa.data"
+import { useStudent, useUpdateStudent, useRemoveStudent } from "@/hooks/use-students"
 import type { SiswaFormData } from "@/features/siswa/types/siswa"
 
 function formatDate(dateStr: string): string {
@@ -95,9 +95,60 @@ export function SiswaDetailPage({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const siswa = DUMMY_SISWA.find((s) => s.id === Number(resolvedParams.id))
+  const {
+    data: siswa,
+    isLoading: isDetailLoading,
+    isError,
+    refetch,
+  } = useStudent(Number(resolvedParams.id))
+  const updateSiswa = useUpdateStudent()
+  const removeSiswa = useRemoveStudent()
 
-  if (!siswa) {
+  async function handleEditSubmit(formData: SiswaFormData) {
+    if (!siswa) return
+    setIsLoading(true)
+    try {
+      await updateSiswa.mutateAsync({ id: siswa.id, data: formData })
+      setFormDialogOpen(false)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!siswa) return
+    setIsLoading(true)
+    try {
+      await removeSiswa.mutateAsync(siswa.id)
+      setDeleteDialogOpen(false)
+      router.push("/admin/siswa")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  if (isDetailLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title="Detail Siswa"
+          action={
+            <Button variant="outline" onClick={() => router.push("/admin/siswa")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Kembali
+            </Button>
+          }
+        />
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <p className="text-muted-foreground">Memuat data siswa...</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (isError || !siswa) {
     return (
       <div className="space-y-6">
         <PageHeader
@@ -112,47 +163,27 @@ export function SiswaDetailPage({
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <User className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-lg font-medium">Siswa tidak ditemukan</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Data siswa dengan ID {resolvedParams.id} tidak tersedia.
+            <p className="text-lg font-medium">
+              {isError ? "Gagal memuat data siswa" : "Siswa tidak ditemukan"}
             </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {isError
+                ? "Terjadi kesalahan saat memuat data siswa."
+                : `Data siswa dengan ID ${resolvedParams.id} tidak tersedia.`}
+            </p>
+            {isError && (
+              <Button
+                variant="outline"
+                className="mt-4"
+                onClick={() => refetch()}
+              >
+                Muat Ulang
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
     )
-  }
-
-  async function handleEditSubmit(formData: SiswaFormData) {
-    if (!siswa) return
-    setIsLoading(true)
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_SISWA.findIndex((s) => s.id === siswa.id)
-      if (idx !== -1) {
-        DUMMY_SISWA[idx] = {
-          ...DUMMY_SISWA[idx],
-          ...formData,
-          updated_at: new Date().toISOString(),
-        }
-      }
-      setFormDialogOpen(false)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  async function handleDelete() {
-    if (!siswa) return
-    setIsLoading(true)
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_SISWA.findIndex((s) => s.id === siswa.id)
-      if (idx !== -1) DUMMY_SISWA.splice(idx, 1)
-      setDeleteDialogOpen(false)
-      router.push("/admin/siswa")
-    } finally {
-      setIsLoading(false)
-    }
   }
 
   return (

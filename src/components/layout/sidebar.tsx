@@ -29,7 +29,6 @@ import {
   CalendarDays,
   Megaphone,
   FileSpreadsheet,
-  Send,
   X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -68,20 +67,14 @@ const navItems: NavEntry[] = [
   { type: "item", label: "Analitik", href: "/guru/analitik", icon: BarChart3, roles: ["super_admin", "admin"] },
   { type: "item", label: "PKL", href: "/admin/pkl", icon: Award, roles: ["super_admin", "admin"] },
 
-  { type: "item", label: "Beranda", href: "/guru", icon: LayoutDashboard, roles: ["guru"] },
+  { type: "item", label: "Dashboard", href: "/guru", icon: LayoutDashboard, roles: ["guru"] },
   { type: "item", label: "Kelas Saya", href: "/guru/kelas", icon: BookOpen, roles: ["guru"] },
-  { type: "item", label: "Pembelajaran", href: "/guru/materi", icon: BookMarked, roles: ["guru"] },
-  { type: "item", label: "Tugas", href: "/guru/tugas", icon: ClipboardList, roles: ["guru"] },
-  { type: "item", label: "Pengumpulan", href: "/guru/pengumpulan", icon: Send, roles: ["guru"] },
-  { type: "item", label: "Penilaian", href: "/guru/penilaian", icon: Award, roles: ["guru"] },
   { type: "item", label: "Jadwal Pelajaran", href: "/guru/jadwal-pelajaran", icon: Calendar, roles: ["guru"] },
   { type: "item", label: "Pengumuman", href: "/guru/pengumuman", icon: Megaphone, roles: ["guru"] },
 
-  { type: "item", label: "Beranda", href: "/siswa", icon: LayoutDashboard, roles: ["siswa"] },
-  { type: "item", label: "Pelajaran", href: "/siswa/pelajaran", icon: GraduationCap, roles: ["siswa"] },
-  { type: "item", label: "Tugas", href: "/siswa/tugas", icon: ClipboardList, roles: ["siswa"] },
+  { type: "item", label: "Dashboard", href: "/siswa", icon: LayoutDashboard, roles: ["siswa"] },
+  { type: "item", label: "Pelajaran Saya", href: "/siswa/pelajaran", icon: GraduationCap, roles: ["siswa"] },
   { type: "item", label: "Jadwal Pelajaran", href: "/siswa/jadwal-pelajaran", icon: Calendar, roles: ["siswa"] },
-  { type: "item", label: "Absensi", href: "/siswa/absensi", icon: CalendarCheck, roles: ["siswa"] },
   { type: "item", label: "Pengumuman", href: "/siswa/pengumuman", icon: Megaphone, roles: ["siswa"] },
 
   { type: "item", label: "Beranda", href: "/wali", icon: LayoutDashboard, roles: ["wali"] },

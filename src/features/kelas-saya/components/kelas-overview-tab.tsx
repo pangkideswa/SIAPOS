@@ -1,11 +1,6 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import {
   Users,
   BookOpen,
@@ -13,30 +8,15 @@ import {
   Send,
   GraduationCap,
   CalendarDays,
-  Megaphone,
   Activity,
-  Pin,
-  PinOff,
   Clock,
-  Plus,
-  Pencil,
-  Trash2,
-  Search,
 } from "lucide-react"
-import { toast } from "sonner"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
-import type { Pengumuman } from "@/features/pengumuman/types/pengumuman"
-import { PengumumanFormDialog } from "@/features/pengumuman/components/pengumuman-form-dialog"
-import { STATUS_PENGUMUMAN_COLORS } from "@/features/pengumuman/constants/pengumuman.constants"
-import { DUMMY_PENGUMUMAN } from "@/features/pengumuman/dummy/pengumuman.data"
-import { getPengumumanTargetRoles } from "@/features/pengumuman/lib/pengumuman-helpers"
-import { pushNotifikasi } from "@/features/notifications/lib/notifikasi-service"
 import {
   getAnggotaKelas,
   getKelasAktivitas,
   getKelasJadwal,
   getKelasMateri,
-  getKelasPengumumanAll,
   getKelasTugas,
   getTugasPengumpulan,
   formatTanggalPendek,
@@ -62,66 +42,6 @@ export function KelasOverviewTab({ kelasMengajar }: KelasOverviewTabProps) {
   const tugas = getKelasTugas(kelasMengajar.id)
   const jadwal = getKelasJadwal(kelasMengajar.kelas)
   const aktivitas = getKelasAktivitas(kelasMengajar.id)
-  const [, setVersion] = useState(0)
-  const [formOpen, setFormOpen] = useState(false)
-  const [editingItem, setEditingItem] = useState<Pengumuman | null>(null)
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [deletingItem, setDeletingItem] = useState<Pengumuman | null>(null)
-  const [pengumumanSearch, setPengumumanSearch] = useState("")
-
-  const pengumumanAll = getKelasPengumumanAll(kelasMengajar.kelas).filter(
-    (p) =>
-      !pengumumanSearch ||
-      p.judul.toLowerCase().includes(pengumumanSearch.toLowerCase()) ||
-      p.ringkasan.toLowerCase().includes(pengumumanSearch.toLowerCase())
-  )
-
-  function handleSave(data: Pengumuman) {
-    const idx = DUMMY_PENGUMUMAN.findIndex((p) => p.id === data.id)
-    if (idx !== -1) {
-      DUMMY_PENGUMUMAN[idx] = { ...data }
-    } else {
-      DUMMY_PENGUMUMAN.unshift(data)
-    }
-    if (data.status === "Dipublikasikan") {
-      pushNotifikasi({
-        tipe: "pengumuman",
-        judul: `Pengumuman Kelas: ${data.judul}`,
-        pesan: `Pengumuman baru di kelas ${kelasMengajar.mata_pelajaran} — ${kelasMengajar.kelas}.`,
-        href: `/siswa/kelas/${kelasMengajar.id}`,
-        target_roles: getPengumumanTargetRoles(data.target),
-      })
-    }
-    setVersion((v) => v + 1)
-    setFormOpen(false)
-    setEditingItem(null)
-    toast.success(
-      idx !== -1 ? "Pengumuman berhasil diperbarui" : "Pengumuman berhasil dibuat"
-    )
-  }
-
-  function togglePin(item: Pengumuman) {
-    const idx = DUMMY_PENGUMUMAN.findIndex((p) => p.id === item.id)
-    if (idx !== -1) {
-      DUMMY_PENGUMUMAN[idx] = {
-        ...DUMMY_PENGUMUMAN[idx],
-        pinned: !DUMMY_PENGUMUMAN[idx].pinned,
-        updated_at: new Date().toISOString(),
-      }
-    }
-    setVersion((v) => v + 1)
-    toast.success(item.pinned ? "Pengumuman dilepas dari pin" : "Pengumuman dipin")
-  }
-
-  function confirmDelete() {
-    if (!deletingItem) return
-    const idx = DUMMY_PENGUMUMAN.findIndex((p) => p.id === deletingItem.id)
-    if (idx !== -1) DUMMY_PENGUMUMAN.splice(idx, 1)
-    setVersion((v) => v + 1)
-    setDeleteOpen(false)
-    setDeletingItem(null)
-    toast.success("Pengumuman berhasil dihapus")
-  }
 
   const sudahMengumpulkan = tugas.reduce(
     (total, t) =>
@@ -140,7 +60,6 @@ export function KelasOverviewTab({ kelasMengajar }: KelasOverviewTabProps) {
 
   return (
     <div className="space-y-5">
-      {/* Statistik */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           {
@@ -192,7 +111,6 @@ export function KelasOverviewTab({ kelasMengajar }: KelasOverviewTabProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Informasi Kelas */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -240,7 +158,6 @@ export function KelasOverviewTab({ kelasMengajar }: KelasOverviewTabProps) {
           </CardContent>
         </Card>
 
-        {/* Jadwal */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -282,118 +199,6 @@ export function KelasOverviewTab({ kelasMengajar }: KelasOverviewTabProps) {
           </CardContent>
         </Card>
 
-        {/* Pengumuman */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
-            <CardTitle className="flex items-center gap-2">
-              <Megaphone className="h-4 w-4 text-orange-500" />
-              Pengumuman Kelas
-            </CardTitle>
-            <Button
-              size="sm"
-              onClick={() => {
-                setEditingItem(null)
-                setFormOpen(true)
-              }}
-              className="bg-primary hover:bg-primary/90"
-            >
-              <Plus className="mr-1.5 h-4 w-4" />
-              Buat Pengumuman
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="relative max-w-sm mb-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Cari pengumuman..."
-                value={pengumumanSearch}
-                onChange={(e) => setPengumumanSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            {pengumumanAll.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-6 text-center">
-                {pengumumanSearch
-                  ? "Pengumuman tidak ditemukan."
-                  : "Belum ada pengumuman untuk kelas ini."}
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {pengumumanAll.map((p) => (
-                  <div
-                    key={p.id}
-                    className="rounded-lg border border-border p-3 hover:bg-muted/40 transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {p.pinned && (
-                            <Pin className="h-3.5 w-3.5 text-primary shrink-0" />
-                          )}
-                          <p className="text-sm font-medium line-clamp-1">
-                            {p.judul}
-                          </p>
-                          <Badge
-                            className={
-                              STATUS_PENGUMUMAN_COLORS[p.status] ?? ""
-                            }
-                          >
-                            {p.status}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                          {p.ringkasan}
-                        </p>
-                        <p className="flex items-center gap-1 text-[11px] text-muted-foreground/80 mt-1">
-                          <Clock className="h-3 w-3" />
-                          {formatTanggalPendek(p.tanggal_publish)} · {p.penulis}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          title={p.pinned ? "Lepas Pin" : "Pin"}
-                          onClick={() => togglePin(p)}
-                        >
-                          {p.pinned ? (
-                            <PinOff className="h-4 w-4 text-primary" />
-                          ) : (
-                            <Pin className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          title="Edit"
-                          onClick={() => {
-                            setEditingItem(p)
-                            setFormOpen(true)
-                          }}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          title="Hapus"
-                          onClick={() => {
-                            setDeletingItem(p)
-                            setDeleteOpen(true)
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Aktivitas */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -435,25 +240,6 @@ export function KelasOverviewTab({ kelasMengajar }: KelasOverviewTabProps) {
           </CardContent>
         </Card>
       </div>
-
-      <PengumumanFormDialog
-        open={formOpen}
-        onOpenChange={setFormOpen}
-        data={editingItem}
-        onSave={handleSave}
-        teacherMode
-        allowedKelas={[kelasMengajar.kelas]}
-        defaultTarget="Kelas Tertentu"
-        defaultKelas={kelasMengajar.kelas}
-      />
-
-      <ConfirmDialog
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        title="Hapus Pengumuman"
-        description={`Apakah Anda yakin ingin menghapus pengumuman "${deletingItem?.judul}"?`}
-        onConfirm={confirmDelete}
-      />
     </div>
   )
 }

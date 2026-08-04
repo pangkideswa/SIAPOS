@@ -2,11 +2,13 @@
 
 import { useState } from "react"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+  ResponsiveDialogBody,
+  ResponsiveDialogFooter,
+} from "@/components/ui/responsive-dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -16,14 +18,13 @@ import {
   FileText,
   Download,
   Clock,
-  GraduationCap,
   Loader2,
   Save,
   Undo2,
 } from "lucide-react"
 import { toast } from "sonner"
 import { STATUS_PENGUMPULAN_COLORS } from "@/features/pengumpulan/constants/pengumpulan.constants"
-import { DUMMY_PENGUMPULAN } from "@/features/pengumpulan/dummy/pengumpulan.data"
+import { useGradeSubmission } from "@/hooks/use-submissions"
 import type { PengumpulanTugas } from "@/features/pengumpulan/types/pengumpulan"
 
 interface JawabanDetailDialogProps {
@@ -56,6 +57,7 @@ export function JawabanDetailDialog({
   const [nilai, setNilai] = useState<string>("")
   const [feedback, setFeedback] = useState("")
   const [isSaving, setIsSaving] = useState(false)
+  const gradeMutation = useGradeSubmission()
 
   function handleOpen(isOpen: boolean) {
     if (isOpen && submission) {
@@ -76,188 +78,161 @@ export function JawabanDetailDialog({
     }
 
     setIsSaving(true)
-    await new Promise((r) => setTimeout(r, 500))
-
-    const idx = DUMMY_PENGUMPULAN.findIndex(
-      (p) => p.id === submission.id
-    )
-    if (idx !== -1) {
-      DUMMY_PENGUMPULAN[idx] = {
-        ...DUMMY_PENGUMPULAN[idx],
+    try {
+      const graded = await gradeMutation.mutateAsync({
+        id: submission.id,
         nilai: parsed,
         feedback: feedback.trim() || null,
-        updated_at: new Date().toISOString(),
-      }
-      onGraded?.(DUMMY_PENGUMPULAN[idx])
+      })
+      onGraded?.(graded)
+      onOpenChange(false)
+      toast.success(`Nilai ${submission.siswa_nama} berhasil disimpan: ${parsed}`)
+    } finally {
+      setIsSaving(false)
     }
-
-    setIsSaving(false)
-    onOpenChange(false)
-    toast.success(`Nilai ${submission.siswa_nama} berhasil disimpan: ${parsed}`)
   }
 
   async function handleReturn() {
     if (!submission) return
     setIsSaving(true)
-    await new Promise((r) => setTimeout(r, 500))
-
-    const idx = DUMMY_PENGUMPULAN.findIndex(
-      (p) => p.id === submission.id
-    )
-    if (idx !== -1) {
-      DUMMY_PENGUMPULAN[idx] = {
-        ...DUMMY_PENGUMPULAN[idx],
+    try {
+      const returned = await gradeMutation.mutateAsync({
+        id: submission.id,
+        nilai: null,
         feedback: feedback.trim() || null,
-        updated_at: new Date().toISOString(),
-      }
-      onReturned?.(DUMMY_PENGUMPULAN[idx])
+      })
+      onReturned?.(returned)
+      onOpenChange(false)
+      toast.success(
+        `Tugas ${submission.siswa_nama} dikembalikan tanpa nilai`
+      )
+    } finally {
+      setIsSaving(false)
     }
-
-    setIsSaving(false)
-    onOpenChange(false)
-    toast.success(
-      `Tugas ${submission.siswa_nama} dikembalikan tanpa nilai`
-    )
   }
 
   if (!submission) return null
 
   return (
-    <Dialog open={open} onOpenChange={(v) => handleOpen(v)}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Jawaban Siswa</DialogTitle>
-        </DialogHeader>
+    <ResponsiveDialog open={open} onOpenChange={(v) => handleOpen(v)}>
+      <ResponsiveDialogContent showCloseButton>
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Jawaban Siswa</ResponsiveDialogTitle>
+        </ResponsiveDialogHeader>
 
-        <div className="space-y-5 mt-2">
-          {/* Siswa Info */}
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary font-bold text-sm shrink-0">
-              {submission.siswa_nama
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2)}
-            </div>
-            <div>
-              <p className="font-medium">{submission.siswa_nama}</p>
-              <p className="text-xs text-muted-foreground">
-                {submission.siswa_kelas}
-              </p>
-            </div>
-          </div>
-
-          {/* Status */}
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Status</span>
-            <Badge
-              className={
-                STATUS_PENGUMPULAN_COLORS[submission.status] ?? ""
-              }
-            >
-              {submission.status}
-            </Badge>
-          </div>
-
-          {/* File Jawaban */}
-          {submission.file_jawaban && (
-            <div className="space-y-2">
-              <Label>File Jawaban</Label>
-              <div className="flex items-center justify-between p-3 rounded-lg border border-border">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                    <FileText className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">
-                      {submission.file_jawaban.nama}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {submission.file_jawaban.ukuran}
-                    </p>
-                  </div>
-                </div>
-                <Button variant="ghost" size="icon-sm">
-                  <Download className="h-4 w-4" />
-                </Button>
+        <ResponsiveDialogBody>
+          <div className="space-y-5">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary font-bold text-sm shrink-0">
+                {submission.siswa_nama
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2)}
+              </div>
+              <div>
+                <p className="font-medium">{submission.siswa_nama}</p>
+                <p className="text-xs text-muted-foreground">
+                  {submission.siswa_kelas}
+                </p>
               </div>
             </div>
-          )}
 
-          {!submission.file_jawaban && (
-            <div className="text-center py-4 text-sm text-muted-foreground border border-dashed rounded-lg">
-              Tidak ada file jawaban
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Status</span>
+              <Badge
+                className={
+                  STATUS_PENGUMPULAN_COLORS[submission.status] ?? ""
+                }
+              >
+                {submission.status}
+              </Badge>
             </div>
-          )}
 
-          {/* Catatan */}
-          <div className="space-y-2">
-            <Label>Catatan Siswa</Label>
-            <Textarea
-              value={submission.catatan || "Tidak ada catatan."}
-              readOnly
-              rows={3}
-              className="bg-muted/30"
-            />
-          </div>
-
-          {/* Waktu Upload */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="h-4 w-4" />
-            {submission.waktu_pengumpulan ? (
-              <span>
-                Diunggah:{" "}
-                {formatDateTime(submission.waktu_pengumpulan)}
-              </span>
-            ) : (
-              <span>Belum mengumpulkan</span>
+            {submission.file_jawaban && (
+              <div className="space-y-2">
+                <Label>File Jawaban</Label>
+                <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
+                      <FileText className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">
+                        {submission.file_jawaban.nama}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {submission.file_jawaban.ukuran}
+                      </p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="icon-sm">
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             )}
-          </div>
 
-          {/* Beri Nilai */}
-          <div className="space-y-3 p-4 rounded-lg border border-border bg-muted/30">
-            <div className="flex items-center gap-2 mb-3">
-              <GraduationCap className="h-4 w-4 text-primary" />
-              <Label className="font-semibold">Beri Nilai & Umpan Balik</Label>
+            {!submission.file_jawaban && (
+              <div className="text-center py-4 text-sm text-muted-foreground border border-dashed rounded-lg">
+                Tidak ada file jawaban
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label>Catatan Siswa</Label>
+              <Textarea
+                value={submission.catatan || "Tidak ada catatan."}
+                readOnly
+                rows={3}
+                className="bg-muted/30"
+              />
             </div>
-            <div className="flex items-center gap-3">
+
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Clock className="h-4 w-4" />
+              {submission.waktu_pengumpulan ? (
+                <span>
+                  Diunggah:{" "}
+                  {formatDateTime(submission.waktu_pengumpulan)}
+                </span>
+              ) : (
+                <span>Belum mengumpulkan</span>
+              )}
+            </div>
+          </div>
+        </ResponsiveDialogBody>
+
+        <ResponsiveDialogFooter>
+          <div className="flex items-center justify-between w-full">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReturn}
+              disabled={
+                isSaving || submission.status === "Belum Mengumpulkan"
+              }
+            >
+              {isSaving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Undo2 className="mr-2 h-4 w-4" />
+              )}
+              Kembalikan
+            </Button>
+            <div className="flex items-center gap-2">
               <Input
                 type="number"
                 min={0}
                 max={nilaiMaksimal}
                 value={nilai}
                 onChange={(e) => setNilai(e.target.value)}
-                placeholder={`0 - ${nilaiMaksimal}`}
-                className="w-32"
+                placeholder={`0-${nilaiMaksimal}`}
+                className="w-24 h-9"
+                disabled={isSaving || submission.status === "Belum Mengumpulkan"}
               />
-              <span className="text-sm text-muted-foreground">
-                / {nilaiMaksimal}
-              </span>
-            </div>
-            <Textarea
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              placeholder="Tulis umpan balik untuk siswa (opsional)..."
-              rows={3}
-              disabled={isSaving}
-            />
-            <div className="flex items-center justify-end gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleReturn}
-                disabled={
-                  isSaving || submission.status === "Belum Mengumpulkan"
-                }
-              >
-                {isSaving ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Undo2 className="mr-2 h-4 w-4" />
-                )}
-                Kembalikan
-              </Button>
+              <span className="text-xs text-muted-foreground">/ {nilaiMaksimal}</span>
               <Button
                 size="sm"
                 onClick={handleSaveNilai}
@@ -273,8 +248,8 @@ export function JawabanDetailDialog({
               </Button>
             </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   )
 }

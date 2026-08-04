@@ -1,0 +1,325 @@
+// Prisma schema for SIAPOS — Education Operating System
+// PostgreSQL provider, Prisma ORM 7 (driver adapter setup)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  runtime  = "nodejs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  TEACHER
+  STUDENT
+  WALI
+}
+
+enum MaterialStatus {
+  DRAFT
+  PUBLISH
+}
+
+enum AssignmentStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+}
+
+enum SubmissionStatus {
+  NOT_SUBMITTED
+  SUBMITTED
+  LATE
+}
+
+enum AnnouncementStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ScheduleDay {
+  SENIN
+  SELASA
+  RABU
+  KAMIS
+  JUMAT
+  SABTU
+  MINGGU
+}
+
+// ============================================================================
+// Identity
+// ============================================================================
+
+model User {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  password   String
+  role       Role     @default(STUDENT)
+  username   String?  @unique
+  nip        String?  @unique
+  nisn       String?  @unique
+  avatar     String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  teacher       Teacher?
+  student       Student?
+  announcements Announcement[]
+
+  @@index([role])
+  @@map("users")
+}
+
+model Teacher {
+  id                  Int       @id @default(autoincrement())
+  user_id             Int?      @unique
+  user                User?     @relation(fields: [user_id], references: [id])
+  foto                String?
+  nama_lengkap        String
+  nip                 String    @unique
+  nuptk               String?
+  jenis_kelamin       String    @default("Laki-laki")
+  tempat_lahir        String?
+  tanggal_lahir       DateTime?
+  no_hp               String?
+  email               String    @unique
+  alamat              String?
+  pendidikan_terakhir String?
+  status_kepegawaian  String    @default("Honorer")
+  mata_pelajaran      Json?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  classrooms       Classroom[]     @relation("HomeroomTeacher")
+  teaching_classes TeachingClass[]
+
+  @@index([user_id])
+  @@map("teachers")
+}
+
+model Student {
+  id           Int      @id @default(autoincrement())
+  user_id      Int?     @unique
+  user         User?    @relation(fields: [user_id], references: [id])
+  foto         String?
+  nis          String   @unique
+  nisn          String     @unique
+  nama_lengkap  String
+  jenis_kelamin String     @default("Laki-laki")
+  tempat_lahir  String?
+  tanggal_lahir DateTime?
+  agama         String?
+  alamat        String?
+  jurusan_id    Int?
+  kelas         String?
+  tahun_masuk   String?
+  tahun_ajaran  String?
+  status        String     @default("Aktif")
+  nama_ayah     String?
+  nama_ibu      String?
+  no_hp_ortu    String?
+  alamat_ortu   String?
+  classroom_id  Int?
+  classroom     Classroom? @relation(fields: [classroom_id], references: [id])
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+
+  submissions Submission[]
+
+  @@index([classroom_id])
+  @@map("students")
+}
+
+// ============================================================================
+// Academic master data
+// ============================================================================
+
+model Classroom {
+  id                  Int      @id @default(autoincrement())
+  name                String
+  major               String?
+  grade_level         String?
+  homeroom_teacher_id Int?
+  homeroom_teacher    Teacher? @relation("HomeroomTeacher", fields: [homeroom_teacher_id], references: [id])
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  students         Student[]
+  teaching_classes TeachingClass[]
+
+  @@index([homeroom_teacher_id])
+  @@map("classrooms")
+}
+
+model Subject {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  teaching_classes TeachingClass[]
+
+  @@map("subjects")
+}
+
+model TeachingClass {
+  id             Int        @id @default(autoincrement())
+  classroom_id   Int?
+  classroom      Classroom? @relation(fields: [classroom_id], references: [id])
+  subject_id     Int?
+  subject        Subject?   @relation(fields: [subject_id], references: [id])
+  teacher_id     Int?
+  teacher        Teacher?   @relation(fields: [teacher_id], references: [id])
+  guru_nama      String?
+  mata_pelajaran String?
+  kelas          String?
+  tahun_ajaran   String?
+  semester       String?
+  status         String     @default("Aktif")
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+
+  materials   Material[]
+  assignments Assignment[]
+  schedules   Schedule[]
+
+  @@index([classroom_id])
+  @@index([subject_id])
+  @@index([teacher_id])
+  @@map("teaching_classes")
+}
+
+// ============================================================================
+// Learning content
+// ============================================================================
+
+model Material {
+  id                Int            @id @default(autoincrement())
+  teaching_class_id Int?
+  teaching_class    TeachingClass? @relation(fields: [teaching_class_id], references: [id])
+  judul             String
+  deskripsi         String?
+  guru_nama         String?
+  mata_pelajaran    String?
+  kelas             String?
+  pertemuan         Int?
+  jenis_materi      String?
+  thumbnail_url     String?
+  lampiran          Json?
+  video_url         String?
+  link_drive        String?
+  link_eksternal    String?
+  isi_materi        String?
+  status            MaterialStatus @default(DRAFT)
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+
+  @@index([teaching_class_id])
+  @@map("materials")
+}
+
+model Assignment {
+  id                Int              @id @default(autoincrement())
+  teaching_class_id Int?
+  teaching_class    TeachingClass?   @relation(fields: [teaching_class_id], references: [id])
+  judul             String
+  deskripsi         String?
+  guru_nama         String?
+  mata_pelajaran    String?
+  kelas             String?
+  lampiran          Json?
+  tanggal_dibuka    DateTime?
+  tenggat_waktu     DateTime?
+  tenggat_jam       String?
+  nilai_maksimal    Int              @default(100)
+  status            AssignmentStatus @default(DRAFT)
+  created_at        DateTime         @default(now())
+  updated_at        DateTime         @updatedAt
+
+  submissions Submission[]
+
+  @@index([teaching_class_id])
+  @@map("assignments")
+}
+
+model Submission {
+  id                Int              @id @default(autoincrement())
+  assignment_id     Int?
+  assignment        Assignment?      @relation(fields: [assignment_id], references: [id])
+  student_id        Int?
+  student           Student?         @relation(fields: [student_id], references: [id])
+  file_jawaban      Json?
+  catatan           String?
+  waktu_pengumpulan DateTime?
+  status            SubmissionStatus @default(NOT_SUBMITTED)
+  nilai             Int?
+  feedback          String?
+  created_at        DateTime         @default(now())
+  updated_at        DateTime         @updatedAt
+
+  @@index([assignment_id])
+  @@index([student_id])
+  @@map("submissions")
+}
+
+// ============================================================================
+// Communication & scheduling
+// ============================================================================
+
+model Announcement {
+  id              Int                @id @default(autoincrement())
+  judul           String
+  ringkasan       String?
+  isi             String?
+  kategori        String?
+  target          String?
+  kelas           String?
+  status          AnnouncementStatus @default(DRAFT)
+  penulis         String?
+  pinned          Boolean            @default(false)
+  lampiran        Json?
+  tanggal_publish DateTime?
+  author_id       Int?
+  author          User?              @relation(fields: [author_id], references: [id])
+  created_at      DateTime           @default(now())
+  updated_at      DateTime           @updatedAt
+
+  @@index([author_id])
+  @@index([status])
+  @@map("announcements")
+}
+
+model Schedule {
+  id                Int            @id @default(autoincrement())
+  teaching_class_id Int?
+  teaching_class    TeachingClass? @relation(fields: [teaching_class_id], references: [id])
+  hari              ScheduleDay
+  jam_mulai         String?
+  jam_selesai       String?
+  mata_pelajaran    String?
+  guru_nama         String?
+  kelas             String?
+  tahun_ajaran      String?
+  semester          String?
+  ruang             String?
+  status            String         @default("Aktif")
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+
+  @@index([teaching_class_id])
+  @@index([hari])
+  @@map("schedules")
+}

@@ -31,7 +31,7 @@ import {
   ALLOWED_TUGAS_FILE_EXTENSIONS,
   EMPTY_TUGAS_FORM,
 } from "@/features/tugas/constants/tugas.constants"
-import { classroomService } from "@/features/kelas-saya/lib/classroom.service"
+import { useTeachingClasses } from "@/hooks/use-teaching-classes"
 import { formatFileSize, validateFileSize } from "@/lib/file"
 import { cn } from "@/lib/utils"
 import type {
@@ -61,8 +61,6 @@ type TugasFormErrors = Partial<
   >
 >
 
-const ACTIVE_KELAS_MENGAJAR = classroomService.getAktifKelasMengajar()
-
 export function TugasFormDialog({
   open,
   onOpenChange,
@@ -71,6 +69,7 @@ export function TugasFormDialog({
   isLoading = false,
   defaultKelasMengajarId,
 }: TugasFormDialogProps) {
+  const { data: activeKelasMengajar = [] } = useTeachingClasses()
   const [form, setForm] = useState<TugasFormData>(EMPTY_TUGAS_FORM)
   const [errors, setErrors] = useState<TugasFormErrors>({})
 
@@ -93,7 +92,7 @@ export function TugasFormDialog({
     } else {
       const defaultKm =
         defaultKelasMengajarId !== undefined
-          ? classroomService.getById(defaultKelasMengajarId)
+          ? activeKelasMengajar.find((km) => km.id === defaultKelasMengajarId)
           : undefined
       if (defaultKm) {
         setForm({
@@ -108,6 +107,7 @@ export function TugasFormDialog({
       }
     }
     setErrors({})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editingItem, open, defaultKelasMengajarId])
 
   function handleChange(
@@ -126,7 +126,7 @@ export function TugasFormDialog({
 
   function handleKelasMengajarSelect(value: string | null) {
     const kmId = Number(value)
-    const km = classroomService.getById(kmId)
+    const km = activeKelasMengajar.find((k) => k.id === kmId)
     if (km) {
       setForm((prev) => ({
         ...prev,
@@ -298,7 +298,7 @@ export function TugasFormDialog({
                       <SelectValue placeholder="Pilih kelas mengajar" />
                     </SelectTrigger>
                     <SelectContent>
-                      {ACTIVE_KELAS_MENGAJAR.map((km) => (
+                      {activeKelasMengajar.map((km) => (
                         <SelectItem key={km.id} value={String(km.id)}>
                           {km.mata_pelajaran} — {km.kelas} ({km.guru_nama})
                         </SelectItem>

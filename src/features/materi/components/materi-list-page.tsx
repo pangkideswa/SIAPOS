@@ -22,11 +22,25 @@ import {
   GURU_OPTIONS,
   KELAS_OPTIONS,
 } from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
-import { materialService } from "@/features/materi/lib/material.service"
+import {
+  useMaterials,
+  useCreateMaterial,
+  useUpdateMaterial,
+  useRemoveMaterial,
+} from "@/hooks/use-materials"
 import type { Materi, MateriFormData } from "@/features/materi/types/materi"
 
 export function MateriListPage() {
   const router = useRouter()
+  const {
+    data: allMaterials = [],
+    isLoading: isTableLoading,
+    isError,
+    refetch,
+  } = useMaterials()
+  const createMutation = useCreateMaterial()
+  const updateMutation = useUpdateMaterial()
+  const removeMutation = useRemoveMaterial()
   const [search, setSearch] = useState("")
   const [guruFilter, setGuruFilter] = useState<string>("all")
   const [kelasFilter, setKelasFilter] = useState<string>("all")
@@ -40,7 +54,7 @@ export function MateriListPage() {
 
   const perPage = 10
 
-  const filteredData = materialService.getAll().filter((item) => {
+  const filteredData = allMaterials.filter((item) => {
     const matchesSearch =
       !search ||
       item.judul.toLowerCase().includes(search.toLowerCase()) ||
@@ -136,7 +150,7 @@ export function MateriListPage() {
             size="icon-sm"
             title="Edit"
             onClick={() =>
-              openEdit(materialService.getById(Number(item.id)) ?? null)
+              openEdit(allMaterials.find((m) => m.id === Number(item.id)) ?? null)
             }
           >
             <Pencil className="h-4 w-4" />
@@ -146,7 +160,7 @@ export function MateriListPage() {
             size="icon-sm"
             title="Hapus"
             onClick={() =>
-              openDelete(materialService.getById(Number(item.id)) ?? null)
+              openDelete(allMaterials.find((m) => m.id === Number(item.id)) ?? null)
             }
           >
             <Trash2 className="h-4 w-4 text-destructive" />
@@ -173,27 +187,32 @@ export function MateriListPage() {
 
   async function handleFormSubmit(data: MateriFormData) {
     setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 500))
-
-    if (editingItem) {
-      materialService.update(editingItem.id, data)
-    } else {
-      materialService.create(data)
+    try {
+      if (editingItem) {
+        await updateMutation.mutateAsync({
+          id: editingItem.id,
+          data,
+        })
+      } else {
+        await createMutation.mutateAsync(data)
+      }
+      setFormDialogOpen(false)
+      setEditingItem(null)
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
-    setFormDialogOpen(false)
-    setEditingItem(null)
   }
 
   async function handleDelete() {
     if (!deletingItem) return
     setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 500))
-    materialService.remove(deletingItem.id)
-    setIsLoading(false)
-    setDeleteDialogOpen(false)
-    setDeletingItem(null)
+    try {
+      await removeMutation.mutateAsync(deletingItem.id)
+      setDeleteDialogOpen(false)
+      setDeletingItem(null)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -281,12 +300,23 @@ export function MateriListPage() {
       <DataTable
         columns={columns}
         data={paginatedData as unknown as Record<string, unknown>[]}
-        loading={false}
-        emptyMessage="Tidak ada materi ditemukan"
+        loading={isTableLoading}
+        emptyMessage={
+          isError ? "Gagal memuat data materi" : "Tidak ada materi ditemukan"
+        }
         onRowClick={(item) =>
           router.push(`/guru/materi/${String(item.id)}`)
         }
       />
+
+      {isError && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive">
+          Terjadi kesalahan saat memuat data materi.{" "}
+          <button onClick={() => refetch()} className="underline font-medium">
+            Muat ulang
+          </button>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">

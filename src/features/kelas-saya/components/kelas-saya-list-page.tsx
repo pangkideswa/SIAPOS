@@ -8,13 +8,14 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   BookOpen,
-  ClipboardList,
   Users,
   ArrowRight,
   GraduationCap,
+  Calendar,
 } from "lucide-react"
 import {
   getAnggotaKelas,
+  getKelasJadwal,
   getKelasMateri,
   getKelasSayaByGuru,
   getKelasTugas,
@@ -47,11 +48,15 @@ export function KelasSayaListPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {kelasList.map((kelas) => {
             const jumlahSiswa = getAnggotaKelas(kelas.kelas).length
             const jumlahMateri = getKelasMateri(kelas.id).length
             const jumlahTugas = getKelasTugas(kelas.id).length
+            const jadwalList = getKelasJadwal(kelas.kelas)
+            const jadwalStr = jadwalList.length > 0
+              ? `${jadwalList[0].hari} ${jadwalList[0].waktu_mulai}-${jadwalList[0].waktu_selesai}`
+              : "Belum ada jadwal"
             return (
               <Card
                 key={kelas.id}
@@ -78,32 +83,25 @@ export function KelasSayaListPage() {
                       <Badge variant="outline">{kelas.kelas}</Badge>
                     </div>
 
-                    <p className="text-xs text-muted-foreground">
-                      Semester {kelas.semester} · Tahun Ajaran {kelas.tahun_ajaran}
-                    </p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Calendar className="h-3.5 w-3.5" />
+                      <span>{jadwalStr}</span>
+                    </div>
 
-                    <div className="grid grid-cols-3 gap-2 pt-1">
-                      <div className="rounded-lg bg-muted/50 px-2 py-2 text-center">
-                        <Users className="mx-auto h-4 w-4 text-primary mb-1" />
-                        <p className="text-sm font-semibold">{jumlahSiswa}</p>
-                        <p className="text-[10px] text-muted-foreground">
-                          Siswa
-                        </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Users className="h-3.5 w-3.5" />
+                          {jumlahSiswa} siswa
+                        </span>
+                        <span>·</span>
+                        <span>{jumlahMateri} materi</span>
+                        <span>·</span>
+                        <span>{jumlahTugas} tugas</span>
                       </div>
-                      <div className="rounded-lg bg-muted/50 px-2 py-2 text-center">
-                        <BookOpen className="mx-auto h-4 w-4 text-orange-500 mb-1" />
-                        <p className="text-sm font-semibold">{jumlahMateri}</p>
-                        <p className="text-[10px] text-muted-foreground">
-                          Materi
-                        </p>
-                      </div>
-                      <div className="rounded-lg bg-muted/50 px-2 py-2 text-center">
-                        <ClipboardList className="mx-auto h-4 w-4 text-green-600 mb-1" />
-                        <p className="text-sm font-semibold">{jumlahTugas}</p>
-                        <p className="text-[10px] text-muted-foreground">
-                          Tugas
-                        </p>
-                      </div>
+                      <Badge className="bg-green-100 text-green-800 text-[10px]">
+                        {kelas.status}
+                      </Badge>
                     </div>
 
                     <Button
@@ -111,7 +109,7 @@ export function KelasSayaListPage() {
                       className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                       onClick={() => router.push(`/guru/kelas/${kelas.id}`)}
                     >
-                      Buka Kelas
+                      Masuk Kelas
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>

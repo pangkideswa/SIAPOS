@@ -1,5 +1,5 @@
-import api from '@/lib/api/axios'
-import type { Subject, ApiResponse, ApiListResponse } from '@/types'
+import { apiFetch } from '@/lib/client-api'
+import type { Subject, PaginatedResponse } from '@/types'
 
 interface SubjectFilters {
   search?: string
@@ -14,23 +14,32 @@ export const subjectService = {
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== '') params.append(key, String(value))
     })
-    const response = await api.get<ApiListResponse<Subject>>(`/subjects?${params.toString()}`)
-    return response.data
+    return apiFetch<PaginatedResponse<Subject>>(
+      `/api/subjects?${params.toString()}`
+    )
   },
   getById: async (id: number) => {
-    const response = await api.get<ApiResponse<Subject>>(`/subjects/${id}`)
-    return response.data
+    return apiFetch<Subject>(`/api/subjects/${id}`)
   },
-  create: async (data: { name: string; description?: string; is_active?: boolean }) => {
-    const response = await api.post<ApiResponse<Subject>>('/subjects', data)
-    return response.data
+  create: async (data: {
+    name: string
+    description?: string
+    is_active?: boolean
+  }) => {
+    return apiFetch<Subject>('/api/subjects', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
   },
   update: async (id: number, data: Record<string, unknown>) => {
-    const response = await api.put<ApiResponse<Subject>>(`/subjects/${id}`, data)
-    return response.data
+    return apiFetch<Subject>(`/api/subjects/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
   },
   delete: async (id: number) => {
-    const response = await api.delete<ApiResponse<null>>(`/subjects/${id}`)
-    return response.data
+    return apiFetch<null>(`/api/subjects/${id}`, {
+      method: 'DELETE',
+    })
   },
 }

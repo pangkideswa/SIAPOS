@@ -28,7 +28,7 @@ import { GuruDeleteDialog } from "./guru-delete-dialog"
 import {
   STATUS_KEPEGAWAIAN_COLORS,
 } from "@/features/guru/constants/guru.constants"
-import { DUMMY_GURU } from "@/features/guru/dummy/guru.data"
+import { useTeacher, useUpdateTeacher, useRemoveTeacher } from "@/hooks/use-teachers"
 import type { GuruFormData } from "@/features/guru/types/guru"
 
 function formatDate(dateStr: string): string {
@@ -98,9 +98,60 @@ export function GuruDetailPage({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const guru = DUMMY_GURU.find((g) => g.id === Number(resolvedParams.id))
+  const {
+    data: guru,
+    isLoading: isDetailLoading,
+    isError,
+    refetch,
+  } = useTeacher(Number(resolvedParams.id))
+  const updateTeacher = useUpdateTeacher()
+  const removeTeacher = useRemoveTeacher()
 
-  if (!guru) {
+  async function handleEditSubmit(formData: GuruFormData) {
+    if (!guru) return
+    setIsLoading(true)
+    try {
+      await updateTeacher.mutateAsync({ id: guru.id, data: formData })
+      setFormDialogOpen(false)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!guru) return
+    setIsLoading(true)
+    try {
+      await removeTeacher.mutateAsync(guru.id)
+      setDeleteDialogOpen(false)
+      router.push("/admin/guru")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  if (isDetailLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title="Detail Guru"
+          action={
+            <Button variant="outline" onClick={() => router.push("/admin/guru")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Kembali
+            </Button>
+          }
+        />
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <p className="text-muted-foreground">Memuat data guru...</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (isError || !guru) {
     return (
       <div className="space-y-6">
         <PageHeader
@@ -115,47 +166,27 @@ export function GuruDetailPage({
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <User className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-lg font-medium">Guru tidak ditemukan</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Data guru dengan ID {resolvedParams.id} tidak tersedia.
+            <p className="text-lg font-medium">
+              {isError ? "Gagal memuat data guru" : "Guru tidak ditemukan"}
             </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {isError
+                ? "Terjadi kesalahan saat memuat data guru."
+                : `Data guru dengan ID ${resolvedParams.id} tidak tersedia.`}
+            </p>
+            {isError && (
+              <Button
+                variant="outline"
+                className="mt-4"
+                onClick={() => refetch()}
+              >
+                Muat Ulang
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
     )
-  }
-
-  async function handleEditSubmit(formData: GuruFormData) {
-    if (!guru) return
-    setIsLoading(true)
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_GURU.findIndex((g) => g.id === guru.id)
-      if (idx !== -1) {
-        DUMMY_GURU[idx] = {
-          ...DUMMY_GURU[idx],
-          ...formData,
-          updated_at: new Date().toISOString(),
-        }
-      }
-      setFormDialogOpen(false)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  async function handleDelete() {
-    if (!guru) return
-    setIsLoading(true)
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_GURU.findIndex((g) => g.id === guru.id)
-      if (idx !== -1) DUMMY_GURU.splice(idx, 1)
-      setDeleteDialogOpen(false)
-      router.push("/admin/guru")
-    } finally {
-      setIsLoading(false)
-    }
   }
 
   return (

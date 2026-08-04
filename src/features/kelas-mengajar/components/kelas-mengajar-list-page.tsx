@@ -23,10 +23,24 @@ import {
   KELAS_OPTIONS,
   TAHUN_AJARAN_OPTIONS,
 } from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
-import { DUMMY_KELAS_MENGAJAR } from "@/features/kelas-mengajar/dummy/kelas-mengajar.data"
+import {
+  useTeachingClasses,
+  useCreateTeachingClass,
+  useUpdateTeachingClass,
+  useRemoveTeachingClass,
+} from "@/hooks/use-teaching-classes"
 import type { KelasMengajar, KelasMengajarFormData } from "@/features/kelas-mengajar/types/kelas-mengajar"
 
 export function KelasMengajarListPage() {
+  const {
+    data: allData = [],
+    isLoading: isTableLoading,
+    isError,
+    refetch,
+  } = useTeachingClasses()
+  const createTeachingClass = useCreateTeachingClass()
+  const updateTeachingClass = useUpdateTeachingClass()
+  const removeTeachingClass = useRemoveTeachingClass()
   const [search, setSearch] = useState("")
   const [guruFilter, setGuruFilter] = useState<string>("all")
   const [kelasFilter, setKelasFilter] = useState<string>("all")
@@ -40,7 +54,7 @@ export function KelasMengajarListPage() {
 
   const perPage = 10
 
-  const filteredData = DUMMY_KELAS_MENGAJAR.filter((item) => {
+  const filteredData = allData.filter((item) => {
     if (guruFilter !== "all" && item.guru_nama !== guruFilter) return false
     if (kelasFilter !== "all" && item.kelas !== kelasFilter) return false
     if (tahunFilter !== "all" && item.tahun_ajaran !== tahunFilter) return false
@@ -179,51 +193,33 @@ export function KelasMengajarListPage() {
     async (formData: KelasMengajarFormData) => {
       setIsLoading(true)
       try {
-        await new Promise((resolve) => setTimeout(resolve, 500))
-
         if (editingItem) {
-          const idx = DUMMY_KELAS_MENGAJAR.findIndex(
-            (i) => i.id === editingItem.id
-          )
-          if (idx !== -1) {
-            DUMMY_KELAS_MENGAJAR[idx] = {
-              ...DUMMY_KELAS_MENGAJAR[idx],
-              ...formData,
-              updated_at: new Date().toISOString(),
-            }
-          }
+          await updateTeachingClass.mutateAsync({
+            id: editingItem.id,
+            data: formData,
+          })
         } else {
-          const newItem: KelasMengajar = {
-            id: Date.now(),
-            ...formData,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }
-          DUMMY_KELAS_MENGAJAR.push(newItem)
+          await createTeachingClass.mutateAsync(formData)
         }
         setFormDialogOpen(false)
       } finally {
         setIsLoading(false)
       }
     },
-    [editingItem]
+    [editingItem, createTeachingClass, updateTeachingClass]
   )
 
   const handleDelete = useCallback(async () => {
     if (!deletingItem) return
     setIsLoading(true)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_KELAS_MENGAJAR.findIndex(
-        (i) => i.id === deletingItem.id
-      )
-      if (idx !== -1) DUMMY_KELAS_MENGAJAR.splice(idx, 1)
+      await removeTeachingClass.mutateAsync(deletingItem.id)
       setDeleteDialogOpen(false)
       setDeletingItem(null)
     } finally {
       setIsLoading(false)
     }
-  }, [deletingItem])
+  }, [deletingItem, removeTeachingClass])
 
   return (
     <div className="space-y-6">
@@ -313,9 +309,22 @@ export function KelasMengajarListPage() {
       <DataTable
         columns={columns}
         data={paginatedData as unknown as Record<string, unknown>[]}
-        loading={false}
-        emptyMessage="Tidak ada kelas mengajar ditemukan"
+        loading={isTableLoading}
+        emptyMessage={
+          isError
+            ? "Gagal memuat data kelas mengajar"
+            : "Tidak ada kelas mengajar ditemukan"
+        }
       />
+
+      {isError && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive">
+          Terjadi kesalahan saat memuat data kelas mengajar.{" "}
+          <button onClick={() => refetch()} className="underline font-medium">
+            Muat ulang
+          </button>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">

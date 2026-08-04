@@ -153,9 +153,14 @@ export default function ClassesPage() {
       }
       setDialogOpen(false)
     } catch (err: unknown) {
-      const apiErr = err as { response?: { data?: { errors?: Record<string, string[]> } } }
+      const apiErr = err as {
+        response?: { data?: { errors?: Record<string, string[]> } }
+        errors?: Record<string, string[]>
+      }
       if (apiErr.response?.data?.errors) {
         setErrors(apiErr.response.data.errors)
+      } else if (apiErr.errors) {
+        setErrors(apiErr.errors)
       }
     }
   }

@@ -25,9 +25,9 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import { EmptyState } from "@/components/ui/empty-state"
-import { DUMMY_PENGUMPULAN } from "@/features/pengumpulan/dummy/pengumpulan.data"
 import { MAX_PENGUMPULAN_FILE_SIZE_MB } from "@/features/pengumpulan/constants/pengumpulan.constants"
-import { getKelasTugas, getTugasPengumpulan } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useAssignments } from "@/hooks/use-assignments"
+import { useSubmissions, useCreateSubmission } from "@/hooks/use-submissions"
 import type { PengumpulanFile } from "@/features/pengumpulan/types/pengumpulan"
 import type { Tugas } from "@/features/tugas/types/tugas"
 import type { Siswa } from "@/features/siswa/types/siswa"
@@ -53,12 +53,6 @@ function formatDeadline(dateStr: string, jam?: string | null) {
   return jam ? `${date} ${jam} WIB` : date
 }
 
-function getTenggatDateTime(tugas: Tugas) {
-  return new Date(
-    `${tugas.tenggat_waktu}T${tugas.tenggat_jam ?? "23:59"}:00`
-  )
-}
-
 function formatWaktu(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("id-ID", {
     day: "numeric",
@@ -79,16 +73,35 @@ export function SiswaKelasTugasTab({
   kelasMengajar,
   siswa,
 }: SiswaKelasTugasTabProps) {
-  const [, setVersion] = useState(0)
   const [selectedFiles, setSelectedFiles] = useState<
     Record<number, PengumpulanFile | null>
   >({})
   const [catatans, setCatatans] = useState<Record<number, string>>({})
   const [uploadingId, setUploadingId] = useState<number | null>(null)
 
-  const tugasList = getKelasTugas(kelasMengajar.id).filter(
-    (t) => t.status === "Dipublikasikan"
-  )
+  const { data: allAssignments = [] } = useAssignments()
+  const { data: allSubmissions = [] } = useSubmissions()
+  const createSubmission = useCreateSubmission()
+
+  const tugasList = allAssignments
+    .filter(
+      (t) =>
+        t.kelas_mengajar_id === kelasMengajar.id &&
+        t.status === "Dipublikasikan"
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.tenggat_waktu).getTime() -
+        new Date(a.tenggat_waktu).getTime()
+    )
+
+  function getMySubmission(tugasId: number) {
+    return (
+      allSubmissions.find(
+        (p) => p.tugas_id === tugasId && p.siswa_id === siswa.id
+      ) ?? null
+    )
+  }
 
   function handleFileSelect(
     tugasId: number,
@@ -119,63 +132,20 @@ export function SiswaKelasTugasTab({
       return
     }
     setUploadingId(tugas.id)
-    await new Promise((r) => setTimeout(r, 600))
-
-    const now = new Date().toISOString()
-    const status: "Sudah Mengumpulkan" | "Terlambat" =
-      new Date(now) <= getTenggatDateTime(tugas)
-        ? "Sudah Mengumpulkan"
-        : "Terlambat"
-
-    const idx = DUMMY_PENGUMPULAN.findIndex(
-      (p) => p.tugas_id === tugas.id && p.siswa_id === siswa.id
-    )
-
-    if (idx !== -1) {
-      const prev = DUMMY_PENGUMPULAN[idx]
-      const riwayat = prev.riwayat_pengumpulan ?? []
-      DUMMY_PENGUMPULAN[idx] = {
-        ...prev,
-        file_jawaban: file,
-        catatan: catatans[tugas.id] ?? "",
-        waktu_pengumpulan: now,
-        status,
-        updated_at: now,
-        riwayat_pengumpulan: prev.waktu_pengumpulan
-          ? [
-              ...riwayat,
-              {
-                id: Date.now(),
-                file_jawaban: prev.file_jawaban,
-                catatan: prev.catatan,
-                waktu_pengumpulan: prev.waktu_pengumpulan,
-              },
-            ]
-          : riwayat,
-      }
-    } else {
-      const newId = Math.max(...DUMMY_PENGUMPULAN.map((p) => p.id), 0) + 1
-      DUMMY_PENGUMPULAN.push({
-        id: newId,
-        tugas_id: tugas.id,
-        siswa_id: siswa.id,
-        siswa_nama: siswa.nama_lengkap,
-        siswa_kelas: siswa.kelas,
-        file_jawaban: file,
-        catatan: catatans[tugas.id] ?? "",
-        waktu_pengumpulan: now,
-        status,
-        nilai: null,
-        created_at: now,
-        updated_at: now,
+    try {
+      await createSubmission.mutateAsync({
+        assignment_id: tugas.id,
+        student_id: siswa.id,
+        data: {
+          file_jawaban: { ...file },
+          catatan: catatans[tugas.id] || null,
+        },
       })
+      setSelectedFiles((prev) => ({ ...prev, [tugas.id]: null }))
+      setCatatans((prev) => ({ ...prev, [tugas.id]: "" }))
+    } finally {
+      setUploadingId(null)
     }
-
-    setUploadingId(null)
-    setSelectedFiles((prev) => ({ ...prev, [tugas.id]: null }))
-    setCatatans((prev) => ({ ...prev, [tugas.id]: "" }))
-    setVersion((v) => v + 1)
-    toast.success(`Tugas "${tugas.judul}" berhasil dikumpulkan`)
   }
 
   if (tugasList.length === 0) {
@@ -191,9 +161,7 @@ export function SiswaKelasTugasTab({
   return (
     <div className="space-y-4">
       {tugasList.map((tugas) => {
-        const mySubmission = getTugasPengumpulan(tugas.id).find(
-          (p) => p.siswa_id === siswa.id
-        )
+        const mySubmission = getMySubmission(tugas.id)
         const selectedFile = selectedFiles[tugas.id] ?? null
         const riwayat = mySubmission?.riwayat_pengumpulan ?? []
         const isSubmitting = uploadingId === tugas.id

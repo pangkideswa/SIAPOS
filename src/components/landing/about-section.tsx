@@ -25,7 +25,7 @@ export function AboutSection() {
               Tentang SIAPOS
             </h2>
             <p className="mt-4 text-base text-muted-foreground leading-relaxed">
-              SIAPOS adalah Education Operating System yang dirancang
+              SIAPOS adalah Sistem Informaasi Akademik dan Pembelajaran Online Sekolah yang dirancang
               khusus untuk SMK Wahana Bakti. Kami memudahkan proses belajar
               mengajar dengan teknologi modern yang simpel dan ramah pengguna.
             </p>

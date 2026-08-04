@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -17,7 +17,7 @@ import { Plus, Pencil, Trash2, Search, Eye } from "lucide-react"
 import { UserFormDialog } from "./user-form-dialog"
 import { UserDeleteDialog } from "./user-delete-dialog"
 import { ROLE_LABELS, ROLE_COLORS, ADMIN_MANAGEABLE_ROLES, EMPTY_USER_FORM } from "@/features/users/constants/user.constants"
-import { DUMMY_USERS } from "@/features/users/dummy/users.data"
+import { userService } from "@/lib/services/user.service"
 import type { User, UserRole } from "@/types/auth"
 
 export function UserListPage() {
@@ -30,10 +30,21 @@ export function UserListPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [deletingUser, setDeletingUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isTableLoading, setIsTableLoading] = useState(true)
+  const [users, setUsers] = useState<User[]>([])
 
   const perPage = 10
 
-  const filteredUsers = DUMMY_USERS.filter((user) => {
+  const loadUsers = useCallback(async () => {
+    const result = await userService.getAll({ per_page: 1000 })
+    setUsers(result.data)
+  }, [])
+
+  useEffect(() => {
+    loadUsers().finally(() => setIsTableLoading(false))
+  }, [loadUsers])
+
+  const filteredUsers = users.filter((user) => {
     if (roleFilter !== "all" && user.role !== roleFilter) return false
     if (search) {
       const q = search.toLowerCase()
@@ -147,58 +158,48 @@ export function UserListPage() {
     async (formData: typeof EMPTY_USER_FORM) => {
       setIsLoading(true)
       try {
-        // TODO: Replace with backend API call
-        await new Promise((resolve) => setTimeout(resolve, 500))
-
         if (editingUser) {
-          const idx = DUMMY_USERS.findIndex((u) => u.id === editingUser.id)
-          if (idx !== -1) {
-            DUMMY_USERS[idx] = {
-              ...DUMMY_USERS[idx],
-              name: formData.name,
-              username: formData.username,
-              email: formData.email,
-              role: formData.role as UserRole,
-              nip: formData.nip || null,
-              nisn: formData.nisn || null,
-            }
-          }
-        } else {
-          const newUser: User = {
-            id: Date.now(),
+          await userService.update(editingUser.id, {
             name: formData.name,
             username: formData.username,
             email: formData.email,
             role: formData.role as UserRole,
             nip: formData.nip || null,
             nisn: formData.nisn || null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }
-          DUMMY_USERS.push(newUser)
+            password: formData.password || undefined,
+          })
+        } else {
+          await userService.create({
+            name: formData.name,
+            username: formData.username,
+            email: formData.email,
+            password: formData.password,
+            role: formData.role as UserRole,
+            nip: formData.nip || null,
+            nisn: formData.nisn || null,
+          })
         }
         setFormDialogOpen(false)
+        await loadUsers()
       } finally {
         setIsLoading(false)
       }
     },
-    [editingUser]
+    [editingUser, loadUsers]
   )
 
   const handleDelete = useCallback(async () => {
     if (!deletingUser) return
     setIsLoading(true)
     try {
-      // TODO: Replace with backend API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_USERS.findIndex((u) => u.id === deletingUser.id)
-      if (idx !== -1) DUMMY_USERS.splice(idx, 1)
+      await userService.delete(deletingUser.id)
       setDeleteDialogOpen(false)
       setDeletingUser(null)
+      await loadUsers()
     } finally {
       setIsLoading(false)
     }
-  }, [deletingUser])
+  }, [deletingUser, loadUsers])
 
   return (
     <div className="space-y-6">
@@ -250,7 +251,7 @@ export function UserListPage() {
       <DataTable
         columns={columns}
         data={paginatedUsers as unknown as Record<string, unknown>[]}
-        loading={false}
+        loading={isTableLoading}
         emptyMessage="Tidak ada pengguna ditemukan"
         onRowClick={(item) => router.push(`/admin/users/${item.id}`)}
       />

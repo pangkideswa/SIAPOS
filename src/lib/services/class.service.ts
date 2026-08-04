@@ -1,5 +1,5 @@
-import api from '@/lib/api/axios'
-import type { SchoolClass, ApiResponse, ApiListResponse } from '@/types'
+import { apiFetch } from '@/lib/client-api'
+import type { SchoolClass, PaginatedResponse } from '@/types'
 
 interface ClassFilters {
   search?: string
@@ -14,23 +14,33 @@ export const classService = {
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== '') params.append(key, String(value))
     })
-    const response = await api.get<ApiListResponse<SchoolClass>>(`/classes?${params.toString()}`)
-    return response.data
+    return apiFetch<PaginatedResponse<SchoolClass>>(
+      `/api/classes?${params.toString()}`
+    )
   },
   getById: async (id: number) => {
-    const response = await api.get<ApiResponse<SchoolClass>>(`/classes/${id}`)
-    return response.data
+    return apiFetch<SchoolClass>(`/api/classes/${id}`)
   },
-  create: async (data: { name: string; major: string; grade_level: string; homeroom_teacher_id?: number | null }) => {
-    const response = await api.post<ApiResponse<SchoolClass>>('/classes', data)
-    return response.data
+  create: async (data: {
+    name: string
+    major: string
+    grade_level: string
+    homeroom_teacher_id?: number | null
+  }) => {
+    return apiFetch<SchoolClass>('/api/classes', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
   },
   update: async (id: number, data: Record<string, unknown>) => {
-    const response = await api.put<ApiResponse<SchoolClass>>(`/classes/${id}`, data)
-    return response.data
+    return apiFetch<SchoolClass>(`/api/classes/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
   },
   delete: async (id: number) => {
-    const response = await api.delete<ApiResponse<null>>(`/classes/${id}`)
-    return response.data
+    return apiFetch<null>(`/api/classes/${id}`, {
+      method: 'DELETE',
+    })
   },
 }

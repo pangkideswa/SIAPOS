@@ -19,9 +19,9 @@ import {
   GURU_OPTIONS,
   KELAS_OPTIONS,
 } from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
-import { DUMMY_TUGAS } from "@/features/tugas/dummy/tugas.data"
-import { DUMMY_PENGUMPULAN } from "@/features/pengumpulan/dummy/pengumpulan.data"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
+import { useAssignments } from "@/hooks/use-assignments"
+import { useSubmissions } from "@/hooks/use-submissions"
 
 interface TugasWithCount {
   id: number
@@ -37,6 +37,13 @@ interface TugasWithCount {
 
 export function PengumpulanListPage() {
   const router = useRouter()
+  const {
+    data: assignments = [],
+    isLoading: isTableLoading,
+    isError,
+    refetch,
+  } = useAssignments()
+  const { data: submissions = [] } = useSubmissions()
   const [search, setSearch] = useState("")
   const [guruFilter, setGuruFilter] = useState<string>("all")
   const [kelasFilter, setKelasFilter] = useState<string>("all")
@@ -46,11 +53,11 @@ export function PengumpulanListPage() {
   const perPage = 10
 
   const tugasData: TugasWithCount[] = useMemo(() => {
-    return DUMMY_TUGAS.map((t) => {
-      const submissions = DUMMY_PENGUMPULAN.filter(
+    return assignments.map((t) => {
+      const itemSubmissions = submissions.filter(
         (p) => p.tugas_id === t.id
       )
-      const submitted = submissions.filter(
+      const submitted = itemSubmissions.filter(
         (p) => p.status === "Sudah Mengumpulkan" || p.status === "Terlambat"
       ).length
       return {
@@ -62,10 +69,10 @@ export function PengumpulanListPage() {
         tenggat_waktu: t.tenggat_waktu,
         status: t.status,
         jumlah_pengumpul: submitted,
-        total_siswa: submissions.length,
+        total_siswa: itemSubmissions.length,
       }
     })
-  }, [])
+  }, [assignments, submissions])
 
   const filteredData = tugasData.filter((item) => {
     const matchesSearch =
@@ -252,12 +259,23 @@ export function PengumpulanListPage() {
       <DataTable
         columns={columns}
         data={paginatedData as unknown as Record<string, unknown>[]}
-        loading={false}
-        emptyMessage="Tidak ada pengumpulan ditemukan"
+        loading={isTableLoading}
+        emptyMessage={
+          isError ? "Gagal memuat data pengumpulan" : "Tidak ada pengumpulan ditemukan"
+        }
         onRowClick={(item) =>
           router.push(`/guru/pengumpulan/${String(item.id)}`)
         }
       />
+
+      {isError && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive">
+          Terjadi kesalahan saat memuat data pengumpulan.{" "}
+          <button onClick={() => refetch()} className="underline font-medium">
+            Muat ulang
+          </button>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
