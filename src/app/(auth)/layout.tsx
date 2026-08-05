@@ -1,7 +1,29 @@
 "use client"
 
+import { Suspense } from "react"
 import { AuthProvider } from "@/contexts/auth-context"
 import Link from "next/link"
+import { Skeleton } from "@/components/ui/skeleton"
+
+function AuthSkeleton() {
+  return (
+    <div className="w-full max-w-md space-y-6">
+      <div className="space-y-3">
+        <div className="inline-flex items-center gap-2.5 mb-6">
+          <Skeleton className="w-10 h-10 rounded-xl" />
+          <Skeleton className="h-8 w-28" />
+        </div>
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-4 w-64" />
+      </div>
+      <div className="rounded-2xl border border-border/60 bg-white p-6 sm:p-8 space-y-4">
+        <Skeleton className="h-11 w-full rounded-lg" />
+        <Skeleton className="h-11 w-full rounded-lg" />
+        <Skeleton className="h-11 w-full rounded-lg" />
+      </div>
+    </div>
+  )
+}
 
 export default function AuthLayout({
   children,
@@ -34,7 +56,9 @@ export default function AuthLayout({
       </div>
 
       <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-primary/5 via-white to-orange/5 px-4 py-8 lg:py-0">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <Suspense fallback={<AuthSkeleton />}>{children}</Suspense>
+        </AuthProvider>
       </div>
     </div>
   )

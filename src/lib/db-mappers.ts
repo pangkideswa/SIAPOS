@@ -1,7 +1,7 @@
 import type { User as DbUser } from "@/generated/prisma/client"
 import type { User, UserRole } from "@/types/auth"
 
-export type DbRole = "SUPER_ADMIN" | "ADMIN" | "TEACHER" | "STUDENT" | "WALI"
+export type DbRole = "SUPER_ADMIN" | "ADMIN" | "GURU" | "SISWA" | "WALI"
 
 export function mapRole(role: string): UserRole {
   switch (role) {
@@ -9,9 +9,9 @@ export function mapRole(role: string): UserRole {
       return "super_admin"
     case "ADMIN":
       return "admin"
-    case "TEACHER":
+    case "GURU":
       return "guru"
-    case "STUDENT":
+    case "SISWA":
       return "siswa"
     case "WALI":
       return "wali"
@@ -27,13 +27,13 @@ export function toRole(role: UserRole): DbRole {
     case "admin":
       return "ADMIN"
     case "guru":
-      return "TEACHER"
+      return "GURU"
     case "siswa":
-      return "STUDENT"
+      return "SISWA"
     case "wali":
       return "WALI"
     default:
-      return "STUDENT"
+      return "SISWA"
   }
 }
 
@@ -43,6 +43,10 @@ export function toUser(row: DbUser): User {
     name: row.name,
     email: row.email,
     role: mapRole(row.role),
+    provider: row.provider,
+    providerId: row.providerId,
+    image: row.image,
+    emailVerified: row.emailVerified?.toISOString() ?? null,
     username: row.username ?? undefined,
     nip: row.nip,
     nisn: row.nisn,

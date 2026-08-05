@@ -12,8 +12,8 @@
 export const Role = {
   SUPER_ADMIN: 'SUPER_ADMIN',
   ADMIN: 'ADMIN',
-  TEACHER: 'TEACHER',
-  STUDENT: 'STUDENT',
+  GURU: 'GURU',
+  SISWA: 'SISWA',
   WALI: 'WALI'
 } as const
 
@@ -66,3 +66,11 @@ export const ScheduleDay = {
 } as const
 
 export type ScheduleDay = (typeof ScheduleDay)[keyof typeof ScheduleDay]
+
+
+export const NilaiStatus = {
+  LENGKAP: 'LENGKAP',
+  BELUM_LENGKAP: 'BELUM_LENGKAP'
+} as const
+
+export type NilaiStatus = (typeof NilaiStatus)[keyof typeof NilaiStatus]

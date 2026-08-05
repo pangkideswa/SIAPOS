@@ -26,6 +26,10 @@ export interface User {
   name: string
   email: string
   role: UserRole
+  provider?: string
+  providerId?: string | null
+  image?: string | null
+  emailVerified?: string | null
   username?: string
   nip?: string | null
   nisn?: string | null

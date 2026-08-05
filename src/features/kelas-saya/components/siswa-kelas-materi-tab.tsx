@@ -8,7 +8,7 @@ import { BookOpen, FileText, Video, Type, Globe, Eye } from "lucide-react"
 import { MateriViewDialog } from "@/features/kelas-saya/components/materi-view-dialog"
 import { MateriJenisBadge } from "@/features/materi/components/materi-jenis-badge"
 import { EmptyState } from "@/components/ui/empty-state"
-import { getKelasMateri } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useClassroom } from "@/hooks/use-classroom"
 import type { Materi } from "@/features/materi/types/materi"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 
@@ -38,7 +38,8 @@ export function SiswaKelasMateriTab({
   const [dialogOpen, setDialogOpen] = useState(false)
   const [viewingItem, setViewingItem] = useState<Materi | null>(null)
 
-  const materiList = getKelasMateri(kelasMengajar.id).filter(
+  const classroom = useClassroom()
+  const materiList = classroom.getKelasMateri(kelasMengajar.id).filter(
     (m) => m.status === "Publish"
   )
 

@@ -2,10 +2,12 @@
 
 import Link from "next/link"
 import { Megaphone } from "lucide-react"
-import { getRolePengumuman } from "../lib/pengumuman-helpers"
+import { useAnnouncements } from "@/hooks/use-announcements"
+import { filterPengumumanByRole } from "../lib/pengumuman-helpers"
 
 export function PengumumanBaruBadge({ role }: { role: "admin" | "guru" | "siswa" }) {
-  const count = getRolePengumuman(role).length
+  const { data: announcements } = useAnnouncements()
+  const count = filterPengumumanByRole(role, announcements ?? []).length
 
   return (
     <Link

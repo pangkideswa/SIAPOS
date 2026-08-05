@@ -14,10 +14,7 @@ import {
   ClipboardList,
   Lock,
 } from "lucide-react"
-import {
-  getKelasMengajarById,
-  getSiswaByNama,
-} from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useClassroom } from "@/hooks/use-classroom"
 import { SiswaKelasOverviewTab } from "@/features/kelas-saya/components/siswa-kelas-overview-tab"
 import { SiswaKelasMateriTab } from "@/features/kelas-saya/components/siswa-kelas-materi-tab"
 import { SiswaKelasTugasTab } from "@/features/kelas-saya/components/siswa-kelas-tugas-tab"
@@ -39,8 +36,9 @@ export function SiswaKelasDetailPage({
   const resolvedParams = use(params)
   const router = useRouter()
   const { user } = useAuth()
-  const kelasMengajar = getKelasMengajarById(Number(resolvedParams.id))
-  const siswa = getSiswaByNama(user?.name ?? "")
+  const classroom = useClassroom()
+  const kelasMengajar = classroom.getKelasMengajarById(Number(resolvedParams.id))
+  const siswa = classroom.getSiswaByNama(user?.name ?? "")
   const [tab, setTab] = useState<KelasTab>("overview")
 
   if (!kelasMengajar) {

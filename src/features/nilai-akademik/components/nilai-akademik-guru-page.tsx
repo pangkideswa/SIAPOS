@@ -19,7 +19,8 @@ import {
   KELAS_OPTIONS,
   STATUS_NILAI_COLORS,
 } from "../constants/nilai-akademik.constants"
-import { DUMMY_NILAI_AKADEMIK } from "../dummy/nilai-akademik.data"
+import { useNilai, useUpdateNilai } from "@/hooks/use-nilai"
+import type { NilaiUpdateData } from "@/lib/services/nilai.service"
 import { NilaiAkademikDetailDialog } from "./nilai-akademik-detail-dialog"
 import { NilaiAkademikFormDialog } from "./nilai-akademik-form-dialog"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -43,8 +44,11 @@ type Row = Record<string, unknown> & {
 }
 
 export function NilaiAkademikGuruPage() {
-  const [items, setItems] = useState<NilaiAkademik[]>(
-    DUMMY_NILAI_AKADEMIK.filter((d) => d.guru_nama === GURU_LOGIN)
+  const { data = [] } = useNilai()
+  const updateNilai = useUpdateNilai()
+  const items = useMemo(
+    () => data.filter((d) => d.guru_nama === GURU_LOGIN),
+    [data]
   )
   const [search, setSearch] = useState("")
   const [mapelFilter, setMapelFilter] = useState("all")
@@ -82,7 +86,15 @@ export function NilaiAkademikGuruPage() {
   }
 
   const handleSave = (data: NilaiAkademik) => {
-    setItems((prev) => prev.map((d) => (d.id === data.id ? data : d)))
+    const payload: NilaiUpdateData = {
+      tugas: data.tugas,
+      praktik: data.praktik,
+      uts: data.uts,
+      uas: data.uas,
+      semester: data.semester,
+      tahun_ajaran: data.tahun_ajaran,
+    }
+    updateNilai.mutate({ id: data.id, data: payload })
   }
 
   const columns: Column<Row>[] = [

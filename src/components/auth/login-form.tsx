@@ -13,7 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { motion } from "framer-motion"
 import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogBody, ResponsiveDialogFooter } from "@/components/ui/responsive-dialog"
-import { signIn } from "next-auth/react"
+import { signIn, getSession } from "next-auth/react"
 
 const loginSchema = z.object({
   identifier: z
@@ -71,7 +71,21 @@ export function LoginForm() {
       })
       if (result?.error) {
         setGoogleError(true)
+        return
       }
+      const session = await getSession()
+      const role = session?.user?.role
+      const dashboard =
+        role === "admin" || role === "super_admin"
+          ? "/admin"
+          : role === "guru"
+            ? "/guru"
+            : role === "wali"
+              ? "/wali"
+              : role === "siswa"
+                ? "/siswa"
+                : "/"
+      window.location.href = result.url ?? dashboard
     } catch {
       setGoogleError(true)
     } finally {

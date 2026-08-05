@@ -22,18 +22,17 @@ import {
   ArrowUpDown,
   Clock,
 } from "lucide-react"
-import { toast } from "sonner"
 import { TugasFormDialog } from "@/features/tugas/components/tugas-form-dialog"
 import { TugasDeleteDialog } from "@/features/tugas/components/tugas-delete-dialog"
 import { TugasDetailDialog } from "@/features/kelas-saya/components/tugas-detail-dialog"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
-import { assignmentService } from "@/features/tugas/lib/assignment.service"
 import { pushNotifikasi } from "@/features/notifications/lib/notifikasi-service"
 import {
-  getAnggotaKelas,
-  getTugasPengumpulan,
-} from "@/features/kelas-saya/lib/kelas-saya-helpers"
-import { classroomService } from "@/features/kelas-saya/lib/classroom.service"
+  useCreateAssignment,
+  useUpdateAssignment,
+  useRemoveAssignment,
+} from "@/hooks/use-assignments"
+import { useClassroom } from "@/hooks/use-classroom"
 import type { Tugas, TugasFormData } from "@/features/tugas/types/tugas"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 import { cn } from "@/lib/utils"
@@ -65,13 +64,18 @@ export function KelasTugasTab({ kelasMengajar }: KelasTugasTabProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
 
+  const classroom = useClassroom()
+  const createAssignment = useCreateAssignment()
+  const updateAssignment = useUpdateAssignment()
+  const removeAssignment = useRemoveAssignment()
+
   useEffect(() => {
     const timer = setTimeout(() => setIsInitialLoading(false), 500)
     return () => clearTimeout(timer)
   }, [])
 
-  const jumlahSiswa = getAnggotaKelas(kelasMengajar.kelas).length
-  const tugasList = classroomService
+  const jumlahSiswa = classroom.getAnggotaKelas(kelasMengajar.kelas).length
+  const tugasList = classroom
     .getTugas(kelasMengajar.id)
     .filter(
       (t) =>
@@ -94,9 +98,9 @@ export function KelasTugasTab({ kelasMengajar }: KelasTugasTabProps) {
     await new Promise((r) => setTimeout(r, 500))
 
     if (editingItem) {
-      assignmentService.update(editingItem.id, data)
+      await updateAssignment.mutateAsync({ id: editingItem.id, data })
     } else {
-      assignmentService.create(data)
+      await createAssignment.mutateAsync(data)
     }
 
     if (data.status === "Dipublikasikan") {
@@ -112,9 +116,6 @@ export function KelasTugasTab({ kelasMengajar }: KelasTugasTabProps) {
     setIsLoading(false)
     setFormDialogOpen(false)
     setEditingItem(null)
-    toast.success(
-      editingItem ? "Tugas berhasil diperbarui" : "Tugas berhasil dibuat"
-    )
   }
 
   function formatDeadline(dateStr: string, jam?: string | null) {
@@ -130,11 +131,10 @@ export function KelasTugasTab({ kelasMengajar }: KelasTugasTabProps) {
     if (!deletingItem) return
     setIsLoading(true)
     await new Promise((r) => setTimeout(r, 500))
-    assignmentService.remove(deletingItem.id)
+    await removeAssignment.mutateAsync(deletingItem.id)
     setIsLoading(false)
     setDeleteDialogOpen(false)
     setDeletingItem(null)
-    toast.success("Tugas berhasil dihapus")
   }
 
   function cycleStatus(tugas: Tugas) {
@@ -144,7 +144,10 @@ export function KelasTugasTab({ kelasMengajar }: KelasTugasTabProps) {
         : tugas.status === "Dipublikasikan"
           ? "Ditutup"
           : "Dipublikasikan"
-    assignmentService.setStatus(tugas.id, nextStatus)
+    updateAssignment.mutate({
+      id: tugas.id,
+      data: { ...tugas, status: nextStatus },
+    })
     if (nextStatus === "Dipublikasikan") {
       pushNotifikasi({
         tipe: "tugas",
@@ -153,18 +156,11 @@ export function KelasTugasTab({ kelasMengajar }: KelasTugasTabProps) {
         href: `/siswa/kelas/${kelasMengajar.id}`,
         target_roles: ["siswa"],
       })
-      toast.success(`Tugas "${tugas.judul}" dipublikasikan`)
-    } else {
-      toast.info(
-        tugas.status === "Draft"
-          ? `Tugas "${tugas.judul}" ditutup`
-          : `Tugas "${tugas.judul}" dibuka kembali`
-      )
     }
   }
 
   function handleDuplicate(tugas: Tugas) {
-    assignmentService.create({
+    createAssignment.mutate({
       judul: `${tugas.judul} (Salinan)`,
       deskripsi: tugas.deskripsi,
       kelas_mengajar_id: tugas.kelas_mengajar_id,
@@ -178,7 +174,6 @@ export function KelasTugasTab({ kelasMengajar }: KelasTugasTabProps) {
       nilai_maksimal: tugas.nilai_maksimal,
       status: "Draft",
     })
-    toast.success(`Tugas "${tugas.judul}" berhasil disalin`)
   }
 
   return (
@@ -266,7 +261,7 @@ export function KelasTugasTab({ kelasMengajar }: KelasTugasTabProps) {
       ) : (
         <div className="space-y-3">
           {tugasList.map((tugas) => {
-            const pengumpulan = getTugasPengumpulan(tugas.id)
+            const pengumpulan = classroom.getTugasPengumpulan(tugas.id)
             const sudah = pengumpulan.filter(
               (p) => p.status !== "Belum Mengumpulkan"
             ).length

@@ -93,7 +93,6 @@ export function NilaiAkademikFormDialog({ open, onOpenChange, data, onSave }: Pr
     }
 
     onSave(saved)
-    toast.success("Nilai berhasil disimpan")
     onOpenChange(false)
   }
 

@@ -26,16 +26,24 @@ import {
   BookOpenCheck,
   FileSpreadsheet,
 } from "lucide-react"
-import { guruService } from "@/features/guru/lib/guru.service"
-import { siswaService } from "@/features/siswa/lib/siswa.service"
-import { materialService } from "@/features/materi/lib/material.service"
-import { assignmentService } from "@/features/tugas/lib/assignment.service"
-import { classroomService } from "@/features/kelas-saya/lib/classroom.service"
-import { announcementService } from "@/features/pengumuman/lib/announcement.service"
-import { nilaiAkademikService } from "@/features/nilai-akademik/lib/nilai-akademik.service"
-import { dashboardService } from "@/features/dashboard/lib/dashboard.service"
+import { useTeachers } from "@/hooks/use-teachers"
+import { useStudents } from "@/hooks/use-students"
+import { useTeachingClasses } from "@/hooks/use-teaching-classes"
+import { useMaterials } from "@/hooks/use-materials"
+import { useAssignments } from "@/hooks/use-assignments"
+import { useSubmissions } from "@/hooks/use-submissions"
+import { useAnnouncements } from "@/hooks/use-announcements"
+import { useNilai } from "@/hooks/use-nilai"
 import { KATEGORI_PENGUMUMAN_COLORS } from "@/features/pengumuman/constants/pengumuman.constants"
 import { PengumumanBaruBadge } from "@/features/pengumuman/components/pengumuman-baru-badge"
+
+type AdminActivity = {
+  id: string
+  icon: string
+  user_name: string
+  action: string
+  timestamp: string
+}
 
 function getUniqueCount<T>(items: T[], key: keyof T): number {
   return new Set(items.map((item) => item[key])).size
@@ -89,13 +97,22 @@ function AnnouncementIcon({ kategori }: { kategori: string }) {
 export function AdminDashboardPage() {
   const { user } = useAuth()
 
-  const allKelasMengajar = classroomService.getAll()
-  const totalGuru = guruService.getAll().length
-  const totalSiswa = siswaService.getAll().filter((s) => s.status === "Aktif").length
+  const { data: teachers } = useTeachers()
+  const { data: students } = useStudents()
+  const { data: teachingClasses } = useTeachingClasses()
+  const { data: materials } = useMaterials()
+  const { data: assignments } = useAssignments()
+  const { data: submissions } = useSubmissions()
+  const { data: announcementsData } = useAnnouncements()
+  const { data: nilaiData } = useNilai()
+
+  const allKelasMengajar = teachingClasses ?? []
+  const totalGuru = (teachers ?? []).length
+  const totalSiswa = (students ?? []).filter((s) => s.status === "Aktif").length
   const totalKelas = getUniqueCount(allKelasMengajar, "kelas")
   const totalMapel = getUniqueCount(allKelasMengajar, "mata_pelajaran")
-  const totalMateri = materialService.getAll().length
-  const totalTugas = assignmentService.getAll().length
+  const totalMateri = (materials ?? []).length
+  const totalTugas = (assignments ?? []).length
 
   const stats = [
     {
@@ -148,12 +165,40 @@ export function AdminDashboardPage() {
     },
   ]
 
-  const kelasAktif = classroomService.getAktifKelasMengajar()
+  const kelasAktif = allKelasMengajar.filter((k) => k.status === "Aktif")
   const kelasAktifNames = new Set(kelasAktif.map((k) => k.kelas)).size
 
-  const activities = dashboardService.getActivities()
-  const announcements = announcementService.getAll()
-  const semuaNilai = nilaiAkademikService.getAll()
+  const judulTugasMap = new Map((assignments ?? []).map((t) => [t.id, t.judul]))
+  const activities: AdminActivity[] = [
+    ...(submissions ?? [])
+      .filter((s) => s.waktu_pengumpulan)
+      .map((s) => ({
+        id: `submission-${s.id}`,
+        icon: "send",
+        user_name: s.siswa_nama,
+        action: `mengumpulkan tugas: ${judulTugasMap.get(s.tugas_id) ?? "Tugas"}`,
+        timestamp: s.waktu_pengumpulan ?? "",
+      })),
+    ...(materials ?? []).map((m) => ({
+      id: `material-${m.id}`,
+      icon: "book",
+      user_name: m.guru_nama,
+      action: `menambahkan materi: ${m.judul}`,
+      timestamp: m.created_at,
+    })),
+    ...(assignments ?? []).map((t) => ({
+      id: `assignment-${t.id}`,
+      icon: "clipboard",
+      user_name: t.guru_nama,
+      action: `membuat tugas: ${t.judul}`,
+      timestamp: t.created_at,
+    })),
+  ].sort(
+    (a, b) =>
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  )
+  const announcements = announcementsData ?? []
+  const semuaNilai = nilaiData ?? []
 
   const quickActions = [
     { label: "Guru", href: "/admin/guru", icon: GraduationCap, color: "bg-primary/10 text-primary hover:bg-primary/20" },

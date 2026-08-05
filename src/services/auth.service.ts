@@ -21,6 +21,13 @@ interface RegisterInput {
   username?: string | null
 }
 
+interface GoogleLoginInput {
+  email: string
+  name?: string | null
+  image?: string | null
+  providerId?: string | null
+}
+
 export const authService = {
   async login(identifier: string, password: string): Promise<AuthLoginResult> {
     const user = await userRepository.findByIdentifier(identifier)
@@ -61,6 +68,21 @@ export const authService = {
   async getUserById(id: number): Promise<User | null> {
     const user = await userRepository.findById(id)
     if (!user) throw new NotFoundError("Pengguna tidak ditemukan")
+    return toUser(user)
+  },
+
+  async googleLogin(data: GoogleLoginInput): Promise<User> {
+    const email = data.email.trim().toLowerCase()
+    const user = await userRepository.findFirst({ email })
+    if (!user) {
+      throw new AppError("Akun belum terdaftar.", 404)
+    }
+    await userRepository.update(user.id, {
+      provider: "google",
+      providerId: data.providerId ?? null,
+      image: data.image ?? user.image,
+      emailVerified: user.emailVerified ?? new Date(),
+    })
     return toUser(user)
   },
 

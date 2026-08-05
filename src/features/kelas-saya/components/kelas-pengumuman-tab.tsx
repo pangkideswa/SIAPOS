@@ -16,16 +16,18 @@ import {
   Clock,
   Search,
 } from "lucide-react"
-import { toast } from "sonner"
 import { PengumumanFormDialog } from "@/features/pengumuman/components/pengumuman-form-dialog"
 import { STATUS_PENGUMUMAN_COLORS } from "@/features/pengumuman/constants/pengumuman.constants"
-import { DUMMY_PENGUMUMAN } from "@/features/pengumuman/dummy/pengumuman.data"
 import { getPengumumanTargetRoles } from "@/features/pengumuman/lib/pengumuman-helpers"
 import { pushNotifikasi } from "@/features/notifications/lib/notifikasi-service"
 import {
-  getKelasPengumumanAll,
-  formatTanggalPendek,
-} from "@/features/kelas-saya/lib/kelas-saya-helpers"
+  useCreateAnnouncement,
+  useUpdateAnnouncement,
+  useRemoveAnnouncement,
+} from "@/hooks/use-announcements"
+import { useClassroom } from "@/hooks/use-classroom"
+import { formatTanggalPendek } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import type { AnnouncementFormData } from "@/lib/services/announcement.service"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 import type { Pengumuman } from "@/features/pengumuman/types/pengumuman"
 
@@ -34,26 +36,50 @@ interface KelasPengumumanTabProps {
 }
 
 export function KelasPengumumanTab({ kelasMengajar }: KelasPengumumanTabProps) {
-  const [, setVersion] = useState(0)
   const [search, setSearch] = useState("")
   const [formOpen, setFormOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<Pengumuman | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletingItem, setDeletingItem] = useState<Pengumuman | null>(null)
 
-  const pengumumanAll = getKelasPengumumanAll(kelasMengajar.kelas).filter(
-    (p) =>
-      !search ||
-      p.judul.toLowerCase().includes(search.toLowerCase()) ||
-      p.ringkasan.toLowerCase().includes(search.toLowerCase())
-  )
+  const classroom = useClassroom()
+  const createAnnouncement = useCreateAnnouncement()
+  const updateAnnouncement = useUpdateAnnouncement()
+  const removeAnnouncement = useRemoveAnnouncement()
+
+  const pengumumanAll = classroom
+    .getKelasPengumumanAll(kelasMengajar.kelas)
+    .filter(
+      (p) =>
+        !search ||
+        p.judul.toLowerCase().includes(search.toLowerCase()) ||
+        p.ringkasan.toLowerCase().includes(search.toLowerCase())
+    )
+
+  function toFormData(data: Pengumuman): AnnouncementFormData {
+    return {
+      judul: data.judul,
+      ringkasan: data.ringkasan,
+      isi: data.isi,
+      kategori: data.kategori,
+      target: data.target,
+      kelas: data.kelas,
+      status: data.status,
+      penulis: data.penulis,
+      pinned: data.pinned,
+      lampiran: data.lampiran,
+      tanggal_publish: data.tanggal_publish,
+    }
+  }
 
   function handleSave(data: Pengumuman) {
-    const idx = DUMMY_PENGUMUMAN.findIndex((p) => p.id === data.id)
-    if (idx !== -1) {
-      DUMMY_PENGUMUMAN[idx] = { ...data }
+    if (editingItem) {
+      updateAnnouncement.mutate({
+        id: editingItem.id,
+        data: toFormData(data),
+      })
     } else {
-      DUMMY_PENGUMUMAN.unshift(data)
+      createAnnouncement.mutate(toFormData(data))
     }
     if (data.status === "Dipublikasikan") {
       pushNotifikasi({
@@ -64,35 +90,22 @@ export function KelasPengumumanTab({ kelasMengajar }: KelasPengumumanTabProps) {
         target_roles: getPengumumanTargetRoles(data.target),
       })
     }
-    setVersion((v) => v + 1)
     setFormOpen(false)
     setEditingItem(null)
-    toast.success(
-      idx !== -1 ? "Pengumuman berhasil diperbarui" : "Pengumuman berhasil dibuat"
-    )
   }
 
   function togglePin(item: Pengumuman) {
-    const idx = DUMMY_PENGUMUMAN.findIndex((p) => p.id === item.id)
-    if (idx !== -1) {
-      DUMMY_PENGUMUMAN[idx] = {
-        ...DUMMY_PENGUMUMAN[idx],
-        pinned: !DUMMY_PENGUMUMAN[idx].pinned,
-        updated_at: new Date().toISOString(),
-      }
-    }
-    setVersion((v) => v + 1)
-    toast.success(item.pinned ? "Pengumuman dilepas dari pin" : "Pengumuman dipin")
+    updateAnnouncement.mutate({
+      id: item.id,
+      data: { ...toFormData(item), pinned: !item.pinned },
+    })
   }
 
   function confirmDelete() {
     if (!deletingItem) return
-    const idx = DUMMY_PENGUMUMAN.findIndex((p) => p.id === deletingItem.id)
-    if (idx !== -1) DUMMY_PENGUMUMAN.splice(idx, 1)
-    setVersion((v) => v + 1)
+    removeAnnouncement.mutate(deletingItem.id)
     setDeleteOpen(false)
     setDeletingItem(null)
-    toast.success("Pengumuman berhasil dihapus")
   }
 
   return (

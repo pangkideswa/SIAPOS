@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { findDemoUser } from "@/lib/demo-users"
+import { signOut as nextAuthSignOut } from "next-auth/react"
 import { apiFetch } from "@/lib/client-api"
 import type { User, UserRole, AuthResponse } from "@/types/auth"
 
@@ -39,7 +39,7 @@ const PUBLIC_ROUTES = ["/", "/masuk", "/daftar", "/login", "/register"]
 function getInitialUser(): User | null {
   if (typeof window === "undefined") return null
   try {
-    const raw = localStorage.getItem("demo_user")
+    const raw = localStorage.getItem("siapos_user")
     if (!raw) return null
     return JSON.parse(raw) as User
   } catch {
@@ -47,12 +47,17 @@ function getInitialUser(): User | null {
   }
 }
 
-function setDemoCookie(value: string) {
-  document.cookie = `demo_token=${value}; path=/; max-age=86400; SameSite=Lax`
-}
-
-function removeDemoCookie() {
-  document.cookie = "demo_token=; path=/; max-age=0"
+function cacheUser(user: User | null) {
+  if (typeof window === "undefined") return
+  try {
+    if (user) {
+      localStorage.setItem("siapos_user", JSON.stringify(user))
+    } else {
+      localStorage.removeItem("siapos_user")
+    }
+  } catch {
+    // ignore storage errors
+  }
 }
 
 function getDashboardPath(role: UserRole): string {
@@ -71,11 +76,11 @@ function getDashboardPath(role: UserRole): string {
   }
 }
 
-function isServerError(error: unknown): boolean {
+function getErrorStatus(error: unknown): number | null {
   if (error && typeof error === "object" && "status" in error) {
-    return (error as { status: number }).status >= 500
+    return (error as { status: number }).status
   }
-  return true
+  return null
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -99,9 +104,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (mountedRef.current) return
     mountedRef.current = true
 
-    const storedUser = getInitialUser()
-    setUser(storedUser)
-    setIsLoading(false)
+    let cancelled = false
+
+    async function loadUser() {
+      try {
+        const serverUser = await apiFetch<User>("/api/auth/user")
+        if (cancelled) return
+        setUser(serverUser)
+        cacheUser(serverUser)
+      } catch (error) {
+        if (cancelled) return
+        const status = getErrorStatus(error)
+        if (status === 401) {
+          cacheUser(null)
+          setUser(null)
+        } else {
+          const cached = getInitialUser()
+          if (cached) setUser(cached)
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
+    }
+
+    loadUser()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   useEffect(() => {
@@ -114,28 +143,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (identifier: string, password: string) => {
-      let foundUser: User | null = null
-
       try {
         const result = await apiFetch<AuthResponse>("/api/auth/login", {
           method: "POST",
           body: JSON.stringify({ identifier, password }),
         })
-        foundUser = result.user
-      } catch {
-        foundUser = findDemoUser(identifier, password)
+        cacheUser(result.user)
+        setUser(result.user)
+        router.push(getDashboardPath(result.user.role))
+      } catch (error) {
+        if (getErrorStatus(error) === null) {
+          throw new Error("Tidak dapat terhubung ke server. Silakan coba lagi.")
+        }
+        throw error
       }
-
-      if (!foundUser) {
-        throw new Error("Email atau kata sandi salah")
-      }
-
-      localStorage.setItem("demo_user", JSON.stringify(foundUser))
-      setDemoCookie("demo-authenticated")
-      setUser(foundUser)
-
-      const dashboard = getDashboardPath(foundUser.role)
-      router.push(dashboard)
     },
     [router]
   )
@@ -163,35 +184,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             nisn,
           }),
         })
-
-        localStorage.setItem("demo_user", JSON.stringify(result.user))
-        setDemoCookie("demo-authenticated")
+        cacheUser(result.user)
         setUser(result.user)
         router.push(getDashboardPath(result.user.role))
-        return
       } catch (error) {
-        if (!isServerError(error)) {
-          throw error
+        if (getErrorStatus(error) === null) {
+          throw new Error("Tidak dapat terhubung ke server. Silakan coba lagi.")
         }
+        throw error
       }
-
-      const newUser: User = {
-        id: Date.now(),
-        name,
-        email,
-        role,
-        nip: role === "guru" ? (nip ?? null) : null,
-        nisn: role === "siswa" ? (nisn ?? null) : null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      }
-
-      localStorage.setItem("demo_user", JSON.stringify(newUser))
-      setDemoCookie("demo-authenticated")
-      setUser(newUser)
-
-      const dashboard = getDashboardPath(newUser.role)
-      router.push(dashboard)
     },
     [router]
   )
@@ -202,8 +203,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore logout API errors
     }
-    localStorage.removeItem("demo_user")
-    removeDemoCookie()
+    try {
+      await nextAuthSignOut({ redirect: false })
+    } catch {
+      // ignore next-auth sign-out errors
+    }
+    cacheUser(null)
     setUser(null)
     router.push("/masuk")
   }, [router])

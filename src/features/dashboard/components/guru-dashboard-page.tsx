@@ -23,12 +23,13 @@ import {
   GraduationCap,
   Pin,
 } from "lucide-react"
-import { classroomService } from "@/features/kelas-saya/lib/classroom.service"
-import { materialService } from "@/features/materi/lib/material.service"
-import { assignmentService } from "@/features/tugas/lib/assignment.service"
-import { pengumpulanService } from "@/features/pengumpulan/lib/pengumpulan.service"
-import { DUMMY_GURU_JADWAL } from "@/features/dashboard/dummy/dashboard.data"
-import { getRolePengumuman } from "@/features/pengumuman/lib/pengumuman-helpers"
+import { useTeachingClasses } from "@/hooks/use-teaching-classes"
+import { useMaterials } from "@/hooks/use-materials"
+import { useAssignments } from "@/hooks/use-assignments"
+import { useSubmissions } from "@/hooks/use-submissions"
+import { useSchedules } from "@/hooks/use-schedules"
+import { useAnnouncements } from "@/hooks/use-announcements"
+import { filterPengumumanByRole } from "@/features/pengumuman/lib/pengumuman-helpers"
 import { KATEGORI_PENGUMUMAN_COLORS } from "@/features/pengumuman/constants/pengumuman.constants"
 import { formatDateID } from "@/features/kalender-akademik/components/kalender-helpers"
 import { PengumumanBaruBadge } from "@/features/pengumuman/components/pengumuman-baru-badge"
@@ -86,22 +87,29 @@ export function GuruDashboardPage() {
   const router = useRouter()
   const guruName = user?.name ?? GURU_NAME
 
-  const kelasMengajar = classroomService.getKelasSayaByGuru(guruName)
-  const materiByGuru = materialService
-    .getAll()
-    .filter((m) => m.guru_nama === guruName && m.status === "Publish")
-  const tugasByGuru = assignmentService
-    .getAll()
-    .filter((t) => t.guru_nama === guruName)
+  const { data: kelasMengajarData } = useTeachingClasses()
+  const { data: materiData } = useMaterials()
+  const { data: tugasData } = useAssignments()
+  const { data: pengumpulanData } = useSubmissions()
+  const { data: schedules } = useSchedules()
+  const { data: announcementsData } = useAnnouncements()
+
+  const kelasMengajar = (kelasMengajarData ?? []).filter(
+    (k) => k.guru_nama === guruName && k.status === "Aktif"
+  )
+  const materiByGuru = (materiData ?? []).filter(
+    (m) => m.guru_nama === guruName && m.status === "Publish"
+  )
+  const tugasByGuru = (tugasData ?? []).filter(
+    (t) => t.guru_nama === guruName
+  )
   const tugasAktif = tugasByGuru.filter((t) => t.status === "Dipublikasikan")
 
-  const pengumpulanTugas = pengumpulanService
-    .getAll()
-    .filter(
-      (p) =>
-        tugasByGuru.some((t) => t.id === p.tugas_id) &&
-        (p.status === "Sudah Mengumpulkan" || p.status === "Terlambat")
-    )
+  const pengumpulanTugas = (pengumpulanData ?? []).filter(
+    (p) =>
+      tugasByGuru.some((t) => t.id === p.tugas_id) &&
+      (p.status === "Sudah Mengumpulkan" || p.status === "Terlambat")
+  )
   const belumDinilai = pengumpulanTugas.filter((p) => p.nilai === null)
 
   const stats = [
@@ -140,9 +148,13 @@ export function GuruDashboardPage() {
   ]
 
   const todayHari = new Date().toLocaleDateString("id-ID", { weekday: "long" })
-  const jadwalHariIni = DUMMY_GURU_JADWAL.filter(
-    (j) => j.guru_nama === guruName && j.hari === todayHari
-  )
+  const jadwalHariIni = (schedules ?? [])
+    .filter((j) => j.guru_nama === guruName && j.hari === todayHari)
+    .map((j) => ({
+      ...j,
+      waktu_mulai: j.jam_mulai,
+      waktu_selesai: j.jam_selesai,
+    }))
 
   const pengumpulanTerbaru = [...pengumpulanTugas]
     .sort(
@@ -159,7 +171,7 @@ export function GuruDashboardPage() {
   const tugasUntukDinilai = tugasByGuru
     .filter((t) => t.status === "Dipublikasikan" || t.status === "Ditutup")
     .map((t) => {
-      const pengumpulan = pengumpulanService.getAll().filter((p) => p.tugas_id === t.id)
+      const pengumpulan = (pengumpulanData ?? []).filter((p) => p.tugas_id === t.id)
       const sudahMengumpulkan = pengumpulan.filter(
         (p) => p.status === "Sudah Mengumpulkan" || p.status === "Terlambat"
       ).length
@@ -180,7 +192,10 @@ export function GuruDashboardPage() {
     })
     .filter((t) => t.belum_dinilai > 0)
 
-  const announcements = getRolePengumuman("guru").slice(0, 5)
+  const announcements = filterPengumumanByRole(
+    "guru",
+    announcementsData ?? []
+  ).slice(0, 5)
 
   return (
     <div className="space-y-6">

@@ -61,7 +61,9 @@ export const ModelName = {
   Assignment: 'Assignment',
   Submission: 'Submission',
   Announcement: 'Announcement',
-  Schedule: 'Schedule'
+  Schedule: 'Schedule',
+  TahunAkademik: 'TahunAkademik',
+  Nilai: 'Nilai'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -86,6 +88,10 @@ export const UserScalarFieldEnum = {
   email: 'email',
   password: 'password',
   role: 'role',
+  provider: 'provider',
+  providerId: 'providerId',
+  image: 'image',
+  emailVerified: 'emailVerified',
   username: 'username',
   nip: 'nip',
   nisn: 'nisn',
@@ -142,6 +148,7 @@ export const StudentScalarFieldEnum = {
   no_hp_ortu: 'no_hp_ortu',
   alamat_ortu: 'alamat_ortu',
   classroom_id: 'classroom_id',
+  tahun_akademik_id: 'tahun_akademik_id',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
@@ -185,6 +192,7 @@ export const TeachingClassScalarFieldEnum = {
   tahun_ajaran: 'tahun_ajaran',
   semester: 'semester',
   status: 'status',
+  tahun_akademik_id: 'tahun_akademik_id',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
@@ -288,11 +296,47 @@ export const ScheduleScalarFieldEnum = {
   semester: 'semester',
   ruang: 'ruang',
   status: 'status',
+  tahun_akademik_id: 'tahun_akademik_id',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
 
 export type ScheduleScalarFieldEnum = (typeof ScheduleScalarFieldEnum)[keyof typeof ScheduleScalarFieldEnum]
+
+
+export const TahunAkademikScalarFieldEnum = {
+  id: 'id',
+  nama: 'nama',
+  tanggal_mulai: 'tanggal_mulai',
+  tanggal_selesai: 'tanggal_selesai',
+  is_active: 'is_active',
+  keterangan: 'keterangan',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type TahunAkademikScalarFieldEnum = (typeof TahunAkademikScalarFieldEnum)[keyof typeof TahunAkademikScalarFieldEnum]
+
+
+export const NilaiScalarFieldEnum = {
+  id: 'id',
+  student_id: 'student_id',
+  teaching_class_id: 'teaching_class_id',
+  tahun_akademik_id: 'tahun_akademik_id',
+  tugas: 'tugas',
+  praktik: 'praktik',
+  uts: 'uts',
+  uas: 'uas',
+  nilai_akhir: 'nilai_akhir',
+  status: 'status',
+  tahun_ajaran: 'tahun_ajaran',
+  semester: 'semester',
+  keterangan: 'keterangan',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type NilaiScalarFieldEnum = (typeof NilaiScalarFieldEnum)[keyof typeof NilaiScalarFieldEnum]
 
 
 export const SortOrder = {

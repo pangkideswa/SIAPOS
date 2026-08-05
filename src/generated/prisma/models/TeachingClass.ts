@@ -31,6 +31,7 @@ export type TeachingClassAvgAggregateOutputType = {
   classroom_id: number | null
   subject_id: number | null
   teacher_id: number | null
+  tahun_akademik_id: number | null
 }
 
 export type TeachingClassSumAggregateOutputType = {
@@ -38,6 +39,7 @@ export type TeachingClassSumAggregateOutputType = {
   classroom_id: number | null
   subject_id: number | null
   teacher_id: number | null
+  tahun_akademik_id: number | null
 }
 
 export type TeachingClassMinAggregateOutputType = {
@@ -51,6 +53,7 @@ export type TeachingClassMinAggregateOutputType = {
   tahun_ajaran: string | null
   semester: string | null
   status: string | null
+  tahun_akademik_id: number | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -66,6 +69,7 @@ export type TeachingClassMaxAggregateOutputType = {
   tahun_ajaran: string | null
   semester: string | null
   status: string | null
+  tahun_akademik_id: number | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -81,6 +85,7 @@ export type TeachingClassCountAggregateOutputType = {
   tahun_ajaran: number
   semester: number
   status: number
+  tahun_akademik_id: number
   created_at: number
   updated_at: number
   _all: number
@@ -92,6 +97,7 @@ export type TeachingClassAvgAggregateInputType = {
   classroom_id?: true
   subject_id?: true
   teacher_id?: true
+  tahun_akademik_id?: true
 }
 
 export type TeachingClassSumAggregateInputType = {
@@ -99,6 +105,7 @@ export type TeachingClassSumAggregateInputType = {
   classroom_id?: true
   subject_id?: true
   teacher_id?: true
+  tahun_akademik_id?: true
 }
 
 export type TeachingClassMinAggregateInputType = {
@@ -112,6 +119,7 @@ export type TeachingClassMinAggregateInputType = {
   tahun_ajaran?: true
   semester?: true
   status?: true
+  tahun_akademik_id?: true
   created_at?: true
   updated_at?: true
 }
@@ -127,6 +135,7 @@ export type TeachingClassMaxAggregateInputType = {
   tahun_ajaran?: true
   semester?: true
   status?: true
+  tahun_akademik_id?: true
   created_at?: true
   updated_at?: true
 }
@@ -142,6 +151,7 @@ export type TeachingClassCountAggregateInputType = {
   tahun_ajaran?: true
   semester?: true
   status?: true
+  tahun_akademik_id?: true
   created_at?: true
   updated_at?: true
   _all?: true
@@ -244,6 +254,7 @@ export type TeachingClassGroupByOutputType = {
   tahun_ajaran: string | null
   semester: string | null
   status: string
+  tahun_akademik_id: number | null
   created_at: Date
   updated_at: Date
   _count: TeachingClassCountAggregateOutputType | null
@@ -282,14 +293,17 @@ export type TeachingClassWhereInput = {
   tahun_ajaran?: Prisma.StringNullableFilter<"TeachingClass"> | string | null
   semester?: Prisma.StringNullableFilter<"TeachingClass"> | string | null
   status?: Prisma.StringFilter<"TeachingClass"> | string
+  tahun_akademik_id?: Prisma.IntNullableFilter<"TeachingClass"> | number | null
   created_at?: Prisma.DateTimeFilter<"TeachingClass"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"TeachingClass"> | Date | string
   classroom?: Prisma.XOR<Prisma.ClassroomNullableScalarRelationFilter, Prisma.ClassroomWhereInput> | null
   subject?: Prisma.XOR<Prisma.SubjectNullableScalarRelationFilter, Prisma.SubjectWhereInput> | null
   teacher?: Prisma.XOR<Prisma.TeacherNullableScalarRelationFilter, Prisma.TeacherWhereInput> | null
+  tahun_akademik?: Prisma.XOR<Prisma.TahunAkademikNullableScalarRelationFilter, Prisma.TahunAkademikWhereInput> | null
   materials?: Prisma.MaterialListRelationFilter
   assignments?: Prisma.AssignmentListRelationFilter
   schedules?: Prisma.ScheduleListRelationFilter
+  nilais?: Prisma.NilaiListRelationFilter
 }
 
 export type TeachingClassOrderByWithRelationInput = {
@@ -303,14 +317,17 @@ export type TeachingClassOrderByWithRelationInput = {
   tahun_ajaran?: Prisma.SortOrderInput | Prisma.SortOrder
   semester?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   classroom?: Prisma.ClassroomOrderByWithRelationInput
   subject?: Prisma.SubjectOrderByWithRelationInput
   teacher?: Prisma.TeacherOrderByWithRelationInput
+  tahun_akademik?: Prisma.TahunAkademikOrderByWithRelationInput
   materials?: Prisma.MaterialOrderByRelationAggregateInput
   assignments?: Prisma.AssignmentOrderByRelationAggregateInput
   schedules?: Prisma.ScheduleOrderByRelationAggregateInput
+  nilais?: Prisma.NilaiOrderByRelationAggregateInput
 }
 
 export type TeachingClassWhereUniqueInput = Prisma.AtLeast<{
@@ -327,14 +344,17 @@ export type TeachingClassWhereUniqueInput = Prisma.AtLeast<{
   tahun_ajaran?: Prisma.StringNullableFilter<"TeachingClass"> | string | null
   semester?: Prisma.StringNullableFilter<"TeachingClass"> | string | null
   status?: Prisma.StringFilter<"TeachingClass"> | string
+  tahun_akademik_id?: Prisma.IntNullableFilter<"TeachingClass"> | number | null
   created_at?: Prisma.DateTimeFilter<"TeachingClass"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"TeachingClass"> | Date | string
   classroom?: Prisma.XOR<Prisma.ClassroomNullableScalarRelationFilter, Prisma.ClassroomWhereInput> | null
   subject?: Prisma.XOR<Prisma.SubjectNullableScalarRelationFilter, Prisma.SubjectWhereInput> | null
   teacher?: Prisma.XOR<Prisma.TeacherNullableScalarRelationFilter, Prisma.TeacherWhereInput> | null
+  tahun_akademik?: Prisma.XOR<Prisma.TahunAkademikNullableScalarRelationFilter, Prisma.TahunAkademikWhereInput> | null
   materials?: Prisma.MaterialListRelationFilter
   assignments?: Prisma.AssignmentListRelationFilter
   schedules?: Prisma.ScheduleListRelationFilter
+  nilais?: Prisma.NilaiListRelationFilter
 }, "id">
 
 export type TeachingClassOrderByWithAggregationInput = {
@@ -348,6 +368,7 @@ export type TeachingClassOrderByWithAggregationInput = {
   tahun_ajaran?: Prisma.SortOrderInput | Prisma.SortOrder
   semester?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   _count?: Prisma.TeachingClassCountOrderByAggregateInput
@@ -371,6 +392,7 @@ export type TeachingClassScalarWhereWithAggregatesInput = {
   tahun_ajaran?: Prisma.StringNullableWithAggregatesFilter<"TeachingClass"> | string | null
   semester?: Prisma.StringNullableWithAggregatesFilter<"TeachingClass"> | string | null
   status?: Prisma.StringWithAggregatesFilter<"TeachingClass"> | string
+  tahun_akademik_id?: Prisma.IntNullableWithAggregatesFilter<"TeachingClass"> | number | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"TeachingClass"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"TeachingClass"> | Date | string
 }
@@ -387,9 +409,11 @@ export type TeachingClassCreateInput = {
   classroom?: Prisma.ClassroomCreateNestedOneWithoutTeaching_classesInput
   subject?: Prisma.SubjectCreateNestedOneWithoutTeaching_classesInput
   teacher?: Prisma.TeacherCreateNestedOneWithoutTeaching_classesInput
+  tahun_akademik?: Prisma.TahunAkademikCreateNestedOneWithoutTeaching_classesInput
   materials?: Prisma.MaterialCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateInput = {
@@ -403,11 +427,13 @@ export type TeachingClassUncheckedCreateInput = {
   tahun_ajaran?: string | null
   semester?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUpdateInput = {
@@ -422,9 +448,11 @@ export type TeachingClassUpdateInput = {
   classroom?: Prisma.ClassroomUpdateOneWithoutTeaching_classesNestedInput
   subject?: Prisma.SubjectUpdateOneWithoutTeaching_classesNestedInput
   teacher?: Prisma.TeacherUpdateOneWithoutTeaching_classesNestedInput
+  tahun_akademik?: Prisma.TahunAkademikUpdateOneWithoutTeaching_classesNestedInput
   materials?: Prisma.MaterialUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateInput = {
@@ -438,11 +466,13 @@ export type TeachingClassUncheckedUpdateInput = {
   tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassCreateManyInput = {
@@ -456,6 +486,7 @@ export type TeachingClassCreateManyInput = {
   tahun_ajaran?: string | null
   semester?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -482,6 +513,7 @@ export type TeachingClassUncheckedUpdateManyInput = {
   tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -507,6 +539,7 @@ export type TeachingClassCountOrderByAggregateInput = {
   tahun_ajaran?: Prisma.SortOrder
   semester?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -516,6 +549,7 @@ export type TeachingClassAvgOrderByAggregateInput = {
   classroom_id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
   teacher_id?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrder
 }
 
 export type TeachingClassMaxOrderByAggregateInput = {
@@ -529,6 +563,7 @@ export type TeachingClassMaxOrderByAggregateInput = {
   tahun_ajaran?: Prisma.SortOrder
   semester?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -544,6 +579,7 @@ export type TeachingClassMinOrderByAggregateInput = {
   tahun_ajaran?: Prisma.SortOrder
   semester?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -553,6 +589,7 @@ export type TeachingClassSumOrderByAggregateInput = {
   classroom_id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
   teacher_id?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrder
 }
 
 export type TeachingClassNullableScalarRelationFilter = {
@@ -734,6 +771,64 @@ export type TeachingClassUpdateOneWithoutSchedulesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TeachingClassUpdateToOneWithWhereWithoutSchedulesInput, Prisma.TeachingClassUpdateWithoutSchedulesInput>, Prisma.TeachingClassUncheckedUpdateWithoutSchedulesInput>
 }
 
+export type TeachingClassCreateNestedManyWithoutTahun_akademikInput = {
+  create?: Prisma.XOR<Prisma.TeachingClassCreateWithoutTahun_akademikInput, Prisma.TeachingClassUncheckedCreateWithoutTahun_akademikInput> | Prisma.TeachingClassCreateWithoutTahun_akademikInput[] | Prisma.TeachingClassUncheckedCreateWithoutTahun_akademikInput[]
+  connectOrCreate?: Prisma.TeachingClassCreateOrConnectWithoutTahun_akademikInput | Prisma.TeachingClassCreateOrConnectWithoutTahun_akademikInput[]
+  createMany?: Prisma.TeachingClassCreateManyTahun_akademikInputEnvelope
+  connect?: Prisma.TeachingClassWhereUniqueInput | Prisma.TeachingClassWhereUniqueInput[]
+}
+
+export type TeachingClassUncheckedCreateNestedManyWithoutTahun_akademikInput = {
+  create?: Prisma.XOR<Prisma.TeachingClassCreateWithoutTahun_akademikInput, Prisma.TeachingClassUncheckedCreateWithoutTahun_akademikInput> | Prisma.TeachingClassCreateWithoutTahun_akademikInput[] | Prisma.TeachingClassUncheckedCreateWithoutTahun_akademikInput[]
+  connectOrCreate?: Prisma.TeachingClassCreateOrConnectWithoutTahun_akademikInput | Prisma.TeachingClassCreateOrConnectWithoutTahun_akademikInput[]
+  createMany?: Prisma.TeachingClassCreateManyTahun_akademikInputEnvelope
+  connect?: Prisma.TeachingClassWhereUniqueInput | Prisma.TeachingClassWhereUniqueInput[]
+}
+
+export type TeachingClassUpdateManyWithoutTahun_akademikNestedInput = {
+  create?: Prisma.XOR<Prisma.TeachingClassCreateWithoutTahun_akademikInput, Prisma.TeachingClassUncheckedCreateWithoutTahun_akademikInput> | Prisma.TeachingClassCreateWithoutTahun_akademikInput[] | Prisma.TeachingClassUncheckedCreateWithoutTahun_akademikInput[]
+  connectOrCreate?: Prisma.TeachingClassCreateOrConnectWithoutTahun_akademikInput | Prisma.TeachingClassCreateOrConnectWithoutTahun_akademikInput[]
+  upsert?: Prisma.TeachingClassUpsertWithWhereUniqueWithoutTahun_akademikInput | Prisma.TeachingClassUpsertWithWhereUniqueWithoutTahun_akademikInput[]
+  createMany?: Prisma.TeachingClassCreateManyTahun_akademikInputEnvelope
+  set?: Prisma.TeachingClassWhereUniqueInput | Prisma.TeachingClassWhereUniqueInput[]
+  disconnect?: Prisma.TeachingClassWhereUniqueInput | Prisma.TeachingClassWhereUniqueInput[]
+  delete?: Prisma.TeachingClassWhereUniqueInput | Prisma.TeachingClassWhereUniqueInput[]
+  connect?: Prisma.TeachingClassWhereUniqueInput | Prisma.TeachingClassWhereUniqueInput[]
+  update?: Prisma.TeachingClassUpdateWithWhereUniqueWithoutTahun_akademikInput | Prisma.TeachingClassUpdateWithWhereUniqueWithoutTahun_akademikInput[]
+  updateMany?: Prisma.TeachingClassUpdateManyWithWhereWithoutTahun_akademikInput | Prisma.TeachingClassUpdateManyWithWhereWithoutTahun_akademikInput[]
+  deleteMany?: Prisma.TeachingClassScalarWhereInput | Prisma.TeachingClassScalarWhereInput[]
+}
+
+export type TeachingClassUncheckedUpdateManyWithoutTahun_akademikNestedInput = {
+  create?: Prisma.XOR<Prisma.TeachingClassCreateWithoutTahun_akademikInput, Prisma.TeachingClassUncheckedCreateWithoutTahun_akademikInput> | Prisma.TeachingClassCreateWithoutTahun_akademikInput[] | Prisma.TeachingClassUncheckedCreateWithoutTahun_akademikInput[]
+  connectOrCreate?: Prisma.TeachingClassCreateOrConnectWithoutTahun_akademikInput | Prisma.TeachingClassCreateOrConnectWithoutTahun_akademikInput[]
+  upsert?: Prisma.TeachingClassUpsertWithWhereUniqueWithoutTahun_akademikInput | Prisma.TeachingClassUpsertWithWhereUniqueWithoutTahun_akademikInput[]
+  createMany?: Prisma.TeachingClassCreateManyTahun_akademikInputEnvelope
+  set?: Prisma.TeachingClassWhereUniqueInput | Prisma.TeachingClassWhereUniqueInput[]
+  disconnect?: Prisma.TeachingClassWhereUniqueInput | Prisma.TeachingClassWhereUniqueInput[]
+  delete?: Prisma.TeachingClassWhereUniqueInput | Prisma.TeachingClassWhereUniqueInput[]
+  connect?: Prisma.TeachingClassWhereUniqueInput | Prisma.TeachingClassWhereUniqueInput[]
+  update?: Prisma.TeachingClassUpdateWithWhereUniqueWithoutTahun_akademikInput | Prisma.TeachingClassUpdateWithWhereUniqueWithoutTahun_akademikInput[]
+  updateMany?: Prisma.TeachingClassUpdateManyWithWhereWithoutTahun_akademikInput | Prisma.TeachingClassUpdateManyWithWhereWithoutTahun_akademikInput[]
+  deleteMany?: Prisma.TeachingClassScalarWhereInput | Prisma.TeachingClassScalarWhereInput[]
+}
+
+export type TeachingClassCreateNestedOneWithoutNilaisInput = {
+  create?: Prisma.XOR<Prisma.TeachingClassCreateWithoutNilaisInput, Prisma.TeachingClassUncheckedCreateWithoutNilaisInput>
+  connectOrCreate?: Prisma.TeachingClassCreateOrConnectWithoutNilaisInput
+  connect?: Prisma.TeachingClassWhereUniqueInput
+}
+
+export type TeachingClassUpdateOneWithoutNilaisNestedInput = {
+  create?: Prisma.XOR<Prisma.TeachingClassCreateWithoutNilaisInput, Prisma.TeachingClassUncheckedCreateWithoutNilaisInput>
+  connectOrCreate?: Prisma.TeachingClassCreateOrConnectWithoutNilaisInput
+  upsert?: Prisma.TeachingClassUpsertWithoutNilaisInput
+  disconnect?: Prisma.TeachingClassWhereInput | boolean
+  delete?: Prisma.TeachingClassWhereInput | boolean
+  connect?: Prisma.TeachingClassWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TeachingClassUpdateToOneWithWhereWithoutNilaisInput, Prisma.TeachingClassUpdateWithoutNilaisInput>, Prisma.TeachingClassUncheckedUpdateWithoutNilaisInput>
+}
+
 export type TeachingClassCreateWithoutTeacherInput = {
   guru_nama?: string | null
   mata_pelajaran?: string | null
@@ -745,9 +840,11 @@ export type TeachingClassCreateWithoutTeacherInput = {
   updated_at?: Date | string
   classroom?: Prisma.ClassroomCreateNestedOneWithoutTeaching_classesInput
   subject?: Prisma.SubjectCreateNestedOneWithoutTeaching_classesInput
+  tahun_akademik?: Prisma.TahunAkademikCreateNestedOneWithoutTeaching_classesInput
   materials?: Prisma.MaterialCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutTeacherInput = {
@@ -760,11 +857,13 @@ export type TeachingClassUncheckedCreateWithoutTeacherInput = {
   tahun_ajaran?: string | null
   semester?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutTeacherInput = {
@@ -807,6 +906,7 @@ export type TeachingClassScalarWhereInput = {
   tahun_ajaran?: Prisma.StringNullableFilter<"TeachingClass"> | string | null
   semester?: Prisma.StringNullableFilter<"TeachingClass"> | string | null
   status?: Prisma.StringFilter<"TeachingClass"> | string
+  tahun_akademik_id?: Prisma.IntNullableFilter<"TeachingClass"> | number | null
   created_at?: Prisma.DateTimeFilter<"TeachingClass"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"TeachingClass"> | Date | string
 }
@@ -822,9 +922,11 @@ export type TeachingClassCreateWithoutClassroomInput = {
   updated_at?: Date | string
   subject?: Prisma.SubjectCreateNestedOneWithoutTeaching_classesInput
   teacher?: Prisma.TeacherCreateNestedOneWithoutTeaching_classesInput
+  tahun_akademik?: Prisma.TahunAkademikCreateNestedOneWithoutTeaching_classesInput
   materials?: Prisma.MaterialCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutClassroomInput = {
@@ -837,11 +939,13 @@ export type TeachingClassUncheckedCreateWithoutClassroomInput = {
   tahun_ajaran?: string | null
   semester?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutClassroomInput = {
@@ -881,9 +985,11 @@ export type TeachingClassCreateWithoutSubjectInput = {
   updated_at?: Date | string
   classroom?: Prisma.ClassroomCreateNestedOneWithoutTeaching_classesInput
   teacher?: Prisma.TeacherCreateNestedOneWithoutTeaching_classesInput
+  tahun_akademik?: Prisma.TahunAkademikCreateNestedOneWithoutTeaching_classesInput
   materials?: Prisma.MaterialCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutSubjectInput = {
@@ -896,11 +1002,13 @@ export type TeachingClassUncheckedCreateWithoutSubjectInput = {
   tahun_ajaran?: string | null
   semester?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutSubjectInput = {
@@ -941,8 +1049,10 @@ export type TeachingClassCreateWithoutMaterialsInput = {
   classroom?: Prisma.ClassroomCreateNestedOneWithoutTeaching_classesInput
   subject?: Prisma.SubjectCreateNestedOneWithoutTeaching_classesInput
   teacher?: Prisma.TeacherCreateNestedOneWithoutTeaching_classesInput
+  tahun_akademik?: Prisma.TahunAkademikCreateNestedOneWithoutTeaching_classesInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutMaterialsInput = {
@@ -956,10 +1066,12 @@ export type TeachingClassUncheckedCreateWithoutMaterialsInput = {
   tahun_ajaran?: string | null
   semester?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutMaterialsInput = {
@@ -990,8 +1102,10 @@ export type TeachingClassUpdateWithoutMaterialsInput = {
   classroom?: Prisma.ClassroomUpdateOneWithoutTeaching_classesNestedInput
   subject?: Prisma.SubjectUpdateOneWithoutTeaching_classesNestedInput
   teacher?: Prisma.TeacherUpdateOneWithoutTeaching_classesNestedInput
+  tahun_akademik?: Prisma.TahunAkademikUpdateOneWithoutTeaching_classesNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutMaterialsInput = {
@@ -1005,10 +1119,12 @@ export type TeachingClassUncheckedUpdateWithoutMaterialsInput = {
   tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassCreateWithoutAssignmentsInput = {
@@ -1023,8 +1139,10 @@ export type TeachingClassCreateWithoutAssignmentsInput = {
   classroom?: Prisma.ClassroomCreateNestedOneWithoutTeaching_classesInput
   subject?: Prisma.SubjectCreateNestedOneWithoutTeaching_classesInput
   teacher?: Prisma.TeacherCreateNestedOneWithoutTeaching_classesInput
+  tahun_akademik?: Prisma.TahunAkademikCreateNestedOneWithoutTeaching_classesInput
   materials?: Prisma.MaterialCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutAssignmentsInput = {
@@ -1038,10 +1156,12 @@ export type TeachingClassUncheckedCreateWithoutAssignmentsInput = {
   tahun_ajaran?: string | null
   semester?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutAssignmentsInput = {
@@ -1072,8 +1192,10 @@ export type TeachingClassUpdateWithoutAssignmentsInput = {
   classroom?: Prisma.ClassroomUpdateOneWithoutTeaching_classesNestedInput
   subject?: Prisma.SubjectUpdateOneWithoutTeaching_classesNestedInput
   teacher?: Prisma.TeacherUpdateOneWithoutTeaching_classesNestedInput
+  tahun_akademik?: Prisma.TahunAkademikUpdateOneWithoutTeaching_classesNestedInput
   materials?: Prisma.MaterialUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutAssignmentsInput = {
@@ -1087,10 +1209,12 @@ export type TeachingClassUncheckedUpdateWithoutAssignmentsInput = {
   tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassCreateWithoutSchedulesInput = {
@@ -1105,8 +1229,10 @@ export type TeachingClassCreateWithoutSchedulesInput = {
   classroom?: Prisma.ClassroomCreateNestedOneWithoutTeaching_classesInput
   subject?: Prisma.SubjectCreateNestedOneWithoutTeaching_classesInput
   teacher?: Prisma.TeacherCreateNestedOneWithoutTeaching_classesInput
+  tahun_akademik?: Prisma.TahunAkademikCreateNestedOneWithoutTeaching_classesInput
   materials?: Prisma.MaterialCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutSchedulesInput = {
@@ -1120,10 +1246,12 @@ export type TeachingClassUncheckedCreateWithoutSchedulesInput = {
   tahun_ajaran?: string | null
   semester?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutSchedulesInput = {
@@ -1154,8 +1282,10 @@ export type TeachingClassUpdateWithoutSchedulesInput = {
   classroom?: Prisma.ClassroomUpdateOneWithoutTeaching_classesNestedInput
   subject?: Prisma.SubjectUpdateOneWithoutTeaching_classesNestedInput
   teacher?: Prisma.TeacherUpdateOneWithoutTeaching_classesNestedInput
+  tahun_akademik?: Prisma.TahunAkademikUpdateOneWithoutTeaching_classesNestedInput
   materials?: Prisma.MaterialUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutSchedulesInput = {
@@ -1169,10 +1299,165 @@ export type TeachingClassUncheckedUpdateWithoutSchedulesInput = {
   tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
+}
+
+export type TeachingClassCreateWithoutTahun_akademikInput = {
+  guru_nama?: string | null
+  mata_pelajaran?: string | null
+  kelas?: string | null
+  tahun_ajaran?: string | null
+  semester?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  classroom?: Prisma.ClassroomCreateNestedOneWithoutTeaching_classesInput
+  subject?: Prisma.SubjectCreateNestedOneWithoutTeaching_classesInput
+  teacher?: Prisma.TeacherCreateNestedOneWithoutTeaching_classesInput
+  materials?: Prisma.MaterialCreateNestedManyWithoutTeaching_classInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
+  schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
+}
+
+export type TeachingClassUncheckedCreateWithoutTahun_akademikInput = {
+  id?: number
+  classroom_id?: number | null
+  subject_id?: number | null
+  teacher_id?: number | null
+  guru_nama?: string | null
+  mata_pelajaran?: string | null
+  kelas?: string | null
+  tahun_ajaran?: string | null
+  semester?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTeaching_classInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
+  schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
+}
+
+export type TeachingClassCreateOrConnectWithoutTahun_akademikInput = {
+  where: Prisma.TeachingClassWhereUniqueInput
+  create: Prisma.XOR<Prisma.TeachingClassCreateWithoutTahun_akademikInput, Prisma.TeachingClassUncheckedCreateWithoutTahun_akademikInput>
+}
+
+export type TeachingClassCreateManyTahun_akademikInputEnvelope = {
+  data: Prisma.TeachingClassCreateManyTahun_akademikInput | Prisma.TeachingClassCreateManyTahun_akademikInput[]
+  skipDuplicates?: boolean
+}
+
+export type TeachingClassUpsertWithWhereUniqueWithoutTahun_akademikInput = {
+  where: Prisma.TeachingClassWhereUniqueInput
+  update: Prisma.XOR<Prisma.TeachingClassUpdateWithoutTahun_akademikInput, Prisma.TeachingClassUncheckedUpdateWithoutTahun_akademikInput>
+  create: Prisma.XOR<Prisma.TeachingClassCreateWithoutTahun_akademikInput, Prisma.TeachingClassUncheckedCreateWithoutTahun_akademikInput>
+}
+
+export type TeachingClassUpdateWithWhereUniqueWithoutTahun_akademikInput = {
+  where: Prisma.TeachingClassWhereUniqueInput
+  data: Prisma.XOR<Prisma.TeachingClassUpdateWithoutTahun_akademikInput, Prisma.TeachingClassUncheckedUpdateWithoutTahun_akademikInput>
+}
+
+export type TeachingClassUpdateManyWithWhereWithoutTahun_akademikInput = {
+  where: Prisma.TeachingClassScalarWhereInput
+  data: Prisma.XOR<Prisma.TeachingClassUpdateManyMutationInput, Prisma.TeachingClassUncheckedUpdateManyWithoutTahun_akademikInput>
+}
+
+export type TeachingClassCreateWithoutNilaisInput = {
+  guru_nama?: string | null
+  mata_pelajaran?: string | null
+  kelas?: string | null
+  tahun_ajaran?: string | null
+  semester?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  classroom?: Prisma.ClassroomCreateNestedOneWithoutTeaching_classesInput
+  subject?: Prisma.SubjectCreateNestedOneWithoutTeaching_classesInput
+  teacher?: Prisma.TeacherCreateNestedOneWithoutTeaching_classesInput
+  tahun_akademik?: Prisma.TahunAkademikCreateNestedOneWithoutTeaching_classesInput
+  materials?: Prisma.MaterialCreateNestedManyWithoutTeaching_classInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
+  schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
+}
+
+export type TeachingClassUncheckedCreateWithoutNilaisInput = {
+  id?: number
+  classroom_id?: number | null
+  subject_id?: number | null
+  teacher_id?: number | null
+  guru_nama?: string | null
+  mata_pelajaran?: string | null
+  kelas?: string | null
+  tahun_ajaran?: string | null
+  semester?: string | null
+  status?: string
+  tahun_akademik_id?: number | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTeaching_classInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
+  schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
+}
+
+export type TeachingClassCreateOrConnectWithoutNilaisInput = {
+  where: Prisma.TeachingClassWhereUniqueInput
+  create: Prisma.XOR<Prisma.TeachingClassCreateWithoutNilaisInput, Prisma.TeachingClassUncheckedCreateWithoutNilaisInput>
+}
+
+export type TeachingClassUpsertWithoutNilaisInput = {
+  update: Prisma.XOR<Prisma.TeachingClassUpdateWithoutNilaisInput, Prisma.TeachingClassUncheckedUpdateWithoutNilaisInput>
+  create: Prisma.XOR<Prisma.TeachingClassCreateWithoutNilaisInput, Prisma.TeachingClassUncheckedCreateWithoutNilaisInput>
+  where?: Prisma.TeachingClassWhereInput
+}
+
+export type TeachingClassUpdateToOneWithWhereWithoutNilaisInput = {
+  where?: Prisma.TeachingClassWhereInput
+  data: Prisma.XOR<Prisma.TeachingClassUpdateWithoutNilaisInput, Prisma.TeachingClassUncheckedUpdateWithoutNilaisInput>
+}
+
+export type TeachingClassUpdateWithoutNilaisInput = {
+  guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroom?: Prisma.ClassroomUpdateOneWithoutTeaching_classesNestedInput
+  subject?: Prisma.SubjectUpdateOneWithoutTeaching_classesNestedInput
+  teacher?: Prisma.TeacherUpdateOneWithoutTeaching_classesNestedInput
+  tahun_akademik?: Prisma.TahunAkademikUpdateOneWithoutTeaching_classesNestedInput
+  materials?: Prisma.MaterialUpdateManyWithoutTeaching_classNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
+  schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
+}
+
+export type TeachingClassUncheckedUpdateWithoutNilaisInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  classroom_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  subject_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teacher_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  materials?: Prisma.MaterialUncheckedUpdateManyWithoutTeaching_classNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
+  schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassCreateManyTeacherInput = {
@@ -1185,6 +1470,7 @@ export type TeachingClassCreateManyTeacherInput = {
   tahun_ajaran?: string | null
   semester?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -1200,9 +1486,11 @@ export type TeachingClassUpdateWithoutTeacherInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   classroom?: Prisma.ClassroomUpdateOneWithoutTeaching_classesNestedInput
   subject?: Prisma.SubjectUpdateOneWithoutTeaching_classesNestedInput
+  tahun_akademik?: Prisma.TahunAkademikUpdateOneWithoutTeaching_classesNestedInput
   materials?: Prisma.MaterialUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutTeacherInput = {
@@ -1215,11 +1503,13 @@ export type TeachingClassUncheckedUpdateWithoutTeacherInput = {
   tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateManyWithoutTeacherInput = {
@@ -1232,6 +1522,7 @@ export type TeachingClassUncheckedUpdateManyWithoutTeacherInput = {
   tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1246,6 +1537,7 @@ export type TeachingClassCreateManyClassroomInput = {
   tahun_ajaran?: string | null
   semester?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -1261,9 +1553,11 @@ export type TeachingClassUpdateWithoutClassroomInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subject?: Prisma.SubjectUpdateOneWithoutTeaching_classesNestedInput
   teacher?: Prisma.TeacherUpdateOneWithoutTeaching_classesNestedInput
+  tahun_akademik?: Prisma.TahunAkademikUpdateOneWithoutTeaching_classesNestedInput
   materials?: Prisma.MaterialUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutClassroomInput = {
@@ -1276,11 +1570,13 @@ export type TeachingClassUncheckedUpdateWithoutClassroomInput = {
   tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateManyWithoutClassroomInput = {
@@ -1293,6 +1589,7 @@ export type TeachingClassUncheckedUpdateManyWithoutClassroomInput = {
   tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1307,6 +1604,7 @@ export type TeachingClassCreateManySubjectInput = {
   tahun_ajaran?: string | null
   semester?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -1322,9 +1620,11 @@ export type TeachingClassUpdateWithoutSubjectInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   classroom?: Prisma.ClassroomUpdateOneWithoutTeaching_classesNestedInput
   teacher?: Prisma.TeacherUpdateOneWithoutTeaching_classesNestedInput
+  tahun_akademik?: Prisma.TahunAkademikUpdateOneWithoutTeaching_classesNestedInput
   materials?: Prisma.MaterialUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutSubjectInput = {
@@ -1337,16 +1637,86 @@ export type TeachingClassUncheckedUpdateWithoutSubjectInput = {
   tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateManyWithoutSubjectInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   classroom_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teacher_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type TeachingClassCreateManyTahun_akademikInput = {
+  id?: number
+  classroom_id?: number | null
+  subject_id?: number | null
+  teacher_id?: number | null
+  guru_nama?: string | null
+  mata_pelajaran?: string | null
+  kelas?: string | null
+  tahun_ajaran?: string | null
+  semester?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+}
+
+export type TeachingClassUpdateWithoutTahun_akademikInput = {
+  guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroom?: Prisma.ClassroomUpdateOneWithoutTeaching_classesNestedInput
+  subject?: Prisma.SubjectUpdateOneWithoutTeaching_classesNestedInput
+  teacher?: Prisma.TeacherUpdateOneWithoutTeaching_classesNestedInput
+  materials?: Prisma.MaterialUpdateManyWithoutTeaching_classNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
+  schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
+}
+
+export type TeachingClassUncheckedUpdateWithoutTahun_akademikInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  classroom_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  subject_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teacher_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  materials?: Prisma.MaterialUncheckedUpdateManyWithoutTeaching_classNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
+  schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
+}
+
+export type TeachingClassUncheckedUpdateManyWithoutTahun_akademikInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  classroom_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  subject_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   teacher_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1367,12 +1737,14 @@ export type TeachingClassCountOutputType = {
   materials: number
   assignments: number
   schedules: number
+  nilais: number
 }
 
 export type TeachingClassCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   materials?: boolean | TeachingClassCountOutputTypeCountMaterialsArgs
   assignments?: boolean | TeachingClassCountOutputTypeCountAssignmentsArgs
   schedules?: boolean | TeachingClassCountOutputTypeCountSchedulesArgs
+  nilais?: boolean | TeachingClassCountOutputTypeCountNilaisArgs
 }
 
 /**
@@ -1406,6 +1778,13 @@ export type TeachingClassCountOutputTypeCountSchedulesArgs<ExtArgs extends runti
   where?: Prisma.ScheduleWhereInput
 }
 
+/**
+ * TeachingClassCountOutputType without action
+ */
+export type TeachingClassCountOutputTypeCountNilaisArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NilaiWhereInput
+}
+
 
 export type TeachingClassSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1418,14 +1797,17 @@ export type TeachingClassSelect<ExtArgs extends runtime.Types.Extensions.Interna
   tahun_ajaran?: boolean
   semester?: boolean
   status?: boolean
+  tahun_akademik_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   classroom?: boolean | Prisma.TeachingClass$classroomArgs<ExtArgs>
   subject?: boolean | Prisma.TeachingClass$subjectArgs<ExtArgs>
   teacher?: boolean | Prisma.TeachingClass$teacherArgs<ExtArgs>
+  tahun_akademik?: boolean | Prisma.TeachingClass$tahun_akademikArgs<ExtArgs>
   materials?: boolean | Prisma.TeachingClass$materialsArgs<ExtArgs>
   assignments?: boolean | Prisma.TeachingClass$assignmentsArgs<ExtArgs>
   schedules?: boolean | Prisma.TeachingClass$schedulesArgs<ExtArgs>
+  nilais?: boolean | Prisma.TeachingClass$nilaisArgs<ExtArgs>
   _count?: boolean | Prisma.TeachingClassCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["teachingClass"]>
 
@@ -1440,11 +1822,13 @@ export type TeachingClassSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   tahun_ajaran?: boolean
   semester?: boolean
   status?: boolean
+  tahun_akademik_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   classroom?: boolean | Prisma.TeachingClass$classroomArgs<ExtArgs>
   subject?: boolean | Prisma.TeachingClass$subjectArgs<ExtArgs>
   teacher?: boolean | Prisma.TeachingClass$teacherArgs<ExtArgs>
+  tahun_akademik?: boolean | Prisma.TeachingClass$tahun_akademikArgs<ExtArgs>
 }, ExtArgs["result"]["teachingClass"]>
 
 export type TeachingClassSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1458,11 +1842,13 @@ export type TeachingClassSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   tahun_ajaran?: boolean
   semester?: boolean
   status?: boolean
+  tahun_akademik_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   classroom?: boolean | Prisma.TeachingClass$classroomArgs<ExtArgs>
   subject?: boolean | Prisma.TeachingClass$subjectArgs<ExtArgs>
   teacher?: boolean | Prisma.TeachingClass$teacherArgs<ExtArgs>
+  tahun_akademik?: boolean | Prisma.TeachingClass$tahun_akademikArgs<ExtArgs>
 }, ExtArgs["result"]["teachingClass"]>
 
 export type TeachingClassSelectScalar = {
@@ -1476,29 +1862,34 @@ export type TeachingClassSelectScalar = {
   tahun_ajaran?: boolean
   semester?: boolean
   status?: boolean
+  tahun_akademik_id?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type TeachingClassOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "classroom_id" | "subject_id" | "teacher_id" | "guru_nama" | "mata_pelajaran" | "kelas" | "tahun_ajaran" | "semester" | "status" | "created_at" | "updated_at", ExtArgs["result"]["teachingClass"]>
+export type TeachingClassOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "classroom_id" | "subject_id" | "teacher_id" | "guru_nama" | "mata_pelajaran" | "kelas" | "tahun_ajaran" | "semester" | "status" | "tahun_akademik_id" | "created_at" | "updated_at", ExtArgs["result"]["teachingClass"]>
 export type TeachingClassInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   classroom?: boolean | Prisma.TeachingClass$classroomArgs<ExtArgs>
   subject?: boolean | Prisma.TeachingClass$subjectArgs<ExtArgs>
   teacher?: boolean | Prisma.TeachingClass$teacherArgs<ExtArgs>
+  tahun_akademik?: boolean | Prisma.TeachingClass$tahun_akademikArgs<ExtArgs>
   materials?: boolean | Prisma.TeachingClass$materialsArgs<ExtArgs>
   assignments?: boolean | Prisma.TeachingClass$assignmentsArgs<ExtArgs>
   schedules?: boolean | Prisma.TeachingClass$schedulesArgs<ExtArgs>
+  nilais?: boolean | Prisma.TeachingClass$nilaisArgs<ExtArgs>
   _count?: boolean | Prisma.TeachingClassCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TeachingClassIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   classroom?: boolean | Prisma.TeachingClass$classroomArgs<ExtArgs>
   subject?: boolean | Prisma.TeachingClass$subjectArgs<ExtArgs>
   teacher?: boolean | Prisma.TeachingClass$teacherArgs<ExtArgs>
+  tahun_akademik?: boolean | Prisma.TeachingClass$tahun_akademikArgs<ExtArgs>
 }
 export type TeachingClassIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   classroom?: boolean | Prisma.TeachingClass$classroomArgs<ExtArgs>
   subject?: boolean | Prisma.TeachingClass$subjectArgs<ExtArgs>
   teacher?: boolean | Prisma.TeachingClass$teacherArgs<ExtArgs>
+  tahun_akademik?: boolean | Prisma.TeachingClass$tahun_akademikArgs<ExtArgs>
 }
 
 export type $TeachingClassPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1507,9 +1898,11 @@ export type $TeachingClassPayload<ExtArgs extends runtime.Types.Extensions.Inter
     classroom: Prisma.$ClassroomPayload<ExtArgs> | null
     subject: Prisma.$SubjectPayload<ExtArgs> | null
     teacher: Prisma.$TeacherPayload<ExtArgs> | null
+    tahun_akademik: Prisma.$TahunAkademikPayload<ExtArgs> | null
     materials: Prisma.$MaterialPayload<ExtArgs>[]
     assignments: Prisma.$AssignmentPayload<ExtArgs>[]
     schedules: Prisma.$SchedulePayload<ExtArgs>[]
+    nilais: Prisma.$NilaiPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1522,6 +1915,7 @@ export type $TeachingClassPayload<ExtArgs extends runtime.Types.Extensions.Inter
     tahun_ajaran: string | null
     semester: string | null
     status: string
+    tahun_akademik_id: number | null
     created_at: Date
     updated_at: Date
   }, ExtArgs["result"]["teachingClass"]>
@@ -1921,9 +2315,11 @@ export interface Prisma__TeachingClassClient<T, Null = never, ExtArgs extends ru
   classroom<T extends Prisma.TeachingClass$classroomArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeachingClass$classroomArgs<ExtArgs>>): Prisma.Prisma__ClassroomClient<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   subject<T extends Prisma.TeachingClass$subjectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeachingClass$subjectArgs<ExtArgs>>): Prisma.Prisma__SubjectClient<runtime.Types.Result.GetResult<Prisma.$SubjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   teacher<T extends Prisma.TeachingClass$teacherArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeachingClass$teacherArgs<ExtArgs>>): Prisma.Prisma__TeacherClient<runtime.Types.Result.GetResult<Prisma.$TeacherPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  tahun_akademik<T extends Prisma.TeachingClass$tahun_akademikArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeachingClass$tahun_akademikArgs<ExtArgs>>): Prisma.Prisma__TahunAkademikClient<runtime.Types.Result.GetResult<Prisma.$TahunAkademikPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   materials<T extends Prisma.TeachingClass$materialsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeachingClass$materialsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MaterialPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignments<T extends Prisma.TeachingClass$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeachingClass$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   schedules<T extends Prisma.TeachingClass$schedulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeachingClass$schedulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SchedulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  nilais<T extends Prisma.TeachingClass$nilaisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeachingClass$nilaisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NilaiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1963,6 +2359,7 @@ export interface TeachingClassFieldRefs {
   readonly tahun_ajaran: Prisma.FieldRef<"TeachingClass", 'String'>
   readonly semester: Prisma.FieldRef<"TeachingClass", 'String'>
   readonly status: Prisma.FieldRef<"TeachingClass", 'String'>
+  readonly tahun_akademik_id: Prisma.FieldRef<"TeachingClass", 'Int'>
   readonly created_at: Prisma.FieldRef<"TeachingClass", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"TeachingClass", 'DateTime'>
 }
@@ -2423,6 +2820,25 @@ export type TeachingClass$teacherArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 /**
+ * TeachingClass.tahun_akademik
+ */
+export type TeachingClass$tahun_akademikArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TahunAkademik
+   */
+  select?: Prisma.TahunAkademikSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TahunAkademik
+   */
+  omit?: Prisma.TahunAkademikOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TahunAkademikInclude<ExtArgs> | null
+  where?: Prisma.TahunAkademikWhereInput
+}
+
+/**
  * TeachingClass.materials
  */
 export type TeachingClass$materialsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2492,6 +2908,30 @@ export type TeachingClass$schedulesArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.ScheduleScalarFieldEnum | Prisma.ScheduleScalarFieldEnum[]
+}
+
+/**
+ * TeachingClass.nilais
+ */
+export type TeachingClass$nilaisArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Nilai
+   */
+  select?: Prisma.NilaiSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Nilai
+   */
+  omit?: Prisma.NilaiOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NilaiInclude<ExtArgs> | null
+  where?: Prisma.NilaiWhereInput
+  orderBy?: Prisma.NilaiOrderByWithRelationInput | Prisma.NilaiOrderByWithRelationInput[]
+  cursor?: Prisma.NilaiWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NilaiScalarFieldEnum | Prisma.NilaiScalarFieldEnum[]
 }
 
 /**

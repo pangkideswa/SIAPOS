@@ -13,19 +13,14 @@ import {
   GraduationCap,
   Calendar,
 } from "lucide-react"
-import {
-  getAnggotaKelas,
-  getKelasJadwal,
-  getKelasMateri,
-  getKelasSayaByGuru,
-  getKelasTugas,
-} from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useClassroom } from "@/hooks/use-classroom"
 
 export function KelasSayaListPage() {
   const { user } = useAuth()
   const router = useRouter()
 
-  const kelasList = getKelasSayaByGuru(user?.name ?? "")
+  const classroom = useClassroom()
+  const kelasList = classroom.getKelasSayaByGuru(user?.name ?? "")
 
   return (
     <div className="space-y-6">
@@ -50,10 +45,10 @@ export function KelasSayaListPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {kelasList.map((kelas) => {
-            const jumlahSiswa = getAnggotaKelas(kelas.kelas).length
-            const jumlahMateri = getKelasMateri(kelas.id).length
-            const jumlahTugas = getKelasTugas(kelas.id).length
-            const jadwalList = getKelasJadwal(kelas.kelas)
+            const jumlahSiswa = classroom.getAnggotaKelas(kelas.kelas).length
+            const jumlahMateri = classroom.getKelasMateri(kelas.id).length
+            const jumlahTugas = classroom.getKelasTugas(kelas.id).length
+            const jadwalList = classroom.getKelasJadwal(kelas.kelas)
             const jadwalStr = jadwalList.length > 0
               ? `${jadwalList[0].hari} ${jadwalList[0].waktu_mulai}-${jadwalList[0].waktu_selesai}`
               : "Belum ada jadwal"

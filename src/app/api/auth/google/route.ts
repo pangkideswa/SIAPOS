@@ -1,52 +1,35 @@
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import "server-only"
+import { NextRequest } from "next/server"
+import { authService } from "@/services/auth.service"
+import { ok, apiError, parseWithSchema } from "@/lib/api-utils"
+import { z } from "zod"
+
+const googleSchema = z.object({
+  email: z
+    .string({ required_error: "Email wajib diisi" })
+    .email("Format email tidak valid"),
+  name: z.string().optional().nullable(),
+  image: z.string().optional().nullable(),
+  providerId: z.string().optional().nullable(),
+})
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json()
-
-    if (!email) {
-      return NextResponse.json(
-        { error: "Email wajib diisi" },
-        { status: 400 }
-      )
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email },
-      include: { teacher: true, student: true },
+    const body = parseWithSchema(googleSchema, await request.json())
+    const user = await authService.googleLogin({
+      email: body.email,
+      name: body.name,
+      image: body.image,
+      providerId: body.providerId,
     })
-
-    if (!user) {
-      return NextResponse.json(
-        {
-          error: "Akun tidak terdaftar",
-          message:
-            "Akun Anda belum terdaftar di SIAPOS. Silakan hubungi Administrator.",
-        },
-        { status: 404 }
-      )
-    }
-
-    const roleMap: Record<string, string> = {
-      SUPER_ADMIN: "super_admin",
-      ADMIN: "admin",
-      TEACHER: "guru",
-      STUDENT: "siswa",
-      WALI: "wali",
-    }
-
-    return NextResponse.json({
+    return ok({
       user_id: user.id,
       name: user.name,
       email: user.email,
-      role: roleMap[user.role] ?? user.role.toLowerCase(),
+      role: user.role,
+      image: user.image,
     })
   } catch (error) {
-    console.error("Google auth error:", error)
-    return NextResponse.json(
-      { error: "Terjadi kesalahan server" },
-      { status: 500 }
-    )
+    return apiError(error)
   }
 }

@@ -45,6 +45,7 @@ const STUDENTS: SeedStudent[] = [
 async function main() {
   console.log("Seeding database...")
 
+  await prisma.nilai.deleteMany()
   await prisma.submission.deleteMany()
   await prisma.assignment.deleteMany()
   await prisma.material.deleteMany()
@@ -55,6 +56,7 @@ async function main() {
   await prisma.teacher.deleteMany()
   await prisma.classroom.deleteMany()
   await prisma.subject.deleteMany()
+  await prisma.tahunAkademik.deleteMany()
   await prisma.user.deleteMany()
 
   const adminPassword = await hash("Admin123!", 10)
@@ -130,7 +132,7 @@ async function main() {
         name: g.name,
         email: g.email,
         password: guruPassword,
-        role: "TEACHER",
+        role: "GURU",
         username: g.username,
         nip: g.nip,
       },
@@ -168,6 +170,17 @@ async function main() {
     }),
   }
 
+  const tahunAkademik = await prisma.tahunAkademik.create({
+    data: {
+      nama: "2025/2026",
+      tanggal_mulai: new Date("2025-07-14"),
+      tanggal_selesai: new Date("2026-06-27"),
+      is_active: true,
+      keterangan: "Tahun akademik berjalan",
+    },
+  })
+  const tahunAkademikId = tahunAkademik.id
+
   const studentRecords: Record<string, { id: number; nama_lengkap: string; nisn: string; kelas: string }> = {}
 
   for (let i = 0; i < STUDENTS.length; i++) {
@@ -177,7 +190,7 @@ async function main() {
         name: s.nama_lengkap,
         email: `siswa${i + 1}@siapos.id`,
         password: siswaPassword,
-        role: "STUDENT",
+        role: "SISWA",
         username: `siswa${i + 1}`,
         nisn: s.nisn,
       },
@@ -199,6 +212,7 @@ async function main() {
         classroom_id: classroom.id,
         tahun_masuk: s.classroomKey === "X" ? "2024" : s.classroomKey === "XI" ? "2023" : "2022",
         tahun_ajaran: "2025/2026",
+        tahun_akademik_id: tahunAkademikId,
         status: "Aktif",
         nama_ayah: "Budi Santoso",
         nama_ibu: "Sri Rahayu",
@@ -227,6 +241,10 @@ async function main() {
     { key: "jar", classroom: classrooms.X, subject: subjects.jar, guru: guruAndi },
     { key: "mat", classroom: classrooms.X, subject: subjects.mat, guru: guruSiti },
     { key: "bindo", classroom: classrooms.X, subject: subjects.bindo, guru: guruSiti },
+    { key: "webXI", classroom: classrooms.XI, subject: subjects.web, guru: guruAsep },
+    { key: "dbXI", classroom: classrooms.XI, subject: subjects.db, guru: guruAsep },
+    { key: "jarXI", classroom: classrooms.XI, subject: subjects.jar, guru: guruAndi },
+    { key: "matXI", classroom: classrooms.XI, subject: subjects.mat, guru: guruSiti },
   ]
 
   for (const pair of tcPairs) {
@@ -241,6 +259,7 @@ async function main() {
         tahun_ajaran: "2025/2026",
         semester: "Ganjil",
         status: "Aktif",
+        tahun_akademik_id: tahunAkademikId,
       },
     })
     teachingClasses[pair.key] = tc
@@ -295,6 +314,26 @@ async function main() {
     jenis_materi: "Gambar",
     isi_materi: "<p>Materi pengkabelan jaringan komputer.</p>",
   })
+  await createMaterial("webXI", {
+    judul: "Framework CSS Modern",
+    deskripsi: "Pengenalan Tailwind CSS dan Bootstrap untuk UI modern",
+    guru_nama: "Asep Nugraha",
+    mata_pelajaran: "Pemrograman Web",
+    kelas: "XI TKJ 1",
+    pertemuan: 1,
+    jenis_materi: "PDF",
+    isi_materi: "<p>Materi framework CSS untuk membangun antarmuka modern.</p>",
+  })
+  await createMaterial("jarXI", {
+    judul: "Routing & Switching Dasar",
+    deskripsi: "Konsep routing dan konfigurasi switch pada jaringan",
+    guru_nama: "Andi Wijaya",
+    mata_pelajaran: "Jaringan Komputer",
+    kelas: "XI TKJ 1",
+    pertemuan: 2,
+    jenis_materi: "PPTX",
+    isi_materi: "<p>Materi routing dan switching.</p>",
+  })
 
   const createAssignment = (key: string, data: Record<string, unknown>) => {
     const tc = teachingClasses[key]
@@ -341,6 +380,28 @@ async function main() {
     kelas: "X TKJ 1",
     tanggal_dibuka: daysFrom(-1),
     tenggat_waktu: daysFrom(14),
+    tenggat_jam: "23:59",
+    nilai_maksimal: 100,
+  })
+  await createAssignment("webXI", {
+    judul: "Membuat Landing Page Responsive",
+    deskripsi: "Buat landing page responsive menggunakan framework CSS",
+    guru_nama: "Asep Nugraha",
+    mata_pelajaran: "Pemrograman Web",
+    kelas: "XI TKJ 1",
+    tanggal_dibuka: daysFrom(-4),
+    tenggat_waktu: daysFrom(5),
+    tenggat_jam: "23:59",
+    nilai_maksimal: 100,
+  })
+  await createAssignment("matXI", {
+    judul: "Latihan Trigonometri",
+    deskripsi: "Kerjakan latihan soal trigonometri dasar",
+    guru_nama: "Siti Aminah",
+    mata_pelajaran: "Matematika",
+    kelas: "XI TKJ 1",
+    tanggal_dibuka: daysFrom(-2),
+    tenggat_waktu: daysFrom(12),
     tenggat_jam: "23:59",
     nilai_maksimal: 100,
   })
@@ -396,6 +457,48 @@ async function main() {
         waktu_pengumpulan: daysFrom(-2),
         status: "SUBMITTED",
         nilai: 92,
+      },
+    })
+  }
+
+  const assignmentWebXI = await prisma.assignment.findFirst({
+    where: { judul: "Membuat Landing Page Responsive" },
+  })
+  const siswaNadia = studentRecords["0081234574"]
+  const siswaBayu = studentRecords["0081234575"]
+  const siswaIntan = studentRecords["0081234576"]
+
+  if (assignmentWebXI && siswaNadia) {
+    await prisma.submission.create({
+      data: {
+        assignment_id: assignmentWebXI.id,
+        student_id: siswaNadia.id,
+        catatan: "Sudah dikerjakan, mohon diperiksa",
+        waktu_pengumpulan: daysFrom(-1),
+        status: "SUBMITTED",
+        nilai: 88,
+        feedback: "Layout sudah bagus, perhatikan responsiveness pada tablet",
+      },
+    })
+  }
+  if (assignmentWebXI && siswaBayu) {
+    await prisma.submission.create({
+      data: {
+        assignment_id: assignmentWebXI.id,
+        student_id: siswaBayu.id,
+        catatan: "Tugas terlambat dikumpulkan",
+        waktu_pengumpulan: daysFrom(-0.5),
+        status: "LATE",
+        nilai: null,
+      },
+    })
+  }
+  if (assignmentWebXI && siswaIntan) {
+    await prisma.submission.create({
+      data: {
+        assignment_id: assignmentWebXI.id,
+        student_id: siswaIntan.id,
+        status: "NOT_SUBMITTED",
       },
     })
   }
@@ -461,12 +564,16 @@ async function main() {
   }
 
   const scheduleData = [
-    { day: "SENIN", key: "web", start: "07:00", end: "08:30", room: "Lab Komputer 1" },
-    { day: "SENIN", key: "db", start: "08:30", end: "10:00", room: "Lab Komputer 1" },
-    { day: "SELASA", key: "mat", start: "07:00", end: "08:30", room: "Ruang 1" },
-    { day: "RABU", key: "jar", start: "10:00", end: "11:30", room: "Lab Komputer 2" },
-    { day: "KAMIS", key: "bindo", start: "07:00", end: "08:30", room: "Ruang 1" },
-    { day: "JUMAT", key: "web", start: "08:30", end: "10:00", room: "Lab Komputer 1" },
+    { day: "SENIN", key: "web", start: "07:00", end: "08:30", room: "Lab Komputer 1", kelas: "X TKJ 1" },
+    { day: "SENIN", key: "db", start: "08:30", end: "10:00", room: "Lab Komputer 1", kelas: "X TKJ 1" },
+    { day: "SELASA", key: "web", start: "07:00", end: "08:30", room: "Lab Komputer 1", kelas: "X TKJ 1" },
+    { day: "RABU", key: "jar", start: "10:00", end: "11:30", room: "Lab Komputer 2", kelas: "X TKJ 1" },
+    { day: "KAMIS", key: "bindo", start: "07:00", end: "08:30", room: "Ruang 1", kelas: "X TKJ 1" },
+    { day: "JUMAT", key: "web", start: "08:30", end: "10:00", room: "Lab Komputer 1", kelas: "X TKJ 1" },
+    { day: "SENIN", key: "webXI", start: "09:00", end: "10:30", room: "Lab Komputer 1", kelas: "XI TKJ 1" },
+    { day: "SELASA", key: "dbXI", start: "08:00", end: "09:30", room: "Lab Komputer 1", kelas: "XI TKJ 1" },
+    { day: "RABU", key: "jarXI", start: "07:00", end: "08:30", room: "Lab Komputer 2", kelas: "XI TKJ 1" },
+    { day: "KAMIS", key: "matXI", start: "10:00", end: "11:30", room: "Ruang 1", kelas: "XI TKJ 1" },
   ]
 
   for (const s of scheduleData) {
@@ -478,13 +585,61 @@ async function main() {
         hari: s.day as never,
         jam_mulai: s.start,
         jam_selesai: s.end,
-        mata_pelajaran: s.key === "web" ? "Pemrograman Web" : s.key === "db" ? "Basis Data" : s.key === "jar" ? "Jaringan Komputer" : s.key === "mat" ? "Matematika" : "Bahasa Indonesia",
-        guru_nama: s.key === "jar" ? "Andi Wijaya" : s.key === "mat" || s.key === "bindo" ? "Siti Aminah" : "Asep Nugraha",
-        kelas: "X TKJ 1",
+        mata_pelajaran:
+          s.key === "web" || s.key === "webXI"
+            ? "Pemrograman Web"
+            : s.key === "db" || s.key === "dbXI"
+              ? "Basis Data"
+              : s.key === "jar" || s.key === "jarXI"
+                ? "Jaringan Komputer"
+                : s.key === "mat" || s.key === "matXI"
+                  ? "Matematika"
+                  : "Bahasa Indonesia",
+        guru_nama:
+          s.key.includes("jar") ? "Andi Wijaya" : s.key.includes("mat") || s.key.includes("bindo") ? "Siti Aminah" : "Asep Nugraha",
+        kelas: s.kelas,
         tahun_ajaran: "2025/2026",
         semester: "Ganjil",
         ruang: s.room,
         status: "Aktif",
+        tahun_akademik_id: tahunAkademikId,
+      },
+    })
+  }
+
+  const nilaiSeeds = [
+    { nisn: "0081234567", key: "web", tugas: 88, praktik: 90, uts: 85, uas: 92 },
+    { nisn: "0081234567", key: "db", tugas: 80, praktik: 84, uts: 78, uas: 86 },
+    { nisn: "0081234568", key: "web", tugas: 75, praktik: 78, uts: 80, uas: 74 },
+    { nisn: "0081234569", key: "web", tugas: 92, praktik: 95, uts: 88, uas: 96 },
+    { nisn: "0081234570", key: "mat", tugas: 70, praktik: null, uts: 72, uas: 68 },
+    { nisn: "0081234574", key: "webXI", tugas: 85, praktik: 88, uts: 90, uas: 86 },
+    { nisn: "0081234574", key: "matXI", tugas: 78, praktik: null, uts: 80, uas: 84 },
+    { nisn: "0081234575", key: "webXI", tugas: 90, praktik: 92, uts: 85, uas: 88 },
+    { nisn: "0081234576", key: "webXI", tugas: 72, praktik: 75, uts: 70, uas: 78 },
+  ]
+
+  for (const ns of nilaiSeeds) {
+    const student = studentRecords[ns.nisn]
+    const tc = teachingClasses[ns.key]
+    if (!student || !tc) continue
+    const nilaiFinal =
+      ns.tugas != null && ns.praktik != null && ns.uts != null && ns.uas != null
+        ? Math.round((ns.tugas + ns.praktik + ns.uts + ns.uas) / 4)
+        : null
+    await prisma.nilai.create({
+      data: {
+        student_id: student.id,
+        teaching_class_id: tc.id,
+        tahun_akademik_id: tahunAkademikId,
+        tugas: ns.tugas,
+        praktik: ns.praktik,
+        uts: ns.uts,
+        uas: ns.uas,
+        nilai_akhir: nilaiFinal,
+        status: nilaiFinal != null ? "LENGKAP" : "BELUM_LENGKAP",
+        tahun_ajaran: "2025/2026",
+        semester: "Ganjil",
       },
     })
   }
@@ -493,7 +648,8 @@ async function main() {
   const studentCount = await prisma.student.count()
   const classroomCount = await prisma.classroom.count()
   const subjectCount = await prisma.subject.count()
-  console.log(`Seed selesai. ${teacherCount} guru, ${studentCount} siswa, ${classroomCount} kelas, ${subjectCount} mapel.`)
+  const nilaiCount = await prisma.nilai.count()
+  console.log(`Seed selesai. ${teacherCount} guru, ${studentCount} siswa, ${classroomCount} kelas, ${subjectCount} mapel, ${nilaiCount} nilai.`)
 }
 
 main()

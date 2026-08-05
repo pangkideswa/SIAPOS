@@ -72,3 +72,13 @@ export type Announcement = Prisma.AnnouncementModel
  * 
  */
 export type Schedule = Prisma.ScheduleModel
+/**
+ * Model TahunAkademik
+ * 
+ */
+export type TahunAkademik = Prisma.TahunAkademikModel
+/**
+ * Model Nilai
+ * 
+ */
+export type Nilai = Prisma.NilaiModel

@@ -407,7 +407,9 @@ export const ModelName = {
   Assignment: 'Assignment',
   Submission: 'Submission',
   Announcement: 'Announcement',
-  Schedule: 'Schedule'
+  Schedule: 'Schedule',
+  TahunAkademik: 'TahunAkademik',
+  Nilai: 'Nilai'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -423,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "teacher" | "student" | "classroom" | "subject" | "teachingClass" | "material" | "assignment" | "submission" | "announcement" | "schedule"
+    modelProps: "user" | "teacher" | "student" | "classroom" | "subject" | "teachingClass" | "material" | "assignment" | "submission" | "announcement" | "schedule" | "tahunAkademik" | "nilai"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1241,6 +1243,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TahunAkademik: {
+      payload: Prisma.$TahunAkademikPayload<ExtArgs>
+      fields: Prisma.TahunAkademikFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TahunAkademikFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TahunAkademikPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TahunAkademikFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TahunAkademikPayload>
+        }
+        findFirst: {
+          args: Prisma.TahunAkademikFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TahunAkademikPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TahunAkademikFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TahunAkademikPayload>
+        }
+        findMany: {
+          args: Prisma.TahunAkademikFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TahunAkademikPayload>[]
+        }
+        create: {
+          args: Prisma.TahunAkademikCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TahunAkademikPayload>
+        }
+        createMany: {
+          args: Prisma.TahunAkademikCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TahunAkademikCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TahunAkademikPayload>[]
+        }
+        delete: {
+          args: Prisma.TahunAkademikDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TahunAkademikPayload>
+        }
+        update: {
+          args: Prisma.TahunAkademikUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TahunAkademikPayload>
+        }
+        deleteMany: {
+          args: Prisma.TahunAkademikDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TahunAkademikUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TahunAkademikUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TahunAkademikPayload>[]
+        }
+        upsert: {
+          args: Prisma.TahunAkademikUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TahunAkademikPayload>
+        }
+        aggregate: {
+          args: Prisma.TahunAkademikAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTahunAkademik>
+        }
+        groupBy: {
+          args: Prisma.TahunAkademikGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TahunAkademikGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TahunAkademikCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TahunAkademikCountAggregateOutputType> | number
+        }
+      }
+    }
+    Nilai: {
+      payload: Prisma.$NilaiPayload<ExtArgs>
+      fields: Prisma.NilaiFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NilaiFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NilaiPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NilaiFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NilaiPayload>
+        }
+        findFirst: {
+          args: Prisma.NilaiFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NilaiPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NilaiFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NilaiPayload>
+        }
+        findMany: {
+          args: Prisma.NilaiFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NilaiPayload>[]
+        }
+        create: {
+          args: Prisma.NilaiCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NilaiPayload>
+        }
+        createMany: {
+          args: Prisma.NilaiCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.NilaiCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NilaiPayload>[]
+        }
+        delete: {
+          args: Prisma.NilaiDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NilaiPayload>
+        }
+        update: {
+          args: Prisma.NilaiUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NilaiPayload>
+        }
+        deleteMany: {
+          args: Prisma.NilaiDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NilaiUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.NilaiUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NilaiPayload>[]
+        }
+        upsert: {
+          args: Prisma.NilaiUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NilaiPayload>
+        }
+        aggregate: {
+          args: Prisma.NilaiAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNilai>
+        }
+        groupBy: {
+          args: Prisma.NilaiGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NilaiGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NilaiCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NilaiCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1286,6 +1436,10 @@ export const UserScalarFieldEnum = {
   email: 'email',
   password: 'password',
   role: 'role',
+  provider: 'provider',
+  providerId: 'providerId',
+  image: 'image',
+  emailVerified: 'emailVerified',
   username: 'username',
   nip: 'nip',
   nisn: 'nisn',
@@ -1342,6 +1496,7 @@ export const StudentScalarFieldEnum = {
   no_hp_ortu: 'no_hp_ortu',
   alamat_ortu: 'alamat_ortu',
   classroom_id: 'classroom_id',
+  tahun_akademik_id: 'tahun_akademik_id',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
@@ -1385,6 +1540,7 @@ export const TeachingClassScalarFieldEnum = {
   tahun_ajaran: 'tahun_ajaran',
   semester: 'semester',
   status: 'status',
+  tahun_akademik_id: 'tahun_akademik_id',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
@@ -1488,11 +1644,47 @@ export const ScheduleScalarFieldEnum = {
   semester: 'semester',
   ruang: 'ruang',
   status: 'status',
+  tahun_akademik_id: 'tahun_akademik_id',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
 
 export type ScheduleScalarFieldEnum = (typeof ScheduleScalarFieldEnum)[keyof typeof ScheduleScalarFieldEnum]
+
+
+export const TahunAkademikScalarFieldEnum = {
+  id: 'id',
+  nama: 'nama',
+  tanggal_mulai: 'tanggal_mulai',
+  tanggal_selesai: 'tanggal_selesai',
+  is_active: 'is_active',
+  keterangan: 'keterangan',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type TahunAkademikScalarFieldEnum = (typeof TahunAkademikScalarFieldEnum)[keyof typeof TahunAkademikScalarFieldEnum]
+
+
+export const NilaiScalarFieldEnum = {
+  id: 'id',
+  student_id: 'student_id',
+  teaching_class_id: 'teaching_class_id',
+  tahun_akademik_id: 'tahun_akademik_id',
+  tugas: 'tugas',
+  praktik: 'praktik',
+  uts: 'uts',
+  uas: 'uas',
+  nilai_akhir: 'nilai_akhir',
+  status: 'status',
+  tahun_ajaran: 'tahun_ajaran',
+  semester: 'semester',
+  keterangan: 'keterangan',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type NilaiScalarFieldEnum = (typeof NilaiScalarFieldEnum)[keyof typeof NilaiScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1690,6 +1882,20 @@ export type ListEnumScheduleDayFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'NilaiStatus'
+ */
+export type EnumNilaiStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NilaiStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'NilaiStatus[]'
+ */
+export type ListEnumNilaiStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NilaiStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1864,6 +2070,8 @@ export type GlobalOmitConfig = {
   submission?: Prisma.SubmissionOmit
   announcement?: Prisma.AnnouncementOmit
   schedule?: Prisma.ScheduleOmit
+  tahunAkademik?: Prisma.TahunAkademikOmit
+  nilai?: Prisma.NilaiOmit
 }
 
 /* Types for Logging */

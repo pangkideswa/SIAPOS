@@ -21,12 +21,10 @@ import { EmptyState } from "@/components/ui/empty-state"
 import { JawabanDetailDialog } from "@/features/pengumpulan/components/jawaban-detail-dialog"
 import { pushNotifikasi } from "@/features/notifications/lib/notifikasi-service"
 import {
-  getAnggotaKelas,
-  getKelasTugas,
-  getTugasPengumpulan,
   getInitials,
   formatWaktuPengumpulan,
 } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useClassroom } from "@/hooks/use-classroom"
 import type { PengumpulanTugas } from "@/features/pengumpulan/types/pengumpulan"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 import type { Siswa } from "@/features/siswa/types/siswa"
@@ -58,7 +56,8 @@ interface NilaiRow {
 }
 
 export function KelasPengumpulanTab({ kelasMengajar }: KelasPengumpulanTabProps) {
-  const tugasList = getKelasTugas(kelasMengajar.id)
+  const classroom = useClassroom()
+  const tugasList = classroom.getKelasTugas(kelasMengajar.id)
   const [selectedTugasId, setSelectedTugasId] = useState<number>(
     () => tugasList[0]?.id ?? 0
   )
@@ -70,8 +69,8 @@ export function KelasPengumpulanTab({ kelasMengajar }: KelasPengumpulanTabProps)
 
   const rows = useMemo<NilaiRow[]>(() => {
     if (!selectedTugas) return []
-    const roster = getAnggotaKelas(kelasMengajar.kelas)
-    const submissions = getTugasPengumpulan(selectedTugas.id)
+    const roster = classroom.getAnggotaKelas(kelasMengajar.kelas)
+    const submissions = classroom.getTugasPengumpulan(selectedTugas.id)
     return roster.map((siswa) => {
       const sub = submissions.find((p) => p.siswa_id === siswa.id)
       if (sub) {
@@ -96,7 +95,8 @@ export function KelasPengumpulanTab({ kelasMengajar }: KelasPengumpulanTabProps)
         isVirtual: true,
       }
     })
-  }, [selectedTugas, kelasMengajar.kelas])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTugas, kelasMengajar.kelas, classroom.submissions])
 
   const filteredRows = rows.filter(
     (r) => filter === "Semua" || r.submission.status === filter

@@ -15,14 +15,8 @@ import {
 } from "lucide-react"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 import type { Siswa } from "@/features/siswa/types/siswa"
-import { DUMMY_SISWA_JADWAL } from "@/features/dashboard/dummy/dashboard.data"
-import {
-  getKelasMateri,
-  getKelasPengumuman,
-  getKelasTugas,
-  getTugasPengumpulan,
-  formatTanggalPendek,
-} from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { formatTanggalPendek } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useClassroom } from "@/hooks/use-classroom"
 
 interface SiswaKelasOverviewTabProps {
   kelasMengajar: KelasMengajar
@@ -43,16 +37,17 @@ export function SiswaKelasOverviewTab({
   kelasMengajar,
   siswa,
 }: SiswaKelasOverviewTabProps) {
-  const materi = getKelasMateri(kelasMengajar.id).filter(
+  const classroom = useClassroom()
+  const materi = classroom.getKelasMateri(kelasMengajar.id).filter(
     (m) => m.status === "Publish"
   )
-  const tugas = getKelasTugas(kelasMengajar.id).filter(
+  const tugas = classroom.getKelasTugas(kelasMengajar.id).filter(
     (t) => t.status === "Dipublikasikan"
   )
-  const pengumuman = getKelasPengumuman(kelasMengajar.kelas)
+  const pengumuman = classroom.getKelasPengumuman(kelasMengajar.kelas)
 
   const mySubmissions = tugas.map((t) =>
-    getTugasPengumpulan(t.id).find((p) => p.siswa_id === siswa.id)
+    classroom.getTugasPengumpulan(t.id).find((p) => p.siswa_id === siswa.id)
   )
   const selesai = mySubmissions.filter(
     (p) => p && p.status !== "Belum Mengumpulkan"
@@ -69,7 +64,7 @@ export function SiswaKelasOverviewTab({
         ) / 10
       : null
 
-  const jadwal = DUMMY_SISWA_JADWAL.filter((j) => j.kelas === siswa.kelas).sort(
+  const jadwal = classroom.getKelasJadwal(siswa.kelas).sort(
     (a, b) =>
       HARI_URUTAN.indexOf(a.hari) - HARI_URUTAN.indexOf(b.hari) ||
       a.waktu_mulai.localeCompare(b.waktu_mulai)

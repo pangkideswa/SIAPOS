@@ -21,15 +21,18 @@ import {
   ArrowUpDown,
   BookOpen,
 } from "lucide-react"
-import { toast } from "sonner"
 import { MateriFormDialog } from "@/features/materi/components/materi-form-dialog"
 import { MateriDeleteDialog } from "@/features/materi/components/materi-delete-dialog"
 import { MateriJenisBadge } from "@/features/materi/components/materi-jenis-badge"
 import { MateriViewDialog } from "@/features/kelas-saya/components/materi-view-dialog"
 import { STATUS_MATERI_COLORS } from "@/features/materi/constants/materi.constants"
-import { materialService } from "@/features/materi/lib/material.service"
 import { pushNotifikasi } from "@/features/notifications/lib/notifikasi-service"
-import { classroomService } from "@/features/kelas-saya/lib/classroom.service"
+import {
+  useCreateMaterial,
+  useUpdateMaterial,
+  useRemoveMaterial,
+} from "@/hooks/use-materials"
+import { useClassroom } from "@/hooks/use-classroom"
 import type { Materi, MateriFormData } from "@/features/materi/types/materi"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 import { cn } from "@/lib/utils"
@@ -76,12 +79,17 @@ export function KelasMateriTab({ kelasMengajar }: KelasMateriTabProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
 
+  const classroom = useClassroom()
+  const createMaterial = useCreateMaterial()
+  const updateMaterial = useUpdateMaterial()
+  const removeMaterial = useRemoveMaterial()
+
   useEffect(() => {
     const timer = setTimeout(() => setIsInitialLoading(false), 500)
     return () => clearTimeout(timer)
   }, [])
 
-  const materiList = classroomService
+  const materiList = classroom
     .getMateri(kelasMengajar.id)
     .filter(
       (m) =>
@@ -104,9 +112,9 @@ export function KelasMateriTab({ kelasMengajar }: KelasMateriTabProps) {
     await new Promise((r) => setTimeout(r, 500))
 
     if (editingItem) {
-      materialService.update(editingItem.id, data)
+      await updateMaterial.mutateAsync({ id: editingItem.id, data })
     } else {
-      materialService.create(data)
+      await createMaterial.mutateAsync(data)
     }
 
     if (data.status === "Publish") {
@@ -122,24 +130,25 @@ export function KelasMateriTab({ kelasMengajar }: KelasMateriTabProps) {
     setIsLoading(false)
     setFormDialogOpen(false)
     setEditingItem(null)
-    toast.success(editingItem ? "Materi berhasil diperbarui" : "Materi berhasil ditambahkan")
   }
 
   async function handleDelete() {
     if (!deletingItem) return
     setIsLoading(true)
     await new Promise((r) => setTimeout(r, 500))
-    materialService.remove(deletingItem.id)
+    await removeMaterial.mutateAsync(deletingItem.id)
     setIsLoading(false)
     setDeleteDialogOpen(false)
     setDeletingItem(null)
-    toast.success("Materi berhasil dihapus")
   }
 
   function togglePublish(materi: Materi) {
     const nextStatus: Materi["status"] =
       materi.status === "Publish" ? "Draft" : "Publish"
-    materialService.setStatus(materi.id, nextStatus)
+    updateMaterial.mutate({
+      id: materi.id,
+      data: { ...materi, status: nextStatus },
+    })
     if (nextStatus === "Publish") {
       pushNotifikasi({
         tipe: "materi",
@@ -148,9 +157,6 @@ export function KelasMateriTab({ kelasMengajar }: KelasMateriTabProps) {
         href: `/siswa/kelas/${kelasMengajar.id}`,
         target_roles: ["siswa"],
       })
-      toast.success(`Materi "${materi.judul}" dipublikasikan`)
-    } else {
-      toast.info(`Materi "${materi.judul}" disimpan sebagai draft`)
     }
   }
 

@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar, Clock } from "lucide-react"
 import { EmptyState } from "@/components/ui/empty-state"
-import { getKelasJadwal } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useClassroom } from "@/hooks/use-classroom"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 
 interface KelasJadwalTabProps {
@@ -31,7 +31,8 @@ const HARI_COLORS: Record<string, string> = {
 }
 
 export function KelasJadwalTab({ kelasMengajar }: KelasJadwalTabProps) {
-  const jadwalList = getKelasJadwal(kelasMengajar.kelas)
+  const classroom = useClassroom()
+  const jadwalList = classroom.getKelasJadwal(kelasMengajar.kelas)
 
   const jadwalByHari = HARI_URUTAN.map((hari) => ({
     hari,

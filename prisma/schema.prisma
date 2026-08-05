@@ -18,8 +18,8 @@ datasource db {
 enum Role {
   SUPER_ADMIN
   ADMIN
-  TEACHER
-  STUDENT
+  GURU
+  SISWA
   WALI
 }
 
@@ -61,17 +61,21 @@ enum ScheduleDay {
 // ============================================================================
 
 model User {
-  id         Int      @id @default(autoincrement())
-  name       String
-  email      String   @unique
-  password   String
-  role       Role     @default(STUDENT)
-  username   String?  @unique
-  nip        String?  @unique
-  nisn       String?  @unique
-  avatar     String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  password      String
+  role          Role      @default(SISWA)
+  provider      String    @default("email")
+  providerId    String?
+  image         String?
+  emailVerified DateTime?
+  username      String?   @unique
+  nip           String?   @unique
+  nisn          String?   @unique
+  avatar        String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
 
   teacher       Teacher?
   student       Student?
@@ -132,12 +136,16 @@ model Student {
   alamat_ortu   String?
   classroom_id  Int?
   classroom     Classroom? @relation(fields: [classroom_id], references: [id])
+  tahun_akademik_id Int?
+  tahun_akademik    TahunAkademik? @relation(fields: [tahun_akademik_id], references: [id])
   created_at    DateTime   @default(now())
   updated_at    DateTime   @updatedAt
 
   submissions Submission[]
+  nilais       Nilai[]
 
   @@index([classroom_id])
+  @@index([tahun_akademik_id])
   @@map("students")
 }
 
@@ -189,16 +197,20 @@ model TeachingClass {
   tahun_ajaran   String?
   semester       String?
   status         String     @default("Aktif")
+  tahun_akademik_id Int?
+  tahun_akademik    TahunAkademik? @relation(fields: [tahun_akademik_id], references: [id])
   created_at     DateTime   @default(now())
   updated_at     DateTime   @updatedAt
 
   materials   Material[]
   assignments Assignment[]
   schedules   Schedule[]
+  nilais      Nilai[]
 
   @@index([classroom_id])
   @@index([subject_id])
   @@index([teacher_id])
+  @@index([tahun_akademik_id])
   @@map("teaching_classes")
 }
 
@@ -209,7 +221,7 @@ model TeachingClass {
 model Material {
   id                Int            @id @default(autoincrement())
   teaching_class_id Int?
-  teaching_class    TeachingClass? @relation(fields: [teaching_class_id], references: [id])
+  teaching_class    TeachingClass? @relation(fields: [teaching_class_id], references: [id], onDelete: Cascade)
   judul             String
   deskripsi         String?
   guru_nama         String?
@@ -234,7 +246,7 @@ model Material {
 model Assignment {
   id                Int              @id @default(autoincrement())
   teaching_class_id Int?
-  teaching_class    TeachingClass?   @relation(fields: [teaching_class_id], references: [id])
+  teaching_class    TeachingClass?   @relation(fields: [teaching_class_id], references: [id], onDelete: Cascade)
   judul             String
   deskripsi         String?
   guru_nama         String?
@@ -258,9 +270,9 @@ model Assignment {
 model Submission {
   id                Int              @id @default(autoincrement())
   assignment_id     Int?
-  assignment        Assignment?      @relation(fields: [assignment_id], references: [id])
+  assignment        Assignment?      @relation(fields: [assignment_id], references: [id], onDelete: Cascade)
   student_id        Int?
-  student           Student?         @relation(fields: [student_id], references: [id])
+  student           Student?         @relation(fields: [student_id], references: [id], onDelete: Cascade)
   file_jawaban      Json?
   catatan           String?
   waktu_pengumpulan DateTime?
@@ -305,7 +317,7 @@ model Announcement {
 model Schedule {
   id                Int            @id @default(autoincrement())
   teaching_class_id Int?
-  teaching_class    TeachingClass? @relation(fields: [teaching_class_id], references: [id])
+  teaching_class    TeachingClass? @relation(fields: [teaching_class_id], references: [id], onDelete: Cascade)
   hari              ScheduleDay
   jam_mulai         String?
   jam_selesai       String?
@@ -316,10 +328,67 @@ model Schedule {
   semester          String?
   ruang             String?
   status            String         @default("Aktif")
+  tahun_akademik_id Int?
+  tahun_akademik    TahunAkademik? @relation(fields: [tahun_akademik_id], references: [id])
   created_at        DateTime       @default(now())
   updated_at        DateTime       @updatedAt
 
   @@index([teaching_class_id])
   @@index([hari])
+  @@index([tahun_akademik_id])
   @@map("schedules")
+}
+
+// ============================================================================
+// Academic year & grades
+// ============================================================================
+
+enum NilaiStatus {
+  LENGKAP
+  BELUM_LENGKAP
+}
+
+model TahunAkademik {
+  id              Int      @id @default(autoincrement())
+  nama            String   @unique
+  tanggal_mulai   DateTime?
+  tanggal_selesai DateTime?
+  is_active       Boolean  @default(false)
+  keterangan      String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  students         Student[]
+  teaching_classes TeachingClass[]
+  schedules        Schedule[]
+  nilais           Nilai[]
+
+  @@index([is_active])
+  @@map("tahun_akademik")
+}
+
+model Nilai {
+  id                Int            @id @default(autoincrement())
+  student_id        Int?
+  student           Student?       @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  teaching_class_id Int?
+  teaching_class    TeachingClass? @relation(fields: [teaching_class_id], references: [id], onDelete: Cascade)
+  tahun_akademik_id Int?
+  tahun_akademik    TahunAkademik? @relation(fields: [tahun_akademik_id], references: [id])
+  tugas             Int?
+  praktik           Int?
+  uts               Int?
+  uas               Int?
+  nilai_akhir       Int?
+  status            NilaiStatus    @default(BELUM_LENGKAP)
+  tahun_ajaran      String?
+  semester          String?
+  keterangan        String?
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+
+  @@unique([student_id, teaching_class_id, semester])
+  @@index([teaching_class_id])
+  @@index([tahun_akademik_id])
+  @@map("nilai")
 }

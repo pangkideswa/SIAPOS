@@ -12,15 +12,8 @@ import {
   Clock,
 } from "lucide-react"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
-import {
-  getAnggotaKelas,
-  getKelasAktivitas,
-  getKelasJadwal,
-  getKelasMateri,
-  getKelasTugas,
-  getTugasPengumpulan,
-  formatTanggalPendek,
-} from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { formatTanggalPendek } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useClassroom } from "@/hooks/use-classroom"
 
 interface KelasOverviewTabProps {
   kelasMengajar: KelasMengajar
@@ -37,16 +30,17 @@ const HARI_URUTAN = [
 ]
 
 export function KelasOverviewTab({ kelasMengajar }: KelasOverviewTabProps) {
-  const siswa = getAnggotaKelas(kelasMengajar.kelas)
-  const materi = getKelasMateri(kelasMengajar.id)
-  const tugas = getKelasTugas(kelasMengajar.id)
-  const jadwal = getKelasJadwal(kelasMengajar.kelas)
-  const aktivitas = getKelasAktivitas(kelasMengajar.id)
+  const classroom = useClassroom()
+  const siswa = classroom.getAnggotaKelas(kelasMengajar.kelas)
+  const materi = classroom.getKelasMateri(kelasMengajar.id)
+  const tugas = classroom.getKelasTugas(kelasMengajar.id)
+  const jadwal = classroom.getKelasJadwal(kelasMengajar.kelas)
+  const aktivitas = classroom.getKelasAktivitas(kelasMengajar.id)
 
   const sudahMengumpulkan = tugas.reduce(
     (total, t) =>
       total +
-      getTugasPengumpulan(t.id).filter(
+      classroom.getTugasPengumpulan(t.id).filter(
         (p) => p.status !== "Belum Mengumpulkan"
       ).length,
     0

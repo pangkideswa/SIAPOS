@@ -29,11 +29,13 @@ export type AggregateSchedule = {
 export type ScheduleAvgAggregateOutputType = {
   id: number | null
   teaching_class_id: number | null
+  tahun_akademik_id: number | null
 }
 
 export type ScheduleSumAggregateOutputType = {
   id: number | null
   teaching_class_id: number | null
+  tahun_akademik_id: number | null
 }
 
 export type ScheduleMinAggregateOutputType = {
@@ -49,6 +51,7 @@ export type ScheduleMinAggregateOutputType = {
   semester: string | null
   ruang: string | null
   status: string | null
+  tahun_akademik_id: number | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -66,6 +69,7 @@ export type ScheduleMaxAggregateOutputType = {
   semester: string | null
   ruang: string | null
   status: string | null
+  tahun_akademik_id: number | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -83,6 +87,7 @@ export type ScheduleCountAggregateOutputType = {
   semester: number
   ruang: number
   status: number
+  tahun_akademik_id: number
   created_at: number
   updated_at: number
   _all: number
@@ -92,11 +97,13 @@ export type ScheduleCountAggregateOutputType = {
 export type ScheduleAvgAggregateInputType = {
   id?: true
   teaching_class_id?: true
+  tahun_akademik_id?: true
 }
 
 export type ScheduleSumAggregateInputType = {
   id?: true
   teaching_class_id?: true
+  tahun_akademik_id?: true
 }
 
 export type ScheduleMinAggregateInputType = {
@@ -112,6 +119,7 @@ export type ScheduleMinAggregateInputType = {
   semester?: true
   ruang?: true
   status?: true
+  tahun_akademik_id?: true
   created_at?: true
   updated_at?: true
 }
@@ -129,6 +137,7 @@ export type ScheduleMaxAggregateInputType = {
   semester?: true
   ruang?: true
   status?: true
+  tahun_akademik_id?: true
   created_at?: true
   updated_at?: true
 }
@@ -146,6 +155,7 @@ export type ScheduleCountAggregateInputType = {
   semester?: true
   ruang?: true
   status?: true
+  tahun_akademik_id?: true
   created_at?: true
   updated_at?: true
   _all?: true
@@ -250,6 +260,7 @@ export type ScheduleGroupByOutputType = {
   semester: string | null
   ruang: string | null
   status: string
+  tahun_akademik_id: number | null
   created_at: Date
   updated_at: Date
   _count: ScheduleCountAggregateOutputType | null
@@ -290,9 +301,11 @@ export type ScheduleWhereInput = {
   semester?: Prisma.StringNullableFilter<"Schedule"> | string | null
   ruang?: Prisma.StringNullableFilter<"Schedule"> | string | null
   status?: Prisma.StringFilter<"Schedule"> | string
+  tahun_akademik_id?: Prisma.IntNullableFilter<"Schedule"> | number | null
   created_at?: Prisma.DateTimeFilter<"Schedule"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Schedule"> | Date | string
   teaching_class?: Prisma.XOR<Prisma.TeachingClassNullableScalarRelationFilter, Prisma.TeachingClassWhereInput> | null
+  tahun_akademik?: Prisma.XOR<Prisma.TahunAkademikNullableScalarRelationFilter, Prisma.TahunAkademikWhereInput> | null
 }
 
 export type ScheduleOrderByWithRelationInput = {
@@ -308,9 +321,11 @@ export type ScheduleOrderByWithRelationInput = {
   semester?: Prisma.SortOrderInput | Prisma.SortOrder
   ruang?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   teaching_class?: Prisma.TeachingClassOrderByWithRelationInput
+  tahun_akademik?: Prisma.TahunAkademikOrderByWithRelationInput
 }
 
 export type ScheduleWhereUniqueInput = Prisma.AtLeast<{
@@ -329,9 +344,11 @@ export type ScheduleWhereUniqueInput = Prisma.AtLeast<{
   semester?: Prisma.StringNullableFilter<"Schedule"> | string | null
   ruang?: Prisma.StringNullableFilter<"Schedule"> | string | null
   status?: Prisma.StringFilter<"Schedule"> | string
+  tahun_akademik_id?: Prisma.IntNullableFilter<"Schedule"> | number | null
   created_at?: Prisma.DateTimeFilter<"Schedule"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Schedule"> | Date | string
   teaching_class?: Prisma.XOR<Prisma.TeachingClassNullableScalarRelationFilter, Prisma.TeachingClassWhereInput> | null
+  tahun_akademik?: Prisma.XOR<Prisma.TahunAkademikNullableScalarRelationFilter, Prisma.TahunAkademikWhereInput> | null
 }, "id">
 
 export type ScheduleOrderByWithAggregationInput = {
@@ -347,6 +364,7 @@ export type ScheduleOrderByWithAggregationInput = {
   semester?: Prisma.SortOrderInput | Prisma.SortOrder
   ruang?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   _count?: Prisma.ScheduleCountOrderByAggregateInput
@@ -372,6 +390,7 @@ export type ScheduleScalarWhereWithAggregatesInput = {
   semester?: Prisma.StringNullableWithAggregatesFilter<"Schedule"> | string | null
   ruang?: Prisma.StringNullableWithAggregatesFilter<"Schedule"> | string | null
   status?: Prisma.StringWithAggregatesFilter<"Schedule"> | string
+  tahun_akademik_id?: Prisma.IntNullableWithAggregatesFilter<"Schedule"> | number | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Schedule"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"Schedule"> | Date | string
 }
@@ -390,6 +409,7 @@ export type ScheduleCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   teaching_class?: Prisma.TeachingClassCreateNestedOneWithoutSchedulesInput
+  tahun_akademik?: Prisma.TahunAkademikCreateNestedOneWithoutSchedulesInput
 }
 
 export type ScheduleUncheckedCreateInput = {
@@ -405,6 +425,7 @@ export type ScheduleUncheckedCreateInput = {
   semester?: string | null
   ruang?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -423,6 +444,7 @@ export type ScheduleUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teaching_class?: Prisma.TeachingClassUpdateOneWithoutSchedulesNestedInput
+  tahun_akademik?: Prisma.TahunAkademikUpdateOneWithoutSchedulesNestedInput
 }
 
 export type ScheduleUncheckedUpdateInput = {
@@ -438,6 +460,7 @@ export type ScheduleUncheckedUpdateInput = {
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ruang?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -455,6 +478,7 @@ export type ScheduleCreateManyInput = {
   semester?: string | null
   ruang?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -487,6 +511,7 @@ export type ScheduleUncheckedUpdateManyInput = {
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ruang?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -514,6 +539,7 @@ export type ScheduleCountOrderByAggregateInput = {
   semester?: Prisma.SortOrder
   ruang?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -521,6 +547,7 @@ export type ScheduleCountOrderByAggregateInput = {
 export type ScheduleAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   teaching_class_id?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrder
 }
 
 export type ScheduleMaxOrderByAggregateInput = {
@@ -536,6 +563,7 @@ export type ScheduleMaxOrderByAggregateInput = {
   semester?: Prisma.SortOrder
   ruang?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -553,6 +581,7 @@ export type ScheduleMinOrderByAggregateInput = {
   semester?: Prisma.SortOrder
   ruang?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -560,6 +589,7 @@ export type ScheduleMinOrderByAggregateInput = {
 export type ScheduleSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   teaching_class_id?: Prisma.SortOrder
+  tahun_akademik_id?: Prisma.SortOrder
 }
 
 export type ScheduleCreateNestedManyWithoutTeaching_classInput = {
@@ -608,6 +638,48 @@ export type EnumScheduleDayFieldUpdateOperationsInput = {
   set?: $Enums.ScheduleDay
 }
 
+export type ScheduleCreateNestedManyWithoutTahun_akademikInput = {
+  create?: Prisma.XOR<Prisma.ScheduleCreateWithoutTahun_akademikInput, Prisma.ScheduleUncheckedCreateWithoutTahun_akademikInput> | Prisma.ScheduleCreateWithoutTahun_akademikInput[] | Prisma.ScheduleUncheckedCreateWithoutTahun_akademikInput[]
+  connectOrCreate?: Prisma.ScheduleCreateOrConnectWithoutTahun_akademikInput | Prisma.ScheduleCreateOrConnectWithoutTahun_akademikInput[]
+  createMany?: Prisma.ScheduleCreateManyTahun_akademikInputEnvelope
+  connect?: Prisma.ScheduleWhereUniqueInput | Prisma.ScheduleWhereUniqueInput[]
+}
+
+export type ScheduleUncheckedCreateNestedManyWithoutTahun_akademikInput = {
+  create?: Prisma.XOR<Prisma.ScheduleCreateWithoutTahun_akademikInput, Prisma.ScheduleUncheckedCreateWithoutTahun_akademikInput> | Prisma.ScheduleCreateWithoutTahun_akademikInput[] | Prisma.ScheduleUncheckedCreateWithoutTahun_akademikInput[]
+  connectOrCreate?: Prisma.ScheduleCreateOrConnectWithoutTahun_akademikInput | Prisma.ScheduleCreateOrConnectWithoutTahun_akademikInput[]
+  createMany?: Prisma.ScheduleCreateManyTahun_akademikInputEnvelope
+  connect?: Prisma.ScheduleWhereUniqueInput | Prisma.ScheduleWhereUniqueInput[]
+}
+
+export type ScheduleUpdateManyWithoutTahun_akademikNestedInput = {
+  create?: Prisma.XOR<Prisma.ScheduleCreateWithoutTahun_akademikInput, Prisma.ScheduleUncheckedCreateWithoutTahun_akademikInput> | Prisma.ScheduleCreateWithoutTahun_akademikInput[] | Prisma.ScheduleUncheckedCreateWithoutTahun_akademikInput[]
+  connectOrCreate?: Prisma.ScheduleCreateOrConnectWithoutTahun_akademikInput | Prisma.ScheduleCreateOrConnectWithoutTahun_akademikInput[]
+  upsert?: Prisma.ScheduleUpsertWithWhereUniqueWithoutTahun_akademikInput | Prisma.ScheduleUpsertWithWhereUniqueWithoutTahun_akademikInput[]
+  createMany?: Prisma.ScheduleCreateManyTahun_akademikInputEnvelope
+  set?: Prisma.ScheduleWhereUniqueInput | Prisma.ScheduleWhereUniqueInput[]
+  disconnect?: Prisma.ScheduleWhereUniqueInput | Prisma.ScheduleWhereUniqueInput[]
+  delete?: Prisma.ScheduleWhereUniqueInput | Prisma.ScheduleWhereUniqueInput[]
+  connect?: Prisma.ScheduleWhereUniqueInput | Prisma.ScheduleWhereUniqueInput[]
+  update?: Prisma.ScheduleUpdateWithWhereUniqueWithoutTahun_akademikInput | Prisma.ScheduleUpdateWithWhereUniqueWithoutTahun_akademikInput[]
+  updateMany?: Prisma.ScheduleUpdateManyWithWhereWithoutTahun_akademikInput | Prisma.ScheduleUpdateManyWithWhereWithoutTahun_akademikInput[]
+  deleteMany?: Prisma.ScheduleScalarWhereInput | Prisma.ScheduleScalarWhereInput[]
+}
+
+export type ScheduleUncheckedUpdateManyWithoutTahun_akademikNestedInput = {
+  create?: Prisma.XOR<Prisma.ScheduleCreateWithoutTahun_akademikInput, Prisma.ScheduleUncheckedCreateWithoutTahun_akademikInput> | Prisma.ScheduleCreateWithoutTahun_akademikInput[] | Prisma.ScheduleUncheckedCreateWithoutTahun_akademikInput[]
+  connectOrCreate?: Prisma.ScheduleCreateOrConnectWithoutTahun_akademikInput | Prisma.ScheduleCreateOrConnectWithoutTahun_akademikInput[]
+  upsert?: Prisma.ScheduleUpsertWithWhereUniqueWithoutTahun_akademikInput | Prisma.ScheduleUpsertWithWhereUniqueWithoutTahun_akademikInput[]
+  createMany?: Prisma.ScheduleCreateManyTahun_akademikInputEnvelope
+  set?: Prisma.ScheduleWhereUniqueInput | Prisma.ScheduleWhereUniqueInput[]
+  disconnect?: Prisma.ScheduleWhereUniqueInput | Prisma.ScheduleWhereUniqueInput[]
+  delete?: Prisma.ScheduleWhereUniqueInput | Prisma.ScheduleWhereUniqueInput[]
+  connect?: Prisma.ScheduleWhereUniqueInput | Prisma.ScheduleWhereUniqueInput[]
+  update?: Prisma.ScheduleUpdateWithWhereUniqueWithoutTahun_akademikInput | Prisma.ScheduleUpdateWithWhereUniqueWithoutTahun_akademikInput[]
+  updateMany?: Prisma.ScheduleUpdateManyWithWhereWithoutTahun_akademikInput | Prisma.ScheduleUpdateManyWithWhereWithoutTahun_akademikInput[]
+  deleteMany?: Prisma.ScheduleScalarWhereInput | Prisma.ScheduleScalarWhereInput[]
+}
+
 export type ScheduleCreateWithoutTeaching_classInput = {
   hari: $Enums.ScheduleDay
   jam_mulai?: string | null
@@ -621,6 +693,7 @@ export type ScheduleCreateWithoutTeaching_classInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  tahun_akademik?: Prisma.TahunAkademikCreateNestedOneWithoutSchedulesInput
 }
 
 export type ScheduleUncheckedCreateWithoutTeaching_classInput = {
@@ -635,6 +708,7 @@ export type ScheduleUncheckedCreateWithoutTeaching_classInput = {
   semester?: string | null
   ruang?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -681,8 +755,68 @@ export type ScheduleScalarWhereInput = {
   semester?: Prisma.StringNullableFilter<"Schedule"> | string | null
   ruang?: Prisma.StringNullableFilter<"Schedule"> | string | null
   status?: Prisma.StringFilter<"Schedule"> | string
+  tahun_akademik_id?: Prisma.IntNullableFilter<"Schedule"> | number | null
   created_at?: Prisma.DateTimeFilter<"Schedule"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Schedule"> | Date | string
+}
+
+export type ScheduleCreateWithoutTahun_akademikInput = {
+  hari: $Enums.ScheduleDay
+  jam_mulai?: string | null
+  jam_selesai?: string | null
+  mata_pelajaran?: string | null
+  guru_nama?: string | null
+  kelas?: string | null
+  tahun_ajaran?: string | null
+  semester?: string | null
+  ruang?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  teaching_class?: Prisma.TeachingClassCreateNestedOneWithoutSchedulesInput
+}
+
+export type ScheduleUncheckedCreateWithoutTahun_akademikInput = {
+  id?: number
+  teaching_class_id?: number | null
+  hari: $Enums.ScheduleDay
+  jam_mulai?: string | null
+  jam_selesai?: string | null
+  mata_pelajaran?: string | null
+  guru_nama?: string | null
+  kelas?: string | null
+  tahun_ajaran?: string | null
+  semester?: string | null
+  ruang?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+}
+
+export type ScheduleCreateOrConnectWithoutTahun_akademikInput = {
+  where: Prisma.ScheduleWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScheduleCreateWithoutTahun_akademikInput, Prisma.ScheduleUncheckedCreateWithoutTahun_akademikInput>
+}
+
+export type ScheduleCreateManyTahun_akademikInputEnvelope = {
+  data: Prisma.ScheduleCreateManyTahun_akademikInput | Prisma.ScheduleCreateManyTahun_akademikInput[]
+  skipDuplicates?: boolean
+}
+
+export type ScheduleUpsertWithWhereUniqueWithoutTahun_akademikInput = {
+  where: Prisma.ScheduleWhereUniqueInput
+  update: Prisma.XOR<Prisma.ScheduleUpdateWithoutTahun_akademikInput, Prisma.ScheduleUncheckedUpdateWithoutTahun_akademikInput>
+  create: Prisma.XOR<Prisma.ScheduleCreateWithoutTahun_akademikInput, Prisma.ScheduleUncheckedCreateWithoutTahun_akademikInput>
+}
+
+export type ScheduleUpdateWithWhereUniqueWithoutTahun_akademikInput = {
+  where: Prisma.ScheduleWhereUniqueInput
+  data: Prisma.XOR<Prisma.ScheduleUpdateWithoutTahun_akademikInput, Prisma.ScheduleUncheckedUpdateWithoutTahun_akademikInput>
+}
+
+export type ScheduleUpdateManyWithWhereWithoutTahun_akademikInput = {
+  where: Prisma.ScheduleScalarWhereInput
+  data: Prisma.XOR<Prisma.ScheduleUpdateManyMutationInput, Prisma.ScheduleUncheckedUpdateManyWithoutTahun_akademikInput>
 }
 
 export type ScheduleCreateManyTeaching_classInput = {
@@ -697,6 +831,7 @@ export type ScheduleCreateManyTeaching_classInput = {
   semester?: string | null
   ruang?: string | null
   status?: string
+  tahun_akademik_id?: number | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -714,6 +849,7 @@ export type ScheduleUpdateWithoutTeaching_classInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tahun_akademik?: Prisma.TahunAkademikUpdateOneWithoutSchedulesNestedInput
 }
 
 export type ScheduleUncheckedUpdateWithoutTeaching_classInput = {
@@ -728,12 +864,81 @@ export type ScheduleUncheckedUpdateWithoutTeaching_classInput = {
   semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ruang?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ScheduleUncheckedUpdateManyWithoutTeaching_classInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  hari?: Prisma.EnumScheduleDayFieldUpdateOperationsInput | $Enums.ScheduleDay
+  jam_mulai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jam_selesai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ruang?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ScheduleCreateManyTahun_akademikInput = {
+  id?: number
+  teaching_class_id?: number | null
+  hari: $Enums.ScheduleDay
+  jam_mulai?: string | null
+  jam_selesai?: string | null
+  mata_pelajaran?: string | null
+  guru_nama?: string | null
+  kelas?: string | null
+  tahun_ajaran?: string | null
+  semester?: string | null
+  ruang?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+}
+
+export type ScheduleUpdateWithoutTahun_akademikInput = {
+  hari?: Prisma.EnumScheduleDayFieldUpdateOperationsInput | $Enums.ScheduleDay
+  jam_mulai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jam_selesai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ruang?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  teaching_class?: Prisma.TeachingClassUpdateOneWithoutSchedulesNestedInput
+}
+
+export type ScheduleUncheckedUpdateWithoutTahun_akademikInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  teaching_class_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  hari?: Prisma.EnumScheduleDayFieldUpdateOperationsInput | $Enums.ScheduleDay
+  jam_mulai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jam_selesai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ruang?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ScheduleUncheckedUpdateManyWithoutTahun_akademikInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  teaching_class_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   hari?: Prisma.EnumScheduleDayFieldUpdateOperationsInput | $Enums.ScheduleDay
   jam_mulai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jam_selesai?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -763,9 +968,11 @@ export type ScheduleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   semester?: boolean
   ruang?: boolean
   status?: boolean
+  tahun_akademik_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   teaching_class?: boolean | Prisma.Schedule$teaching_classArgs<ExtArgs>
+  tahun_akademik?: boolean | Prisma.Schedule$tahun_akademikArgs<ExtArgs>
 }, ExtArgs["result"]["schedule"]>
 
 export type ScheduleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -781,9 +988,11 @@ export type ScheduleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   semester?: boolean
   ruang?: boolean
   status?: boolean
+  tahun_akademik_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   teaching_class?: boolean | Prisma.Schedule$teaching_classArgs<ExtArgs>
+  tahun_akademik?: boolean | Prisma.Schedule$tahun_akademikArgs<ExtArgs>
 }, ExtArgs["result"]["schedule"]>
 
 export type ScheduleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -799,9 +1008,11 @@ export type ScheduleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   semester?: boolean
   ruang?: boolean
   status?: boolean
+  tahun_akademik_id?: boolean
   created_at?: boolean
   updated_at?: boolean
   teaching_class?: boolean | Prisma.Schedule$teaching_classArgs<ExtArgs>
+  tahun_akademik?: boolean | Prisma.Schedule$tahun_akademikArgs<ExtArgs>
 }, ExtArgs["result"]["schedule"]>
 
 export type ScheduleSelectScalar = {
@@ -817,25 +1028,30 @@ export type ScheduleSelectScalar = {
   semester?: boolean
   ruang?: boolean
   status?: boolean
+  tahun_akademik_id?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type ScheduleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "teaching_class_id" | "hari" | "jam_mulai" | "jam_selesai" | "mata_pelajaran" | "guru_nama" | "kelas" | "tahun_ajaran" | "semester" | "ruang" | "status" | "created_at" | "updated_at", ExtArgs["result"]["schedule"]>
+export type ScheduleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "teaching_class_id" | "hari" | "jam_mulai" | "jam_selesai" | "mata_pelajaran" | "guru_nama" | "kelas" | "tahun_ajaran" | "semester" | "ruang" | "status" | "tahun_akademik_id" | "created_at" | "updated_at", ExtArgs["result"]["schedule"]>
 export type ScheduleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   teaching_class?: boolean | Prisma.Schedule$teaching_classArgs<ExtArgs>
+  tahun_akademik?: boolean | Prisma.Schedule$tahun_akademikArgs<ExtArgs>
 }
 export type ScheduleIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   teaching_class?: boolean | Prisma.Schedule$teaching_classArgs<ExtArgs>
+  tahun_akademik?: boolean | Prisma.Schedule$tahun_akademikArgs<ExtArgs>
 }
 export type ScheduleIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   teaching_class?: boolean | Prisma.Schedule$teaching_classArgs<ExtArgs>
+  tahun_akademik?: boolean | Prisma.Schedule$tahun_akademikArgs<ExtArgs>
 }
 
 export type $SchedulePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Schedule"
   objects: {
     teaching_class: Prisma.$TeachingClassPayload<ExtArgs> | null
+    tahun_akademik: Prisma.$TahunAkademikPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -850,6 +1066,7 @@ export type $SchedulePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     semester: string | null
     ruang: string | null
     status: string
+    tahun_akademik_id: number | null
     created_at: Date
     updated_at: Date
   }, ExtArgs["result"]["schedule"]>
@@ -1247,6 +1464,7 @@ readonly fields: ScheduleFieldRefs;
 export interface Prisma__ScheduleClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   teaching_class<T extends Prisma.Schedule$teaching_classArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Schedule$teaching_classArgs<ExtArgs>>): Prisma.Prisma__TeachingClassClient<runtime.Types.Result.GetResult<Prisma.$TeachingClassPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  tahun_akademik<T extends Prisma.Schedule$tahun_akademikArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Schedule$tahun_akademikArgs<ExtArgs>>): Prisma.Prisma__TahunAkademikClient<runtime.Types.Result.GetResult<Prisma.$TahunAkademikPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1288,6 +1506,7 @@ export interface ScheduleFieldRefs {
   readonly semester: Prisma.FieldRef<"Schedule", 'String'>
   readonly ruang: Prisma.FieldRef<"Schedule", 'String'>
   readonly status: Prisma.FieldRef<"Schedule", 'String'>
+  readonly tahun_akademik_id: Prisma.FieldRef<"Schedule", 'Int'>
   readonly created_at: Prisma.FieldRef<"Schedule", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"Schedule", 'DateTime'>
 }
@@ -1707,6 +1926,25 @@ export type Schedule$teaching_classArgs<ExtArgs extends runtime.Types.Extensions
    */
   include?: Prisma.TeachingClassInclude<ExtArgs> | null
   where?: Prisma.TeachingClassWhereInput
+}
+
+/**
+ * Schedule.tahun_akademik
+ */
+export type Schedule$tahun_akademikArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TahunAkademik
+   */
+  select?: Prisma.TahunAkademikSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TahunAkademik
+   */
+  omit?: Prisma.TahunAkademikOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TahunAkademikInclude<ExtArgs> | null
+  where?: Prisma.TahunAkademikWhereInput
 }
 
 /**

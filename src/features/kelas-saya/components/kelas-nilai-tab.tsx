@@ -6,12 +6,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Award, Search, TrendingUp, TrendingDown, Minus } from "lucide-react"
-import {
-  getAnggotaKelas,
-  getKelasTugas,
-  getTugasPengumpulan,
-  getInitials,
-} from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { getInitials } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useClassroom } from "@/hooks/use-classroom"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 
 interface KelasNilaiTabProps {
@@ -43,8 +39,9 @@ function getNilaiColor(rataRata: number | null) {
 export function KelasNilaiTab({ kelasMengajar }: KelasNilaiTabProps) {
   const [search, setSearch] = useState("")
 
-  const tugasList = getKelasTugas(kelasMengajar.id)
-  const anggota = getAnggotaKelas(kelasMengajar.kelas)
+  const classroom = useClassroom()
+  const tugasList = classroom.getKelasTugas(kelasMengajar.id)
+  const anggota = classroom.getAnggotaKelas(kelasMengajar.kelas)
 
   const nilaiData = useMemo<NilaiSiswa[]>(() => {
     return anggota.map((siswa) => {
@@ -53,7 +50,7 @@ export function KelasNilaiTab({ kelasMengajar }: KelasNilaiTabProps) {
         count: number
       }>(
         (acc, tugas) => {
-          const submissions = getTugasPengumpulan(tugas.id)
+          const submissions = classroom.getTugasPengumpulan(tugas.id)
           const sub = submissions.find(
             (p) => p.siswa_id === siswa.id && p.nilai !== null
           )
@@ -76,7 +73,8 @@ export function KelasNilaiTab({ kelasMengajar }: KelasNilaiTabProps) {
         totalTugas: tugasList.length,
       }
     })
-  }, [anggota, tugasList])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [anggota, tugasList, classroom.submissions])
 
   const filtered = nilaiData.filter(
     (n) =>

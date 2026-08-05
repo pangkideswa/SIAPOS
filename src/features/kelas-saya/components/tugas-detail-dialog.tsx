@@ -17,11 +17,9 @@ import {
   Users,
 } from "lucide-react"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
+import { formatTanggal } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useClassroom } from "@/hooks/use-classroom"
 import type { Tugas } from "@/features/tugas/types/tugas"
-import {
-  getTugasPengumpulan,
-  formatTanggal,
-} from "@/features/kelas-saya/lib/kelas-saya-helpers"
 
 interface TugasDetailDialogProps {
   open: boolean
@@ -34,9 +32,11 @@ export function TugasDetailDialog({
   onOpenChange,
   tugas,
 }: TugasDetailDialogProps) {
+  const classroom = useClassroom()
+
   if (!tugas) return null
 
-  const pengumpulan = getTugasPengumpulan(tugas.id)
+  const pengumpulan = classroom.getTugasPengumpulan(tugas.id)
   const sudah = pengumpulan.filter(
     (p) => p.status !== "Belum Mengumpulkan"
   ).length

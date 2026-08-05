@@ -18,13 +18,13 @@ import {
   SEMESTER_OPTIONS,
   STATUS_NILAI_COLORS,
 } from "../constants/nilai-akademik.constants"
-import { DUMMY_NILAI_AKADEMIK } from "../dummy/nilai-akademik.data"
+import { useNilai } from "@/hooks/use-nilai"
 import { NilaiAkademikDetailDialog } from "./nilai-akademik-detail-dialog"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { FileOutput, TrendingUp } from "lucide-react"
 
 const PER_PAGE = 10
-const SISWA_LOGIN = "Ahmad Fauzi"
+const SISWA_LOGIN = "Rizki Pratama"
 
 type Row = Record<string, unknown> & {
   id: number
@@ -38,8 +38,10 @@ type Row = Record<string, unknown> & {
 }
 
 export function NilaiAkademikSiswaPage() {
-  const [items] = useState<NilaiAkademik[]>(
-    DUMMY_NILAI_AKADEMIK.filter((d) => d.siswa_nama === SISWA_LOGIN)
+  const { data = [] } = useNilai()
+  const items = useMemo(
+    () => data.filter((d) => d.siswa_nama === SISWA_LOGIN),
+    [data]
   )
   const [search, setSearch] = useState("")
   const [semesterFilter, setSemesterFilter] = useState("all")

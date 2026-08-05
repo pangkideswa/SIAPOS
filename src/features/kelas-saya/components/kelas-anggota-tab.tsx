@@ -6,10 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Users, Search, Phone, Hash } from "lucide-react"
 import { useState } from "react"
 import { EmptyState } from "@/components/ui/empty-state"
-import {
-  getAnggotaKelas,
-  getInitials,
-} from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { getInitials } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useClassroom } from "@/hooks/use-classroom"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 
 interface KelasAnggotaTabProps {
@@ -19,7 +17,8 @@ interface KelasAnggotaTabProps {
 export function KelasAnggotaTab({ kelasMengajar }: KelasAnggotaTabProps) {
   const [search, setSearch] = useState("")
 
-  const anggota = getAnggotaKelas(kelasMengajar.kelas).filter(
+  const classroom = useClassroom()
+  const anggota = classroom.getAnggotaKelas(kelasMengajar.kelas).filter(
     (s) =>
       !search ||
       s.nama_lengkap.toLowerCase().includes(search.toLowerCase()) ||

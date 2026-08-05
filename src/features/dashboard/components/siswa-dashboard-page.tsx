@@ -26,12 +26,13 @@ import {
   Award,
   ClipboardCheck,
 } from "lucide-react"
-import { materialService } from "@/features/materi/lib/material.service"
-import { assignmentService } from "@/features/tugas/lib/assignment.service"
-import { pengumpulanService } from "@/features/pengumpulan/lib/pengumpulan.service"
+import { useMaterials } from "@/hooks/use-materials"
+import { useAssignments } from "@/hooks/use-assignments"
+import { useSubmissions } from "@/hooks/use-submissions"
+import { useSchedules } from "@/hooks/use-schedules"
+import { useAnnouncements } from "@/hooks/use-announcements"
 import { absensiService } from "@/features/absensi/lib/absensi.service"
-import { DUMMY_SISWA_JADWAL } from "@/features/dashboard/dummy/dashboard.data"
-import { getRolePengumuman } from "@/features/pengumuman/lib/pengumuman-helpers"
+import { filterPengumumanByRole } from "@/features/pengumuman/lib/pengumuman-helpers"
 import { KATEGORI_PENGUMUMAN_COLORS } from "@/features/pengumuman/constants/pengumuman.constants"
 import { formatDateID } from "@/features/kalender-akademik/components/kalender-helpers"
 import { PengumumanBaruBadge } from "@/features/pengumuman/components/pengumuman-baru-badge"
@@ -93,24 +94,28 @@ export function SiswaDashboardPage() {
   const router = useRouter()
   const siswaName = user?.name ?? "Rizki Pratama"
 
-  const materiByKelas = materialService
-    .getAll()
-    .filter((m) => m.kelas === SISWA_KELAS && m.status === "Publish")
+  const { data: materiData } = useMaterials()
+  const { data: tugasData } = useAssignments()
+  const { data: pengumpulanData } = useSubmissions()
+  const { data: schedules } = useSchedules()
+  const { data: announcementsData } = useAnnouncements()
+
+  const materiByKelas = (materiData ?? []).filter(
+    (m) => m.kelas === SISWA_KELAS && m.status === "Publish"
+  )
   const materiTerbaru = [...materiByKelas]
     .sort((a, b) => b.created_at.localeCompare(a.created_at))
     .slice(0, 4)
 
-  const tugasByKelas = assignmentService
-    .getAll()
-    .filter(
-      (t) =>
-        t.kelas === SISWA_KELAS &&
-        (t.status === "Dipublikasikan" || t.status === "Ditutup")
-    )
+  const tugasByKelas = (tugasData ?? []).filter(
+    (t) =>
+      t.kelas === SISWA_KELAS &&
+      (t.status === "Dipublikasikan" || t.status === "Ditutup")
+  )
   const tugasAktif = tugasByKelas.filter((t) => t.status === "Dipublikasikan")
-  const pengumpulanBySiswa = pengumpulanService
-    .getAll()
-    .filter((p) => p.siswa_nama === siswaName)
+  const pengumpulanBySiswa = (pengumpulanData ?? []).filter(
+    (p) => p.siswa_nama === siswaName
+  )
   const tugasSelesai = pengumpulanBySiswa.filter(
     (p) => p.status === "Sudah Mengumpulkan" || p.status === "Terlambat"
   )
@@ -184,11 +189,18 @@ export function SiswaDashboardPage() {
     }))
 
   const todayHari = new Date().toLocaleDateString("id-ID", { weekday: "long" })
-  const jadwalHariIni = DUMMY_SISWA_JADWAL.filter(
-    (j) => j.kelas === SISWA_KELAS && j.hari === todayHari
-  )
+  const jadwalHariIni = (schedules ?? [])
+    .filter((j) => j.kelas === SISWA_KELAS && j.hari === todayHari)
+    .map((j) => ({
+      ...j,
+      waktu_mulai: j.jam_mulai,
+      waktu_selesai: j.jam_selesai,
+    }))
 
-  const announcements = getRolePengumuman("siswa").slice(0, 5)
+  const announcements = filterPengumumanByRole(
+    "siswa",
+    announcementsData ?? []
+  ).slice(0, 5)
 
   return (
     <div className="space-y-6">

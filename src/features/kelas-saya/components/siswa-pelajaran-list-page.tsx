@@ -13,20 +13,15 @@ import {
   ArrowRight,
   Users,
 } from "lucide-react"
-import {
-  getAnggotaKelas,
-  getKelasByRombel,
-  getKelasMateri,
-  getKelasTugas,
-  getSiswaByNama,
-} from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useClassroom } from "@/hooks/use-classroom"
 
 export function SiswaPelajaranListPage() {
   const { user } = useAuth()
   const router = useRouter()
 
-  const siswa = getSiswaByNama(user?.name ?? "")
-  const pelajaran = siswa ? getKelasByRombel(siswa.kelas) : []
+  const classroom = useClassroom()
+  const siswa = classroom.getSiswaByNama(user?.name ?? "")
+  const pelajaran = siswa ? classroom.getKelasByRombel(siswa.kelas) : []
 
   return (
     <div className="space-y-6">
@@ -55,9 +50,9 @@ export function SiswaPelajaranListPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
           {pelajaran.map((kelas) => {
-            const jumlahSiswa = getAnggotaKelas(kelas.kelas).length
-            const jumlahMateri = getKelasMateri(kelas.id).length
-            const jumlahTugas = getKelasTugas(kelas.id).length
+            const jumlahSiswa = classroom.getAnggotaKelas(kelas.kelas).length
+            const jumlahMateri = classroom.getKelasMateri(kelas.id).length
+            const jumlahTugas = classroom.getKelasTugas(kelas.id).length
             return (
               <Card
                 key={kelas.id}

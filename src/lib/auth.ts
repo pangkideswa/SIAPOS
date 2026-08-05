@@ -1,5 +1,6 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
+import { authService } from "@/services/auth.service"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -15,22 +16,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!email) return false
 
         try {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api"}/auth/google`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email, name: user.name, avatar: user.image }),
-            }
-          )
-
-          if (!res.ok) {
-            return false
-          }
-
-          const data = await res.json()
-          user.role = data.role
-          user.id = data.user_id
+          const dbUser = await authService.googleLogin({
+            email,
+            name: user.name,
+            image: user.image,
+            providerId: account.providerAccountId,
+          })
+          user.id = String(dbUser.id)
+          user.role = dbUser.role
+          user.image = dbUser.image ?? user.image
           return true
         } catch {
           return false

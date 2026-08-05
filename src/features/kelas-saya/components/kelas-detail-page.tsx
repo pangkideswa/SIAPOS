@@ -18,13 +18,7 @@ import {
   Send,
   BookMarked,
 } from "lucide-react"
-import {
-  getKelasMengajarById,
-  getAnggotaKelas,
-  getKelasMateri,
-  getKelasTugas,
-  getTugasPengumpulan,
-} from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useClassroom } from "@/hooks/use-classroom"
 import { KelasOverviewTab } from "@/features/kelas-saya/components/kelas-overview-tab"
 import { KelasMateriTab } from "@/features/kelas-saya/components/kelas-materi-tab"
 import { KelasTugasTab } from "@/features/kelas-saya/components/kelas-tugas-tab"
@@ -54,7 +48,8 @@ export function KelasDetailPage({
 }) {
   const resolvedParams = use(params)
   const router = useRouter()
-  const kelasMengajar = getKelasMengajarById(Number(resolvedParams.id))
+  const classroom = useClassroom()
+  const kelasMengajar = classroom.getKelasMengajarById(Number(resolvedParams.id))
   const [tab, setTab] = useState<KelasTab>("ringkasan")
 
   if (!kelasMengajar) {
@@ -81,22 +76,22 @@ export function KelasDetailPage({
     )
   }
 
-  const jumlahSiswa = getAnggotaKelas(kelasMengajar.kelas).length
-  const jumlahMateri = getKelasMateri(kelasMengajar.id).length
-  const jumlahTugas = getKelasTugas(kelasMengajar.id).length
+  const jumlahSiswa = classroom.getAnggotaKelas(kelasMengajar.kelas).length
+  const jumlahMateri = classroom.getKelasMateri(kelasMengajar.id).length
+  const jumlahTugas = classroom.getKelasTugas(kelasMengajar.id).length
 
-  const tugasList = getKelasTugas(kelasMengajar.id)
+  const tugasList = classroom.getKelasTugas(kelasMengajar.id)
   const jumlahPengumpulan = tugasList.reduce(
     (total, t) =>
       total +
-      getTugasPengumpulan(t.id).filter(
+      classroom.getTugasPengumpulan(t.id).filter(
         (p) => p.status !== "Belum Mengumpulkan"
       ).length,
     0
   )
 
   const allGrades = tugasList.flatMap((t) =>
-    getTugasPengumpulan(t.id)
+    classroom.getTugasPengumpulan(t.id)
       .filter((p) => p.nilai !== null)
       .map((p) => p.nilai as number)
   )

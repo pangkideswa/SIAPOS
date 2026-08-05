@@ -7,9 +7,10 @@ const AUTH_ROUTES = ["/masuk", "/daftar", "/login", "/register"]
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get("token")?.value
-  const demoToken = request.cookies.get("demo_token")?.value
-  const nextAuthToken = request.cookies.get("next-auth.session-token")?.value
-  const isAuthenticated = !!token || !!demoToken || !!nextAuthToken
+  const nextAuthToken =
+    request.cookies.get("next-auth.session-token")?.value ??
+    request.cookies.get("__Secure-next-auth.session-token")?.value
+  const isAuthenticated = !!token || !!nextAuthToken
 
   if (PUBLIC_ROUTES.some((route) => pathname === route)) {
     return NextResponse.next()
