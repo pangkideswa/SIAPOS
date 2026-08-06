@@ -6,7 +6,6 @@ import { materialSchema } from "@/lib/validations/material.schemas"
 import {
   allowedTeachingClassIdsFor,
   assertTeachingClassAccess,
-  filterByTeachingClassAccess,
   isAdmin,
   requireApiUser,
 } from "@/auth/api-authorization"
@@ -16,9 +15,18 @@ export async function GET() {
   try {
     const user = await requireApiUser()
     const materials = await materialService.getAll()
-    const allowedIds = await allowedTeachingClassIdsFor(user)
-    const scoped = filterByTeachingClassAccess(user, materials, allowedIds)
-      .filter((item) => user.role !== "siswa" || item.status === "Publish")
+const allowedIds = await allowedTeachingClassIdsFor(user)
+
+const scoped = materials
+  .filter(
+    (item) =>
+      item.kelas_mengajar_id &&
+      allowedIds.has(item.kelas_mengajar_id)
+  )
+  .filter(
+    (item) =>
+      user.role !== "siswa" || item.status === "Publish"
+  )
     return ok(isAdmin(user) ? materials : scoped)
   } catch (error) {
     return apiError(error)

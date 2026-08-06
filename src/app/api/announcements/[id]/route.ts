@@ -70,7 +70,7 @@ export async function PUT(
       Number(id),
       {
         ...(body as unknown as AnnouncementCreateInput),
-        penulis: isAdmin(user) ? body.penulis : user.name,
+        penulis: isAdmin(user) ? body.penulis || user.name : user.name,
       }
     )
     return ok(announcement, "Pengumuman berhasil diperbarui")

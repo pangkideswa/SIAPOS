@@ -6,7 +6,6 @@ import { assignmentSchema } from "@/lib/validations/assignment.schemas"
 import {
   allowedTeachingClassIdsFor,
   assertTeachingClassAccess,
-  filterByTeachingClassAccess,
   isAdmin,
   requireApiUser,
 } from "@/auth/api-authorization"
@@ -16,9 +15,18 @@ export async function GET() {
   try {
     const user = await requireApiUser()
     const assignments = await assignmentService.getAll()
-    const allowedIds = await allowedTeachingClassIdsFor(user)
-    const scoped = filterByTeachingClassAccess(user, assignments, allowedIds)
-      .filter((item) => user.role !== "siswa" || item.status === "Dipublikasikan")
+const allowedIds = await allowedTeachingClassIdsFor(user)
+
+const scoped = assignments
+  .filter(
+    (item) =>
+      item.kelas_mengajar_id &&
+      allowedIds.has(item.kelas_mengajar_id)
+  )
+  .filter(
+    (item) =>
+      user.role !== "siswa" || item.status === "Dipublikasikan"
+  )
     return ok(isAdmin(user) ? assignments : scoped)
   } catch (error) {
     return apiError(error)
