@@ -1,7 +1,6 @@
 import "server-only"
 import { z } from "zod"
 import { submissionRepository } from "@/repositories/submission.repository"
-import { assignmentRepository } from "@/repositories/assignment.repository"
 import type { Penilaian } from "@/features/penilaian/types/penilaian"
 import { penilaianUpdateSchema } from "@/lib/validations/penilaian.schemas"
 
@@ -22,12 +21,8 @@ type SubmissionRow = NonNullable<
   Awaited<ReturnType<typeof submissionRepository.findById>>
 >
 
-async function toPenilaian(
-  row: SubmissionRow
-): Promise<Penilaian> {
-  const assignment = row.assignment_id
-    ? await assignmentRepository.findById(row.assignment_id)
-    : null
+function toPenilaian(row: SubmissionRow): Penilaian {
+  const assignment = row.assignment
   return {
     id: row.id,
     pengumpulan_id: row.id,
@@ -49,11 +44,7 @@ async function toPenilaian(
 export const penilaianService = {
   async getAll(): Promise<Penilaian[]> {
     const rows = await submissionRepository.findAll()
-    const result: Penilaian[] = []
-    for (const row of rows) {
-      result.push(await toPenilaian(row))
-    }
-    return result
+    return rows.map(toPenilaian)
   },
 
   async getById(id: number): Promise<Penilaian | null> {
@@ -71,7 +62,7 @@ export const penilaianService = {
     })
     if (!row) return null
 
-    const penilaian = await toPenilaian(row)
+    const penilaian = toPenilaian(row)
     return {
       ...penilaian,
       status_penilaian: status,

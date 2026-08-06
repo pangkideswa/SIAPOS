@@ -29,6 +29,7 @@ import {
   EyeOff,
 } from "lucide-react"
 import { toast } from "sonner"
+import { apiFetch } from "@/lib/client-api"
 
 export function PengaturanPage() {
   const { logout } = useAuth()
@@ -65,11 +66,24 @@ export function PengaturanPage() {
       return
     }
     setIsSaving(true)
-    await new Promise((r) => setTimeout(r, 500))
-    setIsSaving(false)
-    setPasswordOpen(false)
-    setPasswords({ oldPassword: "", newPassword: "", confirmPassword: "" })
-    toast.success("Password berhasil diubah")
+    try {
+      await apiFetch<boolean>("/api/auth/password", {
+        method: "POST",
+        body: JSON.stringify({
+          old_password: passwords.oldPassword,
+          new_password: passwords.newPassword,
+          new_password_confirmation: passwords.confirmPassword,
+        }),
+      })
+      setPasswordOpen(false)
+      setPasswords({ oldPassword: "", newPassword: "", confirmPassword: "" })
+      toast.success("Password berhasil diubah")
+    } catch (err: unknown) {
+      const apiErr = err as { message?: string }
+      toast.error(apiErr.message ?? "Gagal mengubah password")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   async function handleLogoutAll() {

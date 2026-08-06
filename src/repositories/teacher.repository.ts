@@ -5,6 +5,7 @@ import type { Teacher, Prisma } from "@/generated/prisma/client"
 export type TeacherCreateData = Prisma.TeacherUncheckedCreateInput
 export type TeacherUpdateData = Prisma.TeacherUncheckedUpdateInput
 export type TeacherWhere = Prisma.TeacherWhereInput
+export type TeacherFindManyArgs = Prisma.TeacherFindManyArgs
 
 export const teacherRepository = {
   async findAll(): Promise<Teacher[]> {
@@ -21,11 +22,15 @@ export const teacherRepository = {
     return prisma.teacher.findFirst({ where })
   },
 
-  async findMany(where: TeacherWhere): Promise<Teacher[]> {
+  async findMany(args: TeacherFindManyArgs): Promise<Teacher[]> {
     return prisma.teacher.findMany({
-      where,
+      ...args,
       orderBy: { nama_lengkap: "asc" },
     })
+  },
+
+  async count(where: TeacherWhere): Promise<number> {
+    return prisma.teacher.count({ where })
   },
 
   async create(data: TeacherCreateData): Promise<Teacher> {

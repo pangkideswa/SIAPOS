@@ -47,6 +47,21 @@ export { Prisma }
  */
 export type User = Prisma.UserModel
 /**
+ * Model Account
+ * 
+ */
+export type Account = Prisma.AccountModel
+/**
+ * Model Session
+ * 
+ */
+export type Session = Prisma.SessionModel
+/**
+ * Model VerificationToken
+ * 
+ */
+export type VerificationToken = Prisma.VerificationTokenModel
+/**
  * Model Teacher
  * 
  */
@@ -56,6 +71,11 @@ export type Teacher = Prisma.TeacherModel
  * 
  */
 export type Student = Prisma.StudentModel
+/**
+ * Model Jurusan
+ * 
+ */
+export type Jurusan = Prisma.JurusanModel
 /**
  * Model Classroom
  * 
@@ -87,6 +107,16 @@ export type Assignment = Prisma.AssignmentModel
  */
 export type Submission = Prisma.SubmissionModel
 /**
+ * Model AttendanceSession
+ * 
+ */
+export type AttendanceSession = Prisma.AttendanceSessionModel
+/**
+ * Model Attendance
+ * 
+ */
+export type Attendance = Prisma.AttendanceModel
+/**
  * Model Announcement
  * 
  */
@@ -106,3 +136,8 @@ export type TahunAkademik = Prisma.TahunAkademikModel
  * 
  */
 export type Nilai = Prisma.NilaiModel
+/**
+ * Model Notifikasi
+ * 
+ */
+export type Notifikasi = Prisma.NotifikasiModel

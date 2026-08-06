@@ -304,6 +304,7 @@ export type TeachingClassWhereInput = {
   assignments?: Prisma.AssignmentListRelationFilter
   schedules?: Prisma.ScheduleListRelationFilter
   nilais?: Prisma.NilaiListRelationFilter
+  attendance_sessions?: Prisma.AttendanceSessionListRelationFilter
 }
 
 export type TeachingClassOrderByWithRelationInput = {
@@ -328,6 +329,7 @@ export type TeachingClassOrderByWithRelationInput = {
   assignments?: Prisma.AssignmentOrderByRelationAggregateInput
   schedules?: Prisma.ScheduleOrderByRelationAggregateInput
   nilais?: Prisma.NilaiOrderByRelationAggregateInput
+  attendance_sessions?: Prisma.AttendanceSessionOrderByRelationAggregateInput
 }
 
 export type TeachingClassWhereUniqueInput = Prisma.AtLeast<{
@@ -355,6 +357,7 @@ export type TeachingClassWhereUniqueInput = Prisma.AtLeast<{
   assignments?: Prisma.AssignmentListRelationFilter
   schedules?: Prisma.ScheduleListRelationFilter
   nilais?: Prisma.NilaiListRelationFilter
+  attendance_sessions?: Prisma.AttendanceSessionListRelationFilter
 }, "id">
 
 export type TeachingClassOrderByWithAggregationInput = {
@@ -414,6 +417,7 @@ export type TeachingClassCreateInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateInput = {
@@ -434,6 +438,7 @@ export type TeachingClassUncheckedCreateInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUpdateInput = {
@@ -453,6 +458,7 @@ export type TeachingClassUpdateInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateInput = {
@@ -473,6 +479,7 @@ export type TeachingClassUncheckedUpdateInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassCreateManyInput = {
@@ -755,6 +762,22 @@ export type TeachingClassUpdateOneWithoutAssignmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TeachingClassUpdateToOneWithWhereWithoutAssignmentsInput, Prisma.TeachingClassUpdateWithoutAssignmentsInput>, Prisma.TeachingClassUncheckedUpdateWithoutAssignmentsInput>
 }
 
+export type TeachingClassCreateNestedOneWithoutAttendance_sessionsInput = {
+  create?: Prisma.XOR<Prisma.TeachingClassCreateWithoutAttendance_sessionsInput, Prisma.TeachingClassUncheckedCreateWithoutAttendance_sessionsInput>
+  connectOrCreate?: Prisma.TeachingClassCreateOrConnectWithoutAttendance_sessionsInput
+  connect?: Prisma.TeachingClassWhereUniqueInput
+}
+
+export type TeachingClassUpdateOneWithoutAttendance_sessionsNestedInput = {
+  create?: Prisma.XOR<Prisma.TeachingClassCreateWithoutAttendance_sessionsInput, Prisma.TeachingClassUncheckedCreateWithoutAttendance_sessionsInput>
+  connectOrCreate?: Prisma.TeachingClassCreateOrConnectWithoutAttendance_sessionsInput
+  upsert?: Prisma.TeachingClassUpsertWithoutAttendance_sessionsInput
+  disconnect?: Prisma.TeachingClassWhereInput | boolean
+  delete?: Prisma.TeachingClassWhereInput | boolean
+  connect?: Prisma.TeachingClassWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TeachingClassUpdateToOneWithWhereWithoutAttendance_sessionsInput, Prisma.TeachingClassUpdateWithoutAttendance_sessionsInput>, Prisma.TeachingClassUncheckedUpdateWithoutAttendance_sessionsInput>
+}
+
 export type TeachingClassCreateNestedOneWithoutSchedulesInput = {
   create?: Prisma.XOR<Prisma.TeachingClassCreateWithoutSchedulesInput, Prisma.TeachingClassUncheckedCreateWithoutSchedulesInput>
   connectOrCreate?: Prisma.TeachingClassCreateOrConnectWithoutSchedulesInput
@@ -845,6 +868,7 @@ export type TeachingClassCreateWithoutTeacherInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutTeacherInput = {
@@ -864,6 +888,7 @@ export type TeachingClassUncheckedCreateWithoutTeacherInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutTeacherInput = {
@@ -927,6 +952,7 @@ export type TeachingClassCreateWithoutClassroomInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutClassroomInput = {
@@ -946,6 +972,7 @@ export type TeachingClassUncheckedCreateWithoutClassroomInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutClassroomInput = {
@@ -990,6 +1017,7 @@ export type TeachingClassCreateWithoutSubjectInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutSubjectInput = {
@@ -1009,6 +1037,7 @@ export type TeachingClassUncheckedCreateWithoutSubjectInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutSubjectInput = {
@@ -1053,6 +1082,7 @@ export type TeachingClassCreateWithoutMaterialsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutMaterialsInput = {
@@ -1072,6 +1102,7 @@ export type TeachingClassUncheckedCreateWithoutMaterialsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutMaterialsInput = {
@@ -1106,6 +1137,7 @@ export type TeachingClassUpdateWithoutMaterialsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutMaterialsInput = {
@@ -1125,6 +1157,7 @@ export type TeachingClassUncheckedUpdateWithoutMaterialsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassCreateWithoutAssignmentsInput = {
@@ -1143,6 +1176,7 @@ export type TeachingClassCreateWithoutAssignmentsInput = {
   materials?: Prisma.MaterialCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutAssignmentsInput = {
@@ -1162,6 +1196,7 @@ export type TeachingClassUncheckedCreateWithoutAssignmentsInput = {
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutAssignmentsInput = {
@@ -1196,6 +1231,7 @@ export type TeachingClassUpdateWithoutAssignmentsInput = {
   materials?: Prisma.MaterialUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutAssignmentsInput = {
@@ -1213,6 +1249,101 @@ export type TeachingClassUncheckedUpdateWithoutAssignmentsInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutTeaching_classNestedInput
+  schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedUpdateManyWithoutTeaching_classNestedInput
+}
+
+export type TeachingClassCreateWithoutAttendance_sessionsInput = {
+  guru_nama?: string | null
+  mata_pelajaran?: string | null
+  kelas?: string | null
+  tahun_ajaran?: string | null
+  semester?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  classroom?: Prisma.ClassroomCreateNestedOneWithoutTeaching_classesInput
+  subject?: Prisma.SubjectCreateNestedOneWithoutTeaching_classesInput
+  teacher?: Prisma.TeacherCreateNestedOneWithoutTeaching_classesInput
+  tahun_akademik?: Prisma.TahunAkademikCreateNestedOneWithoutTeaching_classesInput
+  materials?: Prisma.MaterialCreateNestedManyWithoutTeaching_classInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
+  schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
+}
+
+export type TeachingClassUncheckedCreateWithoutAttendance_sessionsInput = {
+  id?: number
+  classroom_id?: number | null
+  subject_id?: number | null
+  teacher_id?: number | null
+  guru_nama?: string | null
+  mata_pelajaran?: string | null
+  kelas?: string | null
+  tahun_ajaran?: string | null
+  semester?: string | null
+  status?: string
+  tahun_akademik_id?: number | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTeaching_classInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
+  schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
+  nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
+}
+
+export type TeachingClassCreateOrConnectWithoutAttendance_sessionsInput = {
+  where: Prisma.TeachingClassWhereUniqueInput
+  create: Prisma.XOR<Prisma.TeachingClassCreateWithoutAttendance_sessionsInput, Prisma.TeachingClassUncheckedCreateWithoutAttendance_sessionsInput>
+}
+
+export type TeachingClassUpsertWithoutAttendance_sessionsInput = {
+  update: Prisma.XOR<Prisma.TeachingClassUpdateWithoutAttendance_sessionsInput, Prisma.TeachingClassUncheckedUpdateWithoutAttendance_sessionsInput>
+  create: Prisma.XOR<Prisma.TeachingClassCreateWithoutAttendance_sessionsInput, Prisma.TeachingClassUncheckedCreateWithoutAttendance_sessionsInput>
+  where?: Prisma.TeachingClassWhereInput
+}
+
+export type TeachingClassUpdateToOneWithWhereWithoutAttendance_sessionsInput = {
+  where?: Prisma.TeachingClassWhereInput
+  data: Prisma.XOR<Prisma.TeachingClassUpdateWithoutAttendance_sessionsInput, Prisma.TeachingClassUncheckedUpdateWithoutAttendance_sessionsInput>
+}
+
+export type TeachingClassUpdateWithoutAttendance_sessionsInput = {
+  guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroom?: Prisma.ClassroomUpdateOneWithoutTeaching_classesNestedInput
+  subject?: Prisma.SubjectUpdateOneWithoutTeaching_classesNestedInput
+  teacher?: Prisma.TeacherUpdateOneWithoutTeaching_classesNestedInput
+  tahun_akademik?: Prisma.TahunAkademikUpdateOneWithoutTeaching_classesNestedInput
+  materials?: Prisma.MaterialUpdateManyWithoutTeaching_classNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
+  schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
+  nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
+}
+
+export type TeachingClassUncheckedUpdateWithoutAttendance_sessionsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  classroom_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  subject_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  teacher_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  semester?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  materials?: Prisma.MaterialUncheckedUpdateManyWithoutTeaching_classNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
@@ -1233,6 +1364,7 @@ export type TeachingClassCreateWithoutSchedulesInput = {
   materials?: Prisma.MaterialCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutSchedulesInput = {
@@ -1252,6 +1384,7 @@ export type TeachingClassUncheckedCreateWithoutSchedulesInput = {
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutSchedulesInput = {
@@ -1286,6 +1419,7 @@ export type TeachingClassUpdateWithoutSchedulesInput = {
   materials?: Prisma.MaterialUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutSchedulesInput = {
@@ -1305,6 +1439,7 @@ export type TeachingClassUncheckedUpdateWithoutSchedulesInput = {
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassCreateWithoutTahun_akademikInput = {
@@ -1323,6 +1458,7 @@ export type TeachingClassCreateWithoutTahun_akademikInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutTahun_akademikInput = {
@@ -1342,6 +1478,7 @@ export type TeachingClassUncheckedCreateWithoutTahun_akademikInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutTahun_akademikInput = {
@@ -1386,6 +1523,7 @@ export type TeachingClassCreateWithoutNilaisInput = {
   materials?: Prisma.MaterialCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassUncheckedCreateWithoutNilaisInput = {
@@ -1405,6 +1543,7 @@ export type TeachingClassUncheckedCreateWithoutNilaisInput = {
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTeaching_classInput
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutTeaching_classInput
   schedules?: Prisma.ScheduleUncheckedCreateNestedManyWithoutTeaching_classInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedCreateNestedManyWithoutTeaching_classInput
 }
 
 export type TeachingClassCreateOrConnectWithoutNilaisInput = {
@@ -1439,6 +1578,7 @@ export type TeachingClassUpdateWithoutNilaisInput = {
   materials?: Prisma.MaterialUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutNilaisInput = {
@@ -1458,6 +1598,7 @@ export type TeachingClassUncheckedUpdateWithoutNilaisInput = {
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutTeaching_classNestedInput
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassCreateManyTeacherInput = {
@@ -1491,6 +1632,7 @@ export type TeachingClassUpdateWithoutTeacherInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutTeacherInput = {
@@ -1510,6 +1652,7 @@ export type TeachingClassUncheckedUpdateWithoutTeacherInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateManyWithoutTeacherInput = {
@@ -1558,6 +1701,7 @@ export type TeachingClassUpdateWithoutClassroomInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutClassroomInput = {
@@ -1577,6 +1721,7 @@ export type TeachingClassUncheckedUpdateWithoutClassroomInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateManyWithoutClassroomInput = {
@@ -1625,6 +1770,7 @@ export type TeachingClassUpdateWithoutSubjectInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutSubjectInput = {
@@ -1644,6 +1790,7 @@ export type TeachingClassUncheckedUpdateWithoutSubjectInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateManyWithoutSubjectInput = {
@@ -1692,6 +1839,7 @@ export type TeachingClassUpdateWithoutTahun_akademikInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateWithoutTahun_akademikInput = {
@@ -1711,6 +1859,7 @@ export type TeachingClassUncheckedUpdateWithoutTahun_akademikInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutTeaching_classNestedInput
   schedules?: Prisma.ScheduleUncheckedUpdateManyWithoutTeaching_classNestedInput
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutTeaching_classNestedInput
+  attendance_sessions?: Prisma.AttendanceSessionUncheckedUpdateManyWithoutTeaching_classNestedInput
 }
 
 export type TeachingClassUncheckedUpdateManyWithoutTahun_akademikInput = {
@@ -1738,6 +1887,7 @@ export type TeachingClassCountOutputType = {
   assignments: number
   schedules: number
   nilais: number
+  attendance_sessions: number
 }
 
 export type TeachingClassCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1745,6 +1895,7 @@ export type TeachingClassCountOutputTypeSelect<ExtArgs extends runtime.Types.Ext
   assignments?: boolean | TeachingClassCountOutputTypeCountAssignmentsArgs
   schedules?: boolean | TeachingClassCountOutputTypeCountSchedulesArgs
   nilais?: boolean | TeachingClassCountOutputTypeCountNilaisArgs
+  attendance_sessions?: boolean | TeachingClassCountOutputTypeCountAttendance_sessionsArgs
 }
 
 /**
@@ -1785,6 +1936,13 @@ export type TeachingClassCountOutputTypeCountNilaisArgs<ExtArgs extends runtime.
   where?: Prisma.NilaiWhereInput
 }
 
+/**
+ * TeachingClassCountOutputType without action
+ */
+export type TeachingClassCountOutputTypeCountAttendance_sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AttendanceSessionWhereInput
+}
+
 
 export type TeachingClassSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1808,6 +1966,7 @@ export type TeachingClassSelect<ExtArgs extends runtime.Types.Extensions.Interna
   assignments?: boolean | Prisma.TeachingClass$assignmentsArgs<ExtArgs>
   schedules?: boolean | Prisma.TeachingClass$schedulesArgs<ExtArgs>
   nilais?: boolean | Prisma.TeachingClass$nilaisArgs<ExtArgs>
+  attendance_sessions?: boolean | Prisma.TeachingClass$attendance_sessionsArgs<ExtArgs>
   _count?: boolean | Prisma.TeachingClassCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["teachingClass"]>
 
@@ -1877,6 +2036,7 @@ export type TeachingClassInclude<ExtArgs extends runtime.Types.Extensions.Intern
   assignments?: boolean | Prisma.TeachingClass$assignmentsArgs<ExtArgs>
   schedules?: boolean | Prisma.TeachingClass$schedulesArgs<ExtArgs>
   nilais?: boolean | Prisma.TeachingClass$nilaisArgs<ExtArgs>
+  attendance_sessions?: boolean | Prisma.TeachingClass$attendance_sessionsArgs<ExtArgs>
   _count?: boolean | Prisma.TeachingClassCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TeachingClassIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1903,6 +2063,7 @@ export type $TeachingClassPayload<ExtArgs extends runtime.Types.Extensions.Inter
     assignments: Prisma.$AssignmentPayload<ExtArgs>[]
     schedules: Prisma.$SchedulePayload<ExtArgs>[]
     nilais: Prisma.$NilaiPayload<ExtArgs>[]
+    attendance_sessions: Prisma.$AttendanceSessionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2320,6 +2481,7 @@ export interface Prisma__TeachingClassClient<T, Null = never, ExtArgs extends ru
   assignments<T extends Prisma.TeachingClass$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeachingClass$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   schedules<T extends Prisma.TeachingClass$schedulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeachingClass$schedulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SchedulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   nilais<T extends Prisma.TeachingClass$nilaisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeachingClass$nilaisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NilaiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  attendance_sessions<T extends Prisma.TeachingClass$attendance_sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TeachingClass$attendance_sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttendanceSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2932,6 +3094,30 @@ export type TeachingClass$nilaisArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.NilaiScalarFieldEnum | Prisma.NilaiScalarFieldEnum[]
+}
+
+/**
+ * TeachingClass.attendance_sessions
+ */
+export type TeachingClass$attendance_sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AttendanceSession
+   */
+  select?: Prisma.AttendanceSessionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AttendanceSession
+   */
+  omit?: Prisma.AttendanceSessionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AttendanceSessionInclude<ExtArgs> | null
+  where?: Prisma.AttendanceSessionWhereInput
+  orderBy?: Prisma.AttendanceSessionOrderByWithRelationInput | Prisma.AttendanceSessionOrderByWithRelationInput[]
+  cursor?: Prisma.AttendanceSessionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AttendanceSessionScalarFieldEnum | Prisma.AttendanceSessionScalarFieldEnum[]
 }
 
 /**

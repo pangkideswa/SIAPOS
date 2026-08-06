@@ -8,6 +8,15 @@ export type SubmissionWhere = Prisma.SubmissionWhereInput
 
 const SUBMISSION_INCLUDE = {
   student: { select: { nama_lengkap: true, kelas: true } },
+  assignment: {
+    select: {
+      id: true,
+      judul: true,
+      mata_pelajaran: true,
+      guru_nama: true,
+      tenggat_waktu: true,
+    },
+  },
 } as const
 
 export type SubmissionRow = Prisma.SubmissionGetPayload<{

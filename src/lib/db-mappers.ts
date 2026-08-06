@@ -1,5 +1,6 @@
 import type { User as DbUser } from "@/generated/prisma/client"
 import type { User, UserRole } from "@/types/auth"
+import type { NotifikasiTipe } from "@/features/notifications/types/notifikasi"
 
 export type DbRole = "SUPER_ADMIN" | "ADMIN" | "GURU" | "SISWA" | "WALI"
 
@@ -43,6 +44,7 @@ export function toUser(row: DbUser): User {
     name: row.name,
     email: row.email,
     role: mapRole(row.role),
+    status: row.status,
     provider: row.provider,
     providerId: row.providerId,
     image: row.image,
@@ -51,6 +53,8 @@ export function toUser(row: DbUser): User {
     nip: row.nip,
     nisn: row.nisn,
     avatar: row.avatar,
+    login_count: row.login_count,
+    last_login: row.last_login?.toISOString() ?? null,
     created_at: row.created_at.toISOString(),
     updated_at: row.updated_at.toISOString(),
   }
@@ -141,4 +145,41 @@ const DAY_LABELS: Record<string, string> = {
 
 export function toScheduleDay(day: string): string {
   return DAY_LABELS[day] ?? day
+}
+
+export type DbNotifikasiTipe =
+  | "MATERI"
+  | "TUGAS"
+  | "PENILAIAN"
+  | "PENGUMUMAN"
+  | "SISTEM"
+
+export function toNotifikasiTipe(tipe: string): NotifikasiTipe {
+  switch (tipe) {
+    case "MATERI":
+      return "materi"
+    case "TUGAS":
+      return "tugas"
+    case "PENILAIAN":
+      return "penilaian"
+    case "PENGUMUMAN":
+      return "pengumuman"
+    default:
+      return "sistem"
+  }
+}
+
+export function toNotifikasiTipeDb(tipe: NotifikasiTipe): DbNotifikasiTipe {
+  switch (tipe) {
+    case "materi":
+      return "MATERI"
+    case "tugas":
+      return "TUGAS"
+    case "penilaian":
+      return "PENILAIAN"
+    case "pengumuman":
+      return "PENGUMUMAN"
+    default:
+      return "SISTEM"
+  }
 }

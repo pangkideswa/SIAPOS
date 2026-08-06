@@ -20,7 +20,11 @@ import {
 import { JurusanFormDialog } from "./jurusan-form-dialog"
 import { JurusanDeleteDialog } from "./jurusan-delete-dialog"
 import { STATUS_LABELS, STATUS_COLORS, EMPTY_JURUSAN_FORM } from "@/features/jurusan/constants/jurusan.constants"
-import { DUMMY_JURUSANS } from "@/features/jurusan/dummy/jurusan.data"
+import {
+  useJurusan,
+  useUpdateJurusan,
+  useDeleteJurusan,
+} from "@/hooks/use-jurusan"
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -61,9 +65,36 @@ export function JurusanDetailPage({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const jurusan = DUMMY_JURUSANS.find(
-    (j) => j.id === Number(resolvedParams.id)
-  )
+  const {
+    data: jurusan,
+    isLoading: isDetailLoading,
+  } = useJurusan(Number(resolvedParams.id))
+  const updateJurusan = useUpdateJurusan()
+  const deleteJurusan = useDeleteJurusan()
+
+  if (isDetailLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title="Detail Jurusan"
+          action={
+            <Button
+              variant="outline"
+              onClick={() => router.push("/admin/jurusan")}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Kembali
+            </Button>
+          }
+        />
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <p className="text-muted-foreground">Memuat data jurusan...</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   if (!jurusan) {
     return (
@@ -99,18 +130,15 @@ export function JurusanDetailPage({
     if (!jurusan) return
     setIsLoading(true)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_JURUSANS.findIndex((j) => j.id === jurusan.id)
-      if (idx !== -1) {
-        DUMMY_JURUSANS[idx] = {
-          ...DUMMY_JURUSANS[idx],
+      await updateJurusan.mutateAsync({
+        id: jurusan.id,
+        data: {
           name: formData.name,
           code: formData.code,
           is_active: formData.is_active,
           description: formData.description || null,
-          updated_at: new Date().toISOString(),
-        }
-      }
+        },
+      })
       setFormDialogOpen(false)
     } finally {
       setIsLoading(false)
@@ -121,9 +149,7 @@ export function JurusanDetailPage({
     if (!jurusan) return
     setIsLoading(true)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_JURUSANS.findIndex((j) => j.id === jurusan.id)
-      if (idx !== -1) DUMMY_JURUSANS.splice(idx, 1)
+      await deleteJurusan.mutateAsync(jurusan.id)
       setDeleteDialogOpen(false)
       router.push("/admin/jurusan")
     } finally {

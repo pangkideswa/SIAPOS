@@ -20,6 +20,15 @@ export const Role = {
 export type Role = (typeof Role)[keyof typeof Role]
 
 
+export const AccountStatus = {
+  BELUM_AKTIF: 'BELUM_AKTIF',
+  AKTIF: 'AKTIF',
+  DIBLOKIR: 'DIBLOKIR'
+} as const
+
+export type AccountStatus = (typeof AccountStatus)[keyof typeof AccountStatus]
+
+
 export const MaterialStatus = {
   DRAFT: 'DRAFT',
   PUBLISH: 'PUBLISH'
@@ -66,6 +75,37 @@ export const ScheduleDay = {
 } as const
 
 export type ScheduleDay = (typeof ScheduleDay)[keyof typeof ScheduleDay]
+
+
+export const NotifikasiTipe = {
+  MATERI: 'MATERI',
+  TUGAS: 'TUGAS',
+  PENILAIAN: 'PENILAIAN',
+  PENGUMUMAN: 'PENGUMUMAN',
+  SISTEM: 'SISTEM'
+} as const
+
+export type NotifikasiTipe = (typeof NotifikasiTipe)[keyof typeof NotifikasiTipe]
+
+
+export const AttendanceStatus = {
+  HADIR: 'HADIR',
+  IZIN: 'IZIN',
+  SAKIT: 'SAKIT',
+  ALPHA: 'ALPHA',
+  TERLAMBAT: 'TERLAMBAT'
+} as const
+
+export type AttendanceStatus = (typeof AttendanceStatus)[keyof typeof AttendanceStatus]
+
+
+export const AttendanceSessionStatus = {
+  SELESAI: 'SELESAI',
+  BERLANGSUNG: 'BERLANGSUNG',
+  BELUM: 'BELUM'
+} as const
+
+export type AttendanceSessionStatus = (typeof AttendanceSessionStatus)[keyof typeof AttendanceSessionStatus]
 
 
 export const NilaiStatus = {

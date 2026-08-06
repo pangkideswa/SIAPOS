@@ -23,6 +23,12 @@ enum Role {
   WALI
 }
 
+enum AccountStatus {
+  BELUM_AKTIF
+  AKTIF
+  DIBLOKIR
+}
+
 enum MaterialStatus {
   DRAFT
   PUBLISH
@@ -56,33 +62,100 @@ enum ScheduleDay {
   MINGGU
 }
 
+enum NotifikasiTipe {
+  MATERI
+  TUGAS
+  PENILAIAN
+  PENGUMUMAN
+  SISTEM
+}
+
+enum AttendanceStatus {
+  HADIR
+  IZIN
+  SAKIT
+  ALPHA
+  TERLAMBAT
+}
+
+enum AttendanceSessionStatus {
+  SELESAI
+  BERLANGSUNG
+  BELUM
+}
+
 // ============================================================================
 // Identity
 // ============================================================================
 
 model User {
-  id            Int       @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   name          String
-  email         String    @unique
-  password      String
-  role          Role      @default(SISWA)
-  provider      String    @default("email")
+  email         String?       @unique
+  password      String?
+  role          Role          @default(SISWA)
+  status        AccountStatus @default(BELUM_AKTIF)
+  provider      String        @default("email")
   providerId    String?
   image         String?
   emailVerified DateTime?
-  username      String?   @unique
-  nip           String?   @unique
-  nisn          String?   @unique
+  username      String?       @unique
+  nip           String?       @unique
+  nisn          String?       @unique
   avatar        String?
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
+  login_count   Int           @default(0)
+  last_login    DateTime?
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
 
   teacher       Teacher?
   student       Student?
   announcements Announcement[]
+  accounts      Account[]
+  sessions      Session[]
 
   @@index([role])
   @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            Int
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
 model Teacher {
@@ -113,36 +186,38 @@ model Teacher {
 }
 
 model Student {
-  id           Int      @id @default(autoincrement())
-  user_id      Int?     @unique
-  user         User?    @relation(fields: [user_id], references: [id])
-  foto         String?
-  nis          String   @unique
-  nisn          String     @unique
-  nama_lengkap  String
-  jenis_kelamin String     @default("Laki-laki")
-  tempat_lahir  String?
-  tanggal_lahir DateTime?
-  agama         String?
-  alamat        String?
-  jurusan_id    Int?
-  kelas         String?
-  tahun_masuk   String?
-  tahun_ajaran  String?
-  status        String     @default("Aktif")
-  nama_ayah     String?
-  nama_ibu      String?
-  no_hp_ortu    String?
-  alamat_ortu   String?
-  classroom_id  Int?
-  classroom     Classroom? @relation(fields: [classroom_id], references: [id])
+  id                Int            @id @default(autoincrement())
+  user_id           Int?           @unique
+  user              User?          @relation(fields: [user_id], references: [id])
+  foto              String?
+  nis               String         @unique
+  nisn              String         @unique
+  nama_lengkap      String
+  jenis_kelamin     String         @default("Laki-laki")
+  tempat_lahir      String?
+  tanggal_lahir     DateTime?
+  agama             String?
+  alamat            String?
+  jurusan_id        Int?
+  jurusan           Jurusan?       @relation(fields: [jurusan_id], references: [id])
+  kelas             String?
+  tahun_masuk       String?
+  tahun_ajaran      String?
+  status            String         @default("Aktif")
+  nama_ayah         String?
+  nama_ibu          String?
+  no_hp_ortu        String?
+  alamat_ortu       String?
+  classroom_id      Int?
+  classroom         Classroom?     @relation(fields: [classroom_id], references: [id])
   tahun_akademik_id Int?
   tahun_akademik    TahunAkademik? @relation(fields: [tahun_akademik_id], references: [id])
-  created_at    DateTime   @default(now())
-  updated_at    DateTime   @updatedAt
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
 
-  submissions Submission[]
-  nilais       Nilai[]
+  submissions        Submission[]
+  nilais             Nilai[]
+  attendance_records Attendance[]
 
   @@index([classroom_id])
   @@index([tahun_akademik_id])
@@ -152,6 +227,20 @@ model Student {
 // ============================================================================
 // Academic master data
 // ============================================================================
+
+model Jurusan {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  name        String
+  description String?
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  students Student[]
+
+  @@map("jurusans")
+}
 
 model Classroom {
   id                  Int      @id @default(autoincrement())
@@ -184,28 +273,29 @@ model Subject {
 }
 
 model TeachingClass {
-  id             Int        @id @default(autoincrement())
-  classroom_id   Int?
-  classroom      Classroom? @relation(fields: [classroom_id], references: [id])
-  subject_id     Int?
-  subject        Subject?   @relation(fields: [subject_id], references: [id])
-  teacher_id     Int?
-  teacher        Teacher?   @relation(fields: [teacher_id], references: [id])
-  guru_nama      String?
-  mata_pelajaran String?
-  kelas          String?
-  tahun_ajaran   String?
-  semester       String?
-  status         String     @default("Aktif")
+  id                Int            @id @default(autoincrement())
+  classroom_id      Int?
+  classroom         Classroom?     @relation(fields: [classroom_id], references: [id])
+  subject_id        Int?
+  subject           Subject?       @relation(fields: [subject_id], references: [id])
+  teacher_id        Int?
+  teacher           Teacher?       @relation(fields: [teacher_id], references: [id])
+  guru_nama         String?
+  mata_pelajaran    String?
+  kelas             String?
+  tahun_ajaran      String?
+  semester          String?
+  status            String         @default("Aktif")
   tahun_akademik_id Int?
   tahun_akademik    TahunAkademik? @relation(fields: [tahun_akademik_id], references: [id])
-  created_at     DateTime   @default(now())
-  updated_at     DateTime   @updatedAt
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
 
-  materials   Material[]
-  assignments Assignment[]
-  schedules   Schedule[]
-  nilais      Nilai[]
+  materials           Material[]
+  assignments         Assignment[]
+  schedules           Schedule[]
+  nilais              Nilai[]
+  attendance_sessions AttendanceSession[]
 
   @@index([classroom_id])
   @@index([subject_id])
@@ -288,6 +378,49 @@ model Submission {
 }
 
 // ============================================================================
+// Attendance
+// ============================================================================
+
+model AttendanceSession {
+  id                Int                     @id @default(autoincrement())
+  teaching_class_id Int?
+  teaching_class    TeachingClass?          @relation(fields: [teaching_class_id], references: [id], onDelete: SetNull)
+  tanggal           DateTime
+  jam_mulai         String?
+  jam_selesai       String?
+  mata_pelajaran    String?
+  guru_nama         String?
+  kelas             String?
+  tahun_ajaran      String?
+  semester          String?
+  status            AttendanceSessionStatus @default(BELUM)
+  created_at        DateTime                @default(now())
+  updated_at        DateTime                @updatedAt
+
+  records Attendance[]
+
+  @@index([teaching_class_id])
+  @@index([tanggal])
+  @@map("attendance_sessions")
+}
+
+model Attendance {
+  id         Int               @id @default(autoincrement())
+  session_id Int
+  session    AttendanceSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  student_id Int
+  student    Student           @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  status     AttendanceStatus  @default(HADIR)
+  keterangan String?
+  created_at DateTime          @default(now())
+  updated_at DateTime          @updatedAt
+
+  @@unique([session_id, student_id])
+  @@index([student_id])
+  @@map("attendance_records")
+}
+
+// ============================================================================
 // Communication & scheduling
 // ============================================================================
 
@@ -349,14 +482,14 @@ enum NilaiStatus {
 }
 
 model TahunAkademik {
-  id              Int      @id @default(autoincrement())
-  nama            String   @unique
+  id              Int       @id @default(autoincrement())
+  nama            String    @unique
   tanggal_mulai   DateTime?
   tanggal_selesai DateTime?
-  is_active       Boolean  @default(false)
+  is_active       Boolean   @default(false)
   keterangan      String?
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
 
   students         Student[]
   teaching_classes TeachingClass[]
@@ -391,4 +524,21 @@ model Nilai {
   @@index([teaching_class_id])
   @@index([tahun_akademik_id])
   @@map("nilai")
+}
+
+// ============================================================================
+// Notifications
+// ============================================================================
+
+model Notifikasi {
+  id          Int            @id @default(autoincrement())
+  tipe        NotifikasiTipe
+  judul       String
+  pesan       String
+  href        String?
+  targetRoles String[]       @default([])
+  is_read     Boolean        @default(false)
+  created_at  DateTime       @default(now())
+
+  @@map("notifikasis")
 }

@@ -86,12 +86,16 @@ export function GuruDashboardPage() {
   const { user } = useAuth()
   const router = useRouter()
   const guruName = user?.name ?? GURU_NAME
+  const todayHari = new Date().toLocaleDateString("id-ID", { weekday: "long" })
 
   const { data: kelasMengajarData } = useTeachingClasses()
   const { data: materiData } = useMaterials()
   const { data: tugasData } = useAssignments()
   const { data: pengumpulanData } = useSubmissions()
-  const { data: schedules } = useSchedules()
+  const { data: schedules } = useSchedules({
+    guru_nama: guruName,
+    hari: todayHari,
+  })
   const { data: announcementsData } = useAnnouncements()
 
   const kelasMengajar = (kelasMengajarData ?? []).filter(
@@ -147,7 +151,6 @@ export function GuruDashboardPage() {
     },
   ]
 
-  const todayHari = new Date().toLocaleDateString("id-ID", { weekday: "long" })
   const jadwalHariIni = (schedules ?? [])
     .filter((j) => j.guru_nama === guruName && j.hari === todayHari)
     .map((j) => ({

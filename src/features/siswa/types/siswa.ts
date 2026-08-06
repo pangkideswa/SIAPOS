@@ -1,5 +1,6 @@
 export interface Siswa {
   id: number
+  user_id?: number | null
   foto: string | null
   nis: string
   nisn: string
@@ -23,4 +24,4 @@ export interface Siswa {
   updated_at: string
 }
 
-export type SiswaFormData = Omit<Siswa, "id" | "created_at" | "updated_at" | "jurusan_nama">
+export type SiswaFormData = Omit<Siswa, "id" | "user_id" | "created_at" | "updated_at" | "jurusan_nama">

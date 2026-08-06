@@ -41,6 +41,10 @@ export const teachingClassRepository = {
     return prisma.teachingClass.findMany(args)
   },
 
+  async count(where: TeachingClassWhere): Promise<number> {
+    return prisma.teachingClass.count({ where })
+  },
+
   async findWithRelations(
     args: TeachingClassFindManyArgs = {}
   ): Promise<TeachingClass[]> {

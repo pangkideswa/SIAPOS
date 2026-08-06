@@ -54,3 +54,49 @@ export const registerSchema = z
     path: ["password_confirmation"],
   })
 export type RegisterInput = z.infer<typeof registerSchema>
+
+export const updateProfileSchema = z.object({
+  name: z
+    .string({ required_error: "Nama lengkap wajib diisi" })
+    .min(2, "Nama lengkap minimal 2 karakter")
+    .max(255, "Nama lengkap maksimal 255 karakter"),
+  email: z
+    .string({ required_error: "Email wajib diisi" })
+    .email("Format email tidak valid")
+    .max(255, "Email maksimal 255 karakter"),
+  nip: z
+    .string()
+    .min(3, "NIP minimal 3 karakter")
+    .max(18, "NIP maksimal 18 karakter")
+    .nullable()
+    .optional(),
+  nisn: z
+    .string()
+    .min(10, "NISN harus 10 digit angka")
+    .max(10, "NISN harus 10 digit angka")
+    .regex(/^\d{10}$/, "NISN harus 10 digit angka")
+    .nullable()
+    .optional(),
+})
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>
+
+export const changePasswordSchema = z
+  .object({
+    old_password: z
+      .string({ required_error: "Password lama wajib diisi" })
+      .min(1, "Password lama wajib diisi"),
+    new_password: z
+      .string({ required_error: "Password baru wajib diisi" })
+      .min(6, "Password baru minimal 6 karakter")
+      .max(100, "Password baru maksimal 100 karakter"),
+    new_password_confirmation: z
+      .string({ required_error: "Konfirmasi password baru wajib diisi" }),
+  })
+  .refine(
+    (data) => data.new_password === data.new_password_confirmation,
+    {
+      message: "Konfirmasi password baru tidak sesuai",
+      path: ["new_password_confirmation"],
+    }
+  )
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>

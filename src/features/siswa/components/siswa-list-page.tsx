@@ -32,25 +32,17 @@ import {
   KELAS_OPTIONS,
 } from "@/features/siswa/constants/siswa.constants"
 import {
-  useStudents,
+  useStudentsPaginated,
   useCreateStudent,
   useUpdateStudent,
   useRemoveStudent,
 } from "@/hooks/use-students"
+import { studentService } from "@/lib/services/student.service"
 import type { Siswa, SiswaFormData } from "@/features/siswa/types/siswa"
 
 export function SiswaListPage() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const {
-    data: allSiswa = [],
-    isLoading: isTableLoading,
-    isError,
-    refetch,
-  } = useStudents()
-  const createSiswa = useCreateStudent()
-  const updateSiswa = useUpdateStudent()
-  const removeSiswa = useRemoveStudent()
   const [search, setSearch] = useState("")
   const [jurusanFilter, setJurusanFilter] = useState<string>("all")
   const [kelasFilter, setKelasFilter] = useState<string>("all")
@@ -62,31 +54,26 @@ export function SiswaListPage() {
   const [deletingSiswa, setDeletingSiswa] = useState<Siswa | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const perPage = 10
-
-  const filteredSiswa = allSiswa.filter((s) => {
-    if (jurusanFilter !== "all" && s.jurusan_id !== Number(jurusanFilter))
-      return false
-    if (kelasFilter !== "all" && s.kelas !== kelasFilter) return false
-    if (statusFilter !== "all" && s.status !== statusFilter) return false
-    if (search) {
-      const q = search.toLowerCase()
-      return (
-        s.nama_lengkap.toLowerCase().includes(q) ||
-        s.nis.includes(q) ||
-        s.nisn.includes(q) ||
-        s.kelas.toLowerCase().includes(q) ||
-        (s.jurusan_nama?.toLowerCase().includes(q) ?? false)
-      )
-    }
-    return true
+  const {
+    data,
+    isLoading: isTableLoading,
+    isError,
+    refetch,
+  } = useStudentsPaginated({
+    search: search || undefined,
+    jurusan_id:
+      jurusanFilter === "all" ? undefined : Number(jurusanFilter),
+    kelas: kelasFilter === "all" ? undefined : kelasFilter,
+    status: statusFilter === "all" ? undefined : statusFilter,
+    page,
+    per_page: 10,
   })
+  const createSiswa = useCreateStudent()
+  const updateSiswa = useUpdateStudent()
+  const removeSiswa = useRemoveStudent()
 
-  const totalPages = Math.ceil(filteredSiswa.length / perPage)
-  const paginatedSiswa = filteredSiswa.slice(
-    (page - 1) * perPage,
-    page * perPage
-  )
+  const allSiswa = data?.data ?? []
+  const meta = data?.meta
 
   const columns: Column<Record<string, unknown>>[] = [
     {
@@ -212,8 +199,16 @@ export function SiswaListPage() {
     }
   }
 
-  function handleExport() {
-    // TODO: Replace with actual export logic
+  async function handleExport() {
+    const result = await studentService.getAllPaginated({
+      search: search || undefined,
+      jurusan_id:
+        jurusanFilter === "all" ? undefined : Number(jurusanFilter),
+      kelas: kelasFilter === "all" ? undefined : kelasFilter,
+      status: statusFilter === "all" ? undefined : statusFilter,
+      page: 1,
+      per_page: 10000,
+    })
     const headers = [
       "NIS",
       "NISN",
@@ -223,7 +218,7 @@ export function SiswaListPage() {
       "Jurusan",
       "Status",
     ]
-    const rows = filteredSiswa.map((s) => [
+    const rows = result.data.map((s) => [
       s.nis,
       s.nisn,
       s.nama_lengkap,
@@ -410,7 +405,7 @@ export function SiswaListPage() {
 
       <DataTable
         columns={columns}
-        data={paginatedSiswa as unknown as Record<string, unknown>[]}
+        data={allSiswa as unknown as Record<string, unknown>[]}
         loading={isTableLoading}
         emptyMessage={
           isError ? "Gagal memuat data siswa" : "Tidak ada siswa ditemukan"
@@ -427,10 +422,10 @@ export function SiswaListPage() {
         </div>
       )}
 
-      {totalPages > 1 && (
+      {meta && meta.last_page > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Halaman {page} dari {totalPages} ({filteredSiswa.length} data)
+            Halaman {meta.current_page} dari {meta.last_page} ({meta.total} data)
           </p>
           <div className="flex gap-2">
             <Button
@@ -444,7 +439,7 @@ export function SiswaListPage() {
             <Button
               variant="outline"
               size="sm"
-              disabled={page >= totalPages}
+              disabled={page >= meta.last_page}
               onClick={() => setPage(page + 1)}
             >
               Selanjutnya

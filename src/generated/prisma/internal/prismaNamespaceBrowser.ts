@@ -52,18 +52,25 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  Account: 'Account',
+  Session: 'Session',
+  VerificationToken: 'VerificationToken',
   Teacher: 'Teacher',
   Student: 'Student',
+  Jurusan: 'Jurusan',
   Classroom: 'Classroom',
   Subject: 'Subject',
   TeachingClass: 'TeachingClass',
   Material: 'Material',
   Assignment: 'Assignment',
   Submission: 'Submission',
+  AttendanceSession: 'AttendanceSession',
+  Attendance: 'Attendance',
   Announcement: 'Announcement',
   Schedule: 'Schedule',
   TahunAkademik: 'TahunAkademik',
-  Nilai: 'Nilai'
+  Nilai: 'Nilai',
+  Notifikasi: 'Notifikasi'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -88,6 +95,7 @@ export const UserScalarFieldEnum = {
   email: 'email',
   password: 'password',
   role: 'role',
+  status: 'status',
   provider: 'provider',
   providerId: 'providerId',
   image: 'image',
@@ -96,11 +104,50 @@ export const UserScalarFieldEnum = {
   nip: 'nip',
   nisn: 'nisn',
   avatar: 'avatar',
+  login_count: 'login_count',
+  last_login: 'last_login',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const AccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  provider: 'provider',
+  providerAccountId: 'providerAccountId',
+  refresh_token: 'refresh_token',
+  access_token: 'access_token',
+  expires_at: 'expires_at',
+  token_type: 'token_type',
+  scope: 'scope',
+  id_token: 'id_token',
+  session_state: 'session_state'
+} as const
+
+export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
+
+
+export const SessionScalarFieldEnum = {
+  id: 'id',
+  sessionToken: 'sessionToken',
+  userId: 'userId',
+  expires: 'expires'
+} as const
+
+export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
+
+
+export const VerificationTokenScalarFieldEnum = {
+  identifier: 'identifier',
+  token: 'token',
+  expires: 'expires'
+} as const
+
+export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
 
 
 export const TeacherScalarFieldEnum = {
@@ -154,6 +201,19 @@ export const StudentScalarFieldEnum = {
 } as const
 
 export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
+
+
+export const JurusanScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  description: 'description',
+  is_active: 'is_active',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type JurusanScalarFieldEnum = (typeof JurusanScalarFieldEnum)[keyof typeof JurusanScalarFieldEnum]
 
 
 export const ClassroomScalarFieldEnum = {
@@ -262,6 +322,38 @@ export const SubmissionScalarFieldEnum = {
 export type SubmissionScalarFieldEnum = (typeof SubmissionScalarFieldEnum)[keyof typeof SubmissionScalarFieldEnum]
 
 
+export const AttendanceSessionScalarFieldEnum = {
+  id: 'id',
+  teaching_class_id: 'teaching_class_id',
+  tanggal: 'tanggal',
+  jam_mulai: 'jam_mulai',
+  jam_selesai: 'jam_selesai',
+  mata_pelajaran: 'mata_pelajaran',
+  guru_nama: 'guru_nama',
+  kelas: 'kelas',
+  tahun_ajaran: 'tahun_ajaran',
+  semester: 'semester',
+  status: 'status',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type AttendanceSessionScalarFieldEnum = (typeof AttendanceSessionScalarFieldEnum)[keyof typeof AttendanceSessionScalarFieldEnum]
+
+
+export const AttendanceScalarFieldEnum = {
+  id: 'id',
+  session_id: 'session_id',
+  student_id: 'student_id',
+  status: 'status',
+  keterangan: 'keterangan',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type AttendanceScalarFieldEnum = (typeof AttendanceScalarFieldEnum)[keyof typeof AttendanceScalarFieldEnum]
+
+
 export const AnnouncementScalarFieldEnum = {
   id: 'id',
   judul: 'judul',
@@ -337,6 +429,20 @@ export const NilaiScalarFieldEnum = {
 } as const
 
 export type NilaiScalarFieldEnum = (typeof NilaiScalarFieldEnum)[keyof typeof NilaiScalarFieldEnum]
+
+
+export const NotifikasiScalarFieldEnum = {
+  id: 'id',
+  tipe: 'tipe',
+  judul: 'judul',
+  pesan: 'pesan',
+  href: 'href',
+  targetRoles: 'targetRoles',
+  is_read: 'is_read',
+  created_at: 'created_at'
+} as const
+
+export type NotifikasiScalarFieldEnum = (typeof NotifikasiScalarFieldEnum)[keyof typeof NotifikasiScalarFieldEnum]
 
 
 export const SortOrder = {

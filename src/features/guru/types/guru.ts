@@ -1,5 +1,6 @@
 export interface Guru {
   id: number
+  user_id?: number | null
   foto: string | null
   nama_lengkap: string
   nip: string
@@ -17,4 +18,4 @@ export interface Guru {
   updated_at: string
 }
 
-export type GuruFormData = Omit<Guru, "id" | "created_at" | "updated_at">
+export type GuruFormData = Omit<Guru, "id" | "user_id" | "created_at" | "updated_at">

@@ -1,27 +1,15 @@
 import "server-only"
-import { NextRequest } from "next/server"
 import { authService } from "@/services/auth.service"
-import { ok, apiError, unauthorized, getCurrentUserId } from "@/lib/api-utils"
-import { auth } from "@/lib/auth"
+import { ok, apiError, unauthorized } from "@/lib/api-utils"
+import { getCurrentUser } from "@/auth/session"
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const userId = await getCurrentUserId(request)
-
-    if (userId) {
-      const user = await authService.getUserById(userId)
-      if (!user) return unauthorized()
-      return ok(user)
-    }
-
-    const session = await auth()
-    const sessionUserId = session?.user?.id
-    if (sessionUserId) {
-      const user = await authService.getUserById(Number(sessionUserId))
-      if (user) return ok(user)
-    }
-
-    return unauthorized()
+    const current = await getCurrentUser()
+    if (!current) return unauthorized()
+    const user = await authService.getUserById(current.id)
+    if (!user) return unauthorized()
+    return ok(user)
   } catch (error) {
     return apiError(error)
   }

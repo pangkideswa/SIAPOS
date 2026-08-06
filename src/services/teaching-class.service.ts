@@ -1,12 +1,21 @@
 import "server-only"
 import { teachingClassRepository, teachingClassAssignmentRepository } from "@/repositories/teaching-class.repository"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
-import type { TeacherSubject, User, Subject, SchoolClass } from "@/types"
+import type { TeacherSubject, User, Subject, SchoolClass, PaginatedResponse } from "@/types"
 
 export interface TeacherSubjectCreateInput {
   teacher_id: number
   subject_id: number
   class_id: number
+}
+
+export interface KelasMengajarFilters {
+  search?: string
+  guru?: string
+  kelas?: string
+  tahun_ajaran?: string
+  page?: number
+  per_page?: number
 }
 
 function toUserReference(row: {
@@ -20,7 +29,10 @@ function toUserReference(row: {
     name: row.nama_lengkap,
     email: row.email,
     role: "guru",
+    status: "AKTIF",
     nip: row.nip,
+    login_count: 0,
+    last_login: null,
     created_at: "",
     updated_at: "",
   }
@@ -114,6 +126,9 @@ function toKelasMengajar(row: {
 }): KelasMengajar {
   return {
     id: row.id,
+    classroom_id: row.classroom_id,
+    subject_id: row.subject_id,
+    teacher_id: row.teacher_id,
     guru_nama: row.guru_nama ?? "",
     mata_pelajaran: row.mata_pelajaran ?? "",
     kelas: row.kelas ?? "",
@@ -129,6 +144,49 @@ export const teachingClassService = {
   async getAll(): Promise<KelasMengajar[]> {
     const rows = await teachingClassRepository.findAll()
     return rows.map(toKelasMengajar)
+  },
+
+  async getAllPaginated(
+    filters: KelasMengajarFilters = {}
+  ): Promise<PaginatedResponse<KelasMengajar>> {
+    const { search, guru, kelas, tahun_ajaran } = filters
+    const page = Math.max(1, filters.page ?? 1)
+    const perPage = Math.min(100, Math.max(1, filters.per_page ?? 10))
+
+    const where = {
+      ...(search
+        ? {
+            OR: [
+              { guru_nama: { contains: search } },
+              { mata_pelajaran: { contains: search } },
+              { kelas: { contains: search } },
+            ],
+          }
+        : {}),
+      ...(guru && guru !== "all" ? { guru_nama: guru } : {}),
+      ...(kelas && kelas !== "all" ? { kelas } : {}),
+      ...(tahun_ajaran && tahun_ajaran !== "all" ? { tahun_ajaran } : {}),
+    }
+
+    const [total, rows] = await Promise.all([
+      teachingClassRepository.count(where),
+      teachingClassRepository.findMany({
+        where,
+        orderBy: { created_at: "desc" },
+        skip: (page - 1) * perPage,
+        take: perPage,
+      }),
+    ])
+
+    return {
+      data: rows.map(toKelasMengajar),
+      meta: {
+        current_page: page,
+        last_page: Math.max(1, Math.ceil(total / perPage)),
+        per_page: perPage,
+        total,
+      },
+    }
   },
 
   async getById(id: number): Promise<KelasMengajar | null> {

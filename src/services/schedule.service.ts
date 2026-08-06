@@ -1,5 +1,5 @@
 import "server-only"
-import { type Schedule } from "@/generated/prisma/client"
+import { type Prisma, type Schedule } from "@/generated/prisma/client"
 import { scheduleRepository } from "@/repositories/schedule.repository"
 import { toScheduleDay } from "@/lib/db-mappers"
 import type { JadwalPelajaran } from "@/features/jadwal-pelajaran/types/jadwal-pelajaran"
@@ -8,6 +8,12 @@ export type ScheduleCreateInput = Omit<
   JadwalPelajaran,
   "id" | "created_at" | "updated_at"
 >
+
+export interface ScheduleFilters {
+  guru_nama?: string
+  kelas?: string
+  hari?: string
+}
 
 const DAY_DB: Record<string, string> = {
   Senin: "SENIN",
@@ -54,8 +60,15 @@ function toJadwalCreate(data: ScheduleCreateInput) {
 }
 
 export const scheduleService = {
-  async getAll(): Promise<JadwalPelajaran[]> {
-    const rows = await scheduleRepository.findAll()
+  async getAll(filters: ScheduleFilters = {}): Promise<JadwalPelajaran[]> {
+    const where: Prisma.ScheduleWhereInput = {
+      ...(filters.guru_nama ? { guru_nama: filters.guru_nama } : {}),
+      ...(filters.kelas ? { kelas: filters.kelas } : {}),
+      ...(filters.hari
+        ? { hari: (DAY_DB[filters.hari] ?? filters.hari.toUpperCase()) as never }
+        : {}),
+    }
+    const rows = await scheduleRepository.findMany(where)
     return rows.map(toJadwal)
   },
 

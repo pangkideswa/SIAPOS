@@ -1,19 +1,19 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Save, CheckCircle } from "lucide-react"
+import { ArrowLeft, Save, CheckCircle, Loader2 } from "lucide-react"
 import {
   STATUS_KEHADIRAN_OPTIONS,
 } from "@/features/absensi/constants/absensi.constants"
 import {
-  DUMMY_SESI_ABSENSI,
-  DUMMY_ABSENSI_SISWA,
-} from "@/features/absensi/dummy/absensi.data"
+  useAttendanceDetail,
+  useSaveAttendanceRecords,
+} from "@/hooks/use-attendance"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import type { StatusKehadiran } from "@/features/absensi/types/absensi"
@@ -42,21 +42,31 @@ export function GuruAbsensiInputPage() {
   const params = useParams()
   const sesiId = Number(params.id)
 
-  const sesi = DUMMY_SESI_ABSENSI.find((s) => s.id === sesiId)
-  const absensiRecords = useMemo(
-    () => DUMMY_ABSENSI_SISWA.filter((a) => a.sesi_id === sesiId),
-    [sesiId]
-  )
+  const {
+    data: detail,
+    isLoading,
+    isError,
+  } = useAttendanceDetail(sesiId)
+
+  const sesi = detail
+  const absensiRecords = detail?.records ?? []
 
   const [attendance, setAttendance] = useState<Map<number, StatusKehadiran>>(
-    () => {
+    new Map()
+  )
+  const [loadedId, setLoadedId] = useState<number | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+
+  useEffect(() => {
+    if (detail && detail.id !== loadedId) {
       const map = new Map<number, StatusKehadiran>()
-      for (const rec of absensiRecords) {
+      for (const rec of detail.records) {
         map.set(rec.siswa_id, rec.status)
       }
-      return map
+      setAttendance(map)
+      setLoadedId(detail.id)
     }
-  )
+  }, [detail, loadedId])
 
   const updateStatus = (siswaId: number, status: StatusKehadiran) => {
     setAttendance((prev) => {
@@ -69,15 +79,47 @@ export function GuruAbsensiInputPage() {
   const markAllHadir = () => {
     setAttendance((prev) => {
       const next = new Map(prev)
-      for (const [key] of prev) {
-        next.set(key, "Hadir")
+      for (const rec of absensiRecords) {
+        next.set(rec.siswa_id, "Hadir")
       }
       return next
     })
   }
 
-  const handleSave = () => {
-    toast.success("Absensi berhasil disimpan!")
+  const saveMutation = useSaveAttendanceRecords(sesiId)
+
+  const handleSave = async () => {
+    const records = absensiRecords.map((rec) => ({
+      student_id: rec.siswa_id,
+      status: attendance.get(rec.siswa_id) ?? "Hadir",
+      keterangan: rec.keterangan || null,
+    }))
+    if (records.length === 0) {
+      toast.error("Tidak ada data siswa untuk disimpan")
+      return
+    }
+    setIsSaving(true)
+    try {
+      await saveMutation.mutateAsync(records)
+      router.push("/guru/absensi")
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Input Absensi" />
+        <Card>
+          <CardContent>
+            <p className="text-center text-muted-foreground py-8">
+              Memuat data sesi absensi...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   if (!sesi) {
@@ -87,8 +129,16 @@ export function GuruAbsensiInputPage() {
         <Card>
           <CardContent>
             <p className="text-center text-muted-foreground py-8">
-              Sesi absensi tidak ditemukan.
+              {isError
+                ? "Gagal memuat data sesi absensi."
+                : "Sesi absensi tidak ditemukan."}
             </p>
+            <div className="flex justify-center pb-4">
+              <Button variant="outline" onClick={() => router.back()}>
+                <ArrowLeft className="h-4 w-4 mr-1.5" />
+                Kembali
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -109,8 +159,12 @@ export function GuruAbsensiInputPage() {
           title="Input Absensi"
           description={`${sesi.mata_pelajaran} - ${sesi.kelas}`}
           action={
-            <Button onClick={handleSave}>
-              <Save className="h-4 w-4 mr-1.5" />
+            <Button onClick={handleSave} disabled={isSaving}>
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4 mr-1.5" />
+              )}
               Simpan Absensi
             </Button>
           }
@@ -240,8 +294,12 @@ export function GuruAbsensiInputPage() {
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={handleSave} size="lg">
-          <Save className="h-4 w-4 mr-1.5" />
+        <Button onClick={handleSave} size="lg" disabled={isSaving}>
+          {isSaving ? (
+            <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+          ) : (
+            <Save className="h-4 w-4 mr-1.5" />
+          )}
           Simpan Absensi
         </Button>
       </div>

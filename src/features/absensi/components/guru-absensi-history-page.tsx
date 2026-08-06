@@ -15,10 +15,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Search, Eye } from "lucide-react"
-import { DUMMY_SESI_ABSENSI } from "@/features/absensi/dummy/absensi.data"
+import { useAuth } from "@/contexts/auth-context"
+import { useAttendanceList } from "@/hooks/use-attendance"
 import { STATUS_SESI_COLORS } from "@/features/absensi/constants/absensi.constants"
 
-const GURU_NAME = "Asep Nugraha"
 const PER_PAGE = 10
 
 type SesiRow = Record<string, unknown> & {
@@ -45,15 +45,21 @@ function formatDateID(dateStr: string): string {
 
 export function GuruAbsensiHistoryPage() {
   const router = useRouter()
+  const { user } = useAuth()
+  const guruName = user?.name ?? ""
 
   const [search, setSearch] = useState("")
   const [kelasFilter, setKelasFilter] = useState("all")
   const [page, setPage] = useState(1)
 
-  const guruSesi = useMemo(
-    () => DUMMY_SESI_ABSENSI.filter((s) => s.guru_nama === GURU_NAME),
-    []
-  )
+  const {
+    data: sesiList = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useAttendanceList({ guru: guruName })
+
+  const guruSesi = useMemo(() => (guruName ? sesiList : []), [guruName, sesiList])
 
   const filteredData = useMemo(() => {
     let data = [...guruSesi]
@@ -212,9 +218,22 @@ export function GuruAbsensiHistoryPage() {
         <DataTable<SesiRow>
           columns={columns}
           data={paginatedData as unknown as SesiRow[]}
+          loading={isLoading}
           onRowClick={(item) => router.push(`/guru/absensi/${item.id}`)}
-          emptyMessage="Tidak ada riwayat absensi"
+          emptyMessage={
+            isError
+              ? "Gagal memuat riwayat absensi"
+              : "Tidak ada riwayat absensi"
+          }
         />
+        {isError && (
+          <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive mt-4">
+            Terjadi kesalahan saat memuat riwayat absensi.{" "}
+            <button onClick={() => refetch()} className="underline font-medium">
+              Muat ulang
+            </button>
+          </div>
+        )}
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4">
             <p className="text-sm text-muted-foreground">

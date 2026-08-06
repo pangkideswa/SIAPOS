@@ -58,6 +58,8 @@ function toNilaiAkademik(row: NonNullable<Awaited<ReturnType<typeof nilaiReposit
     | undefined
   return {
     id: row.id,
+    siswa_id: row.student_id,
+    kelas_mengajar_id: row.teaching_class_id,
     siswa_nama: student?.nama_lengkap ?? "",
     siswa_kelas: student?.kelas ?? "",
     mata_pelajaran: tc?.mata_pelajaran ?? "",

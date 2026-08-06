@@ -14,7 +14,10 @@ import type { Tugas } from "@/features/tugas/types/tugas"
 import type { PengumpulanTugas } from "@/features/pengumpulan/types/pengumpulan"
 import type { Pengumuman } from "@/features/pengumuman/types/pengumuman"
 import type { Siswa } from "@/features/siswa/types/siswa"
+import type { Guru } from "@/features/guru/types/guru"
+import type { User } from "@/types/auth"
 import type { KelasAktivitas } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { useTeachers } from "@/hooks/use-teachers"
 
 export interface JadwalKelas {
   id: number
@@ -33,6 +36,7 @@ export function useClassroom() {
   const { data: submissions = [] } = useSubmissions()
   const { data: announcements = [] } = useAnnouncements()
   const { data: students = [] } = useStudents()
+  const { data: teachers = [] } = useTeachers()
   const { data: schedules = [] } = useSchedules()
 
   const jadwalList = useMemo<JadwalKelas[]>(
@@ -102,10 +106,36 @@ export function useClassroom() {
             s.status === "Aktif"
         )
 
+      const getSiswaByUser = (user?: User | null): Siswa | undefined => {
+        if (!user) return undefined
+        return students.find((s) => s.user_id === user.id && s.status === "Aktif")
+          ?? students.find((s) => user.nisn && s.nisn === user.nisn && s.status === "Aktif")
+          ?? getSiswaByNama(user.name)
+      }
+
+      const getGuruByUser = (user?: User | null): Guru | undefined => {
+        if (!user) return undefined
+        return teachers.find((g) => g.user_id === user.id)
+          ?? teachers.find((g) => user.nip && g.nip === user.nip)
+          ?? teachers.find(
+            (g) => g.nama_lengkap.toLowerCase() === user.name.toLowerCase()
+          )
+      }
+
       const getKelasSayaByGuru = (guruNama: string): KelasMengajar[] =>
         teachingClasses.filter(
           (km) => km.guru_nama === guruNama && km.status === "Aktif"
         )
+
+      const getKelasSayaByUser = (user?: User | null): KelasMengajar[] => {
+        const guru = getGuruByUser(user)
+        if (!guru) return []
+        return teachingClasses.filter(
+          (km) =>
+            km.status === "Aktif" &&
+            (km.teacher_id === guru.id || km.guru_nama === guru.nama_lengkap)
+        )
+      }
 
       const getKelasMengajarById = (id: number): KelasMengajar | undefined =>
         teachingClasses.find((km) => km.id === id)
@@ -159,6 +189,9 @@ export function useClassroom() {
         getKelasByRombel,
         getAnggotaKelas,
         getSiswaByNama,
+        getSiswaByUser,
+        getGuruByUser,
+        getKelasSayaByUser,
         getKelasMateri,
         getKelasTugas,
         getTugasPengumpulan,
@@ -187,6 +220,7 @@ export function useClassroom() {
       submissions,
       announcements,
       students,
+      teachers,
       jadwalList,
     ]
   )

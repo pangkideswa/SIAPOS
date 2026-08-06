@@ -31,7 +31,9 @@ export function NotifikasiProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notifikasi[]>([])
 
   useEffect(() => {
-    const sync = () => setNotifications([...getNotifikasi()])
+    const sync = () => {
+      getNotifikasi().then((list) => setNotifications(list))
+    }
     sync()
     return subscribeNotifikasi(sync)
   }, [])

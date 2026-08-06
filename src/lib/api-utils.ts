@@ -1,11 +1,7 @@
 import "server-only"
 import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
 import { ZodError, type ZodType } from "zod"
 import { Prisma } from "@/generated/prisma/client"
-import { verifyToken } from "@/lib/auth-token"
-import { mapRole } from "@/lib/db-mappers"
-import type { UserRole } from "@/types/auth"
 
 // ============================================================================
 // Application errors
@@ -141,44 +137,4 @@ export function unauthorized(message = "Tidak terautentikasi") {
 
 export function forbidden(message = "Anda tidak memiliki akses ke sumber daya ini") {
   return NextResponse.json({ message }, { status: 403 })
-}
-
-// ============================================================================
-// Authentication & authorization helpers
-// ============================================================================
-
-export async function getCurrentUserId(
-  request: NextRequest
-): Promise<number | null> {
-  const token = request.cookies.get("token")?.value
-  if (!token) return null
-  const payload = verifyToken(token)
-  return payload?.sub ?? null
-}
-
-/**
- * Role guard for route handlers.
- *
- * When a real JWT `token` cookie is present the route is strictly protected:
- * missing/expired token → 401, insufficient role → 403.
- * When no token exists (demo mode) the request is allowed so the prototype
- * keeps working without a database.
- *
- * Returns the authenticated user id when authorized.
- */
-export function requireRole(
-  request: NextRequest,
-  roles: UserRole[]
-): number | null {
-  const token = request.cookies.get("token")?.value
-  if (!token) return null
-
-  const payload = verifyToken(token)
-  if (!payload) {
-    throw new AppError("Sesi berakhir, silakan login kembali", 401)
-  }
-  if (!roles.includes(mapRole(payload.role))) {
-    throw new AppError("Anda tidak memiliki akses ke sumber daya ini", 403)
-  }
-  return payload.sub
 }

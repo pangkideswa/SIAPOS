@@ -3,10 +3,12 @@ import { NextRequest } from "next/server"
 import { subjectService } from "@/services/subject.service"
 import { ok, created, apiError, parseWithSchema } from "@/lib/api-utils"
 import { subjectSchema } from "@/lib/validations/subject.schemas"
+import { requireAdmin, requireApiUser } from "@/auth/api-authorization"
 import type { SubjectCreateInput } from "@/services/subject.service"
 
 export async function GET(request: NextRequest) {
   try {
+    await requireApiUser()
     const searchParams = request.nextUrl.searchParams
     const subjects = await subjectService.getAll({
       search: searchParams.get("search") ?? undefined,
@@ -28,6 +30,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdmin()
     const body = parseWithSchema(subjectSchema, await request.json())
     const subject = await subjectService.create(
       body as unknown as SubjectCreateInput

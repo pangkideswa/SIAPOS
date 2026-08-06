@@ -380,10 +380,6 @@ export type SubjectNullableScalarRelationFilter = {
   isNot?: Prisma.SubjectWhereInput | null
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type SubjectCreateNestedOneWithoutTeaching_classesInput = {
   create?: Prisma.XOR<Prisma.SubjectCreateWithoutTeaching_classesInput, Prisma.SubjectUncheckedCreateWithoutTeaching_classesInput>
   connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutTeaching_classesInput

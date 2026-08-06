@@ -12,10 +12,7 @@ import {
   STATUS_KEHADIRAN_COLORS,
   STATUS_SESI_COLORS,
 } from "@/features/absensi/constants/absensi.constants"
-import {
-  DUMMY_SESI_ABSENSI,
-  DUMMY_ABSENSI_SISWA,
-} from "@/features/absensi/dummy/absensi.data"
+import { useAttendanceDetail } from "@/hooks/use-attendance"
 
 type AbsensiRow = Record<string, unknown> & {
   siswa_nama: string
@@ -39,15 +36,15 @@ export function AdminAbsensiDetailPage() {
   const params = useParams()
   const id = Number(params.id)
 
-  const sesi = useMemo(
-    () => DUMMY_SESI_ABSENSI.find((s) => s.id === id),
-    [id]
-  )
+  const {
+    data: detail,
+    isLoading,
+    isError,
+    refetch,
+  } = useAttendanceDetail(id)
 
-  const absensiList = useMemo(
-    () => DUMMY_ABSENSI_SISWA.filter((a) => a.sesi_id === id),
-    [id]
-  )
+  const sesi = detail
+  const absensiList = useMemo(() => detail?.records ?? [], [detail])
 
   const summary = useMemo(() => {
     const s = { hadir: 0, izin: 0, sakit: 0, alpha: 0, terlambat: 0, total: 0 }
@@ -62,6 +59,21 @@ export function AdminAbsensiDetailPage() {
     return s
   }, [absensiList])
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Detail Absensi" />
+        <Card>
+          <CardContent>
+            <div className="flex flex-col items-center gap-4 py-12">
+              <p className="text-muted-foreground">Memuat data absensi...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   if (!sesi) {
     return (
       <div className="space-y-6">
@@ -70,8 +82,15 @@ export function AdminAbsensiDetailPage() {
           <CardContent>
             <div className="flex flex-col items-center gap-4 py-12">
               <p className="text-muted-foreground">
-                Sesi absensi tidak ditemukan
+                {isError
+                  ? "Gagal memuat data absensi."
+                  : "Sesi absensi tidak ditemukan"}
               </p>
+              {isError && (
+                <Button variant="outline" onClick={() => refetch()}>
+                  Muat Ulang
+                </Button>
+              )}
               <Button variant="outline" onClick={() => router.back()}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Kembali

@@ -3,13 +3,19 @@ import { NextRequest } from "next/server"
 import { submissionService } from "@/services/submission.service"
 import { ok, apiError, notFound, parseWithSchema } from "@/lib/api-utils"
 import { gradeSubmissionSchema } from "@/lib/validations/submission.schemas"
+import {
+  assertSubmissionAccess,
+  requireApiUser,
+} from "@/auth/api-authorization"
 
 export async function GET(
   _request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await requireApiUser()
     const { id } = await context.params
+    await assertSubmissionAccess(user, Number(id))
     const submission = await submissionService.getById(Number(id))
     if (!submission) return notFound("Pengumpulan tidak ditemukan")
     return ok(submission)
@@ -23,7 +29,9 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await requireApiUser("super_admin", "admin", "guru")
     const { id } = await context.params
+    await assertSubmissionAccess(user, Number(id))
     const body = parseWithSchema(gradeSubmissionSchema, await request.json())
     const submission = await submissionService.grade(
       Number(id),
@@ -41,7 +49,9 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await requireApiUser("super_admin", "admin", "siswa")
     const { id } = await context.params
+    await assertSubmissionAccess(user, Number(id))
     await submissionService.remove(Number(id))
     return ok(true, "Pengumpulan berhasil dihapus")
   } catch (error) {

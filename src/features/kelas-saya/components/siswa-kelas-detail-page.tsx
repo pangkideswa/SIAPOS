@@ -38,7 +38,7 @@ export function SiswaKelasDetailPage({
   const { user } = useAuth()
   const classroom = useClassroom()
   const kelasMengajar = classroom.getKelasMengajarById(Number(resolvedParams.id))
-  const siswa = classroom.getSiswaByNama(user?.name ?? "")
+  const siswa = classroom.getSiswaByUser(user)
   const [tab, setTab] = useState<KelasTab>("overview")
 
   if (!kelasMengajar) {

@@ -1,11 +1,47 @@
 import "server-only"
 import { type Student } from "@/generated/prisma/client"
 import { studentRepository } from "@/repositories/student.repository"
+import { prisma } from "@/lib/prisma"
+import { assertUniqueField } from "@/lib/duplicate-check"
 import type { Siswa, SiswaFormData } from "@/features/siswa/types/siswa"
+import type { PaginatedResponse } from "@/types"
+
+export interface StudentFilters {
+  search?: string
+  jurusan_id?: number
+  kelas?: string
+  status?: string
+  page?: number
+  per_page?: number
+}
+
+async function enrichJurusanNama(rows: Student[]): Promise<Siswa[]> {
+  const jurusanIds = [
+    ...new Set(
+      rows.map((row) => row.jurusan_id).filter((id): id is number => id !== null)
+    ),
+  ]
+  let jurusanMap = new Map<number, string>()
+  if (jurusanIds.length > 0) {
+    const jurusans = await prisma.jurusan.findMany({
+      where: { id: { in: jurusanIds } },
+      select: { id: true, name: true },
+    })
+    jurusanMap = new Map(jurusans.map((j) => [j.id, j.name]))
+  }
+  return rows.map((row) => {
+    const sis = toSiswa(row)
+    if (row.jurusan_id !== null) {
+      sis.jurusan_nama = jurusanMap.get(row.jurusan_id) ?? undefined
+    }
+    return sis
+  })
+}
 
 function toSiswa(row: Student): Siswa {
   return {
     id: row.id,
+    user_id: row.user_id,
     foto: row.foto,
     nis: row.nis,
     nisn: row.nisn,
@@ -56,22 +92,98 @@ function toSiswaCreate(data: SiswaFormData) {
 export const studentService = {
   async getAll(): Promise<Siswa[]> {
     const rows = await studentRepository.findAll()
-    return rows.map(toSiswa)
+    return enrichJurusanNama(rows)
+  },
+
+  async getAllPaginated(
+    filters: StudentFilters = {}
+  ): Promise<PaginatedResponse<Siswa>> {
+    const per_page = filters.per_page ?? 10
+    const page = filters.page ?? 1
+
+    const where = {
+      ...(filters.search
+        ? {
+            OR: [
+              {
+                nama_lengkap: {
+                  contains: filters.search,
+                  mode: "insensitive" as const,
+                },
+              },
+              { nis: { contains: filters.search } },
+              { nisn: { contains: filters.search } },
+              { kelas: { contains: filters.search } },
+            ],
+          }
+        : {}),
+      ...(filters.jurusan_id !== undefined
+        ? { jurusan_id: filters.jurusan_id }
+        : {}),
+      ...(filters.kelas ? { kelas: filters.kelas } : {}),
+      ...(filters.status ? { status: filters.status } : {}),
+    }
+
+    const [rows, total] = await Promise.all([
+      studentRepository.findMany({
+        where,
+        skip: (page - 1) * per_page,
+        take: per_page,
+      }),
+      studentRepository.count(where),
+    ])
+
+    return {
+      data: await enrichJurusanNama(rows),
+      meta: {
+        current_page: page,
+        last_page: Math.max(1, Math.ceil(total / per_page)),
+        per_page,
+        total,
+      },
+    }
   },
 
   async getById(id: number): Promise<Siswa | null> {
     const row = await studentRepository.findById(id)
-    return row ? toSiswa(row) : null
+    if (!row) return null
+    const [siswa] = await enrichJurusanNama([row])
+    return siswa
   },
 
   async create(data: SiswaFormData): Promise<Siswa> {
+    await assertUniqueField(
+      (value) => studentRepository.findFirst({ nis: value }),
+      data.nis,
+      "NIS"
+    )
+    await assertUniqueField(
+      (value) => studentRepository.findFirst({ nisn: value }),
+      data.nisn,
+      "NISN"
+    )
     const row = await studentRepository.create(toSiswaCreate(data))
-    return toSiswa(row)
+    const [siswa] = await enrichJurusanNama([row])
+    return siswa
   },
 
   async update(id: number, data: SiswaFormData): Promise<Siswa | null> {
+    await assertUniqueField(
+      (value) => studentRepository.findFirst({ nis: value }),
+      data.nis,
+      "NIS",
+      id
+    )
+    await assertUniqueField(
+      (value) => studentRepository.findFirst({ nisn: value }),
+      data.nisn,
+      "NISN",
+      id
+    )
     const row = await studentRepository.update(id, toSiswaCreate(data))
-    return row ? toSiswa(row) : null
+    if (!row) return null
+    const [siswa] = await enrichJurusanNama([row])
+    return siswa
   },
 
   async remove(id: number): Promise<boolean> {

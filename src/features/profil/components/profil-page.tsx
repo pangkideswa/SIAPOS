@@ -30,6 +30,7 @@ import {
   Hash,
 } from "lucide-react"
 import { toast } from "sonner"
+import { apiFetch } from "@/lib/client-api"
 
 function getInitials(name: string): string {
   return name
@@ -77,10 +78,28 @@ export function ProfilPage() {
 
   async function handleSave() {
     setIsSaving(true)
-    await new Promise((r) => setTimeout(r, 500))
-    setIsSaving(false)
-    setEditOpen(false)
-    toast.success("Profil berhasil diperbarui")
+    try {
+      const body: Record<string, string> = {
+        name: profileData.nama,
+        email: profileData.email,
+      }
+      if (user?.role === "guru") {
+        body.nip = profileData.nipNisn
+      } else if (user?.role === "siswa") {
+        body.nisn = profileData.nipNisn
+      }
+      await apiFetch("/api/auth/profile", {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      })
+      setEditOpen(false)
+      toast.success("Profil berhasil diperbarui")
+    } catch (err: unknown) {
+      const apiErr = err as { message?: string }
+      toast.error(apiErr.message ?? "Gagal memperbarui profil")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (

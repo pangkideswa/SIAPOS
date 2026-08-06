@@ -21,7 +21,12 @@ import {
   STATUS_COLORS,
   EMPTY_JURUSAN_FORM,
 } from "@/features/jurusan/constants/jurusan.constants"
-import { DUMMY_JURUSANS } from "@/features/jurusan/dummy/jurusan.data"
+import {
+  useJurusans,
+  useCreateJurusan,
+  useUpdateJurusan,
+  useDeleteJurusan,
+} from "@/hooks/use-jurusan"
 import type { Jurusan } from "@/features/jurusan/types/jurusan"
 
 export function JurusanListPage() {
@@ -35,27 +40,20 @@ export function JurusanListPage() {
   const [deletingJurusan, setDeletingJurusan] = useState<Jurusan | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const perPage = 10
+  const createJurusan = useCreateJurusan()
+  const updateJurusan = useUpdateJurusan()
+  const deleteJurusan = useDeleteJurusan()
 
-  const filteredJurusan = DUMMY_JURUSANS.filter((j) => {
-    if (statusFilter === "active" && !j.is_active) return false
-    if (statusFilter === "inactive" && j.is_active) return false
-    if (search) {
-      const q = search.toLowerCase()
-      return (
-        j.name.toLowerCase().includes(q) ||
-        j.code.toLowerCase().includes(q) ||
-        (j.description?.toLowerCase().includes(q) ?? false)
-      )
-    }
-    return true
+  const { data, isLoading: isTableLoading } = useJurusans({
+    search: search || undefined,
+    is_active:
+      statusFilter === "all" ? undefined : statusFilter === "active",
+    page,
+    per_page: 10,
   })
 
-  const totalPages = Math.ceil(filteredJurusan.length / perPage)
-  const paginatedJurusan = filteredJurusan.slice(
-    (page - 1) * perPage,
-    page * perPage
-  )
+  const jurusans = data?.data ?? []
+  const meta = data?.meta
 
   const columns: Column<Record<string, unknown>>[] = [
     {
@@ -155,57 +153,43 @@ export function JurusanListPage() {
     async (formData: typeof EMPTY_JURUSAN_FORM) => {
       setIsLoading(true)
       try {
-        // TODO: Replace with backend API call
-        await new Promise((resolve) => setTimeout(resolve, 500))
-
         if (editingJurusan) {
-          const idx = DUMMY_JURUSANS.findIndex(
-            (j) => j.id === editingJurusan.id
-          )
-          if (idx !== -1) {
-            DUMMY_JURUSANS[idx] = {
-              ...DUMMY_JURUSANS[idx],
+          await updateJurusan.mutateAsync({
+            id: editingJurusan.id,
+            data: {
               name: formData.name,
               code: formData.code,
               is_active: formData.is_active,
               description: formData.description || null,
-              updated_at: new Date().toISOString(),
-            }
-          }
+            },
+          })
         } else {
-          const newJurusan: Jurusan = {
-            id: Date.now(),
+          await createJurusan.mutateAsync({
             name: formData.name,
             code: formData.code,
             is_active: formData.is_active,
             description: formData.description || null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }
-          DUMMY_JURUSANS.push(newJurusan)
+          })
         }
         setFormDialogOpen(false)
       } finally {
         setIsLoading(false)
       }
     },
-    [editingJurusan]
+    [editingJurusan, createJurusan, updateJurusan]
   )
 
   const handleDelete = useCallback(async () => {
     if (!deletingJurusan) return
     setIsLoading(true)
     try {
-      // TODO: Replace with backend API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      const idx = DUMMY_JURUSANS.findIndex((j) => j.id === deletingJurusan.id)
-      if (idx !== -1) DUMMY_JURUSANS.splice(idx, 1)
+      await deleteJurusan.mutateAsync(deletingJurusan.id)
       setDeleteDialogOpen(false)
       setDeletingJurusan(null)
     } finally {
       setIsLoading(false)
     }
-  }, [deletingJurusan])
+  }, [deletingJurusan, deleteJurusan])
 
   return (
     <div className="space-y-6">
@@ -256,16 +240,17 @@ export function JurusanListPage() {
 
       <DataTable
         columns={columns}
-        data={paginatedJurusan as unknown as Record<string, unknown>[]}
-        loading={false}
+        data={jurusans as unknown as Record<string, unknown>[]}
+        loading={isTableLoading}
         emptyMessage="Tidak ada jurusan ditemukan"
         onRowClick={(item) => router.push(`/admin/jurusan/${item.id}`)}
       />
 
-      {totalPages > 1 && (
+      {meta && meta.last_page > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Halaman {page} dari {totalPages} ({filteredJurusan.length} data)
+            Halaman {meta.current_page} dari {meta.last_page} ({meta.total}{" "}
+            data)
           </p>
           <div className="flex gap-2">
             <Button
@@ -279,7 +264,7 @@ export function JurusanListPage() {
             <Button
               variant="outline"
               size="sm"
-              disabled={page >= totalPages}
+              disabled={page >= meta.last_page}
               onClick={() => setPage(page + 1)}
             >
               Selanjutnya

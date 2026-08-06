@@ -3,6 +3,7 @@ import { NextRequest } from "next/server"
 import { classService } from "@/services/class.service"
 import { ok, apiError, notFound, parseWithSchema } from "@/lib/api-utils"
 import { classroomSchema } from "@/lib/validations/classroom.schemas"
+import { requireAdmin, requireApiUser } from "@/auth/api-authorization"
 import type { ClassroomCreateInput } from "@/services/class.service"
 
 export async function GET(
@@ -10,6 +11,7 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    await requireApiUser()
     const { id } = await context.params
     const classroom = await classService.getById(Number(id))
     if (!classroom) return notFound("Kelas tidak ditemukan")
@@ -24,6 +26,7 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    await requireAdmin()
     const { id } = await context.params
     const body = parseWithSchema(classroomSchema, await request.json())
     const classroom = await classService.update(
@@ -41,6 +44,7 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    await requireAdmin()
     const { id } = await context.params
     await classService.remove(Number(id))
     return ok(true, "Kelas berhasil dihapus")

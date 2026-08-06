@@ -663,14 +663,6 @@ export type TeacherUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TeacherUpdateToOneWithWhereWithoutUserInput, Prisma.TeacherUpdateWithoutUserInput>, Prisma.TeacherUncheckedUpdateWithoutUserInput>
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type TeacherCreateNestedOneWithoutClassroomsInput = {
   create?: Prisma.XOR<Prisma.TeacherCreateWithoutClassroomsInput, Prisma.TeacherUncheckedCreateWithoutClassroomsInput>
   connectOrCreate?: Prisma.TeacherCreateOrConnectWithoutClassroomsInput

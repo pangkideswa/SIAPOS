@@ -7,7 +7,7 @@ import { registerSchema } from "@/lib/validations/auth.schemas"
 export async function POST(request: NextRequest) {
   try {
     const body = parseWithSchema(registerSchema, await request.json())
-    const result = await authService.register({
+    const user = await authService.register({
       name: body.name,
       email: body.email,
       password: body.password,
@@ -15,15 +15,7 @@ export async function POST(request: NextRequest) {
       nip: body.nip,
       nisn: body.nisn,
     })
-    const response = ok(result, "Registrasi berhasil")
-    response.cookies.set("token", result.token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    })
-    return response
+    return ok(user, "Registrasi berhasil")
   } catch (error) {
     return apiError(error, 422)
   }

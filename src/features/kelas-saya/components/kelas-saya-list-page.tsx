@@ -20,7 +20,7 @@ export function KelasSayaListPage() {
   const router = useRouter()
 
   const classroom = useClassroom()
-  const kelasList = classroom.getKelasSayaByGuru(user?.name ?? "")
+  const kelasList = classroom.getKelasSayaByUser(user)
 
   return (
     <div className="space-y-6">

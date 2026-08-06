@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -18,6 +18,7 @@ import { UserFormDialog } from "./user-form-dialog"
 import { UserDeleteDialog } from "./user-delete-dialog"
 import { ROLE_LABELS, ROLE_COLORS, ADMIN_MANAGEABLE_ROLES, EMPTY_USER_FORM } from "@/features/users/constants/user.constants"
 import { userService } from "@/lib/services/user.service"
+import { useUsers } from "@/hooks/use-users"
 import type { User, UserRole } from "@/types/auth"
 
 export function UserListPage() {
@@ -30,37 +31,20 @@ export function UserListPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [deletingUser, setDeletingUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [isTableLoading, setIsTableLoading] = useState(true)
-  const [users, setUsers] = useState<User[]>([])
 
-  const perPage = 10
-
-  const loadUsers = useCallback(async () => {
-    const result = await userService.getAll({ per_page: 1000 })
-    setUsers(result.data)
-  }, [])
-
-  useEffect(() => {
-    loadUsers().finally(() => setIsTableLoading(false))
-  }, [loadUsers])
-
-  const filteredUsers = users.filter((user) => {
-    if (roleFilter !== "all" && user.role !== roleFilter) return false
-    if (search) {
-      const q = search.toLowerCase()
-      return (
-        user.name.toLowerCase().includes(q) ||
-        user.email.toLowerCase().includes(q) ||
-        (user.username?.toLowerCase().includes(q) ?? false) ||
-        (user.nip?.toLowerCase().includes(q) ?? false) ||
-        (user.nisn?.toLowerCase().includes(q) ?? false)
-      )
-    }
-    return true
+  const {
+    data,
+    isLoading: isTableLoading,
+    refetch,
+  } = useUsers({
+    role: roleFilter === "all" ? undefined : roleFilter,
+    search: search || undefined,
+    page,
+    per_page: 10,
   })
 
-  const totalPages = Math.ceil(filteredUsers.length / perPage)
-  const paginatedUsers = filteredUsers.slice((page - 1) * perPage, page * perPage)
+  const users = data?.data ?? []
+  const meta = data?.meta
 
   const columns: Column<Record<string, unknown>>[] = [
     {
@@ -180,12 +164,12 @@ export function UserListPage() {
           })
         }
         setFormDialogOpen(false)
-        await loadUsers()
+        await refetch()
       } finally {
         setIsLoading(false)
       }
     },
-    [editingUser, loadUsers]
+    [editingUser, refetch]
   )
 
   const handleDelete = useCallback(async () => {
@@ -195,11 +179,11 @@ export function UserListPage() {
       await userService.delete(deletingUser.id)
       setDeleteDialogOpen(false)
       setDeletingUser(null)
-      await loadUsers()
+      await refetch()
     } finally {
       setIsLoading(false)
     }
-  }, [deletingUser, loadUsers])
+  }, [deletingUser, refetch])
 
   return (
     <div className="space-y-6">
@@ -250,16 +234,16 @@ export function UserListPage() {
 
       <DataTable
         columns={columns}
-        data={paginatedUsers as unknown as Record<string, unknown>[]}
+        data={users as unknown as Record<string, unknown>[]}
         loading={isTableLoading}
         emptyMessage="Tidak ada pengguna ditemukan"
         onRowClick={(item) => router.push(`/admin/users/${item.id}`)}
       />
 
-      {totalPages > 1 && (
+      {meta && meta.last_page > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Halaman {page} dari {totalPages} ({filteredUsers.length} data)
+            Halaman {meta.current_page} dari {meta.last_page} ({meta.total} data)
           </p>
           <div className="flex gap-2">
             <Button
@@ -273,7 +257,7 @@ export function UserListPage() {
             <Button
               variant="outline"
               size="sm"
-              disabled={page >= totalPages}
+              disabled={page >= (meta?.last_page ?? 1)}
               onClick={() => setPage(page + 1)}
             >
               Selanjutnya

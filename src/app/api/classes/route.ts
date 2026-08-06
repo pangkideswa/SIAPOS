@@ -3,10 +3,12 @@ import { NextRequest } from "next/server"
 import { classService } from "@/services/class.service"
 import { ok, created, apiError, parseWithSchema } from "@/lib/api-utils"
 import { classroomSchema } from "@/lib/validations/classroom.schemas"
+import { requireAdmin, requireApiUser } from "@/auth/api-authorization"
 import type { ClassroomCreateInput } from "@/services/class.service"
 
 export async function GET(request: NextRequest) {
   try {
+    await requireApiUser()
     const searchParams = request.nextUrl.searchParams
     const classes = await classService.getAll({
       search: searchParams.get("search") ?? undefined,
@@ -26,6 +28,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdmin()
     const body = parseWithSchema(classroomSchema, await request.json())
     const classroom = await classService.create(
       body as unknown as ClassroomCreateInput

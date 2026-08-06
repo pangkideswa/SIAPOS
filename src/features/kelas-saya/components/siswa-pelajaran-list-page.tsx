@@ -20,7 +20,7 @@ export function SiswaPelajaranListPage() {
   const router = useRouter()
 
   const classroom = useClassroom()
-  const siswa = classroom.getSiswaByNama(user?.name ?? "")
+  const siswa = classroom.getSiswaByUser(user)
   const pelajaran = siswa ? classroom.getKelasByRombel(siswa.kelas) : []
 
   return (

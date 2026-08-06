@@ -5,6 +5,7 @@ import type { Student, Prisma } from "@/generated/prisma/client"
 export type StudentCreateData = Prisma.StudentUncheckedCreateInput
 export type StudentUpdateData = Prisma.StudentUncheckedUpdateInput
 export type StudentWhere = Prisma.StudentWhereInput
+export type StudentFindManyArgs = Prisma.StudentFindManyArgs
 
 export const studentRepository = {
   async findAll(): Promise<Student[]> {
@@ -21,11 +22,15 @@ export const studentRepository = {
     return prisma.student.findFirst({ where })
   },
 
-  async findMany(where: StudentWhere): Promise<Student[]> {
+  async findMany(args: StudentFindManyArgs): Promise<Student[]> {
     return prisma.student.findMany({
-      where,
+      ...args,
       orderBy: { nama_lengkap: "asc" },
     })
+  },
+
+  async count(where: StudentWhere): Promise<number> {
+    return prisma.student.count({ where })
   },
 
   async findByClassroomId(classroomId: number): Promise<Student[]> {

@@ -10,9 +10,9 @@ import {
   type ReactNode,
 } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { signOut as nextAuthSignOut } from "next-auth/react"
+import { signIn, signOut, getSession } from "next-auth/react"
 import { apiFetch } from "@/lib/client-api"
-import type { User, UserRole, AuthResponse } from "@/types/auth"
+import type { User, UserRole } from "@/types/auth"
 
 interface AuthContextType {
   user: User | null
@@ -83,6 +83,16 @@ function getErrorStatus(error: unknown): number | null {
   return null
 }
 
+function networkError(): Error {
+  return new Error("Tidak dapat terhubung ke server. Silakan coba lagi.")
+}
+
+function apiErrorWithStatus(message: string, status: number): Error {
+  const error = new Error(message) as Error & { status: number }
+  error.status = status
+  return error
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(getInitialUser)
   const [isLoading, setIsLoading] = useState(true)
@@ -108,6 +118,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     async function loadUser() {
       try {
+        const session = await getSession()
+        if (cancelled) return
+        if (!session?.user?.id) {
+          cacheUser(null)
+          setUser(null)
+          return
+        }
         const serverUser = await apiFetch<User>("/api/auth/user")
         if (cancelled) return
         setUser(serverUser)
@@ -141,24 +158,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [isLoading, isAuthenticated, pathname, router])
 
+  const establishSession = useCallback(async () => {
+    const session = await getSession()
+    if (!session?.user?.id) {
+      throw networkError()
+    }
+    const serverUser = await apiFetch<User>("/api/auth/user")
+    cacheUser(serverUser)
+    setUser(serverUser)
+    return serverUser
+  }, [])
+
   const login = useCallback(
     async (identifier: string, password: string) => {
       try {
-        const result = await apiFetch<AuthResponse>("/api/auth/login", {
-          method: "POST",
-          body: JSON.stringify({ identifier, password }),
+        const result = await signIn("credentials", {
+          identifier,
+          password,
+          redirect: false,
         })
-        cacheUser(result.user)
-        setUser(result.user)
-        router.push(getDashboardPath(result.user.role))
+        if (!result || result.error) {
+          throw apiErrorWithStatus(
+            "Email, NIP/NISN, atau kata sandi salah",
+            401
+          )
+        }
+        const serverUser = await establishSession()
+        router.push(getDashboardPath(serverUser.role))
       } catch (error) {
         if (getErrorStatus(error) === null) {
-          throw new Error("Tidak dapat terhubung ke server. Silakan coba lagi.")
+          throw networkError()
         }
         throw error
       }
     },
-    [router]
+    [establishSession, router]
   )
 
   const register = useCallback(
@@ -172,7 +206,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       nisn?: string
     ) => {
       try {
-        const result = await apiFetch<AuthResponse>("/api/auth/register", {
+        await apiFetch<User>("/api/auth/register", {
           method: "POST",
           body: JSON.stringify({
             name,
@@ -184,29 +218,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             nisn,
           }),
         })
-        cacheUser(result.user)
-        setUser(result.user)
-        router.push(getDashboardPath(result.user.role))
+        const result = await signIn("credentials", {
+          identifier: email,
+          password,
+          redirect: false,
+        })
+        if (!result || result.error) {
+          throw apiErrorWithStatus(
+            "Registrasi berhasil. Silakan masuk menggunakan akun baru Anda.",
+            400
+          )
+        }
+        const serverUser = await establishSession()
+        router.push(getDashboardPath(serverUser.role))
       } catch (error) {
         if (getErrorStatus(error) === null) {
-          throw new Error("Tidak dapat terhubung ke server. Silakan coba lagi.")
+          throw networkError()
         }
         throw error
       }
     },
-    [router]
+    [establishSession, router]
   )
 
   const logout = useCallback(async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" })
+      await signOut({ redirect: false })
     } catch {
-      // ignore logout API errors
-    }
-    try {
-      await nextAuthSignOut({ redirect: false })
-    } catch {
-      // ignore next-auth sign-out errors
+      // ignore sign-out errors
     }
     cacheUser(null)
     setUser(null)

@@ -46,29 +46,68 @@ async function main() {
   console.log("Seeding database...")
 
   await prisma.nilai.deleteMany()
+  await prisma.notifikasi.deleteMany()
   await prisma.submission.deleteMany()
   await prisma.assignment.deleteMany()
   await prisma.material.deleteMany()
   await prisma.schedule.deleteMany()
+  await prisma.attendance.deleteMany()
+  await prisma.attendanceSession.deleteMany()
   await prisma.teachingClass.deleteMany()
   await prisma.announcement.deleteMany()
   await prisma.student.deleteMany()
   await prisma.teacher.deleteMany()
   await prisma.classroom.deleteMany()
   await prisma.subject.deleteMany()
+  await prisma.jurusan.deleteMany()
   await prisma.tahunAkademik.deleteMany()
   await prisma.user.deleteMany()
 
-  const adminPassword = await hash("Admin123!", 10)
+  const adminPassword = await hash("admin123", 10)
   const guruPassword = await hash("Guru123!", 10)
   const siswaPassword = await hash("Siswa123!", 10)
 
-  const admin = await prisma.user.create({
-    data: {
-      name: "Administrator SIAPOS",
+  const jurusans = await Promise.all([
+    prisma.jurusan.create({
+      data: {
+        code: "TKJ",
+        name: "Teknik Komputer dan Jaringan",
+        description: "Keahlian di bidang komputer dan jaringan",
+        is_active: true,
+      },
+    }),
+    prisma.jurusan.create({
+      data: {
+        code: "TBSM",
+        name: "Teknik Bisnis Sepeda Motor",
+        description: "Keahlian di bidang bisnis dan perawatan sepeda motor",
+        is_active: true,
+      },
+    }),
+    prisma.jurusan.create({
+      data: {
+        code: "BDP",
+        name: "Bisnis Daring dan Pemasaran",
+        description: "Keahlian di bidang bisnis daring dan pemasaran",
+        is_active: true,
+      },
+    }),
+  ])
+
+  const admin = await prisma.user.upsert({
+    where: { username: "admin" },
+    update: {
+      name: "Super Admin",
+      role: "SUPER_ADMIN",
+      status: "AKTIF",
+      password: adminPassword,
+    },
+    create: {
+      name: "Super Admin",
       email: "admin@siapos.id",
       password: adminPassword,
-      role: "ADMIN",
+      role: "SUPER_ADMIN",
+      status: "AKTIF",
       username: "admin",
       nip: "198501012010011001",
     },
@@ -133,6 +172,7 @@ async function main() {
         email: g.email,
         password: guruPassword,
         role: "GURU",
+        status: "AKTIF",
         username: g.username,
         nip: g.nip,
       },
@@ -191,6 +231,7 @@ async function main() {
         email: `siswa${i + 1}@siapos.id`,
         password: siswaPassword,
         role: "SISWA",
+        status: "AKTIF",
         username: `siswa${i + 1}`,
         nisn: s.nisn,
       },
@@ -207,7 +248,7 @@ async function main() {
         tanggal_lahir: new Date(2008, (i % 12), 1 + (i % 27)),
         agama: "Islam",
         alamat: `Jl. Cendana No. ${i + 1}, Bandung`,
-        jurusan_id: 1,
+        jurusan_id: jurusans[0].id,
         kelas: s.kelas,
         classroom_id: classroom.id,
         tahun_masuk: s.classroomKey === "X" ? "2024" : s.classroomKey === "XI" ? "2023" : "2022",
@@ -234,7 +275,10 @@ async function main() {
   const guruSiti = guruRecords["198703122010012002"]
   const guruAndi = guruRecords["199210142019032003"]
 
-  const teachingClasses: Record<string, { id: number }> = {}
+  const teachingClasses: Record<
+    string,
+    { id: number; classroom_id: number | null }
+  > = {}
   const tcPairs = [
     { key: "web", classroom: classrooms.X, subject: subjects.web, guru: guruAsep },
     { key: "db", classroom: classrooms.X, subject: subjects.db, guru: guruAsep },
@@ -644,12 +688,178 @@ async function main() {
     })
   }
 
+  await prisma.notifikasi.createMany({
+    data: [
+      {
+        tipe: "PENGUMUMAN",
+        judul: "Jadwal Penilaian Akhir Semester",
+        pesan: "Penilaian akhir semester Ganjil 2025/2026 akan dimulai bulan depan. Persiapkan diri dengan baik.",
+        href: "/siswa/pengumuman",
+        targetRoles: ["siswa"],
+      },
+      {
+        tipe: "SISTEM",
+        judul: "Tahun Ajaran Baru 2026/2027",
+        pesan: "Pendataan tahun ajaran baru telah dibuka. Pastikan data kelas sudah lengkap.",
+        href: "/admin/kelas",
+        targetRoles: ["admin"],
+      },
+      {
+        tipe: "TUGAS",
+        judul: "Tugas menunggu penilaian",
+        pesan: "Ada pengumpulan tugas yang belum dinilai. Periksa halaman pengumpulan untuk memberikan nilai.",
+        href: "/guru/pengumpulan",
+        targetRoles: ["guru"],
+      },
+    ],
+  })
+
+  // ==========================================================================
+  // Attendance seeding — derive sessions from schedules, past 4 weeks
+  // ==========================================================================
+
+  const attendanceStudents = await prisma.student.findMany({
+    select: { id: true, classroom_id: true },
+  })
+  const studentsInClassroom = (classroomId: number | null): number[] =>
+    classroomId == null
+      ? []
+      : attendanceStudents
+          .filter((s) => s.classroom_id === classroomId)
+          .map((s) => s.id)
+
+  const DAY_TO_JS: Record<string, number> = {
+    SENIN: 1,
+    SELASA: 2,
+    RABU: 3,
+    KAMIS: 4,
+    JUMAT: 5,
+    SABTU: 6,
+    MINGGU: 0,
+  }
+
+  const getDateForWeekday = (jsDay: number, weeksBack: number): Date => {
+    const d = new Date()
+    d.setDate(d.getDate() - weeksBack * 7)
+    while (d.getDay() !== jsDay) d.setDate(d.getDate() - 1)
+    d.setHours(0, 0, 0, 0)
+    return d
+  }
+
+  const attendanceStatusPool: Array<{
+    status: "HADIR" | "IZIN" | "SAKIT" | "ALPHA" | "TERLAMBAT"
+    keterangan: string | null
+  }> = [
+    { status: "HADIR", keterangan: null },
+    { status: "HADIR", keterangan: null },
+    { status: "IZIN", keterangan: "Izin keperluan keluarga" },
+    { status: "HADIR", keterangan: null },
+    { status: "SAKIT", keterangan: "Sakit demam" },
+    { status: "HADIR", keterangan: null },
+    { status: "ALPHA", keterangan: null },
+    { status: "HADIR", keterangan: null },
+    { status: "TERLAMBAT", keterangan: null },
+    { status: "HADIR", keterangan: null },
+  ]
+
+  let attendanceSessionCount = 0
+  let attendanceRecordCount = 0
+  let sessionSeq = 0
+
+  for (const s of scheduleData) {
+    const tc = teachingClasses[s.key]
+    if (!tc) continue
+    const mapel = s.key.includes("jar")
+      ? "Jaringan Komputer"
+      : s.key.includes("mat")
+        ? "Matematika"
+        : s.key.includes("bindo")
+          ? "Bahasa Indonesia"
+          : s.key.includes("db")
+            ? "Basis Data"
+            : "Pemrograman Web"
+    const guru =
+      s.key.includes("jar") || s.key.includes("mat") || s.key.includes("bindo")
+        ? s.key.includes("jar")
+          ? "Andi Wijaya"
+          : "Siti Aminah"
+        : "Asep Nugraha"
+    const siswaIds = studentsInClassroom(tc.classroom_id)
+    if (siswaIds.length === 0) continue
+
+    for (let w = 4; w >= 1; w--) {
+      const tanggal = getDateForWeekday(DAY_TO_JS[s.day], w)
+      const session = await prisma.attendanceSession.create({
+        data: {
+          teaching_class_id: tc.id,
+          tanggal,
+          jam_mulai: s.start,
+          jam_selesai: s.end,
+          mata_pelajaran: mapel,
+          guru_nama: guru,
+          kelas: s.kelas,
+          tahun_ajaran: "2025/2026",
+          semester: "Ganjil",
+          status: "SELESAI",
+        },
+      })
+      attendanceSessionCount++
+      sessionSeq++
+      const records = siswaIds.map((studentId, idx) => {
+        const pick =
+          attendanceStatusPool[(sessionSeq + idx) % attendanceStatusPool.length]
+        return {
+          session_id: session.id,
+          student_id: studentId,
+          status: pick.status,
+          keterangan: pick.keterangan,
+        }
+      })
+      await prisma.attendance.createMany({ data: records })
+      attendanceRecordCount += records.length
+    }
+  }
+
+  // Live session today for the demo guru so the input page has a target.
+  const liveTc = teachingClasses["web"]
+  if (liveTc) {
+    const siswaIds = studentsInClassroom(liveTc.classroom_id)
+    if (siswaIds.length > 0) {
+      const liveSession = await prisma.attendanceSession.create({
+        data: {
+          teaching_class_id: liveTc.id,
+          tanggal: new Date(),
+          jam_mulai: "07:00",
+          jam_selesai: "08:30",
+          mata_pelajaran: "Pemrograman Web",
+          guru_nama: "Asep Nugraha",
+          kelas: "X TKJ 1",
+          tahun_ajaran: "2025/2026",
+          semester: "Ganjil",
+          status: "BERLANGSUNG",
+        },
+      })
+      attendanceSessionCount++
+      const records = siswaIds.map((studentId) => ({
+        session_id: liveSession.id,
+        student_id: studentId,
+        status: "HADIR" as const,
+        keterangan: null,
+      }))
+      await prisma.attendance.createMany({ data: records })
+      attendanceRecordCount += records.length
+    }
+  }
+
   const teacherCount = await prisma.teacher.count()
   const studentCount = await prisma.student.count()
   const classroomCount = await prisma.classroom.count()
   const subjectCount = await prisma.subject.count()
   const nilaiCount = await prisma.nilai.count()
-  console.log(`Seed selesai. ${teacherCount} guru, ${studentCount} siswa, ${classroomCount} kelas, ${subjectCount} mapel, ${nilaiCount} nilai.`)
+
+  console.log(
+    `Seed selesai. ${teacherCount} guru, ${studentCount} siswa, ${classroomCount} kelas, ${subjectCount} mapel, ${nilaiCount} nilai, ${attendanceSessionCount} sesi absensi, ${attendanceRecordCount} record absensi.`
+  )
 }
 
 main()

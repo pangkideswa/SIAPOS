@@ -1,5 +1,6 @@
 import type { DefaultSession } from "next-auth"
 export type UserRole = "super_admin" | "admin" | "guru" | "siswa" | "wali"
+export type AccountStatus = "BELUM_AKTIF" | "AKTIF" | "DIBLOKIR"
 
 declare module "next-auth" {
   interface User {
@@ -14,18 +15,12 @@ declare module "next-auth" {
   }
 }
 
-declare module "next-auth" {
-  interface JWT {
-    role?: string
-    userId?: string
-  }
-}
-
 export interface User {
   id: number
   name: string
-  email: string
+  email: string | null
   role: UserRole
+  status: AccountStatus
   provider?: string
   providerId?: string | null
   image?: string | null
@@ -34,6 +29,8 @@ export interface User {
   nip?: string | null
   nisn?: string | null
   avatar?: string | null
+  login_count: number
+  last_login: string | null
   created_at: string
   updated_at: string
 }

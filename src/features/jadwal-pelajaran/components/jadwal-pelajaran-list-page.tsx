@@ -13,21 +13,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { DUMMY_JADWAL_PELAJARAN } from "@/features/jadwal-pelajaran/dummy/jadwal-pelajaran.data"
+import { useSchedules } from "@/hooks/use-schedules"
+import type { JadwalPelajaran } from "../types/jadwal-pelajaran"
 import { HARI_OPTIONS, HARI_INDEX, STATUS_JADWAL_COLORS } from "@/features/jadwal-pelajaran/constants/jadwal-pelajaran.constants"
-import {
-  KELAS_OPTIONS,
-  GURU_OPTIONS,
-} from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
 
 export function JadwalPelajaranListPage() {
+  const { data: jadwalData } = useSchedules()
   const [search, setSearch] = useState("")
   const [kelasFilter, setKelasFilter] = useState("all")
   const [guruFilter, setGuruFilter] = useState("all")
   const [hariFilter, setHariFilter] = useState("all")
 
+  const kelasOptions = useMemo(
+    () =>
+      Array.from(new Set((jadwalData ?? []).map((j) => j.kelas))).sort(),
+    [jadwalData]
+  )
+  const guruOptions = useMemo(
+    () =>
+      Array.from(new Set((jadwalData ?? []).map((j) => j.guru_nama))).sort(),
+    [jadwalData]
+  )
+
   const filteredData = useMemo(() => {
-    let data = [...DUMMY_JADWAL_PELAJARAN]
+    let data = [...(jadwalData ?? [])]
 
     if (search) {
       const q = search.toLowerCase()
@@ -58,10 +67,10 @@ export function JadwalPelajaranListPage() {
     })
 
     return data
-  }, [search, kelasFilter, guruFilter, hariFilter])
+  }, [search, kelasFilter, guruFilter, hariFilter, jadwalData])
 
   const groupedByHari = useMemo(() => {
-    const groups: Record<string, typeof DUMMY_JADWAL_PELAJARAN> = {}
+    const groups: Record<string, JadwalPelajaran[]> = {}
     for (const jadwal of filteredData) {
       if (!groups[jadwal.hari]) groups[jadwal.hari] = []
       groups[jadwal.hari].push(jadwal)
@@ -109,7 +118,7 @@ export function JadwalPelajaranListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Kelas</SelectItem>
-            {KELAS_OPTIONS.map((k) => (
+            {kelasOptions.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}
           </SelectContent>
@@ -120,7 +129,7 @@ export function JadwalPelajaranListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Guru</SelectItem>
-            {GURU_OPTIONS.map((g) => (
+            {guruOptions.map((g) => (
               <SelectItem key={g} value={g}>{g}</SelectItem>
             ))}
           </SelectContent>

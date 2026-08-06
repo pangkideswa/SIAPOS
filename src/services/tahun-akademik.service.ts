@@ -1,6 +1,8 @@
 import "server-only"
 import { Prisma, type TahunAkademik } from "@/generated/prisma/client"
 import { tahunAkademikRepository } from "@/repositories/tahun-akademik.repository"
+import { assertUniqueField } from "@/lib/duplicate-check"
+import type { PaginatedResponse } from "@/types"
 
 export interface TahunAkademikDTO {
   id: number
@@ -17,6 +19,13 @@ export type TahunAkademikCreateInput = Omit<
   TahunAkademikDTO,
   "id" | "created_at" | "updated_at"
 >
+
+export interface TahunAkademikFilters {
+  search?: string
+  is_active?: boolean
+  page?: number
+  per_page?: number
+}
 
 function toTahunAkademik(row: TahunAkademik): TahunAkademikDTO {
   return {
@@ -49,6 +58,39 @@ export const tahunAkademikService = {
     return rows.map(toTahunAkademik)
   },
 
+  async getAllPaginated(
+    filters: TahunAkademikFilters = {}
+  ): Promise<PaginatedResponse<TahunAkademikDTO>> {
+    const { search, is_active } = filters
+    const page = Math.max(1, filters.page ?? 1)
+    const perPage = Math.min(100, Math.max(1, filters.per_page ?? 10))
+
+    const where = {
+      ...(search ? { nama: { contains: search } } : {}),
+      ...(is_active === undefined ? {} : { is_active }),
+    }
+
+    const [total, rows] = await Promise.all([
+      tahunAkademikRepository.count(where),
+      tahunAkademikRepository.findMany({
+        where,
+        orderBy: { nama: "desc" },
+        skip: (page - 1) * perPage,
+        take: perPage,
+      }),
+    ])
+
+    return {
+      data: rows.map(toTahunAkademik),
+      meta: {
+        current_page: page,
+        last_page: Math.max(1, Math.ceil(total / perPage)),
+        per_page: perPage,
+        total,
+      },
+    }
+  },
+
   async getActive(): Promise<TahunAkademikDTO | null> {
     const row = await tahunAkademikRepository.findActive()
     return row ? toTahunAkademik(row) : null
@@ -60,6 +102,11 @@ export const tahunAkademikService = {
   },
 
   async create(data: TahunAkademikCreateInput): Promise<TahunAkademikDTO> {
+    await assertUniqueField(
+      (value) => tahunAkademikRepository.findFirst({ nama: value }),
+      data.nama,
+      "Nama tahun akademik"
+    )
     const row = await tahunAkademikRepository.create(toTahunAkademikCreate(data))
     return toTahunAkademik(row)
   },
@@ -68,6 +115,12 @@ export const tahunAkademikService = {
     id: number,
     data: TahunAkademikCreateInput
   ): Promise<TahunAkademikDTO | null> {
+    await assertUniqueField(
+      (value) => tahunAkademikRepository.findFirst({ nama: value }),
+      data.nama,
+      "Nama tahun akademik",
+      id
+    )
     const row = await tahunAkademikRepository.update(id, toTahunAkademikCreate(data))
     return row ? toTahunAkademik(row) : null
   },

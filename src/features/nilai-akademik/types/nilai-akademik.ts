@@ -2,6 +2,8 @@ export type StatusNilai = "Lengkap" | "Belum Lengkap"
 
 export interface NilaiAkademik {
   id: number
+  siswa_id?: number | null
+  kelas_mengajar_id?: number | null
   siswa_nama: string
   siswa_kelas: string
   mata_pelajaran: string

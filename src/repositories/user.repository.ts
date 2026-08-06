@@ -30,6 +30,7 @@ export const userRepository = {
           { username: identifier },
           { nip: identifier },
           { nisn: identifier },
+          { name: { equals: identifier, mode: "insensitive" } },
         ],
       },
     })

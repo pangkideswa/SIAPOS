@@ -30,14 +30,13 @@ import { useMaterials } from "@/hooks/use-materials"
 import { useAssignments } from "@/hooks/use-assignments"
 import { useSubmissions } from "@/hooks/use-submissions"
 import { useSchedules } from "@/hooks/use-schedules"
+import { useStudents } from "@/hooks/use-students"
 import { useAnnouncements } from "@/hooks/use-announcements"
-import { absensiService } from "@/features/absensi/lib/absensi.service"
+import { useAttendanceRekap } from "@/hooks/use-attendance"
 import { filterPengumumanByRole } from "@/features/pengumuman/lib/pengumuman-helpers"
 import { KATEGORI_PENGUMUMAN_COLORS } from "@/features/pengumuman/constants/pengumuman.constants"
 import { formatDateID } from "@/features/kalender-akademik/components/kalender-helpers"
 import { PengumumanBaruBadge } from "@/features/pengumuman/components/pengumuman-baru-badge"
-
-const SISWA_KELAS = "XI TKJ 1"
 
 function formatDateShort(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -98,10 +97,19 @@ export function SiswaDashboardPage() {
   const { data: tugasData } = useAssignments()
   const { data: pengumpulanData } = useSubmissions()
   const { data: schedules } = useSchedules()
+  const { data: siswaData } = useStudents()
   const { data: announcementsData } = useAnnouncements()
+  const { data: rekapData } = useAttendanceRekap()
+
+  const siswa = (siswaData ?? []).find(
+    (s) =>
+      s.nama_lengkap.toLowerCase() === siswaName.toLowerCase() &&
+      s.status === "Aktif"
+  )
+  const siswaKelas = siswa?.kelas ?? ""
 
   const materiByKelas = (materiData ?? []).filter(
-    (m) => m.kelas === SISWA_KELAS && m.status === "Publish"
+    (m) => m.kelas === siswaKelas && m.status === "Publish"
   )
   const materiTerbaru = [...materiByKelas]
     .sort((a, b) => b.created_at.localeCompare(a.created_at))
@@ -109,7 +117,7 @@ export function SiswaDashboardPage() {
 
   const tugasByKelas = (tugasData ?? []).filter(
     (t) =>
-      t.kelas === SISWA_KELAS &&
+      t.kelas === siswaKelas &&
       (t.status === "Dipublikasikan" || t.status === "Ditutup")
   )
   const tugasAktif = tugasByKelas.filter((t) => t.status === "Dipublikasikan")
@@ -130,7 +138,7 @@ export function SiswaDashboardPage() {
       ? Math.round((tugasSelesai.length / tugasByKelas.length) * 100)
       : 0
 
-  const rekap = absensiService.getRekapAbsensi().find((r) => r.siswa_nama === siswaName)
+  const rekap = (rekapData ?? []).find((r) => r.siswa_nama === siswaName)
   const kehadiran = rekap?.persentase ?? 0
 
   const nilaiSiswa = pengumpulanBySiswa
@@ -190,7 +198,7 @@ export function SiswaDashboardPage() {
 
   const todayHari = new Date().toLocaleDateString("id-ID", { weekday: "long" })
   const jadwalHariIni = (schedules ?? [])
-    .filter((j) => j.kelas === SISWA_KELAS && j.hari === todayHari)
+    .filter((j) => j.kelas === siswaKelas && j.hari === todayHari)
     .map((j) => ({
       ...j,
       waktu_mulai: j.jam_mulai,
@@ -219,7 +227,7 @@ export function SiswaDashboardPage() {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Badge variant="outline" className="hidden sm:inline-flex">
-            {SISWA_KELAS}
+            {siswaKelas}
           </Badge>
           <PengumumanBaruBadge role="siswa" />
         </div>
@@ -299,7 +307,7 @@ export function SiswaDashboardPage() {
                   Tugas dengan Deadline Terdekat
                 </CardTitle>
                 <CardDescription>
-                  Tugas untuk kelas {SISWA_KELAS}
+                  Tugas untuk kelas {siswaKelas}
                 </CardDescription>
               </div>
               <Badge variant="secondary">{tugasAktif.length}</Badge>
@@ -345,7 +353,7 @@ export function SiswaDashboardPage() {
               Progres Belajar
             </CardTitle>
             <CardDescription>
-              Perkembangan pengerjaan tugas kelas {SISWA_KELAS}
+              Perkembangan pengerjaan tugas kelas {siswaKelas}
             </CardDescription>
           </CardHeader>
           <CardContent>

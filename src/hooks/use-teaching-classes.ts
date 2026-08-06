@@ -1,6 +1,7 @@
 'use client'
 
 import { createCrudHooks } from '@/hooks/use-api-crud'
+import { useQuery } from '@tanstack/react-query'
 import { teachingClassService, type TeachingClassFormData } from '@/lib/services/teaching-class.service'
 import type { KelasMengajar } from '@/features/kelas-mengajar/types/kelas-mengajar'
 
@@ -29,3 +30,17 @@ export const useTeachingClass = teachingClassHooks.useDetail
 export const useCreateTeachingClass = teachingClassHooks.useCreate
 export const useUpdateTeachingClass = teachingClassHooks.useUpdate
 export const useRemoveTeachingClass = teachingClassHooks.useRemove
+
+export function useTeachingClassesPaginated(filters: {
+  search?: string
+  guru?: string
+  kelas?: string
+  tahun_ajaran?: string
+  page?: number
+  per_page?: number
+} = {}) {
+  return useQuery({
+    queryKey: ['teaching-classes', filters],
+    queryFn: () => teachingClassService.getAllPaginated(filters),
+  })
+}

@@ -23,7 +23,7 @@ import {
   JENIS_KELAMIN_OPTIONS,
 } from "@/features/guru/constants/guru.constants"
 import {
-  useTeachers,
+  useTeachersPaginated,
   useCreateTeacher,
   useUpdateTeacher,
   useRemoveTeacher,
@@ -32,15 +32,6 @@ import type { Guru, GuruFormData } from "@/features/guru/types/guru"
 
 export function GuruListPage() {
   const router = useRouter()
-  const {
-    data: allGuru = [],
-    isLoading: isTableLoading,
-    isError,
-    refetch,
-  } = useTeachers()
-  const createGuru = useCreateTeacher()
-  const updateGuru = useUpdateTeacher()
-  const removeGuru = useRemoveTeacher()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [jkFilter, setJkFilter] = useState<string>("all")
@@ -51,30 +42,25 @@ export function GuruListPage() {
   const [deletingGuru, setDeletingGuru] = useState<Guru | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const perPage = 10
-
-  const filteredGuru = allGuru.filter((g) => {
-    if (statusFilter !== "all" && g.status_kepegawaian !== statusFilter)
-      return false
-    if (jkFilter !== "all" && g.jenis_kelamin !== jkFilter) return false
-    if (search) {
-      const q = search.toLowerCase()
-      return (
-        g.nama_lengkap.toLowerCase().includes(q) ||
-        g.nip.includes(q) ||
-        (g.nuptk?.includes(q) ?? false) ||
-        g.email.toLowerCase().includes(q) ||
-        g.mata_pelajaran.some((mp) => mp.toLowerCase().includes(q))
-      )
-    }
-    return true
+  const {
+    data,
+    isLoading: isTableLoading,
+    isError,
+    refetch,
+  } = useTeachersPaginated({
+    search: search || undefined,
+    status_kepegawaian:
+      statusFilter === "all" ? undefined : statusFilter,
+    jenis_kelamin: jkFilter === "all" ? undefined : jkFilter,
+    page,
+    per_page: 10,
   })
+  const createGuru = useCreateTeacher()
+  const updateGuru = useUpdateTeacher()
+  const removeGuru = useRemoveTeacher()
 
-  const totalPages = Math.ceil(filteredGuru.length / perPage)
-  const paginatedGuru = filteredGuru.slice(
-    (page - 1) * perPage,
-    page * perPage
-  )
+  const allGuru = data?.data ?? []
+  const meta = data?.meta
 
   const columns: Column<Record<string, unknown>>[] = [
     {
@@ -297,7 +283,7 @@ export function GuruListPage() {
 
       <DataTable
         columns={columns}
-        data={paginatedGuru as unknown as Record<string, unknown>[]}
+        data={allGuru as unknown as Record<string, unknown>[]}
         loading={isTableLoading}
         emptyMessage={
           isError ? "Gagal memuat data guru" : "Tidak ada guru ditemukan"
@@ -314,10 +300,10 @@ export function GuruListPage() {
         </div>
       )}
 
-      {totalPages > 1 && (
+      {meta && meta.last_page > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Halaman {page} dari {totalPages} ({filteredGuru.length} data)
+            Halaman {meta.current_page} dari {meta.last_page} ({meta.total} data)
           </p>
           <div className="flex gap-2">
             <Button
@@ -331,7 +317,7 @@ export function GuruListPage() {
             <Button
               variant="outline"
               size="sm"
-              disabled={page >= totalPages}
+              disabled={page >= meta.last_page}
               onClick={() => setPage(page + 1)}
             >
               Selanjutnya

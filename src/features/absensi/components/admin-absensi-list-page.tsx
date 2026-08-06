@@ -18,7 +18,7 @@ import {
 import {
   STATUS_SESI_COLORS,
 } from "@/features/absensi/constants/absensi.constants"
-import { DUMMY_SESI_ABSENSI } from "@/features/absensi/dummy/absensi.data"
+import { useAttendanceList } from "@/hooks/use-attendance"
 import {
   KELAS_OPTIONS,
   GURU_OPTIONS,
@@ -51,6 +51,12 @@ function formatDateID(dateStr: string): string {
 
 export function AdminAbsensiListPage() {
   const router = useRouter()
+  const {
+    data: sesiList = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useAttendanceList()
 
   const [search, setSearch] = useState("")
   const [kelasFilter, setKelasFilter] = useState("all")
@@ -59,12 +65,12 @@ export function AdminAbsensiListPage() {
   const [tanggalFilter, setTanggalFilter] = useState("")
   const [page, setPage] = useState(1)
 
-  const totalSesi = DUMMY_SESI_ABSENSI.length
-  const sesiSelesai = DUMMY_SESI_ABSENSI.filter(
+  const totalSesi = sesiList.length
+  const sesiSelesai = sesiList.filter(
     (s) => s.status === "Selesai"
   ).length
-  const totalHadir = DUMMY_SESI_ABSENSI.reduce((acc, s) => acc + s.hadir, 0)
-  const totalSiswaAll = DUMMY_SESI_ABSENSI.reduce(
+  const totalHadir = sesiList.reduce((acc, s) => acc + s.hadir, 0)
+  const totalSiswaAll = sesiList.reduce(
     (acc, s) => acc + s.total_siswa,
     0
   )
@@ -72,7 +78,7 @@ export function AdminAbsensiListPage() {
     totalSiswaAll > 0 ? Math.round((totalHadir / totalSiswaAll) * 100) : 0
 
   const filteredData = useMemo(() => {
-    let data = [...DUMMY_SESI_ABSENSI]
+    let data = [...sesiList]
 
     if (search) {
       const q = search.toLowerCase()
@@ -101,7 +107,7 @@ export function AdminAbsensiListPage() {
     }
 
     return data
-  }, [search, kelasFilter, guruFilter, mapelFilter, tanggalFilter])
+  }, [sesiList, search, kelasFilter, guruFilter, mapelFilter, tanggalFilter])
 
   const totalPages = Math.ceil(filteredData.length / PER_PAGE)
   const paginatedData = filteredData.slice(
@@ -271,9 +277,22 @@ export function AdminAbsensiListPage() {
         <DataTable<SesiRow>
           columns={columns}
           data={paginatedData as unknown as SesiRow[]}
+          loading={isLoading}
           onRowClick={(item) => router.push(`/admin/absensi/${item.id}`)}
-          emptyMessage="Tidak ada data sesi absensi"
+          emptyMessage={
+            isError
+              ? "Gagal memuat data sesi absensi"
+              : "Tidak ada data sesi absensi"
+          }
         />
+        {isError && (
+          <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive mt-4">
+            Terjadi kesalahan saat memuat data absensi.{" "}
+            <button onClick={() => refetch()} className="underline font-medium">
+              Muat ulang
+            </button>
+          </div>
+        )}
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4">
             <p className="text-sm text-muted-foreground">

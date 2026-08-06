@@ -24,7 +24,7 @@ import {
   TAHUN_AJARAN_OPTIONS,
 } from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
 import {
-  useTeachingClasses,
+  useTeachingClassesPaginated,
   useCreateTeachingClass,
   useUpdateTeachingClass,
   useRemoveTeachingClass,
@@ -32,15 +32,6 @@ import {
 import type { KelasMengajar, KelasMengajarFormData } from "@/features/kelas-mengajar/types/kelas-mengajar"
 
 export function KelasMengajarListPage() {
-  const {
-    data: allData = [],
-    isLoading: isTableLoading,
-    isError,
-    refetch,
-  } = useTeachingClasses()
-  const createTeachingClass = useCreateTeachingClass()
-  const updateTeachingClass = useUpdateTeachingClass()
-  const removeTeachingClass = useRemoveTeachingClass()
   const [search, setSearch] = useState("")
   const [guruFilter, setGuruFilter] = useState<string>("all")
   const [kelasFilter, setKelasFilter] = useState<string>("all")
@@ -52,28 +43,25 @@ export function KelasMengajarListPage() {
   const [deletingItem, setDeletingItem] = useState<KelasMengajar | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const perPage = 10
-
-  const filteredData = allData.filter((item) => {
-    if (guruFilter !== "all" && item.guru_nama !== guruFilter) return false
-    if (kelasFilter !== "all" && item.kelas !== kelasFilter) return false
-    if (tahunFilter !== "all" && item.tahun_ajaran !== tahunFilter) return false
-    if (search) {
-      const q = search.toLowerCase()
-      return (
-        item.guru_nama.toLowerCase().includes(q) ||
-        item.mata_pelajaran.toLowerCase().includes(q) ||
-        item.kelas.toLowerCase().includes(q)
-      )
-    }
-    return true
+  const {
+    data,
+    isLoading: isTableLoading,
+    isError,
+    refetch,
+  } = useTeachingClassesPaginated({
+    search: search || undefined,
+    guru: guruFilter,
+    kelas: kelasFilter,
+    tahun_ajaran: tahunFilter,
+    page,
+    per_page: 10,
   })
+  const createTeachingClass = useCreateTeachingClass()
+  const updateTeachingClass = useUpdateTeachingClass()
+  const removeTeachingClass = useRemoveTeachingClass()
 
-  const totalPages = Math.ceil(filteredData.length / perPage)
-  const paginatedData = filteredData.slice(
-    (page - 1) * perPage,
-    page * perPage
-  )
+  const items = data?.data ?? []
+  const meta = data?.meta
 
   const columns: Column<Record<string, unknown>>[] = [
     {
@@ -308,7 +296,7 @@ export function KelasMengajarListPage() {
 
       <DataTable
         columns={columns}
-        data={paginatedData as unknown as Record<string, unknown>[]}
+        data={items as unknown as Record<string, unknown>[]}
         loading={isTableLoading}
         emptyMessage={
           isError
@@ -326,10 +314,10 @@ export function KelasMengajarListPage() {
         </div>
       )}
 
-      {totalPages > 1 && (
+      {meta && meta.last_page > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Halaman {page} dari {totalPages} ({filteredData.length} data)
+            Halaman {meta.current_page} dari {meta.last_page} ({meta.total} data)
           </p>
           <div className="flex gap-2">
             <Button
@@ -343,7 +331,7 @@ export function KelasMengajarListPage() {
             <Button
               variant="outline"
               size="sm"
-              disabled={page >= totalPages}
+              disabled={page >= (meta?.last_page ?? 1)}
               onClick={() => setPage(page + 1)}
             >
               Selanjutnya

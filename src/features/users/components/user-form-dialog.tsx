@@ -46,7 +46,7 @@ export function UserFormDialog({
       setForm({
         name: editingUser.name,
         username: editingUser.username ?? "",
-        email: editingUser.email,
+        email: editingUser.email ?? "",
         password: "",
         password_confirmation: "",
         role: editingUser.role,

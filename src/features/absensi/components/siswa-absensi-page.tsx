@@ -17,13 +17,10 @@ import {
 import {
   STATUS_KEHADIRAN_COLORS,
 } from "@/features/absensi/constants/absensi.constants"
-import {
-  DUMMY_SESI_ABSENSI,
-  DUMMY_ABSENSI_SISWA,
-} from "@/features/absensi/dummy/absensi.data"
+import { useAuth } from "@/contexts/auth-context"
+import { useStudents } from "@/hooks/use-students"
+import { useSiswaAbsensi } from "@/hooks/use-attendance"
 import type { StatusKehadiran } from "@/features/absensi/types/absensi"
-
-const SISWA_ID = 101
 
 type AbsensiRow = Record<string, unknown> & {
   id: number
@@ -46,10 +43,23 @@ function formatDateID(dateStr: string): string {
 }
 
 export function SiswaAbsensiPage() {
-  const siswaAbsensi = useMemo(
-    () => DUMMY_ABSENSI_SISWA.filter((a) => a.siswa_id === SISWA_ID),
-    []
+  const { user } = useAuth()
+  const siswaName = user?.name ?? ""
+  const { data: siswaData } = useStudents()
+
+  const siswa = (siswaData ?? []).find(
+    (s) =>
+      s.nama_lengkap.toLowerCase() === siswaName.toLowerCase() &&
+      s.status === "Aktif"
   )
+  const siswaId = siswa?.id ?? 0
+
+  const {
+    data: siswaAbsensi = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useSiswaAbsensi(siswaId)
 
   const stats = useMemo(() => {
     const total = siswaAbsensi.length
@@ -67,15 +77,18 @@ export function SiswaAbsensiPage() {
 
   const tableData = useMemo<AbsensiRow[]>(() => {
     return siswaAbsensi.map((a, i) => {
-      const sesi = DUMMY_SESI_ABSENSI.find((s) => s.id === a.sesi_id)
+      const sesi = a.sesi
       return {
         id: a.id,
         no: i + 1,
-        tanggal: a.created_at,
-        jam: sesi ? `${sesi.jam_mulai} - ${sesi.jam_selesai}` : "-",
-        mata_pelajaran: sesi?.mata_pelajaran ?? "-",
-        guru_nama: sesi?.guru_nama ?? "-",
-        kelas: sesi?.kelas ?? a.siswa_kelas,
+        tanggal: sesi.tanggal,
+        jam:
+          sesi.jam_mulai && sesi.jam_selesai
+            ? `${sesi.jam_mulai} - ${sesi.jam_selesai}`
+            : "-",
+        mata_pelajaran: sesi.mata_pelajaran || "-",
+        guru_nama: sesi.guru_nama || "-",
+        kelas: sesi.kelas || a.siswa_kelas,
         status: a.status,
         keterangan: a.keterangan || "-",
       }
@@ -206,8 +219,21 @@ export function SiswaAbsensiPage() {
         <DataTable<AbsensiRow>
           columns={columns}
           data={tableData}
-          emptyMessage="Belum ada riwayat absensi"
+          loading={isLoading}
+          emptyMessage={
+            isError
+              ? "Gagal memuat riwayat absensi"
+              : "Belum ada riwayat absensi"
+          }
         />
+        {isError && (
+          <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive mt-4">
+            Terjadi kesalahan saat memuat riwayat absensi.{" "}
+            <button onClick={() => refetch()} className="underline font-medium">
+              Muat ulang
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { getRekapAbsensi } from "@/features/absensi/dummy/absensi.data"
+import { useAttendanceRekap } from "@/hooks/use-attendance"
 import { KELAS_OPTIONS } from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
 import type { RekapAbsensi } from "@/features/absensi/types/absensi"
 
@@ -30,7 +30,12 @@ export function AdminAbsensiRekapPage() {
   const [page, setPage] = useState(1)
   const perPage = 15
 
-  const rekapData = useMemo(() => getRekapAbsensi(), [])
+  const {
+    data: rekapData = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useAttendanceRekap()
 
   const summaryData = useMemo(() => {
     const totalPertemuan = Math.max(...rekapData.map((r) => r.total_pertemuan), 0)
@@ -239,8 +244,22 @@ export function AdminAbsensiRekapPage() {
       <DataTable
         columns={columns}
         data={paginatedData as RekapRow[]}
-        emptyMessage="Tidak ada data rekap absensi"
+        loading={isLoading}
+        emptyMessage={
+          isError
+            ? "Gagal memuat data rekap absensi"
+            : "Tidak ada data rekap absensi"
+        }
       />
+
+      {isError && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive">
+          Terjadi kesalahan saat memuat data rekap absensi.{" "}
+          <button onClick={() => refetch()} className="underline font-medium">
+            Muat ulang
+          </button>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">

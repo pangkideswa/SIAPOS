@@ -20,20 +20,16 @@ import {
   School,
 } from "lucide-react"
 import { toast } from "sonner"
+import { useAuth } from "@/contexts/auth-context"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
 import { useAssignments } from "@/hooks/use-assignments"
 import { useCreateSubmission, useSubmissions } from "@/hooks/use-submissions"
+import { useStudents } from "@/hooks/use-students"
 import type { Tugas } from "@/features/tugas/types/tugas"
 import type {
   PengumpulanTugas,
   PengumpulanFile,
 } from "@/features/pengumpulan/types/pengumpulan"
-
-const SISWA_SIMULASI = {
-  id: 99,
-  nama: "Andi Siswa (Simulasi)",
-  kelas: "XI TKJ 1",
-}
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -58,6 +54,7 @@ function isAfterDeadline(tenggat: string): boolean {
 }
 
 export function SimulasiSiswaPage() {
+  const { user } = useAuth()
   const [selectedTugas, setSelectedTugas] = useState<Tugas | null>(null)
   const [file, setFile] = useState<PengumpulanFile | null>(null)
   const [catatan, setCatatan] = useState("")
@@ -69,24 +66,39 @@ export function SimulasiSiswaPage() {
     isError,
     refetch,
   } = useAssignments()
+  const {
+    data: allStudents = [],
+    isLoading: isStudentsLoading,
+    isError: isStudentsError,
+    refetch: refetchStudents,
+  } = useStudents()
   const { data: allSubmissions = [] } = useSubmissions()
   const createSubmission = useCreateSubmission()
 
-  const siswaTugas = allTugas.filter(
+  const currentStudent =
+    allStudents.find((siswa) => siswa.user_id === user?.id) ??
+    allStudents.find((siswa) => user?.nisn && siswa.nisn === user.nisn) ??
+    allStudents.find(
+      (siswa) =>
+        siswa.nama_lengkap.toLowerCase() === (user?.name ?? "").toLowerCase()
+    ) ??
+    null
+
+  const siswaTugas = currentStudent
+    ? allTugas.filter(
     (t) =>
       t.status === "Dipublikasikan" &&
-      (t.kelas === SISWA_SIMULASI.kelas ||
-        t.kelas === "X TKJ 2" ||
-        t.kelas === "XI TBSM 1")
-  )
+      t.kelas === currentStudent.kelas
+      )
+    : []
 
   function getSiswaSubmission(tugasId: number): PengumpulanTugas | null {
+    if (!currentStudent) return null
     return (
       allSubmissions.find(
         (p) =>
           p.tugas_id === tugasId &&
-          (p.siswa_nama === SISWA_SIMULASI.nama ||
-            p.siswa_id === SISWA_SIMULASI.id)
+          p.siswa_id === currentStudent.id
       ) ?? null
     )
   }
@@ -137,7 +149,7 @@ export function SimulasiSiswaPage() {
   }
 
   async function handleSubmit() {
-    if (!selectedTugas) return
+    if (!selectedTugas || !currentStudent) return
 
     if (!file) {
       toast.error("File wajib dipilih", {
@@ -156,7 +168,7 @@ export function SimulasiSiswaPage() {
 
     await createSubmission.mutateAsync({
       assignment_id: selectedTugas.id,
-      student_id: SISWA_SIMULASI.id,
+      student_id: currentStudent.id,
       data: {
         file_jawaban: file ? { ...file } : null,
         catatan: catatan.trim() || null,
@@ -329,26 +341,43 @@ export function SimulasiSiswaPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Simulasi Siswa — Kirim Tugas"
-        description={`Masuk sebagai: ${SISWA_SIMULASI.nama} (${SISWA_SIMULASI.kelas})`}
+        title="Tugas Siswa"
+        description={
+          currentStudent
+            ? `Masuk sebagai: ${currentStudent.nama_lengkap} (${currentStudent.kelas})`
+            : "Daftar tugas yang tersedia untuk akun siswa."
+        }
       />
 
       <div className="space-y-4">
-        {isLoading ? (
+        {isLoading || isStudentsLoading ? (
           <Card>
             <CardContent className="pt-6 text-center text-muted-foreground py-12">
               Memuat daftar tugas...
             </CardContent>
           </Card>
-        ) : isError ? (
+        ) : isError || isStudentsError ? (
           <Card>
             <CardContent className="pt-6 text-center py-12">
               <p className="text-destructive mb-4">
                 Gagal memuat daftar tugas.
               </p>
-              <Button variant="outline" onClick={() => refetch()}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  refetch()
+                  refetchStudents()
+                }}
+              >
                 Coba Lagi
               </Button>
+            </CardContent>
+          </Card>
+        ) : !currentStudent ? (
+          <Card>
+            <CardContent className="pt-6 text-center text-muted-foreground py-12">
+              Data siswa untuk akun ini belum ditemukan di database. Hubungi admin
+              sekolah untuk menghubungkan akun Anda dengan data siswa.
             </CardContent>
           </Card>
         ) : siswaTugas.length === 0 ? (

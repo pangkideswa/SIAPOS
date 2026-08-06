@@ -11,24 +11,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { DUMMY_JADWAL_PELAJARAN } from "@/features/jadwal-pelajaran/dummy/jadwal-pelajaran.data"
+import { useAuth } from "@/contexts/auth-context"
+import { useClassroom } from "@/hooks/use-classroom"
+import { useSchedules } from "@/hooks/use-schedules"
+import type { JadwalPelajaran } from "../types/jadwal-pelajaran"
 import { HARI_OPTIONS, HARI_INDEX } from "@/features/jadwal-pelajaran/constants/jadwal-pelajaran.constants"
 
-const SISWA_KELAS = "XI TKJ 1"
-
 export function JadwalPelajaranSiswaPage() {
+  const { user } = useAuth()
+  const classroom = useClassroom()
+  const { data: jadwalData } = useSchedules()
   const [hariFilter, setHariFilter] = useState("all")
+
+  const siswa = classroom.getSiswaByUser(user)
+  const siswaKelas = siswa?.kelas ?? ""
 
   const jadwalKelas = useMemo(
     () =>
-      DUMMY_JADWAL_PELAJARAN.filter(
-        (j) => j.kelas === SISWA_KELAS && j.status === "Aktif"
-      ).sort((a, b) => {
-        const hariDiff = HARI_INDEX[a.hari] - HARI_INDEX[b.hari]
-        if (hariDiff !== 0) return hariDiff
-        return a.jam_mulai.localeCompare(b.jam_mulai)
-      }),
-    []
+      (jadwalData ?? [])
+        .filter(
+          (j) => j.kelas === siswaKelas && j.status === "Aktif"
+        )
+        .sort((a, b) => {
+          const hariDiff = HARI_INDEX[a.hari] - HARI_INDEX[b.hari]
+          if (hariDiff !== 0) return hariDiff
+          return a.jam_mulai.localeCompare(b.jam_mulai)
+        }),
+    [jadwalData, siswaKelas]
   )
 
   const filteredJadwal = useMemo(
@@ -40,7 +49,7 @@ export function JadwalPelajaranSiswaPage() {
   )
 
   const groupedByHari = useMemo(() => {
-    const groups: Record<string, typeof DUMMY_JADWAL_PELAJARAN> = {}
+    const groups: Record<string, JadwalPelajaran[]> = {}
     for (const jadwal of filteredJadwal) {
       if (!groups[jadwal.hari]) groups[jadwal.hari] = []
       groups[jadwal.hari].push(jadwal)
@@ -56,7 +65,7 @@ export function JadwalPelajaranSiswaPage() {
     <div className="space-y-6">
       <PageHeader
         title="Jadwal Pelajaran"
-        description={`Jadwal pelajaran kelas ${SISWA_KELAS}`}
+        description={`Jadwal pelajaran kelas ${siswaKelas}`}
       />
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">

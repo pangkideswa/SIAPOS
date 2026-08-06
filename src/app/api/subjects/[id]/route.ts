@@ -3,6 +3,7 @@ import { NextRequest } from "next/server"
 import { subjectService } from "@/services/subject.service"
 import { ok, apiError, notFound, parseWithSchema } from "@/lib/api-utils"
 import { subjectSchema } from "@/lib/validations/subject.schemas"
+import { requireAdmin, requireApiUser } from "@/auth/api-authorization"
 import type { SubjectCreateInput } from "@/services/subject.service"
 
 export async function GET(
@@ -10,6 +11,7 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    await requireApiUser()
     const { id } = await context.params
     const subject = await subjectService.getById(Number(id))
     if (!subject) return notFound("Mata pelajaran tidak ditemukan")
@@ -24,6 +26,7 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    await requireAdmin()
     const { id } = await context.params
     const body = parseWithSchema(subjectSchema, await request.json())
     const subject = await subjectService.update(
@@ -41,6 +44,7 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    await requireAdmin()
     const { id } = await context.params
     await subjectService.remove(Number(id))
     return ok(true, "Mata pelajaran berhasil dihapus")

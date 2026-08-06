@@ -1,13 +1,16 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { scheduleService } from '@/lib/services/schedule.service'
+import {
+  scheduleService,
+  type ScheduleFilters,
+} from '@/lib/services/schedule.service'
 import type { JadwalPelajaran } from '@/features/jadwal-pelajaran/types/jadwal-pelajaran'
 
-export function useSchedules() {
+export function useSchedules(filters: ScheduleFilters = {}) {
   return useQuery<JadwalPelajaran[]>({
-    queryKey: ['schedules'],
-    queryFn: () => scheduleService.getAll(),
+    queryKey: ['schedules', filters],
+    queryFn: () => scheduleService.getAll(filters),
   })
 }
 

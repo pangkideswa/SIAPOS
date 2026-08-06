@@ -1,11 +1,10 @@
 "use client"
 
-import { DUMMY_NOTIFIKASI } from "@/features/notifications/dummy/notifikasi.data"
-import type {
-  Notifikasi,
-  NotifikasiTipe,
-} from "@/features/notifications/types/notifikasi"
-import type { UserRole } from "@/types/auth"
+import {
+  notificationService,
+  type PushNotifikasiInput,
+} from "@/lib/services/notification.service"
+import type { Notifikasi } from "@/features/notifications/types/notifikasi"
 
 type NotifikasiListener = () => void
 
@@ -22,61 +21,52 @@ function emit() {
   listeners.forEach((listener) => listener())
 }
 
-export function getNotifikasi(): Notifikasi[] {
-  return DUMMY_NOTIFIKASI
-}
+let cache: Notifikasi[] = []
 
-export interface PushNotifikasiInput {
-  tipe: NotifikasiTipe
-  judul: string
-  pesan: string
-  href?: string
-  target_roles: UserRole[]
-}
-
-export function pushNotifikasi(input: PushNotifikasiInput): Notifikasi {
-  const notif: Notifikasi = {
-    id: Date.now(),
-    tipe: input.tipe,
-    judul: input.judul,
-    pesan: input.pesan,
-    href: input.href,
-    target_roles: input.target_roles,
-    is_read: false,
-    created_at: new Date().toISOString(),
+export async function getNotifikasi(): Promise<Notifikasi[]> {
+  try {
+    cache = await notificationService.getAll()
+  } catch {
+    cache = []
   }
-  DUMMY_NOTIFIKASI.unshift(notif)
-  emit()
-  return notif
+  return cache
 }
 
-export function markNotifikasiRead(id: number) {
-  const notif = DUMMY_NOTIFIKASI.find((n) => n.id === id)
-  if (notif && !notif.is_read) {
-    notif.is_read = true
+export function pushNotifikasi(input: PushNotifikasiInput): Promise<Notifikasi> {
+  return notificationService.create(input).then((notification) => {
+    cache = [notification, ...cache]
     emit()
+    return notification
+  })
+}
+
+export async function markNotifikasiRead(id: number) {
+  try {
+    await notificationService.markRead(id)
+    cache = cache.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+    emit()
+  } catch {
+    // server unavailable: keep local state as-is
   }
 }
 
-export function markAllNotifikasiRead() {
-  let changed = false
-  DUMMY_NOTIFIKASI.forEach((n) => {
-    if (!n.is_read) {
-      n.is_read = true
-      changed = true
-    }
-  })
-  if (changed) emit()
+export async function markAllNotifikasiRead() {
+  try {
+    await notificationService.markAllRead()
+    cache = cache.map((n) => ({ ...n, is_read: true }))
+    emit()
+  } catch {
+    // server unavailable: keep local state as-is
+  }
 }
 
-export function markNotifikasiListRead(ids: number[]) {
-  const idSet = new Set(ids)
-  let changed = false
-  DUMMY_NOTIFIKASI.forEach((n) => {
-    if (idSet.has(n.id) && !n.is_read) {
-      n.is_read = true
-      changed = true
-    }
-  })
-  if (changed) emit()
+export async function markNotifikasiListRead(ids: number[]) {
+  try {
+    await notificationService.markListRead(ids)
+    const idSet = new Set(ids)
+    cache = cache.map((n) => (idSet.has(n.id) ? { ...n, is_read: true } : n))
+    emit()
+  } catch {
+    // server unavailable: keep local state as-is
+  }
 }
