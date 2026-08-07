@@ -2,9 +2,11 @@ import "server-only"
 import { z } from "zod"
 import { attendanceRepository } from "@/repositories/attendance.repository"
 import type { AttendanceSessionRow } from "@/repositories/attendance.repository"
+import { NotFoundError } from "@/lib/api-utils"
 import type { Attendance, Prisma } from "@/generated/prisma/client"
 import type {
   AbsensiSiswa,
+  MetodeAbsensi,
   RekapAbsensi,
   SesiAbsensi,
   StatusKehadiran,
@@ -20,6 +22,7 @@ export interface AttendanceFilters {
   guru?: string
   kelas?: string
   tanggal?: string
+  teaching_class_id?: number
 }
 
 export interface SiswaAbsensiRow extends AbsensiSiswa {
@@ -84,6 +87,7 @@ function toSesiAbsensi(row: AttendanceSessionRow): SesiAbsensi {
   const total = row.records.length
   return {
     id: row.id,
+    teaching_class_id: row.teaching_class_id ?? null,
     tanggal: toDateOnly(row.tanggal),
     jam_mulai: row.jam_mulai ?? "",
     jam_selesai: row.jam_selesai ?? "",
@@ -99,9 +103,16 @@ function toSesiAbsensi(row: AttendanceSessionRow): SesiAbsensi {
     alpha: counts.alpha,
     terlambat: counts.terlambat,
     status: SESSION_STATUS_DB[row.status],
+    metode: inferMetode(row),
     created_at: row.created_at.toISOString(),
     updated_at: row.updated_at.toISOString(),
   }
+}
+
+function inferMetode(row: AttendanceSessionRow): MetodeAbsensi {
+  if (row.status === "BERLANGSUNG") return "Siswa"
+  if (row.records.length === 0) return "Siswa"
+  return "Guru"
 }
 
 function toAbsensiSiswa(
@@ -130,6 +141,7 @@ function toSessionCreate(data: AttendanceSessionCreateData) {
     kelas: data.kelas ?? null,
     tahun_ajaran: data.tahun_ajaran ?? null,
     semester: data.semester ?? null,
+    teaching_class_id: data.teaching_class_id ?? null,
     status: SESSION_STATUS_TO_DB[data.status ?? "Belum"],
   }
 }
@@ -139,6 +151,9 @@ export const attendanceService = {
     const where: Prisma.AttendanceSessionWhereInput = {
       ...(filters.guru ? { guru_nama: filters.guru } : {}),
       ...(filters.kelas ? { kelas: filters.kelas } : {}),
+      ...(filters.teaching_class_id
+        ? { teaching_class_id: filters.teaching_class_id }
+        : {}),
     }
     if (filters.tanggal) {
       const start = new Date(filters.tanggal + "T00:00:00")
@@ -227,6 +242,72 @@ export const attendanceService = {
   async create(data: AttendanceSessionCreateData): Promise<SesiAbsensi> {
     const row = await attendanceRepository.createSession(toSessionCreate(data))
     return toSesiAbsensi(row)
+  },
+
+  async createForClass(data: {
+    teaching_class_id: number
+    metode: MetodeAbsensi
+    tanggal: string
+    jam_mulai?: string | null
+    jam_selesai?: string | null
+  }): Promise<SesiAbsensi> {
+    const teachingClass = await attendanceRepository.findTeachingClass(
+      data.teaching_class_id
+    )
+    if (!teachingClass) {
+      throw new NotFoundError("Kelas mengajar tidak ditemukan")
+    }
+    const sessionData = {
+      teaching_class_id: data.teaching_class_id,
+      tanggal: new Date(data.tanggal + "T00:00:00"),
+      jam_mulai: data.jam_mulai ?? null,
+      jam_selesai: data.jam_selesai ?? null,
+      mata_pelajaran: teachingClass.mata_pelajaran ?? null,
+      guru_nama: teachingClass.guru_nama ?? null,
+      kelas: teachingClass.kelas ?? null,
+      tahun_ajaran: teachingClass.tahun_ajaran ?? null,
+      semester: teachingClass.semester ?? null,
+      status: "BELUM" as const,
+    }
+    if (data.metode === "Guru") {
+      const students = await attendanceRepository.findClassStudents(
+        data.teaching_class_id
+      )
+      const row = await attendanceRepository.createSessionWithRecords(
+        sessionData,
+        students.map((s) => ({
+          student_id: s.id,
+          status: "HADIR" as const,
+          keterangan: null,
+        }))
+      )
+      return toSesiAbsensi(row)
+    }
+    const row = await attendanceRepository.createSession(sessionData)
+    return toSesiAbsensi(row)
+  },
+
+  async markStudentPresent(
+    sessionId: number,
+    studentId: number
+  ): Promise<AttendanceSessionDetail | null> {
+    await attendanceRepository.upsertRecord(sessionId, studentId, "HADIR")
+    return this.getById(sessionId)
+  },
+
+  async assertStudentInSession(
+    sessionId: number,
+    studentId: number
+  ): Promise<boolean> {
+    const session = await attendanceRepository.findSessionById(sessionId)
+    if (!session) return false
+    if (!session.teaching_class_id) {
+      return session.records.some((r) => r.student_id === studentId)
+    }
+    const students = await attendanceRepository.findClassStudents(
+      session.teaching_class_id
+    )
+    return students.some((s) => s.id === studentId)
   },
 
   async updateSessionStatus(

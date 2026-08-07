@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import {
@@ -14,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Search, Eye } from "lucide-react"
+import { Search, Eye, BarChart3 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useAttendanceList } from "@/hooks/use-attendance"
 import { STATUS_SESI_COLORS } from "@/features/absensi/constants/absensi.constants"
@@ -149,6 +150,15 @@ export function GuruAbsensiHistoryPage() {
       <PageHeader
         title="Riwayat Absensi"
         description="Riwayat pengambilan absensi kelas Anda"
+        action={
+          <Button
+            variant="outline"
+            onClick={() => router.push("/guru/absensi/rekap")}
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Lihat Rekap
+          </Button>
+        }
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

@@ -94,6 +94,10 @@ export const teachingClassAssignmentRepository = {
     return prisma.teacher.findFirst({ where: { user_id: userId } })
   },
 
+  async getTeacherById(id: number): Promise<Teacher | null> {
+    return prisma.teacher.findUnique({ where: { id } })
+  },
+
   async getSubjectById(id: number): Promise<Subject | null> {
     return prisma.subject.findUnique({ where: { id } })
   },

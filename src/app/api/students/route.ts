@@ -31,28 +31,34 @@ export async function GET(request: NextRequest) {
     }
 
     const jurusanId = searchParams.get("jurusan_id")
-    const students = await studentService.getAllPaginated({
-      search: searchParams.get("search") ?? undefined,
-      jurusan_id:
-        jurusanId !== null && jurusanId !== "" && !Number.isNaN(Number(jurusanId))
-          ? Number(jurusanId)
+    const allowedClasses = isAdmin(user) ? undefined : await allowedClassNamesFor(user)
+    const students = await studentService.getAllPaginated(
+      {
+        search: searchParams.get("search") ?? undefined,
+        jurusan_id:
+          jurusanId !== null && jurusanId !== "" && !Number.isNaN(Number(jurusanId))
+            ? Number(jurusanId)
+            : undefined,
+        kelas: searchParams.get("kelas") ?? undefined,
+        status: searchParams.get("status") ?? undefined,
+        page: searchParams.get("page")
+          ? Number(searchParams.get("page"))
           : undefined,
-      kelas: searchParams.get("kelas") ?? undefined,
-      status: searchParams.get("status") ?? undefined,
-      page: searchParams.get("page")
-        ? Number(searchParams.get("page"))
-        : undefined,
-      per_page: searchParams.get("per_page")
-        ? Number(searchParams.get("per_page"))
-        : undefined,
-    })
+        per_page: searchParams.get("per_page")
+          ? Number(searchParams.get("per_page"))
+          : undefined,
+      },
+      allowedClasses
+    )
     if (!isAdmin(user)) {
       const student = await getStudentProfile(user)
       if (user.role === "siswa") {
-        return ok({ ...students, data: student ? students.data.filter((item) => item.id === student.id) : [] })
+        return ok({
+          ...students,
+          data: student ? students.data.filter((item) => item.id === student.id) : [],
+        })
       }
-      const allowedClasses = await allowedClassNamesFor(user)
-      return ok({ ...students, data: students.data.filter((item) => allowedClasses.has(item.kelas)) })
+      return ok(students)
     }
     return ok(students)
   } catch (error) {

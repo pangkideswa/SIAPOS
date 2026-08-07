@@ -4,6 +4,7 @@ import { announcementService } from "@/services/announcement.service"
 import { AppError, ok, apiError, notFound, parseWithSchema } from "@/lib/api-utils"
 import { announcementSchema } from "@/lib/validations/announcement.schemas"
 import {
+  allowedClassNamesFor,
   getStudentProfile,
   isAdmin,
   requireApiUser,
@@ -22,10 +23,14 @@ async function assertAnnouncementAccess(
     throw new AppError("Anda tidak memiliki akses ke pengumuman ini", 403)
   }
   if (user.role === "guru") {
+    const allowedClasses = await allowedClassNamesFor(user)
     if (
       announcement.penulis === user.name ||
-      (announcement.status === "Dipublikasikan" &&
-        (announcement.target === "Semua Pengguna" || announcement.target === "Guru"))
+      announcement.target === "Semua Pengguna" ||
+      announcement.target === "Guru" ||
+      (announcement.target === "Kelas Tertentu" &&
+        announcement.kelas &&
+        allowedClasses.has(announcement.kelas))
     ) return
   }
   if (user.role === "siswa") {

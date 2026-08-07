@@ -3,6 +3,7 @@ import { NextRequest } from "next/server"
 import { attendanceService } from "@/services/attendance.service"
 import { ok, apiError } from "@/lib/api-utils"
 import {
+  allowedClassNamesFor,
   getStudentProfile,
   getTeacherProfile,
   isAdmin,
@@ -20,7 +21,9 @@ export async function GET(request: NextRequest) {
       return ok(rekap.filter((item) => item.siswa_id === student?.id))
     }
     const teacher = await getTeacherProfile(user)
-    return ok(teacher ? rekap : [])
+    if (!teacher) return ok([])
+    const allowedClasses = await allowedClassNamesFor(user)
+    return ok(rekap.filter((item) => allowedClasses.has(item.siswa_kelas)))
   } catch (error) {
     return apiError(error)
   }

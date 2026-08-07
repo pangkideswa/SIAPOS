@@ -51,6 +51,7 @@ export function KelasMengajarFormDialog({
   useEffect(() => {
     if (editingItem) {
       setForm({
+        teacher_id: editingItem.teacher_id ?? null,
         guru_nama: editingItem.guru_nama,
         mata_pelajaran: editingItem.mata_pelajaran,
         kelas: editingItem.kelas,

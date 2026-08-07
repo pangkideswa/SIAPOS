@@ -1,5 +1,6 @@
 import "server-only"
 import { prisma } from "@/lib/prisma"
+import { AppError, NotFoundError } from "@/lib/api-utils"
 import type {
   Attendance,
   Prisma,
@@ -70,6 +71,91 @@ export const attendanceRepository = {
     return prisma.attendanceSession.create({
       data,
       include: SESSION_INCLUDE,
+    })
+  },
+
+  async createSessionWithRecords(
+    sessionData: AttendanceSessionCreateData,
+    records: AttendanceRecordInput[]
+  ): Promise<AttendanceSessionRow> {
+    return prisma.$transaction(async (tx) => {
+      const session = await tx.attendanceSession.create({ data: sessionData })
+      if (records.length > 0) {
+        await tx.attendance.createMany({
+          data: records.map((r) => ({
+            session_id: session.id,
+            student_id: r.student_id,
+            status: r.status,
+            keterangan: r.keterangan,
+          })),
+        })
+      }
+      return tx.attendanceSession.findUnique({
+        where: { id: session.id },
+        include: SESSION_INCLUDE,
+      }) as Promise<AttendanceSessionRow>
+    })
+  },
+
+  async findTeachingClass(teachingClassId: number) {
+    return prisma.teachingClass.findUnique({
+      where: { id: teachingClassId },
+      select: {
+        id: true,
+        classroom_id: true,
+        kelas: true,
+        mata_pelajaran: true,
+        guru_nama: true,
+        tahun_ajaran: true,
+        semester: true,
+      },
+    })
+  },
+
+  async findClassStudents(teachingClassId: number) {
+    const teachingClass = await this.findTeachingClass(teachingClassId)
+    if (!teachingClass) return []
+    const or: Prisma.StudentWhereInput[] = []
+    if (teachingClass.classroom_id) {
+      or.push({ classroom_id: teachingClass.classroom_id })
+    }
+    if (teachingClass.kelas) {
+      or.push({ kelas: teachingClass.kelas })
+    }
+    if (or.length === 0) return []
+    return prisma.student.findMany({
+      where: { OR: or, status: "Aktif" },
+      select: { id: true, nama_lengkap: true, kelas: true },
+      orderBy: { nama_lengkap: "asc" },
+    })
+  },
+
+  async upsertRecord(
+    sessionId: number,
+    studentId: number,
+    status: Attendance["status"] = "HADIR"
+  ): Promise<void> {
+    const session = await prisma.attendanceSession.findUnique({
+      where: { id: sessionId },
+      select: { status: true },
+    })
+    if (!session) {
+      throw new NotFoundError("Sesi absensi tidak ditemukan")
+    }
+    if (session.status !== "BERLANGSUNG") {
+      throw new AppError("Absensi belum dibuka untuk sesi ini", 400)
+    }
+    await prisma.attendance.upsert({
+      where: {
+        session_id_student_id: { session_id: sessionId, student_id: studentId },
+      },
+      create: {
+        session_id: sessionId,
+        student_id: studentId,
+        status,
+        keterangan: null,
+      },
+      update: { status, keterangan: null },
     })
   },
 

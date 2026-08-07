@@ -12,20 +12,23 @@ import {
   LayoutDashboard,
   BookOpen,
   ClipboardList,
+  CalendarCheck,
   Lock,
 } from "lucide-react"
 import { useClassroom } from "@/hooks/use-classroom"
 import { SiswaKelasOverviewTab } from "@/features/kelas-saya/components/siswa-kelas-overview-tab"
 import { SiswaKelasMateriTab } from "@/features/kelas-saya/components/siswa-kelas-materi-tab"
 import { SiswaKelasTugasTab } from "@/features/kelas-saya/components/siswa-kelas-tugas-tab"
+import { SiswaKelasAbsensiTab } from "@/features/kelas-saya/components/siswa-kelas-absensi-tab"
 
-type KelasTab = "overview" | "materi" | "tugas"
+type KelasTab = "overview" | "materi" | "tugas" | "absensi"
 
 const TABS: { value: KelasTab; label: string; icon: typeof LayoutDashboard }[] =
   [
-    { value: "overview", label: "Overview", icon: LayoutDashboard },
+    { value: "overview", label: "Ringkasan", icon: LayoutDashboard },
     { value: "materi", label: "Materi", icon: BookOpen },
     { value: "tugas", label: "Tugas", icon: ClipboardList },
+    { value: "absensi", label: "Absensi", icon: CalendarCheck },
   ]
 
 export function SiswaKelasDetailPage({
@@ -47,17 +50,17 @@ export function SiswaKelasDetailPage({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push("/siswa/pelajaran")}
+          onClick={() => router.push("/siswa/kelas")}
           className="-ml-2"
         >
           <ArrowLeft className="mr-1 h-4 w-4" />
-          Kembali ke Pelajaran
+          Kembali ke Kelas Saya
         </Button>
         <Card>
           <CardContent className="py-16 text-center">
-            <p className="text-lg font-semibold">Pelajaran Tidak Ditemukan</p>
+            <p className="text-lg font-semibold">Kelas Tidak Ditemukan</p>
             <p className="text-sm text-muted-foreground mt-1">
-              Pelajaran dengan ID {resolvedParams.id} tidak tersedia.
+              Kelas dengan ID {resolvedParams.id} tidak tersedia.
             </p>
           </CardContent>
         </Card>
@@ -71,11 +74,11 @@ export function SiswaKelasDetailPage({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push("/siswa/pelajaran")}
+          onClick={() => router.push("/siswa/kelas")}
           className="-ml-2"
         >
           <ArrowLeft className="mr-1 h-4 w-4" />
-          Kembali ke Pelajaran
+          Kembali ke Kelas Saya
         </Button>
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
@@ -84,7 +87,7 @@ export function SiswaKelasDetailPage({
             </div>
             <p className="text-lg font-semibold">Akses Terbatas</p>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              Anda tidak terdaftar pada pelajaran{" "}
+              Anda tidak terdaftar pada kelas{" "}
               {kelasMengajar.mata_pelajaran} kelas {kelasMengajar.kelas}.
             </p>
           </CardContent>
@@ -99,11 +102,11 @@ export function SiswaKelasDetailPage({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push("/siswa/pelajaran")}
+          onClick={() => router.push("/siswa/kelas")}
           className="-ml-2"
         >
           <ArrowLeft className="mr-1 h-4 w-4" />
-          Kembali ke Pelajaran
+          Kembali ke Kelas Saya
         </Button>
         <div className="mt-2">
           <div className="flex items-center gap-2 flex-wrap">
@@ -147,6 +150,9 @@ export function SiswaKelasDetailPage({
         </Tabs.Panel>
         <Tabs.Panel value="tugas">
           <SiswaKelasTugasTab kelasMengajar={kelasMengajar} siswa={siswa} />
+        </Tabs.Panel>
+        <Tabs.Panel value="absensi">
+          <SiswaKelasAbsensiTab kelasMengajar={kelasMengajar} />
         </Tabs.Panel>
       </Tabs.Root>
     </div>

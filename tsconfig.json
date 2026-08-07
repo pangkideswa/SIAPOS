@@ -29,12 +29,14 @@
     }
   },
   "include": [
-    "next-env.d.ts",
+    "**/*.mts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    // Exclude Next.js generated type files to avoid referencing missing build artifacts
+    // (These are added by some templates but can cause "file not found" errors when
+    // the .next folder hasn't been generated.)
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

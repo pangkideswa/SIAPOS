@@ -52,50 +52,39 @@ const navItems: NavEntry[] = [
   { type: "item", label: "Mata Pelajaran", href: "/admin/subjects", icon: BookMarked, roles: ["super_admin", "admin"] },
   { type: "item", label: "Penugasan Guru", href: "/admin/assignments", icon: UserCog, roles: ["super_admin", "admin"] },
   { type: "item", label: "Kelas Mengajar", href: "/admin/kelas-mengajar", icon: BookOpenCheck, roles: ["super_admin", "admin"] },
+  { type: "label", label: "Roadmap" },
   { type: "item", label: "Bank Soal", href: "/admin/bank-soal", icon: ListChecks, roles: ["super_admin", "admin"] },
   { type: "item", label: "Paket Soal", href: "/admin/paket-soal", icon: ClipboardList, roles: ["super_admin", "admin"] },
+  { type: "item", label: "PKL", href: "/admin/pkl", icon: Award, roles: ["super_admin", "admin"] },
   { type: "label", label: "Academic" },
   { type: "item", label: "Jadwal Pelajaran", href: "/admin/jadwal-pelajaran", icon: Calendar, roles: ["super_admin", "admin"] },
   { type: "item", label: "Absensi", href: "/admin/absensi", icon: CalendarCheck, roles: ["super_admin", "admin"] },
   { type: "item", label: "Kalender Akademik", href: "/admin/kalender-akademik", icon: CalendarDays, roles: ["super_admin", "admin"] },
   { type: "item", label: "Pengumuman", href: "/admin/pengumuman", icon: Megaphone, roles: ["super_admin", "admin"] },
   { type: "item", label: "Nilai Akademik", href: "/admin/nilai-akademik", icon: FileSpreadsheet, roles: ["super_admin", "admin"] },
-  { type: "label", label: "Assessment" },
+  { type: "label", label: "Roadmap" },
   { type: "item", label: "Quiz", href: "/guru/quiz", icon: FileQuestion, roles: ["super_admin", "admin"] },
   { type: "item", label: "CBT", href: "/guru/cbt", icon: Monitor, roles: ["super_admin", "admin"] },
   { type: "item", label: "Hasil Ujian", href: "/guru/hasil-ujian", icon: ClipboardCheck, roles: ["super_admin", "admin"] },
   { type: "item", label: "Analitik", href: "/guru/analitik", icon: BarChart3, roles: ["super_admin", "admin"] },
-  { type: "item", label: "PKL", href: "/admin/pkl", icon: Award, roles: ["super_admin", "admin"] },
 
   { type: "item", label: "Dashboard", href: "/guru", icon: LayoutDashboard, roles: ["guru"] },
-  { type: "item", label: "Kelas Saya", href: "/guru/kelas", icon: BookOpen, roles: ["guru"] },
-  { type: "item", label: "Materi Pembelajaran", href: "/guru/materi", icon: BookOpen, roles: ["guru"] },
+  { type: "item", label: "Kelas", href: "/guru/kelas", icon: BookOpen, roles: ["guru"] },
   { type: "item", label: "Tugas", href: "/guru/tugas", icon: ClipboardList, roles: ["guru"] },
   { type: "item", label: "Pengumpulan", href: "/guru/pengumpulan", icon: ClipboardCheck, roles: ["guru"] },
   { type: "item", label: "Penilaian", href: "/guru/penilaian", icon: Award, roles: ["guru"] },
-  { type: "item", label: "Jadwal Pelajaran", href: "/guru/jadwal-pelajaran", icon: Calendar, roles: ["guru"] },
+  { type: "item", label: "Jadwal", href: "/guru/jadwal-pelajaran", icon: Calendar, roles: ["guru"] },
   { type: "item", label: "Absensi", href: "/guru/absensi", icon: CalendarCheck, roles: ["guru"] },
-  { type: "item", label: "Kalender Akademik", href: "/guru/kalender-akademik", icon: CalendarDays, roles: ["guru"] },
+  { type: "item", label: "Rekap Absensi", href: "/guru/absensi/rekap", icon: ClipboardCheck, roles: ["guru"] },
   { type: "item", label: "Pengumuman", href: "/guru/pengumuman", icon: Megaphone, roles: ["guru"] },
-  { type: "item", label: "Nilai Akademik", href: "/guru/nilai-akademik", icon: FileSpreadsheet, roles: ["guru"] },
-  { type: "item", label: "Quiz", href: "/guru/quiz", icon: FileQuestion, roles: ["guru"] },
-  { type: "item", label: "CBT", href: "/guru/cbt", icon: Monitor, roles: ["guru"] },
-  { type: "item", label: "Hasil Ujian", href: "/guru/hasil-ujian", icon: ClipboardCheck, roles: ["guru"] },
-  { type: "item", label: "Analitik", href: "/guru/analitik", icon: BarChart3, roles: ["guru"] },
-  { type: "item", label: "PKL", href: "/guru/pkl", icon: Award, roles: ["guru"] },
 
   { type: "item", label: "Dashboard", href: "/siswa", icon: LayoutDashboard, roles: ["siswa"] },
-  { type: "item", label: "Pelajaran Saya", href: "/siswa/pelajaran", icon: GraduationCap, roles: ["siswa"] },
+  { type: "item", label: "Kelas", href: "/siswa/kelas", icon: BookOpen, roles: ["siswa"] },
   { type: "item", label: "Tugas", href: "/siswa/tugas", icon: ClipboardList, roles: ["siswa"] },
-  { type: "item", label: "Jadwal Pelajaran", href: "/siswa/jadwal-pelajaran", icon: Calendar, roles: ["siswa"] },
+  { type: "item", label: "Nilai", href: "/siswa/nilai-akademik", icon: FileSpreadsheet, roles: ["siswa"] },
   { type: "item", label: "Absensi", href: "/siswa/absensi", icon: CalendarCheck, roles: ["siswa"] },
-  { type: "item", label: "Kalender Akademik", href: "/siswa/kalender-akademik", icon: CalendarDays, roles: ["siswa"] },
+  { type: "item", label: "Jadwal", href: "/siswa/jadwal-pelajaran", icon: Calendar, roles: ["siswa"] },
   { type: "item", label: "Pengumuman", href: "/siswa/pengumuman", icon: Megaphone, roles: ["siswa"] },
-  { type: "item", label: "Nilai Akademik", href: "/siswa/nilai-akademik", icon: FileSpreadsheet, roles: ["siswa"] },
-  { type: "item", label: "Quiz", href: "/siswa/quiz", icon: FileQuestion, roles: ["siswa"] },
-  { type: "item", label: "CBT", href: "/siswa/cbt", icon: Monitor, roles: ["siswa"] },
-  { type: "item", label: "Hasil Ujian", href: "/siswa/hasil-ujian", icon: ClipboardCheck, roles: ["siswa"] },
-  { type: "item", label: "PKL", href: "/siswa/pkl", icon: Award, roles: ["siswa"] },
 
   { type: "item", label: "Beranda", href: "/wali", icon: LayoutDashboard, roles: ["wali"] },
   { type: "item", label: "Siswa", href: "/wali/siswa", icon: Users, roles: ["wali"] },
@@ -126,10 +115,29 @@ function SidebarContent({
   const userRole = user?.role ?? "admin"
   const roleLabel = roleLabels[userRole] ?? "Admin"
 
-  const filteredNav = navItems.filter((entry) => {
-    if (entry.type === "label") return true
-    return hasRole(...entry.roles)
-  })
+  const filteredNav = navItems.reduce<NavEntry[]>((items, entry, index) => {
+    if (entry.type === "label") {
+      let sectionHasVisibleItem = false
+      for (let i = index + 1; i < navItems.length; i += 1) {
+        const nextEntry = navItems[i]
+        if (nextEntry.type === "label") break
+        if (nextEntry.type === "item" && hasRole(...nextEntry.roles)) {
+          sectionHasVisibleItem = true
+          break
+        }
+      }
+      if (sectionHasVisibleItem) {
+        items.push(entry)
+      }
+      return items
+    }
+
+    if (entry.type === "item" && hasRole(...entry.roles)) {
+      items.push(entry)
+    }
+
+    return items
+  }, [])
 
   const handleNavigate = () => {
     onCloseMobile?.()

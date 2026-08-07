@@ -1,7 +1,10 @@
 export type StatusKehadiran = "Hadir" | "Izin" | "Sakit" | "Alpha" | "Terlambat"
 
+export type MetodeAbsensi = "Guru" | "Siswa"
+
 export interface SesiAbsensi {
   id: number
+  teaching_class_id: number | null
   tanggal: string
   jam_mulai: string
   jam_selesai: string
@@ -17,6 +20,9 @@ export interface SesiAbsensi {
   alpha: number
   terlambat: number
   status: "Selesai" | "Berlangsung" | "Belum"
+  metode: MetodeAbsensi
+  saya_absen?: boolean
+  status_saya?: StatusKehadiran | null
   created_at: string
   updated_at: string
 }

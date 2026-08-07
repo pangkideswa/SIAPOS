@@ -96,10 +96,36 @@ export const studentService = {
   },
 
   async getAllPaginated(
-    filters: StudentFilters = {}
+    filters: StudentFilters = {},
+    allowedClassNames?: Set<string>
   ): Promise<PaginatedResponse<Siswa>> {
     const per_page = filters.per_page ?? 10
     const page = filters.page ?? 1
+
+    if (allowedClassNames && allowedClassNames.size === 0) {
+      return {
+        data: [],
+        meta: {
+          current_page: 1,
+          last_page: 1,
+          per_page,
+          total: 0,
+        },
+      }
+    }
+
+    const kelasFilter = filters.kelas ?? undefined
+    if (kelasFilter && allowedClassNames && !allowedClassNames.has(kelasFilter)) {
+      return {
+        data: [],
+        meta: {
+          current_page: page,
+          last_page: 1,
+          per_page,
+          total: 0,
+        },
+      }
+    }
 
     const where = {
       ...(filters.search
@@ -120,7 +146,10 @@ export const studentService = {
       ...(filters.jurusan_id !== undefined
         ? { jurusan_id: filters.jurusan_id }
         : {}),
-      ...(filters.kelas ? { kelas: filters.kelas } : {}),
+      ...(kelasFilter ? { kelas: kelasFilter } : {}),
+      ...(allowedClassNames && !kelasFilter
+        ? { kelas: { in: [...allowedClassNames] } }
+        : {}),
       ...(filters.status ? { status: filters.status } : {}),
     }
 

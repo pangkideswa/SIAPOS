@@ -4,6 +4,7 @@ import { announcementService } from "@/services/announcement.service"
 import { ok, created, apiError, parseWithSchema } from "@/lib/api-utils"
 import { announcementSchema } from "@/lib/validations/announcement.schemas"
 import {
+  allowedClassNamesFor,
   getStudentProfile,
   isAdmin,
   requireApiUser,
@@ -16,12 +17,17 @@ export async function GET() {
     const announcements = await announcementService.getAll()
     if (isAdmin(user)) return ok(announcements)
     if (user.role === "guru") {
+      const allowedClasses = await allowedClassNamesFor(user)
       return ok(
         announcements.filter(
           (item) =>
             item.penulis === user.name ||
             (item.status === "Dipublikasikan" &&
-              (item.target === "Semua Pengguna" || item.target === "Guru"))
+              (item.target === "Semua Pengguna" ||
+                item.target === "Guru" ||
+                (item.target === "Kelas Tertentu" &&
+                  item.kelas &&
+                  allowedClasses.has(item.kelas))))
         )
       )
     }

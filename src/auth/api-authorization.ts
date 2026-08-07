@@ -25,13 +25,19 @@ export function isAdmin(user: ApiUser): boolean {
 export async function getTeacherId(user: ApiUser): Promise<number | null> {
   if (isAdmin(user)) return null
   if (user.role !== "guru") return null
+  const where = {
+    OR: [
+      { user_id: user.id },
+      ...(user.email
+        ? [{ email: { equals: user.email, mode: "insensitive" as const } }]
+        : []),
+      ...(user.name
+        ? [{ nama_lengkap: { equals: user.name, mode: "insensitive" as const } }]
+        : []),
+    ],
+  }
   const teacher = await prisma.teacher.findFirst({
-    where: {
-      OR: [
-        { user_id: user.id },
-        ...(user.email ? [{ email: user.email }] : []),
-      ],
-    },
+    where,
     select: { id: true },
   })
   return teacher?.id ?? null
@@ -39,13 +45,19 @@ export async function getTeacherId(user: ApiUser): Promise<number | null> {
 
 export async function getTeacherProfile(user: ApiUser) {
   if (user.role !== "guru") return null
+  const where = {
+    OR: [
+      { user_id: user.id },
+      ...(user.email
+        ? [{ email: { equals: user.email, mode: "insensitive" as const } }]
+        : []),
+      ...(user.name
+        ? [{ nama_lengkap: { equals: user.name, mode: "insensitive" as const } }]
+        : []),
+    ],
+  }
   return prisma.teacher.findFirst({
-    where: {
-      OR: [
-        { user_id: user.id },
-        ...(user.email ? [{ email: user.email }] : []),
-      ],
-    },
+    where,
     select: { id: true, nama_lengkap: true },
   })
 }
@@ -83,7 +95,16 @@ async function requireStudentId(user: ApiUser): Promise<number> {
 export async function teachingClassWhereFor(user: ApiUser) {
   if (isAdmin(user)) return {}
   if (user.role === "guru") {
-    return { teacher_id: await requireTeacherId(user) }
+    const teacherId = await requireTeacherId(user)
+    const teacher = await getTeacherProfile(user)
+    return teacher?.nama_lengkap
+      ? {
+          OR: [
+            { teacher_id: teacherId },
+            { teacher_id: null, guru_nama: teacher.nama_lengkap },
+          ],
+        }
+      : { teacher_id: teacherId }
   }
   if (user.role === "siswa") {
     const studentId = await requireStudentId(user)
@@ -91,9 +112,15 @@ export async function teachingClassWhereFor(user: ApiUser) {
       where: { id: studentId },
       select: { classroom_id: true, kelas: true },
     })
-    return student?.classroom_id
-      ? { classroom_id: student.classroom_id }
-      : { kelas: student?.kelas ?? "__NO_CLASS__" }
+    if (!student) return { kelas: "__NO_CLASS__" }
+    return student.classroom_id
+      ? {
+          OR: [
+            { classroom_id: student.classroom_id },
+            { kelas: student.kelas ?? "__NO_CLASS__" },
+          ],
+        }
+      : { kelas: student.kelas ?? "__NO_CLASS__" }
   }
   throw new AppError("Anda tidak memiliki akses ke sumber daya ini", 403)
 }
@@ -106,15 +133,28 @@ export async function assertTeachingClassAccess(
   if (!teachingClassId) throw new AppError("Kelas mengajar tidak valid", 403)
   const row = await prisma.teachingClass.findUnique({
     where: { id: teachingClassId },
-    select: { id: true, teacher_id: true, classroom_id: true, kelas: true },
+    select: { id: true, teacher_id: true, classroom_id: true, kelas: true, guru_nama: true },
   })
   if (!row) throw new NotFoundError("Kelas mengajar tidak ditemukan")
   if (user.role === "guru") {
-    const teacherId = await requireTeacherId(user)
-    if (row.teacher_id !== teacherId) {
-      throw new AppError("Anda tidak memiliki akses ke kelas ini", 403)
+    const teacher = await getTeacherProfile(user)
+    if (row.teacher_id != null) {
+      if (row.teacher_id === teacher?.id) {
+        return
+      }
     }
-    return
+    const allowedIds = await allowedTeachingClassIdsFor(user)
+    if (allowedIds.has(teachingClassId)) {
+      return
+    }
+    if (
+      teacher?.nama_lengkap &&
+      row.guru_nama &&
+      row.guru_nama.toLowerCase() === teacher.nama_lengkap.toLowerCase()
+    ) {
+      return
+    }
+    throw new AppError("Anda tidak memiliki akses ke kelas ini", 403)
   }
   if (user.role === "siswa") {
     const studentId = await requireStudentId(user)
@@ -124,8 +164,12 @@ export async function assertTeachingClassAccess(
     })
     if (
       (row.classroom_id && row.classroom_id === student?.classroom_id) ||
-      (!row.classroom_id && row.kelas && row.kelas === student?.kelas)
+      (!row.classroom_id && row.kelas && student?.kelas && row.kelas.toLowerCase() === student.kelas.toLowerCase())
     ) {
+      return
+    }
+    const allowedIds = await allowedTeachingClassIdsFor(user)
+    if (allowedIds.has(teachingClassId)) {
       return
     }
   }
@@ -288,8 +332,17 @@ export async function allowedClassNamesFor(user: ApiUser): Promise<Set<string>> 
   }
   if (user.role === "guru") {
     const teacherId = await requireTeacherId(user)
+    const teacher = await getTeacherProfile(user)
+    const where = teacher?.nama_lengkap
+      ? {
+          OR: [
+            { teacher_id: teacherId },
+            { teacher_id: null, guru_nama: teacher.nama_lengkap },
+          ],
+        }
+      : { teacher_id: teacherId }
     const rows = await prisma.teachingClass.findMany({
-      where: { teacher_id: teacherId },
+      where,
       select: { kelas: true },
     })
     return new Set(rows.map((row) => row.kelas).filter((kelas): kelas is string => !!kelas))

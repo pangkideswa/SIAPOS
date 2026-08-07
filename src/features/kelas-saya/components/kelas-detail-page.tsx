@@ -17,6 +17,7 @@ import {
   Megaphone,
   Send,
   BookMarked,
+  CalendarCheck,
 } from "lucide-react"
 import { useClassroom } from "@/hooks/use-classroom"
 import { KelasOverviewTab } from "@/features/kelas-saya/components/kelas-overview-tab"
@@ -27,8 +28,9 @@ import { KelasPengumpulanTab } from "@/features/kelas-saya/components/kelas-peng
 import { KelasNilaiTab } from "@/features/kelas-saya/components/kelas-nilai-tab"
 import { KelasJadwalTab } from "@/features/kelas-saya/components/kelas-jadwal-tab"
 import { KelasPengumumanTab } from "@/features/kelas-saya/components/kelas-pengumuman-tab"
+import { KelasAbsensiTab } from "@/features/kelas-saya/components/kelas-absensi-tab"
 
-type KelasTab = "ringkasan" | "materi" | "tugas" | "pengumpulan" | "penilaian" | "anggota" | "jadwal" | "pengumuman"
+type KelasTab = "ringkasan" | "materi" | "tugas" | "pengumpulan" | "penilaian" | "anggota" | "jadwal" | "pengumuman" | "absensi"
 
 const TABS: { value: KelasTab; label: string; icon: typeof LayoutDashboard }[] = [
   { value: "ringkasan", label: "Ringkasan", icon: LayoutDashboard },
@@ -38,6 +40,7 @@ const TABS: { value: KelasTab; label: string; icon: typeof LayoutDashboard }[] =
   { value: "penilaian", label: "Penilaian", icon: Award },
   { value: "anggota", label: "Anggota", icon: Users },
   { value: "jadwal", label: "Jadwal", icon: Calendar },
+  { value: "absensi", label: "Absensi", icon: CalendarCheck },
   { value: "pengumuman", label: "Pengumuman", icon: Megaphone },
 ]
 
@@ -222,6 +225,9 @@ export function KelasDetailPage({
         </Tabs.Panel>
         <Tabs.Panel value="jadwal">
           <KelasJadwalTab kelasMengajar={kelasMengajar} />
+        </Tabs.Panel>
+        <Tabs.Panel value="absensi">
+          <KelasAbsensiTab kelasMengajar={kelasMengajar} />
         </Tabs.Panel>
         <Tabs.Panel value="pengumuman">
           <KelasPengumumanTab kelasMengajar={kelasMengajar} />

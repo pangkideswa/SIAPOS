@@ -15,32 +15,28 @@ import {
 } from "lucide-react"
 import { useClassroom } from "@/hooks/use-classroom"
 
-export function SiswaPelajaranListPage() {
+export function SiswaKelasSayaListPage() {
   const { user } = useAuth()
   const router = useRouter()
 
   const classroom = useClassroom()
   const siswa = classroom.getSiswaByUser(user)
-  const pelajaran = siswa ? classroom.getKelasByRombel(siswa.kelas) : []
+  const kelasList = siswa ? classroom.getKelasByRombel(siswa.kelas) : []
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Pelajaran"
-        description={
-          siswa
-            ? `Mata pelajaran yang Anda ikuti di kelas ${siswa.kelas}.`
-            : "Daftar mata pelajaran yang Anda ikuti."
-        }
+        title="Kelas Saya"
+        description="Kelas yang Anda ikuti"
       />
 
-      {!siswa || pelajaran.length === 0 ? (
+      {!siswa || kelasList.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-4">
               <GraduationCap className="h-6 w-6 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold">Belum Ada Pelajaran</h3>
+            <h3 className="text-lg font-semibold">Belum Ada Kelas</h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
               Data kelas belum ditemukan untuk akun Anda. Hubungi admin sekolah
               untuk informasi lebih lanjut.
@@ -49,7 +45,7 @@ export function SiswaPelajaranListPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-          {pelajaran.map((kelas) => {
+          {kelasList.map((kelas) => {
             const jumlahSiswa = classroom.getAnggotaKelas(kelas.kelas).length
             const jumlahMateri = classroom.getKelasMateri(kelas.id).length
             const jumlahTugas = classroom.getKelasTugas(kelas.id).length

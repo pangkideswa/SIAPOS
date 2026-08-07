@@ -127,7 +127,7 @@ export function SiswaKelasOverviewTab({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <GraduationCap className="h-4 w-4 text-primary" />
-              Informasi Pelajaran
+              Informasi Kelas
             </CardTitle>
           </CardHeader>
           <CardContent>

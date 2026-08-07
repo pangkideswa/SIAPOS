@@ -92,21 +92,14 @@ export function GuruDashboardPage() {
   const { data: materiData } = useMaterials()
   const { data: tugasData } = useAssignments()
   const { data: pengumpulanData } = useSubmissions()
-  const { data: schedules } = useSchedules({
-    guru_nama: guruName,
-    hari: todayHari,
-  })
+  const { data: schedules } = useSchedules({ hari: todayHari })
   const { data: announcementsData } = useAnnouncements()
 
-  const kelasMengajar = (kelasMengajarData ?? []).filter(
-    (k) => k.guru_nama === guruName && k.status === "Aktif"
-  )
+  const kelasMengajar = kelasMengajarData ?? []
   const materiByGuru = (materiData ?? []).filter(
-    (m) => m.guru_nama === guruName && m.status === "Publish"
+    (m) => m.status === "Publish"
   )
-  const tugasByGuru = (tugasData ?? []).filter(
-    (t) => t.guru_nama === guruName
-  )
+  const tugasByGuru = tugasData ?? []
   const tugasAktif = tugasByGuru.filter((t) => t.status === "Dipublikasikan")
 
   const pengumpulanTugas = (pengumpulanData ?? []).filter(
@@ -151,13 +144,11 @@ export function GuruDashboardPage() {
     },
   ]
 
-  const jadwalHariIni = (schedules ?? [])
-    .filter((j) => j.guru_nama === guruName && j.hari === todayHari)
-    .map((j) => ({
-      ...j,
-      waktu_mulai: j.jam_mulai,
-      waktu_selesai: j.jam_selesai,
-    }))
+  const jadwalHariIni = (schedules ?? []).map((j) => ({
+    ...j,
+    waktu_mulai: j.jam_mulai,
+    waktu_selesai: j.jam_selesai,
+  }))
 
   const pengumpulanTerbaru = [...pengumpulanTugas]
     .sort(

@@ -1,7 +1,16 @@
 import "server-only"
 import { teachingClassRepository, teachingClassAssignmentRepository } from "@/repositories/teaching-class.repository"
+import { teacherRepository } from "@/repositories/teacher.repository"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 import type { TeacherSubject, User, Subject, SchoolClass, PaginatedResponse } from "@/types"
+
+async function getTeacherIdByName(teacherName: string): Promise<number | null> {
+  if (!teacherName) return null
+  const teacher = await teacherRepository.findFirst({
+  nama_lengkap: teacherName,
+})
+  return teacher?.id ?? null
+}
 
 export interface TeacherSubjectCreateInput {
   teacher_id: number
@@ -147,11 +156,24 @@ export const teachingClassService = {
   },
 
   async getAllPaginated(
-    filters: KelasMengajarFilters = {}
+    filters: KelasMengajarFilters = {},
+    allowedTeachingClassIds?: Set<number>
   ): Promise<PaginatedResponse<KelasMengajar>> {
     const { search, guru, kelas, tahun_ajaran } = filters
     const page = Math.max(1, filters.page ?? 1)
     const perPage = Math.min(100, Math.max(1, filters.per_page ?? 10))
+
+    if (allowedTeachingClassIds && allowedTeachingClassIds.size === 0) {
+      return {
+        data: [],
+        meta: {
+          current_page: 1,
+          last_page: 1,
+          per_page: perPage,
+          total: 0,
+        },
+      }
+    }
 
     const where = {
       ...(search
@@ -166,6 +188,9 @@ export const teachingClassService = {
       ...(guru && guru !== "all" ? { guru_nama: guru } : {}),
       ...(kelas && kelas !== "all" ? { kelas } : {}),
       ...(tahun_ajaran && tahun_ajaran !== "all" ? { tahun_ajaran } : {}),
+      ...(allowedTeachingClassIds
+        ? { id: { in: [...allowedTeachingClassIds] } }
+        : {}),
     }
 
     const [total, rows] = await Promise.all([
@@ -209,10 +234,14 @@ export const teachingClassService = {
   async createAssignment(
     data: TeacherSubjectCreateInput
   ): Promise<TeacherSubject> {
+    let teacher: { id: number; nama_lengkap: string } | null = null
     const user = await teachingClassAssignmentRepository.getUserById(data.teacher_id)
-    const teacher = user
-      ? await teachingClassAssignmentRepository.getTeacherByUserId(user.id)
-      : null
+    if (user) {
+      teacher = await teachingClassAssignmentRepository.getTeacherByUserId(user.id)
+    }
+    if (!teacher) {
+      teacher = await teachingClassAssignmentRepository.getTeacherById(data.teacher_id)
+    }
     const subject = await teachingClassAssignmentRepository.getSubjectById(data.subject_id)
     const classroom = await teachingClassAssignmentRepository.getClassroomById(data.class_id)
     const row = await teachingClassRepository.createWithRelations({
@@ -232,7 +261,10 @@ export const teachingClassService = {
   async create(
     data: Omit<KelasMengajar, "id" | "created_at" | "updated_at">
   ): Promise<KelasMengajar> {
+    const teacherId =
+      data.teacher_id ?? (await getTeacherIdByName(data.guru_nama))
     const row = await teachingClassRepository.create({
+      teacher_id: teacherId,
       guru_nama: data.guru_nama,
       mata_pelajaran: data.mata_pelajaran,
       kelas: data.kelas,
@@ -247,7 +279,10 @@ export const teachingClassService = {
     id: number,
     data: Omit<KelasMengajar, "id" | "created_at" | "updated_at">
   ): Promise<KelasMengajar | null> {
+    const teacherId =
+      data.teacher_id ?? (await getTeacherIdByName(data.guru_nama))
     const row = await teachingClassRepository.update(id, {
+      teacher_id: teacherId,
       guru_nama: data.guru_nama,
       mata_pelajaran: data.mata_pelajaran,
       kelas: data.kelas,

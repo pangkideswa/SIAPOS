@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { Button } from "@/components/ui/button"
@@ -14,9 +14,16 @@ import {
   useAttendanceDetail,
   useSaveAttendanceRecords,
 } from "@/hooks/use-attendance"
+import { useClassroom } from "@/hooks/use-classroom"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import type { StatusKehadiran } from "@/features/absensi/types/absensi"
+
+interface RosterSiswa {
+  id: number
+  nama_lengkap: string
+  kelas: string
+}
 
 function formatDateID(dateStr: string): string {
   const d = new Date(dateStr + "T00:00:00")
@@ -48,8 +55,18 @@ export function GuruAbsensiInputPage() {
     isError,
   } = useAttendanceDetail(sesiId)
 
-  const sesi = detail
-  const absensiRecords = detail?.records ?? []
+  const classroom = useClassroom()
+
+  const roster = useMemo<RosterSiswa[]>(() => {
+    if (!detail) return []
+    const fromClass = classroom.getAnggotaKelas(detail.kelas)
+    if (fromClass.length > 0) return fromClass
+    return detail.records.map((r) => ({
+      id: r.siswa_id,
+      nama_lengkap: r.siswa_nama,
+      kelas: r.siswa_kelas,
+    }))
+  }, [detail, classroom])
 
   const [attendance, setAttendance] = useState<Map<number, StatusKehadiran>>(
     new Map()
@@ -63,10 +80,17 @@ export function GuruAbsensiInputPage() {
       for (const rec of detail.records) {
         map.set(rec.siswa_id, rec.status)
       }
+      const defaultForMissing: StatusKehadiran =
+        detail.records.length > 0 ? "Alpha" : "Hadir"
+      for (const siswa of roster) {
+        if (!map.has(siswa.id)) {
+          map.set(siswa.id, defaultForMissing)
+        }
+      }
       setAttendance(map)
       setLoadedId(detail.id)
     }
-  }, [detail, loadedId])
+  }, [detail, loadedId, roster])
 
   const updateStatus = (siswaId: number, status: StatusKehadiran) => {
     setAttendance((prev) => {
@@ -79,8 +103,8 @@ export function GuruAbsensiInputPage() {
   const markAllHadir = () => {
     setAttendance((prev) => {
       const next = new Map(prev)
-      for (const rec of absensiRecords) {
-        next.set(rec.siswa_id, "Hadir")
+      for (const siswa of roster) {
+        next.set(siswa.id, "Hadir")
       }
       return next
     })
@@ -89,10 +113,10 @@ export function GuruAbsensiInputPage() {
   const saveMutation = useSaveAttendanceRecords(sesiId)
 
   const handleSave = async () => {
-    const records = absensiRecords.map((rec) => ({
-      student_id: rec.siswa_id,
-      status: attendance.get(rec.siswa_id) ?? "Hadir",
-      keterangan: rec.keterangan || null,
+    const records = roster.map((siswa) => ({
+      student_id: siswa.id,
+      status: attendance.get(siswa.id) ?? "Hadir",
+      keterangan: null,
     }))
     if (records.length === 0) {
       toast.error("Tidak ada data siswa untuk disimpan")
@@ -122,7 +146,7 @@ export function GuruAbsensiInputPage() {
     )
   }
 
-  if (!sesi) {
+  if (!detail) {
     return (
       <div className="space-y-6">
         <PageHeader title="Input Absensi" />
@@ -144,6 +168,8 @@ export function GuruAbsensiInputPage() {
       </div>
     )
   }
+
+  const sesi = detail
 
   return (
     <div className="space-y-6">
@@ -206,7 +232,7 @@ export function GuruAbsensiInputPage() {
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {absensiRecords.length} siswa
+          {roster.length} siswa
         </p>
         <Button variant="outline" size="sm" onClick={markAllHadir}>
           <CheckCircle className="h-4 w-4 mr-1.5" />
@@ -233,13 +259,14 @@ export function GuruAbsensiInputPage() {
             </tr>
           </thead>
           <tbody>
-            {absensiRecords.map((record, index) => {
-              const currentStatus = attendance.get(record.siswa_id) ?? "Hadir"
+            {roster.map((siswa, index) => {
+              const currentStatus =
+                attendance.get(siswa.id) ?? "Hadir"
               return (
                 <tr
-                  key={record.siswa_id}
+                  key={siswa.id}
                   className={
-                    index < absensiRecords.length - 1
+                    index < roster.length - 1
                       ? "border-b border-border"
                       : ""
                   }
@@ -248,22 +275,20 @@ export function GuruAbsensiInputPage() {
                     {index + 1}
                   </td>
                   <td className="px-4 py-3">
-                    <p className="font-medium">{record.siswa_nama}</p>
+                    <p className="font-medium">{siswa.nama_lengkap}</p>
                     <p className="text-xs text-muted-foreground sm:hidden">
-                      {record.siswa_kelas}
+                      {siswa.kelas}
                     </p>
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell">
-                    <Badge variant="outline">{record.siswa_kelas}</Badge>
+                    <Badge variant="outline">{siswa.kelas}</Badge>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1 flex-wrap">
                       {STATUS_KEHADIRAN_OPTIONS.map((status) => (
                         <button
                           key={status}
-                          onClick={() =>
-                            updateStatus(record.siswa_id, status)
-                          }
+                          onClick={() => updateStatus(siswa.id, status)}
                           className={cn(
                             "px-2 py-1 rounded-lg text-xs font-medium border transition-all",
                             currentStatus === status
@@ -279,7 +304,7 @@ export function GuruAbsensiInputPage() {
                 </tr>
               )
             })}
-            {absensiRecords.length === 0 && (
+            {roster.length === 0 && (
               <tr>
                 <td
                   colSpan={4}

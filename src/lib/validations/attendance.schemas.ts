@@ -10,6 +10,10 @@ export const statusSesiSchema = z.enum(
   { errorMap: () => ({ message: "Status sesi tidak valid" }) }
 )
 
+export const metodeAbsensiSchema = z.enum(["Guru", "Siswa"], {
+  errorMap: () => ({ message: "Metode absensi tidak valid" }),
+})
+
 export const attendanceSessionCreateSchema = z.object({
   tanggal: z.string().min(1, "Tanggal wajib diisi"),
   jam_mulai: z.string().nullable().optional(),
@@ -19,6 +23,8 @@ export const attendanceSessionCreateSchema = z.object({
   kelas: z.string().nullable().optional(),
   tahun_ajaran: z.string().nullable().optional(),
   semester: z.string().nullable().optional(),
+  teaching_class_id: z.number().int().positive().nullable().optional(),
+  metode: metodeAbsensiSchema.optional(),
   status: statusSesiSchema.default("Belum"),
 })
 

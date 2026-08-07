@@ -21,8 +21,11 @@ export async function GET(request: NextRequest) {
     const submissions = assignmentId
       ? await submissionService.getByAssignment(Number(assignmentId))
       : await submissionService.getAll()
-    if (isAdmin(user) || assignmentId) return ok(submissions)
     const studentId = await getStudentId(user)
+    if (isAdmin(user)) return ok(submissions)
+    if (assignmentId && user.role === "siswa") {
+      return ok(submissions.filter((item) => item.siswa_id === studentId))
+    }
     const allowedAssignmentIds = await allowedAssignmentIdsFor(user)
     const scoped = user.role === "siswa"
       ? submissions.filter((item) => item.siswa_id === studentId)

@@ -53,6 +53,7 @@ export const STATUS_COLORS: Record<string, string> = {
 }
 
 export const EMPTY_KELAS_MENGAJAR_FORM: KelasMengajarFormData = {
+  teacher_id: null,
   guru_nama: "",
   mata_pelajaran: "",
   kelas: "",

@@ -42,11 +42,10 @@ export async function GET(request: NextRequest) {
         ? Number(searchParams.get("per_page"))
         : undefined,
     }
-    const result = await teachingClassService.getAllPaginated(filters)
-    if (!isAdmin(user)) {
-      const allowedIds = await allowedTeachingClassIdsFor(user)
-      return ok({ ...result, data: result.data.filter((item) => allowedIds.has(item.id)) })
-    }
+    const allowedIds = isAdmin(user)
+      ? undefined
+      : await allowedTeachingClassIdsFor(user)
+    const result = await teachingClassService.getAllPaginated(filters, allowedIds)
     return ok(result)
   } catch (error) {
     return apiError(error)

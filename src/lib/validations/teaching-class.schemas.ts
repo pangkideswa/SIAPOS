@@ -1,6 +1,11 @@
 import { z } from "zod"
 
 export const teachingClassSchema = z.object({
+  teacher_id: z
+    .number({ required_error: "Guru tidak valid" })
+    .int("Guru tidak valid")
+    .positive("Guru tidak valid")
+    .optional(),
   guru_nama: z
     .string({ required_error: "Nama guru wajib diisi" })
     .min(1, "Nama guru wajib diisi")
