@@ -35,6 +35,11 @@ export const studentSchema = z.object({
     .optional(),
   alamat: z.string().max(500, "Alamat maksimal 500 karakter").nullable().optional(),
   jurusan_id: z.number().int("Jurusan tidak valid").nullable().optional(),
+  classroom_id: z
+    .number()
+    .int("Kelas tidak valid")
+    .nullable()
+    .optional(),
   kelas: z
     .string()
     .max(20, "Kelas maksimal 20 karakter")

@@ -18,6 +18,10 @@ export const classroomRepository = {
     return prisma.classroom.findUnique({ where: { id } })
   },
 
+  async findFirst(where: ClassroomWhere): Promise<Classroom | null> {
+    return prisma.classroom.findFirst({ where })
+  },
+
   async findMany(args: ClassroomFindManyArgs): Promise<Classroom[]> {
     return prisma.classroom.findMany(args)
   },

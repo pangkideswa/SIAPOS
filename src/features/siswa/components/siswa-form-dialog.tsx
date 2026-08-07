@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -27,12 +27,12 @@ import {
   JENIS_KELAMIN_OPTIONS,
   AGAMA_OPTIONS,
   STATUS_SISWA_OPTIONS,
-  KELAS_OPTIONS,
   TAHUN_AJARAN_OPTIONS,
   JURUSAN_OPTIONS,
   EMPTY_SISWA_FORM,
 } from "@/features/siswa/constants/siswa.constants"
 import type { Siswa, SiswaFormData } from "@/features/siswa/types/siswa"
+import { useClasses } from "@/hooks/use-classes"
 
 interface SiswaFormDialogProps {
   open: boolean
@@ -63,8 +63,15 @@ export function SiswaFormDialog({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [fotoPreview, setFotoPreview] = useState<string | null>(null)
 
+  const { data: classesData, isLoading: classesLoading } = useClasses()
+  const classrooms = useMemo(() => classesData?.data ?? [], [classesData])
+
   useEffect(() => {
     if (editingSiswa) {
+      if (classesLoading) return
+      const classroom =
+        classrooms.find((c) => c.id === editingSiswa.classroom_id) ??
+        classrooms.find((c) => c.name === editingSiswa.kelas)
       setForm({
         foto: editingSiswa.foto,
         nis: editingSiswa.nis,
@@ -76,7 +83,8 @@ export function SiswaFormDialog({
         agama: editingSiswa.agama,
         alamat: editingSiswa.alamat ?? "",
         jurusan_id: editingSiswa.jurusan_id,
-        kelas: editingSiswa.kelas,
+        classroom_id: classroom?.id ?? editingSiswa.classroom_id ?? null,
+        kelas: classroom?.name ?? editingSiswa.kelas ?? "",
         tahun_masuk: editingSiswa.tahun_masuk,
         tahun_ajaran: editingSiswa.tahun_ajaran,
         status: editingSiswa.status,
@@ -91,7 +99,15 @@ export function SiswaFormDialog({
       setFotoPreview(null)
     }
     setErrors({})
-  }, [editingSiswa, open])
+  }, [editingSiswa, open, classrooms, classesLoading])
+
+  const classroomOptions = useMemo(() => {
+    const list = classrooms.map((c) => ({ id: c.id, name: c.name }))
+    if (!form.kelas) return list
+    const selected = list.some((c) => c.id === form.classroom_id)
+    if (selected) return list
+    return [...list, { id: -1, name: form.kelas }]
+  }, [classrooms, form.classroom_id, form.kelas])
 
   function handleChange(field: string, value: string | number) {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -99,6 +115,24 @@ export function SiswaFormDialog({
       setErrors((prev) => {
         const next = { ...prev }
         delete next[field]
+        return next
+      })
+    }
+  }
+
+  function handleClassroomChange(value: string) {
+    const id = Number(value)
+    const classroom = classrooms.find((c) => c.id === id)
+    if (!classroom) return
+    setForm((prev) => ({
+      ...prev,
+      classroom_id: classroom.id,
+      kelas: classroom.name,
+    }))
+    if (errors.kelas) {
+      setErrors((prev) => {
+        const next = { ...prev }
+        delete next.kelas
         return next
       })
     }
@@ -127,7 +161,12 @@ export function SiswaFormDialog({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setErrors({})
+    const nextErrors: Record<string, string[]> = {}
+    if (!form.classroom_id && !form.kelas) {
+      nextErrors.kelas = ["Kelas wajib dipilih"]
+    }
+    setErrors(nextErrors)
+    if (Object.keys(nextErrors).length > 0) return
     try {
       await onSubmit(form)
     } catch (err: unknown) {
@@ -384,17 +423,27 @@ export function SiswaFormDialog({
                 <div className="space-y-2">
                   <Label htmlFor="kelas">Kelas *</Label>
                   <Select
-                    value={form.kelas}
-                    onValueChange={(v) => v && handleChange("kelas", v)}
-                    disabled={isLoading}
+                    value={
+                      form.classroom_id != null
+                        ? String(form.classroom_id)
+                        : form.kelas
+                          ? "-1"
+                          : ""
+                    }
+                    onValueChange={(v) => v && handleClassroomChange(v)}
+                    disabled={isLoading || classesLoading}
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue
+                        placeholder={
+                          form.kelas ? form.kelas : "Pilih kelas..."
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      {KELAS_OPTIONS.map((k) => (
-                        <SelectItem key={k} value={k}>
-                          {k}
+                      {classroomOptions.map((c) => (
+                        <SelectItem key={c.id} value={String(c.id)}>
+                          {c.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

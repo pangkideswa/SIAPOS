@@ -29,7 +29,6 @@ import {
   STATUS_SISWA_COLORS,
   STATUS_SISWA_OPTIONS,
   JURUSAN_OPTIONS,
-  KELAS_OPTIONS,
 } from "@/features/siswa/constants/siswa.constants"
 import {
   useStudentsPaginated,
@@ -37,6 +36,7 @@ import {
   useUpdateStudent,
   useRemoveStudent,
 } from "@/hooks/use-students"
+import { useClasses } from "@/hooks/use-classes"
 import { studentService } from "@/lib/services/student.service"
 import type { Siswa, SiswaFormData } from "@/features/siswa/types/siswa"
 
@@ -71,6 +71,9 @@ export function SiswaListPage() {
   const createSiswa = useCreateStudent()
   const updateSiswa = useUpdateStudent()
   const removeSiswa = useRemoveStudent()
+
+  const { data: classesData } = useClasses()
+  const kelasOptions = classesData?.data ?? []
 
   const allSiswa = data?.data ?? []
   const meta = data?.meta
@@ -356,9 +359,9 @@ export function SiswaListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Kelas</SelectItem>
-            {KELAS_OPTIONS.map((k) => (
-              <SelectItem key={k} value={k}>
-                {k}
+            {kelasOptions.map((k) => (
+              <SelectItem key={k.name} value={k.name}>
+                {k.name}
               </SelectItem>
             ))}
           </SelectContent>

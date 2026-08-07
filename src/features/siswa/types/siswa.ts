@@ -12,6 +12,7 @@ export interface Siswa {
   alamat: string | null
   jurusan_id: number
   jurusan_nama?: string
+  classroom_id: number | null
   kelas: string
   tahun_masuk: string
   tahun_ajaran: string

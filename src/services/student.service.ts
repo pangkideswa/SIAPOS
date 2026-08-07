@@ -1,8 +1,10 @@
 import "server-only"
 import { type Student } from "@/generated/prisma/client"
 import { studentRepository } from "@/repositories/student.repository"
+import { classroomRepository } from "@/repositories/classroom.repository"
 import { prisma } from "@/lib/prisma"
 import { assertUniqueField } from "@/lib/duplicate-check"
+import { AppError } from "@/lib/api-utils"
 import type { Siswa, SiswaFormData } from "@/features/siswa/types/siswa"
 import type { PaginatedResponse } from "@/types"
 
@@ -53,6 +55,7 @@ function toSiswa(row: Student): Siswa {
     alamat: row.alamat,
     jurusan_id: row.jurusan_id ?? 0,
     jurusan_nama: undefined,
+    classroom_id: row.classroom_id,
     kelas: row.kelas ?? "",
     tahun_masuk: row.tahun_masuk ?? "",
     tahun_ajaran: row.tahun_ajaran ?? "",
@@ -87,6 +90,27 @@ function toSiswaCreate(data: SiswaFormData) {
     no_hp_ortu: data.no_hp_ortu ?? null,
     alamat_ortu: data.alamat_ortu ?? null,
   }
+}
+
+async function resolveClassroom(
+  data: SiswaFormData
+): Promise<{ classroom_id: number | null; kelas: string | null }> {
+  if (data.classroom_id != null) {
+    const classroom = await classroomRepository.findById(data.classroom_id)
+    if (!classroom) {
+      throw new AppError("Kelas tidak valid", 422, {
+        classroom_id: ["Kelas tidak ditemukan"],
+      })
+    }
+    return { classroom_id: classroom.id, kelas: classroom.name }
+  }
+  if (data.kelas) {
+    const classroom = await classroomRepository.findFirst({
+      name: { equals: data.kelas, mode: "insensitive" },
+    })
+    return { classroom_id: classroom?.id ?? null, kelas: data.kelas }
+  }
+  return { classroom_id: null, kelas: null }
 }
 
 export const studentService = {
@@ -191,7 +215,12 @@ export const studentService = {
       data.nisn,
       "NISN"
     )
-    const row = await studentRepository.create(toSiswaCreate(data))
+    const { classroom_id, kelas } = await resolveClassroom(data)
+    const row = await studentRepository.create({
+      ...toSiswaCreate(data),
+      classroom_id,
+      kelas,
+    })
     const [siswa] = await enrichJurusanNama([row])
     return siswa
   },
@@ -209,7 +238,12 @@ export const studentService = {
       "NISN",
       id
     )
-    const row = await studentRepository.update(id, toSiswaCreate(data))
+    const { classroom_id, kelas } = await resolveClassroom(data)
+    const row = await studentRepository.update(id, {
+      ...toSiswaCreate(data),
+      classroom_id,
+      kelas,
+    })
     if (!row) return null
     const [siswa] = await enrichJurusanNama([row])
     return siswa
