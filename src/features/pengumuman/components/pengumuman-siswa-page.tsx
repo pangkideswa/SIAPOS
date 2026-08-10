@@ -31,7 +31,7 @@ export function PengumumanSiswaPage() {
     [data]
   )
   const [search, setSearch] = useState("")
-  const [kategoriFilter, setKategoriFilter] = useState("all")
+  const [kategoriFilter, setKategoriFilter] = useState("semua")
 
   const filteredData = useMemo(() => {
     let data = [...items]
@@ -41,7 +41,7 @@ export function PengumumanSiswaPage() {
         (d) => d.judul.toLowerCase().includes(q) || d.ringkasan.toLowerCase().includes(q)
       )
     }
-    if (kategoriFilter !== "all") data = data.filter((d) => d.kategori === kategoriFilter)
+    if (kategoriFilter !== "semua") data = data.filter((d) => d.kategori === kategoriFilter)
     return data.sort(
       (a, b) =>
         Number(b.pinned) - Number(a.pinned) ||
@@ -70,12 +70,12 @@ export function PengumumanSiswaPage() {
             className="pl-9"
           />
         </div>
-        <Select value={kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "all")}>
+        <Select value={kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Kategori" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kategori</SelectItem>
+            <SelectItem value="semua">Semua Kategori</SelectItem>
             {KATEGORI_PENGUMUMAN_OPTIONS.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}

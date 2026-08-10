@@ -46,10 +46,10 @@ export function PenilaianListPage() {
   const { data: subjectsData } = useSubjects({ per_page: 200 })
   const subjects = subjectsData?.data ?? []
   const [search, setSearch] = useState("")
-  const [guruFilter, setGuruFilter] = useState<string>("all")
-  const [kelasFilter, setKelasFilter] = useState<string>("all")
-  const [mapelFilter, setMapelFilter] = useState<string>("all")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [guruFilter, setGuruFilter] = useState<string>("semua")
+  const [kelasFilter, setKelasFilter] = useState<string>("semua")
+  const [mapelFilter, setMapelFilter] = useState<string>("semua")
+  const [statusFilter, setStatusFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
 
   const perPage = 10
@@ -82,13 +82,13 @@ export function PenilaianListPage() {
       item.tugas_judul.toLowerCase().includes(search.toLowerCase()) ||
       item.mata_pelajaran.toLowerCase().includes(search.toLowerCase())
     const matchesGuru =
-      guruFilter === "all" || item.guru_nama === guruFilter
+      guruFilter === "semua" || item.guru_nama === guruFilter
     const matchesKelas =
-      kelasFilter === "all" || item.siswa_kelas === kelasFilter
+      kelasFilter === "semua" || item.siswa_kelas === kelasFilter
     const matchesMapel =
-      mapelFilter === "all" || item.mata_pelajaran === mapelFilter
+      mapelFilter === "semua" || item.mata_pelajaran === mapelFilter
     const matchesStatus =
-      statusFilter === "all" || item.status_penilaian === statusFilter
+      statusFilter === "semua" || item.status_penilaian === statusFilter
     return matchesSearch && matchesGuru && matchesKelas && matchesMapel && matchesStatus
   })
 
@@ -280,7 +280,7 @@ export function PenilaianListPage() {
         <Select
           value={guruFilter}
           onValueChange={(v: string | null) => {
-            setGuruFilter(v ?? "all")
+            setGuruFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -288,7 +288,7 @@ export function PenilaianListPage() {
             <SelectValue placeholder="Semua Guru" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Guru</SelectItem>
+            <SelectItem value="semua">Semua Guru</SelectItem>
             {teachers?.map((guru) => (
               <SelectItem key={guru.id} value={guru.nama_lengkap}>
                 {guru.nama_lengkap}
@@ -299,7 +299,7 @@ export function PenilaianListPage() {
         <Select
           value={kelasFilter}
           onValueChange={(v: string | null) => {
-            setKelasFilter(v ?? "all")
+            setKelasFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -307,7 +307,7 @@ export function PenilaianListPage() {
             <SelectValue placeholder="Semua Kelas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {classes.map((kelas) => (
               <SelectItem key={kelas.id} value={kelas.name}>
                 {kelas.name}
@@ -318,7 +318,7 @@ export function PenilaianListPage() {
         <Select
           value={mapelFilter}
           onValueChange={(v: string | null) => {
-            setMapelFilter(v ?? "all")
+            setMapelFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -326,7 +326,7 @@ export function PenilaianListPage() {
             <SelectValue placeholder="Semua Mapel" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Semua Mapel</SelectItem>
             {subjects.map((mapel) => (
               <SelectItem key={mapel.id} value={mapel.name}>
                 {mapel.name}
@@ -337,7 +337,7 @@ export function PenilaianListPage() {
         <Select
           value={statusFilter}
           onValueChange={(v: string | null) => {
-            setStatusFilter(v ?? "all")
+            setStatusFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -345,7 +345,7 @@ export function PenilaianListPage() {
             <SelectValue placeholder="Semua Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             <SelectItem value="Belum Dinilai">Belum Dinilai</SelectItem>
             <SelectItem value="Sudah Dinilai">Sudah Dinilai</SelectItem>
             <SelectItem value="Revisi">Revisi</SelectItem>

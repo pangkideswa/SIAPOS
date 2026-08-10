@@ -50,7 +50,7 @@ export function GuruAbsensiHistoryPage() {
   const guruName = user?.name ?? ""
 
   const [search, setSearch] = useState("")
-  const [kelasFilter, setKelasFilter] = useState("all")
+  const [kelasFilter, setKelasFilter] = useState("semua")
   const [page, setPage] = useState(1)
 
   const {
@@ -74,7 +74,7 @@ export function GuruAbsensiHistoryPage() {
       )
     }
 
-    if (kelasFilter !== "all") {
+    if (kelasFilter !== "semua") {
       data = data.filter((s) => s.kelas === kelasFilter)
     }
 
@@ -206,7 +206,7 @@ export function GuruAbsensiHistoryPage() {
         <Select
           value={kelasFilter}
           onValueChange={(v) => {
-            setKelasFilter(v ?? "all")
+            setKelasFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -214,7 +214,7 @@ export function GuruAbsensiHistoryPage() {
             <SelectValue placeholder="Semua Kelas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {uniqueKelas.map((k) => (
               <SelectItem key={k} value={k}>
                 {k}

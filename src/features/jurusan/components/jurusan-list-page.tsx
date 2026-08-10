@@ -31,7 +31,7 @@ import type { Jurusan } from "@/features/jurusan/types/jurusan"
 
 export function JurusanListPage() {
   const router = useRouter()
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [statusFilter, setStatusFilter] = useState<string>("semua")
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [formDialogOpen, setFormDialogOpen] = useState(false)
@@ -47,7 +47,7 @@ export function JurusanListPage() {
   const { data, isLoading: isTableLoading } = useJurusans({
     search: search || undefined,
     is_active:
-      statusFilter === "all" ? undefined : statusFilter === "active",
+      statusFilter === "semua" ? undefined : statusFilter === "active",
     page,
     per_page: 10,
   })
@@ -223,7 +223,7 @@ export function JurusanListPage() {
         <Select
           value={statusFilter}
           onValueChange={(value) => {
-            setStatusFilter(value ?? "all")
+            setStatusFilter(value ?? "semua")
             setPage(1)
           }}
         >
@@ -231,7 +231,7 @@ export function JurusanListPage() {
             <SelectValue placeholder="Semua Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             <SelectItem value="active">Aktif</SelectItem>
             <SelectItem value="inactive">Tidak Aktif</SelectItem>
           </SelectContent>

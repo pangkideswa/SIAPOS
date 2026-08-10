@@ -47,10 +47,10 @@ export function TugasListPage() {
   const updateMutation = useUpdateAssignment()
   const removeMutation = useRemoveAssignment()
   const [search, setSearch] = useState("")
-  const [guruFilter, setGuruFilter] = useState<string>("all")
-  const [mapelFilter, setMapelFilter] = useState<string>("all")
-  const [kelasFilter, setKelasFilter] = useState<string>("all")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [guruFilter, setGuruFilter] = useState<string>("semua")
+  const [mapelFilter, setMapelFilter] = useState<string>("semua")
+  const [kelasFilter, setKelasFilter] = useState<string>("semua")
+  const [statusFilter, setStatusFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const [formDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -68,13 +68,13 @@ export function TugasListPage() {
       item.guru_nama.toLowerCase().includes(search.toLowerCase()) ||
       item.kelas.toLowerCase().includes(search.toLowerCase())
     const matchesGuru =
-      guruFilter === "all" || item.guru_nama === guruFilter
+      guruFilter === "semua" || item.guru_nama === guruFilter
     const matchesMapel =
-      mapelFilter === "all" || item.mata_pelajaran === mapelFilter
+      mapelFilter === "semua" || item.mata_pelajaran === mapelFilter
     const matchesKelas =
-      kelasFilter === "all" || item.kelas === kelasFilter
+      kelasFilter === "semua" || item.kelas === kelasFilter
     const matchesStatus =
-      statusFilter === "all" || item.status === statusFilter
+      statusFilter === "semua" || item.status === statusFilter
     return (
       matchesSearch &&
       matchesGuru &&
@@ -271,7 +271,7 @@ export function TugasListPage() {
         <Select
           value={guruFilter}
           onValueChange={(v: string | null) => {
-            setGuruFilter(v ?? "all")
+            setGuruFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -279,7 +279,7 @@ export function TugasListPage() {
             <SelectValue placeholder="Semua Guru" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Guru</SelectItem>
+            <SelectItem value="semua">Semua Guru</SelectItem>
             {teachers?.map((guru) => (
               <SelectItem key={guru.id} value={guru.nama_lengkap}>
                 {guru.nama_lengkap}
@@ -290,7 +290,7 @@ export function TugasListPage() {
         <Select
           value={mapelFilter}
           onValueChange={(v: string | null) => {
-            setMapelFilter(v ?? "all")
+            setMapelFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -298,7 +298,7 @@ export function TugasListPage() {
             <SelectValue placeholder="Semua Mapel" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Semua Mapel</SelectItem>
             {subjects.map((mapel) => (
               <SelectItem key={mapel.id} value={mapel.name}>
                 {mapel.name}
@@ -309,7 +309,7 @@ export function TugasListPage() {
         <Select
           value={kelasFilter}
           onValueChange={(v: string | null) => {
-            setKelasFilter(v ?? "all")
+            setKelasFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -317,7 +317,7 @@ export function TugasListPage() {
             <SelectValue placeholder="Semua Kelas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {classes.map((kelas) => (
               <SelectItem key={kelas.id} value={kelas.name}>
                 {kelas.name}
@@ -328,7 +328,7 @@ export function TugasListPage() {
         <Select
           value={statusFilter}
           onValueChange={(v: string | null) => {
-            setStatusFilter(v ?? "all")
+            setStatusFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -336,7 +336,7 @@ export function TugasListPage() {
             <SelectValue placeholder="Semua Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             <SelectItem value="Draft">Draft</SelectItem>
             <SelectItem value="Dipublikasikan">Dipublikasikan</SelectItem>
             <SelectItem value="Ditutup">Ditutup</SelectItem>

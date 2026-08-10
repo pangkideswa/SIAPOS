@@ -51,8 +51,8 @@ export function NilaiAkademikGuruPage() {
     [data]
   )
   const [search, setSearch] = useState("")
-  const [mapelFilter, setMapelFilter] = useState("all")
-  const [kelasFilter, setKelasFilter] = useState("all")
+  const [mapelFilter, setMapelFilter] = useState("semua")
+  const [kelasFilter, setKelasFilter] = useState("semua")
   const [page, setPage] = useState(1)
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<NilaiAkademik | null>(null)
@@ -65,8 +65,8 @@ export function NilaiAkademikGuruPage() {
       const q = search.toLowerCase()
       data = data.filter((d) => d.siswa_nama.toLowerCase().includes(q))
     }
-    if (mapelFilter !== "all") data = data.filter((d) => d.mata_pelajaran === mapelFilter)
-    if (kelasFilter !== "all") data = data.filter((d) => d.siswa_kelas === kelasFilter)
+    if (mapelFilter !== "semua") data = data.filter((d) => d.mata_pelajaran === mapelFilter)
+    if (kelasFilter !== "semua") data = data.filter((d) => d.siswa_kelas === kelasFilter)
     return data
   }, [items, search, mapelFilter, kelasFilter])
 
@@ -204,23 +204,23 @@ export function NilaiAkademikGuruPage() {
             className="pl-9"
           />
         </div>
-        <Select value={mapelFilter} onValueChange={(v) => { setMapelFilter(v ?? "all"); setPage(1) }}>
+        <Select value={mapelFilter} onValueChange={(v) => { setMapelFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[160px]">
             <SelectValue placeholder="Mata Pelajaran" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Semua Mapel</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((m) => (
               <SelectItem key={m} value={m}>{m}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={kelasFilter} onValueChange={(v) => { setKelasFilter(v ?? "all"); setPage(1) }}>
+        <Select value={kelasFilter} onValueChange={(v) => { setKelasFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[130px]">
             <SelectValue placeholder="Kelas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {KELAS_OPTIONS.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}

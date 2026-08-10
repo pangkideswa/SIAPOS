@@ -25,11 +25,11 @@ import type { BankSoal, BankSoalFormData } from "../types/bank-soal"
 export function BankSoalListPage() {
   const router = useRouter()
   const [search, setSearch] = useState("")
-  const [tipeFilter, setTipeFilter] = useState<string>("all")
-  const [mapelFilter, setMapelFilter] = useState<string>("all")
-  const [guruFilter, setGuruFilter] = useState<string>("all")
-  const [kesulitanFilter, setKesulitanFilter] = useState<string>("all")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [tipeFilter, setTipeFilter] = useState<string>("semua")
+  const [mapelFilter, setMapelFilter] = useState<string>("semua")
+  const [guruFilter, setGuruFilter] = useState<string>("semua")
+  const [kesulitanFilter, setKesulitanFilter] = useState<string>("semua")
+  const [statusFilter, setStatusFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -47,11 +47,11 @@ export function BankSoalListPage() {
       item.pertanyaan.toLowerCase().includes(search.toLowerCase()) ||
       item.mata_pelajaran.toLowerCase().includes(search.toLowerCase()) ||
       item.guru_nama.toLowerCase().includes(search.toLowerCase())
-    const matchesTipe = tipeFilter === "all" || item.tipe_soal === tipeFilter
-    const matchesMapel = mapelFilter === "all" || item.mata_pelajaran === mapelFilter
-    const matchesGuru = guruFilter === "all" || item.guru_nama === guruFilter
-    const matchesKesulitan = kesulitanFilter === "all" || item.kesulitan === kesulitanFilter
-    const matchesStatus = statusFilter === "all" || item.status === statusFilter
+    const matchesTipe = tipeFilter === "semua" || item.tipe_soal === tipeFilter
+    const matchesMapel = mapelFilter === "semua" || item.mata_pelajaran === mapelFilter
+    const matchesGuru = guruFilter === "semua" || item.guru_nama === guruFilter
+    const matchesKesulitan = kesulitanFilter === "semua" || item.kesulitan === kesulitanFilter
+    const matchesStatus = statusFilter === "semua" || item.status === statusFilter
     return matchesSearch && matchesTipe && matchesMapel && matchesGuru && matchesKesulitan && matchesStatus
   })
 
@@ -161,35 +161,35 @@ export function BankSoalListPage() {
         <Select value={tipeFilter} onValueChange={(v) => { if (v) { setTipeFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Tipe" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Tipe</SelectItem>
+            <SelectItem value="semua">Semua Tipe</SelectItem>
             {TIPE_SOAL_OPTIONS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={mapelFilter} onValueChange={(v) => { if (v) { setMapelFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Mapel" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Semua Mapel</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={guruFilter} onValueChange={(v) => { if (v) { setGuruFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Guru" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Guru</SelectItem>
+            <SelectItem value="semua">Semua Guru</SelectItem>
             {GURU_BANK_SOAL_OPTIONS.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={kesulitanFilter} onValueChange={(v) => { if (v) { setKesulitanFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Semua Level" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Level</SelectItem>
+            <SelectItem value="semua">Semua Level</SelectItem>
             {KESULITAN_OPTIONS.map((k) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Semua Status" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             {STATUS_BANK_SOAL_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
           </SelectContent>
         </Select>

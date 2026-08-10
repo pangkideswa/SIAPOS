@@ -23,7 +23,7 @@ import type { User, UserRole } from "@/types/auth"
 
 export function UserListPage() {
   const router = useRouter()
-  const [roleFilter, setRoleFilter] = useState<string>("all")
+  const [roleFilter, setRoleFilter] = useState<string>("semua")
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
   const [formDialogOpen, setFormDialogOpen] = useState(false)
@@ -37,7 +37,7 @@ export function UserListPage() {
     isLoading: isTableLoading,
     refetch,
   } = useUsers({
-    role: roleFilter === "all" ? undefined : roleFilter,
+    role: roleFilter === "semua" ? undefined : roleFilter,
     search: search || undefined,
     page,
     per_page: 10,
@@ -214,7 +214,7 @@ export function UserListPage() {
         <Select
           value={roleFilter}
           onValueChange={(value) => {
-            setRoleFilter(value ?? "all")
+            setRoleFilter(value ?? "semua")
             setPage(1)
           }}
         >
@@ -222,7 +222,7 @@ export function UserListPage() {
             <SelectValue placeholder="Semua Role" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Role</SelectItem>
+            <SelectItem value="semua">Semua Role</SelectItem>
             {ADMIN_MANAGEABLE_ROLES.map((role) => (
               <SelectItem key={role} value={role}>
                 {ROLE_LABELS[role]}

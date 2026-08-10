@@ -63,9 +63,9 @@ export function AdminAbsensiListPage() {
   const subjects = useMemo(() => subjectsData?.data ?? [], [subjectsData])
 
   const [search, setSearch] = useState("")
-  const [kelasFilter, setKelasFilter] = useState("all")
-  const [guruFilter, setGuruFilter] = useState("all")
-  const [mapelFilter, setMapelFilter] = useState("all")
+  const [kelasFilter, setKelasFilter] = useState("semua")
+  const [guruFilter, setGuruFilter] = useState("semua")
+  const [mapelFilter, setMapelFilter] = useState("semua")
   const [tanggalFilter, setTanggalFilter] = useState("")
   const [page, setPage] = useState(1)
 
@@ -94,15 +94,15 @@ export function AdminAbsensiListPage() {
       )
     }
 
-    if (kelasFilter !== "all") {
+    if (kelasFilter !== "semua") {
       data = data.filter((s) => s.kelas === kelasFilter)
     }
 
-    if (guruFilter !== "all") {
+    if (guruFilter !== "semua") {
       data = data.filter((s) => s.guru_nama === guruFilter)
     }
 
-    if (mapelFilter !== "all") {
+    if (mapelFilter !== "semua") {
       data = data.filter((s) => s.mata_pelajaran === mapelFilter)
     }
 
@@ -212,7 +212,7 @@ export function AdminAbsensiListPage() {
         <Select
           value={kelasFilter}
           onValueChange={(v) => {
-            setKelasFilter(v ?? "all")
+            setKelasFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -220,7 +220,7 @@ export function AdminAbsensiListPage() {
             <SelectValue placeholder="Semua Kelas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {classes.map((k) => (
               <SelectItem key={k.id} value={k.name}>
                 {k.name}
@@ -231,7 +231,7 @@ export function AdminAbsensiListPage() {
         <Select
           value={guruFilter}
           onValueChange={(v) => {
-            setGuruFilter(v ?? "all")
+            setGuruFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -239,7 +239,7 @@ export function AdminAbsensiListPage() {
             <SelectValue placeholder="Semua Guru" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Guru</SelectItem>
+            <SelectItem value="semua">Semua Guru</SelectItem>
             {teachers?.map((g) => (
               <SelectItem key={g.id} value={g.nama_lengkap}>
                 {g.nama_lengkap}
@@ -250,7 +250,7 @@ export function AdminAbsensiListPage() {
         <Select
           value={mapelFilter}
           onValueChange={(v) => {
-            setMapelFilter(v ?? "all")
+            setMapelFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -258,7 +258,7 @@ export function AdminAbsensiListPage() {
             <SelectValue placeholder="Semua Mapel" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Semua Mapel</SelectItem>
             {subjects.map((m) => (
               <SelectItem key={m.id} value={m.name}>
                 {m.name}

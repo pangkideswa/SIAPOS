@@ -20,9 +20,9 @@ import { HARI_OPTIONS, HARI_INDEX, STATUS_JADWAL_COLORS } from "@/features/jadwa
 export function JadwalPelajaranListPage() {
   const { data: jadwalData } = useSchedules()
   const [search, setSearch] = useState("")
-  const [kelasFilter, setKelasFilter] = useState("all")
-  const [guruFilter, setGuruFilter] = useState("all")
-  const [hariFilter, setHariFilter] = useState("all")
+  const [kelasFilter, setKelasFilter] = useState("semua")
+  const [guruFilter, setGuruFilter] = useState("semua")
+  const [hariFilter, setHariFilter] = useState("semua")
 
   const kelasOptions = useMemo(
     () =>
@@ -48,15 +48,15 @@ export function JadwalPelajaranListPage() {
       )
     }
 
-    if (kelasFilter !== "all") {
+    if (kelasFilter !== "semua") {
       data = data.filter((j) => j.kelas === kelasFilter)
     }
 
-    if (guruFilter !== "all") {
+    if (guruFilter !== "semua") {
       data = data.filter((j) => j.guru_nama === guruFilter)
     }
 
-    if (hariFilter !== "all") {
+    if (hariFilter !== "semua") {
       data = data.filter((j) => j.hari === hariFilter)
     }
 
@@ -99,12 +99,12 @@ export function JadwalPelajaranListPage() {
             className="pl-9"
           />
         </div>
-        <Select value={hariFilter} onValueChange={(v) => setHariFilter(v ?? "all")}>
+        <Select value={hariFilter} onValueChange={(v) => setHariFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[140px]">
             <SelectValue placeholder="Semua Hari" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Hari</SelectItem>
+            <SelectItem value="semua">Semua Hari</SelectItem>
             {HARI_OPTIONS.map((h) => (
               <SelectItem key={h.value} value={h.value}>
                 {h.label}
@@ -112,23 +112,23 @@ export function JadwalPelajaranListPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={kelasFilter} onValueChange={(v) => setKelasFilter(v ?? "all")}>
+        <Select value={kelasFilter} onValueChange={(v) => setKelasFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[140px]">
             <SelectValue placeholder="Semua Kelas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {kelasOptions.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={guruFilter} onValueChange={(v) => setGuruFilter(v ?? "all")}>
+        <Select value={guruFilter} onValueChange={(v) => setGuruFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[140px]">
             <SelectValue placeholder="Semua Guru" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Guru</SelectItem>
+            <SelectItem value="semua">Semua Guru</SelectItem>
             {guruOptions.map((g) => (
               <SelectItem key={g} value={g}>{g}</SelectItem>
             ))}

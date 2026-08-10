@@ -33,8 +33,8 @@ import type { Guru, GuruFormData } from "@/features/guru/types/guru"
 export function GuruListPage() {
   const router = useRouter()
   const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [jkFilter, setJkFilter] = useState<string>("all")
+  const [statusFilter, setStatusFilter] = useState<string>("semua")
+  const [jkFilter, setJkFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -50,8 +50,8 @@ export function GuruListPage() {
   } = useTeachersPaginated({
     search: search || undefined,
     status_kepegawaian:
-      statusFilter === "all" ? undefined : statusFilter,
-    jenis_kelamin: jkFilter === "all" ? undefined : jkFilter,
+      statusFilter === "semua" ? undefined : statusFilter,
+    jenis_kelamin: jkFilter === "semua" ? undefined : jkFilter,
     page,
     per_page: 10,
   })
@@ -244,7 +244,7 @@ export function GuruListPage() {
         <Select
           value={jkFilter}
           onValueChange={(value) => {
-            setJkFilter(value ?? "all")
+            setJkFilter(value ?? "semua")
             setPage(1)
           }}
         >
@@ -252,7 +252,7 @@ export function GuruListPage() {
             <SelectValue placeholder="Semua Jenis Kelamin" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Jenis Kelamin</SelectItem>
+            <SelectItem value="semua">Semua Jenis Kelamin</SelectItem>
             {JENIS_KELAMIN_OPTIONS.map((jk) => (
               <SelectItem key={jk} value={jk}>
                 {jk}
@@ -263,7 +263,7 @@ export function GuruListPage() {
         <Select
           value={statusFilter}
           onValueChange={(value) => {
-            setStatusFilter(value ?? "all")
+            setStatusFilter(value ?? "semua")
             setPage(1)
           }}
         >
@@ -271,7 +271,7 @@ export function GuruListPage() {
             <SelectValue placeholder="Semua Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             {STATUS_KEPEGAWAIAN_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>
                 {s}

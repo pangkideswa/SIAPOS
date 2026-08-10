@@ -19,13 +19,13 @@ import type { Quiz } from "../types/quiz"
 
 export function SiswaQuizListPage() {
   const router = useRouter()
-  const [mapelFilter, setMapelFilter] = useState<string>("all")
+  const [mapelFilter, setMapelFilter] = useState<string>("semua")
 
   const publishedQuizzes = DUMMY_QUIZ.filter((q) => q.status === "Publish")
 
   const filteredData = publishedQuizzes.filter((item) => {
     const paket = DUMMY_PAKET_SOAL.find((p) => p.id === item.paket_soal_id)
-    const matchesMapel = mapelFilter === "all" || paket?.mata_pelajaran === mapelFilter
+    const matchesMapel = mapelFilter === "semua" || paket?.mata_pelajaran === mapelFilter
     return matchesMapel
   })
 
@@ -202,7 +202,7 @@ export function SiswaQuizListPage() {
         <Select value={mapelFilter} onValueChange={(v) => { if (v) setMapelFilter(v) }}>
           <SelectTrigger className="w-full sm:w-[180px]"><SelectValue placeholder="Semua Mata Pelajaran" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Mata Pelajaran</SelectItem>
+            <SelectItem value="semua">Semua Mata Pelajaran</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>

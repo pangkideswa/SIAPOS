@@ -76,10 +76,10 @@ export function PengumumanAdminPage() {
   const updateMutation = useUpdateAnnouncement()
   const removeMutation = useRemoveAnnouncement()
   const [search, setSearch] = useState("")
-  const [kategoriFilter, setKategoriFilter] = useState("all")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [targetFilter, setTargetFilter] = useState("all")
-  const [pinnedFilter, setPinnedFilter] = useState("all")
+  const [kategoriFilter, setKategoriFilter] = useState("semua")
+  const [statusFilter, setStatusFilter] = useState("semua")
+  const [targetFilter, setTargetFilter] = useState("semua")
+  const [pinnedFilter, setPinnedFilter] = useState("semua")
   const [page, setPage] = useState(1)
   const [formOpen, setFormOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<Pengumuman | null>(null)
@@ -97,9 +97,9 @@ export function PengumumanAdminPage() {
           d.penulis.toLowerCase().includes(q)
       )
     }
-    if (kategoriFilter !== "all") data = data.filter((d) => d.kategori === kategoriFilter)
-    if (statusFilter !== "all") data = data.filter((d) => d.status === statusFilter)
-    if (targetFilter !== "all") data = data.filter((d) => d.target === targetFilter)
+    if (kategoriFilter !== "semua") data = data.filter((d) => d.kategori === kategoriFilter)
+    if (statusFilter !== "semua") data = data.filter((d) => d.status === statusFilter)
+    if (targetFilter !== "semua") data = data.filter((d) => d.target === targetFilter)
     if (pinnedFilter === "pinned") data = data.filter((d) => d.pinned)
     if (pinnedFilter === "not-pinned") data = data.filter((d) => !d.pinned)
     return data.sort(
@@ -314,45 +314,45 @@ export function PengumumanAdminPage() {
             className="pl-9"
           />
         </div>
-        <Select value={kategoriFilter} onValueChange={(v) => { setKategoriFilter(v ?? "all"); setPage(1) }}>
+        <Select value={kategoriFilter} onValueChange={(v) => { setKategoriFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Kategori" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kategori</SelectItem>
+            <SelectItem value="semua">Semua Kategori</SelectItem>
             {KATEGORI_PENGUMUMAN_OPTIONS.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v ?? "all"); setPage(1) }}>
+        <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[140px]">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             {STATUS_PENGUMUMAN_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>{s}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={targetFilter} onValueChange={(v) => { setTargetFilter(v ?? "all"); setPage(1) }}>
+        <Select value={targetFilter} onValueChange={(v) => { setTargetFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Target" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Target</SelectItem>
+            <SelectItem value="semua">Semua Target</SelectItem>
             {TARGET_OPTIONS.map((t) => (
               <SelectItem key={t} value={t}>{t}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={pinnedFilter} onValueChange={(v) => { setPinnedFilter(v ?? "all"); setPage(1) }}>
+        <Select value={pinnedFilter} onValueChange={(v) => { setPinnedFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[140px]">
             <SelectValue placeholder="Pin" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Pin</SelectItem>
+            <SelectItem value="semua">Semua Pin</SelectItem>
             <SelectItem value="pinned">Dipin</SelectItem>
             <SelectItem value="not-pinned">Tidak Dipin</SelectItem>
           </SelectContent>

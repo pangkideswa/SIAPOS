@@ -44,10 +44,10 @@ export function HasilUjianListPage() {
   const isSiswa = user?.role === "siswa"
 
   const [search, setSearch] = useState("")
-  const [kelasFilter, setKelasFilter] = useState<string>("all")
-  const [mapelFilter, setMapelFilter] = useState<string>("all")
-  const [jenisFilter, setJenisFilter] = useState<string>("all")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [kelasFilter, setKelasFilter] = useState<string>("semua")
+  const [mapelFilter, setMapelFilter] = useState<string>("semua")
+  const [jenisFilter, setJenisFilter] = useState<string>("semua")
+  const [statusFilter, setStatusFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const [sortKey, setSortKey] = useState<SortKey>("tanggal")
   const [sortDir, setSortDir] = useState<SortDir>("desc")
@@ -93,13 +93,13 @@ export function HasilUjianListPage() {
         item.nama_ujian.toLowerCase().includes(search.toLowerCase()) ||
         item.mata_pelajaran.toLowerCase().includes(search.toLowerCase())
       const matchesKelas =
-        kelasFilter === "all" || item.siswa_kelas === kelasFilter
+        kelasFilter === "semua" || item.siswa_kelas === kelasFilter
       const matchesMapel =
-        mapelFilter === "all" || item.mata_pelajaran === mapelFilter
+        mapelFilter === "semua" || item.mata_pelajaran === mapelFilter
       const matchesJenis =
-        jenisFilter === "all" || item.jenis_ujian === jenisFilter
+        jenisFilter === "semua" || item.jenis_ujian === jenisFilter
       const matchesStatus =
-        statusFilter === "all" || item.status === statusFilter
+        statusFilter === "semua" || item.status === statusFilter
       return (
         matchesSearch && matchesKelas && matchesMapel && matchesJenis && matchesStatus
       )
@@ -397,7 +397,7 @@ export function HasilUjianListPage() {
         <Select
           value={kelasFilter}
           onValueChange={(v: string | null) => {
-            setKelasFilter(v ?? "all")
+            setKelasFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -405,7 +405,7 @@ export function HasilUjianListPage() {
             <SelectValue placeholder="Semua Kelas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {KELAS_HASIL_OPTIONS.map((kelas: string) => (
               <SelectItem key={kelas} value={kelas}>
                 {kelas}
@@ -416,7 +416,7 @@ export function HasilUjianListPage() {
         <Select
           value={mapelFilter}
           onValueChange={(v: string | null) => {
-            setMapelFilter(v ?? "all")
+            setMapelFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -424,7 +424,7 @@ export function HasilUjianListPage() {
             <SelectValue placeholder="Semua Mapel" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Semua Mapel</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((mapel: string) => (
               <SelectItem key={mapel} value={mapel}>
                 {mapel}
@@ -435,7 +435,7 @@ export function HasilUjianListPage() {
         <Select
           value={jenisFilter}
           onValueChange={(v: string | null) => {
-            setJenisFilter(v ?? "all")
+            setJenisFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -443,7 +443,7 @@ export function HasilUjianListPage() {
             <SelectValue placeholder="Semua Jenis" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Jenis</SelectItem>
+            <SelectItem value="semua">Semua Jenis</SelectItem>
             {JENIS_UJIAN_OPTIONS.map((jenis: string) => (
               <SelectItem key={jenis} value={jenis}>
                 {jenis}
@@ -454,7 +454,7 @@ export function HasilUjianListPage() {
         <Select
           value={statusFilter}
           onValueChange={(v: string | null) => {
-            setStatusFilter(v ?? "all")
+            setStatusFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -462,7 +462,7 @@ export function HasilUjianListPage() {
             <SelectValue placeholder="Semua Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             {STATUS_HASIL_OPTIONS.map((status: string) => (
               <SelectItem key={status} value={status}>
                 {status}

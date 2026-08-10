@@ -187,9 +187,9 @@ export const teachingClassService = {
             ],
           }
         : {}),
-      ...(guru && guru !== "all" ? { guru_nama: guru } : {}),
-      ...(kelas && kelas !== "all" ? { kelas } : {}),
-      ...(tahun_ajaran && tahun_ajaran !== "all" ? { tahun_ajaran } : {}),
+      ...(guru && guru !== "semua" ? { guru_nama: guru } : {}),
+      ...(kelas && kelas !== "semua" ? { kelas } : {}),
+      ...(tahun_ajaran && tahun_ajaran !== "semua" ? { tahun_ajaran } : {}),
       ...(allowedTeachingClassIds
         ? { id: { in: [...allowedTeachingClassIds] } }
         : {}),

@@ -44,7 +44,7 @@ export function NilaiAkademikSiswaPage() {
     [data]
   )
   const [search, setSearch] = useState("")
-  const [semesterFilter, setSemesterFilter] = useState("all")
+  const [semesterFilter, setSemesterFilter] = useState("semua")
   const [page, setPage] = useState(1)
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<NilaiAkademik | null>(null)
@@ -55,7 +55,7 @@ export function NilaiAkademikSiswaPage() {
       const q = search.toLowerCase()
       data = data.filter((d) => d.mata_pelajaran.toLowerCase().includes(q))
     }
-    if (semesterFilter !== "all") data = data.filter((d) => d.semester === semesterFilter)
+    if (semesterFilter !== "semua") data = data.filter((d) => d.semester === semesterFilter)
     return data
   }, [items, search, semesterFilter])
 
@@ -149,12 +149,12 @@ export function NilaiAkademikSiswaPage() {
             className="pl-9"
           />
         </div>
-        <Select value={semesterFilter} onValueChange={(v) => { setSemesterFilter(v ?? "all"); setPage(1) }}>
+        <Select value={semesterFilter} onValueChange={(v) => { setSemesterFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[140px]">
             <SelectValue placeholder="Semester" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Semester</SelectItem>
+            <SelectItem value="semua">Semua Semester</SelectItem>
             {SEMESTER_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>{s}</SelectItem>
             ))}

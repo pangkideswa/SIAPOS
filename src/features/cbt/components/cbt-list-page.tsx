@@ -27,9 +27,9 @@ import type { CBTExam, CBTExamFormData } from "../types/cbt"
 export function CBTListPage() {
   const router = useRouter()
   const [search, setSearch] = useState("")
-  const [mapelFilter, setMapelFilter] = useState<string>("all")
-  const [kelasFilter, setKelasFilter] = useState<string>("all")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [mapelFilter, setMapelFilter] = useState<string>("semua")
+  const [kelasFilter, setKelasFilter] = useState<string>("semua")
+  const [statusFilter, setStatusFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -46,9 +46,9 @@ export function CBTListPage() {
       item.nama_ujian.toLowerCase().includes(search.toLowerCase()) ||
       item.kelas.toLowerCase().includes(search.toLowerCase()) ||
       item.deskripsi.toLowerCase().includes(search.toLowerCase())
-    const matchesMapel = mapelFilter === "all" || getPaketSoal(item.paket_soal_id)?.mata_pelajaran === mapelFilter
-    const matchesKelas = kelasFilter === "all" || item.kelas === kelasFilter
-    const matchesStatus = statusFilter === "all" || item.status === statusFilter
+    const matchesMapel = mapelFilter === "semua" || getPaketSoal(item.paket_soal_id)?.mata_pelajaran === mapelFilter
+    const matchesKelas = kelasFilter === "semua" || item.kelas === kelasFilter
+    const matchesStatus = statusFilter === "semua" || item.status === statusFilter
     return matchesSearch && matchesMapel && matchesKelas && matchesStatus
   })
 
@@ -183,21 +183,21 @@ export function CBTListPage() {
         <Select value={mapelFilter} onValueChange={(v) => { if (v) { setMapelFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Mapel" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Semua Mapel</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={kelasFilter} onValueChange={(v) => { if (v) { setKelasFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="Semua Kelas" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {KELAS_OPTIONS.map((k) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Semua Status" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             {STATUS_CBT_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
           </SelectContent>
         </Select>

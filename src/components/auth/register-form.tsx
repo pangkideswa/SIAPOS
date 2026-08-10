@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { useAuth } from "@/contexts/auth-context"
+import { useSettings } from "@/contexts/settings-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -87,6 +88,7 @@ const roles = [
 
 export function RegisterForm() {
   const { register: authRegister } = useAuth()
+  const { settings } = useSettings()
   const [showPassword, setShowPassword] = useState(false)
   const [serverError, setServerError] = useState("")
 
@@ -139,18 +141,21 @@ export function RegisterForm() {
       className="w-full max-w-md"
     >
       <div className="mb-8 text-center lg:text-left">
-        <Link href="/" className="inline-flex items-center gap-2.5 mb-6">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-white font-bold text-sm shadow-md shadow-primary/25">
-            SI
+        <div className="flex flex-col items-center gap-2 text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+            {settings.logo?.logo_siapos ? (
+              <img src={settings.logo.logo_siapos} alt="Logo" className="w-12 h-12 object-contain rounded-xl" />
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/>
+              </svg>
+            )}
           </div>
-          <span className="font-bold text-2xl tracking-tight text-foreground">
-            SIAPOS
-          </span>
-        </Link>
-        <h1 className="text-2xl font-bold text-foreground">Daftar Akun Baru</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Buat akun untuk mulai menggunakan SIAPOS
-        </p>
+          <h1 className="text-2xl font-bold tracking-tight">Daftar Akun {settings.pengaturan_sistem?.nama_aplikasi || "SIAPOS"}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Buat akun untuk mulai menggunakan {settings.pengaturan_sistem?.nama_aplikasi || "SIAPOS"}
+          </p>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 shadow-sm">

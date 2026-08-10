@@ -141,3 +141,8 @@ export type Nilai = Prisma.NilaiModel
  * 
  */
 export type Notifikasi = Prisma.NotifikasiModel
+/**
+ * Model AppSetting
+ * 
+ */
+export type AppSetting = Prisma.AppSettingModel

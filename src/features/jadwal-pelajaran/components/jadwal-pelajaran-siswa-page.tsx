@@ -21,7 +21,7 @@ export function JadwalPelajaranSiswaPage() {
   const { user } = useAuth()
   const classroom = useClassroom()
   const { data: jadwalData } = useSchedules()
-  const [hariFilter, setHariFilter] = useState("all")
+  const [hariFilter, setHariFilter] = useState("semua")
 
   const siswa = classroom.getSiswaByUser(user)
   const siswaKelas = siswa?.kelas ?? ""
@@ -42,7 +42,7 @@ export function JadwalPelajaranSiswaPage() {
 
   const filteredJadwal = useMemo(
     () =>
-      hariFilter === "all"
+      hariFilter === "semua"
         ? jadwalKelas
         : jadwalKelas.filter((j) => j.hari === hariFilter),
     [hariFilter, jadwalKelas]
@@ -69,12 +69,12 @@ export function JadwalPelajaranSiswaPage() {
       />
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-        <Select value={hariFilter} onValueChange={(v) => setHariFilter(v ?? "all")}>
+        <Select value={hariFilter} onValueChange={(v) => setHariFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Semua Hari" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Hari</SelectItem>
+            <SelectItem value="semua">Semua Hari</SelectItem>
             {HARI_OPTIONS.map((h) => (
               <SelectItem key={h.value} value={h.value}>
                 {h.label}

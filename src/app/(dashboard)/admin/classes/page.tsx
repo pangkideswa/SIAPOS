@@ -44,7 +44,7 @@ const EMPTY_FORM: FormData = {
 
 export default function ClassesPage() {
   const [search, setSearch] = useState("")
-  const [gradeFilter, setGradeFilter] = useState<string>("all")
+  const [gradeFilter, setGradeFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -55,7 +55,7 @@ export default function ClassesPage() {
 
   const { data, isLoading } = useClasses({
     search: search || undefined,
-    grade_level: gradeFilter === "all" ? undefined : gradeFilter,
+    grade_level: gradeFilter === "semua" ? undefined : gradeFilter,
     page,
   })
 
@@ -205,7 +205,7 @@ export default function ClassesPage() {
         <Select
           value={gradeFilter}
           onValueChange={(value) => {
-            setGradeFilter(value ?? "all")
+            setGradeFilter(value ?? "semua")
             setPage(1)
           }}
         >
@@ -213,7 +213,7 @@ export default function ClassesPage() {
             <SelectValue placeholder="Semua Tingkat" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Tingkat</SelectItem>
+            <SelectItem value="semua">Semua Tingkat</SelectItem>
             {GRADE_LEVELS.map((g) => (
               <SelectItem key={g} value={g}>
                 {g}

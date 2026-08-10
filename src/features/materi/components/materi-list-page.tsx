@@ -44,9 +44,9 @@ export function MateriListPage() {
   const updateMutation = useUpdateMaterial()
   const removeMutation = useRemoveMaterial()
   const [search, setSearch] = useState("")
-  const [guruFilter, setGuruFilter] = useState<string>("all")
-  const [kelasFilter, setKelasFilter] = useState<string>("all")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [guruFilter, setGuruFilter] = useState<string>("semua")
+  const [kelasFilter, setKelasFilter] = useState<string>("semua")
+  const [statusFilter, setStatusFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const [formDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -62,10 +62,10 @@ export function MateriListPage() {
       item.judul.toLowerCase().includes(search.toLowerCase()) ||
       item.mata_pelajaran.toLowerCase().includes(search.toLowerCase()) ||
       item.guru_nama.toLowerCase().includes(search.toLowerCase())
-    const matchesGuru = guruFilter === "all" || item.guru_nama === guruFilter
-    const matchesKelas = kelasFilter === "all" || item.kelas === kelasFilter
+    const matchesGuru = guruFilter === "semua" || item.guru_nama === guruFilter
+    const matchesKelas = kelasFilter === "semua" || item.kelas === kelasFilter
     const matchesStatus =
-      statusFilter === "all" || item.status === statusFilter
+      statusFilter === "semua" || item.status === statusFilter
     return matchesSearch && matchesGuru && matchesKelas && matchesStatus
   })
 
@@ -246,7 +246,7 @@ export function MateriListPage() {
         <Select
           value={guruFilter}
           onValueChange={(v: string | null) => {
-            setGuruFilter(v ?? "all")
+            setGuruFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -254,7 +254,7 @@ export function MateriListPage() {
             <SelectValue placeholder="Semua Guru" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Guru</SelectItem>
+            <SelectItem value="semua">Semua Guru</SelectItem>
             {teachers?.map((guru) => (
               <SelectItem key={guru.id} value={guru.nama_lengkap}>
                 {guru.nama_lengkap}
@@ -265,7 +265,7 @@ export function MateriListPage() {
         <Select
           value={kelasFilter}
           onValueChange={(v: string | null) => {
-            setKelasFilter(v ?? "all")
+            setKelasFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -273,7 +273,7 @@ export function MateriListPage() {
             <SelectValue placeholder="Semua Kelas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {classes.map((kelas) => (
               <SelectItem key={kelas.id} value={kelas.name}>
                 {kelas.name}
@@ -284,7 +284,7 @@ export function MateriListPage() {
         <Select
           value={statusFilter}
           onValueChange={(v: string | null) => {
-            setStatusFilter(v ?? "all")
+            setStatusFilter(v ?? "semua")
             setPage(1)
           }}
         >
@@ -292,7 +292,7 @@ export function MateriListPage() {
             <SelectValue placeholder="Semua Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             <SelectItem value="Draft">Draft</SelectItem>
             <SelectItem value="Publish">Publish</SelectItem>
           </SelectContent>

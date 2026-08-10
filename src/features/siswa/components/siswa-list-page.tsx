@@ -43,9 +43,9 @@ import type { Siswa, SiswaFormData } from "@/features/siswa/types/siswa"
 export function SiswaListPage() {
   const router = useRouter()
   const [search, setSearch] = useState("")
-  const [jurusanFilter, setJurusanFilter] = useState<string>("all")
-  const [kelasFilter, setKelasFilter] = useState<string>("all")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [jurusanFilter, setJurusanFilter] = useState<string>("semua")
+  const [kelasFilter, setKelasFilter] = useState<string>("semua")
+  const [statusFilter, setStatusFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -62,9 +62,9 @@ export function SiswaListPage() {
   } = useStudentsPaginated({
     search: search || undefined,
     jurusan_id:
-      jurusanFilter === "all" ? undefined : Number(jurusanFilter),
-    kelas: kelasFilter === "all" ? undefined : kelasFilter,
-    status: statusFilter === "all" ? undefined : statusFilter,
+      jurusanFilter === "semua" ? undefined : Number(jurusanFilter),
+    kelas: kelasFilter === "semua" ? undefined : kelasFilter,
+    status: statusFilter === "semua" ? undefined : statusFilter,
     page,
     per_page: 10,
   })
@@ -194,9 +194,9 @@ export function SiswaListPage() {
   function handleExport() {
     const params = new URLSearchParams()
     if (search) params.append("search", search)
-    if (jurusanFilter !== "all") params.append("jurusan_id", jurusanFilter)
-    if (kelasFilter !== "all") params.append("kelas", kelasFilter)
-    if (statusFilter !== "all") params.append("status", statusFilter)
+    if (jurusanFilter !== "semua") params.append("jurusan_id", jurusanFilter)
+    if (kelasFilter !== "semua") params.append("kelas", kelasFilter)
+    if (statusFilter !== "semua") params.append("status", statusFilter)
 
     window.location.href = `/api/students/export?${params.toString()}`
   }
@@ -285,7 +285,7 @@ export function SiswaListPage() {
         <Select
           value={jurusanFilter}
           onValueChange={(value) => {
-            setJurusanFilter(value ?? "all")
+            setJurusanFilter(value ?? "semua")
             setPage(1)
           }}
         >
@@ -293,7 +293,7 @@ export function SiswaListPage() {
             <SelectValue placeholder="Semua Jurusan" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Jurusan</SelectItem>
+            <SelectItem value="semua">Semua Jurusan</SelectItem>
             {JURUSAN_OPTIONS.map((j) => (
               <SelectItem key={j.id} value={String(j.id)}>
                 {j.code}
@@ -304,7 +304,7 @@ export function SiswaListPage() {
         <Select
           value={kelasFilter}
           onValueChange={(value) => {
-            setKelasFilter(value ?? "all")
+            setKelasFilter(value ?? "semua")
             setPage(1)
           }}
         >
@@ -312,7 +312,7 @@ export function SiswaListPage() {
             <SelectValue placeholder="Semua Kelas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {kelasOptions.map((k) => (
               <SelectItem key={k.name} value={k.name}>
                 {k.name}
@@ -323,7 +323,7 @@ export function SiswaListPage() {
         <Select
           value={statusFilter}
           onValueChange={(value) => {
-            setStatusFilter(value ?? "all")
+            setStatusFilter(value ?? "semua")
             setPage(1)
           }}
         >
@@ -331,7 +331,7 @@ export function SiswaListPage() {
             <SelectValue placeholder="Semua Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             {STATUS_SISWA_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>
                 {s}

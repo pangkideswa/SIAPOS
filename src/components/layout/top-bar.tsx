@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/contexts/auth-context"
+import { useSettings } from "@/contexts/settings-context"
 import { NotificationBell } from "@/features/notifications/components/notification-bell"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -116,8 +117,9 @@ function getPageTitle(pathname: string): string {
   return "Beranda"
 }
 
-export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
+export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
   const { user, logout } = useAuth()
+  const { settings } = useSettings()
   const pathname = usePathname()
   const router = useRouter()
   const [searchOpen, setSearchOpen] = useState(false)
@@ -143,7 +145,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   return (
     <header className="h-16 border-b border-border bg-background flex items-center justify-between px-4 md:px-6 shrink-0">
       <div className="flex items-center gap-3">
-        <div className="md:hidden flex items-center gap-2">
+        <div className="flex items-center gap-2 md:hidden">
           <Button
             variant="ghost"
             size="icon-sm"
@@ -153,10 +155,16 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           >
             <Menu className="h-5 w-5 text-muted-foreground" />
           </Button>
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white font-bold text-sm shadow-sm shadow-primary/20">
-            SI
-          </div>
-          <span className="font-bold text-lg tracking-tight">SIAPOS</span>
+          {settings.logo?.logo_siapos ? (
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0 overflow-hidden">
+              <img src={settings.logo.logo_siapos} alt="Logo" className="w-full h-full object-contain" />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white font-bold text-sm shrink-0">
+              {settings.pengaturan_sistem?.nama_aplikasi?.substring(0, 2).toUpperCase() || "SI"}
+            </div>
+          )}
+          <span className="font-bold text-lg tracking-tight line-clamp-1">{settings.pengaturan_sistem?.nama_aplikasi || "SIAPOS"}</span>
         </div>
         <div className="hidden md:block">
           <h1 className="text-lg font-semibold text-foreground">{pageTitle}</h1>

@@ -546,3 +546,15 @@ model Notifikasi {
   @@index([user_id])
   @@map("notifikasis")
 }
+
+// ============================================================================
+// Application Settings (Global)
+// ============================================================================
+
+model AppSetting {
+  key        String   @id
+  value      String   // Stored as JSON string to support multiple formats
+  updated_at DateTime @updatedAt
+
+  @@map("app_settings")
+}

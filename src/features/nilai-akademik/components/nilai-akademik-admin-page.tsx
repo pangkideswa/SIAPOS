@@ -48,11 +48,11 @@ export function NilaiAkademikAdminPage() {
   const { data: items = [] } = useNilai()
   const updateNilai = useUpdateNilai()
   const [search, setSearch] = useState("")
-  const [tahunFilter, setTahunFilter] = useState("all")
-  const [semesterFilter, setSemesterFilter] = useState("all")
-  const [mapelFilter, setMapelFilter] = useState("all")
-  const [guruFilter, setGuruFilter] = useState("all")
-  const [kelasFilter, setKelasFilter] = useState("all")
+  const [tahunFilter, setTahunFilter] = useState("semua")
+  const [semesterFilter, setSemesterFilter] = useState("semua")
+  const [mapelFilter, setMapelFilter] = useState("semua")
+  const [guruFilter, setGuruFilter] = useState("semua")
+  const [kelasFilter, setKelasFilter] = useState("semua")
   const [page, setPage] = useState(1)
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<NilaiAkademik | null>(null)
@@ -65,11 +65,11 @@ export function NilaiAkademikAdminPage() {
       const q = search.toLowerCase()
       data = data.filter((d) => d.siswa_nama.toLowerCase().includes(q))
     }
-    if (tahunFilter !== "all") data = data.filter((d) => d.tahun_ajaran === tahunFilter)
-    if (semesterFilter !== "all") data = data.filter((d) => d.semester === semesterFilter)
-    if (mapelFilter !== "all") data = data.filter((d) => d.mata_pelajaran === mapelFilter)
-    if (guruFilter !== "all") data = data.filter((d) => d.guru_nama === guruFilter)
-    if (kelasFilter !== "all") data = data.filter((d) => d.siswa_kelas === kelasFilter)
+    if (tahunFilter !== "semua") data = data.filter((d) => d.tahun_ajaran === tahunFilter)
+    if (semesterFilter !== "semua") data = data.filter((d) => d.semester === semesterFilter)
+    if (mapelFilter !== "semua") data = data.filter((d) => d.mata_pelajaran === mapelFilter)
+    if (guruFilter !== "semua") data = data.filter((d) => d.guru_nama === guruFilter)
+    if (kelasFilter !== "semua") data = data.filter((d) => d.siswa_kelas === kelasFilter)
     return data
   }, [items, search, tahunFilter, semesterFilter, mapelFilter, guruFilter, kelasFilter])
 
@@ -172,56 +172,56 @@ export function NilaiAkademikAdminPage() {
             className="pl-9"
           />
         </div>
-        <Select value={tahunFilter} onValueChange={(v) => { setTahunFilter(v ?? "all"); setPage(1) }}>
+        <Select value={tahunFilter} onValueChange={(v) => { setTahunFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[140px]">
             <SelectValue placeholder="Tahun Ajaran" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua TA</SelectItem>
+            <SelectItem value="semua">Semua TA</SelectItem>
             {TAHUN_AJARAN_OPTIONS.map((t) => (
               <SelectItem key={t} value={t}>{t}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={semesterFilter} onValueChange={(v) => { setSemesterFilter(v ?? "all"); setPage(1) }}>
+        <Select value={semesterFilter} onValueChange={(v) => { setSemesterFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[120px]">
             <SelectValue placeholder="Semester" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Semester</SelectItem>
+            <SelectItem value="semua">Semua Semester</SelectItem>
             {SEMESTER_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>{s}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={mapelFilter} onValueChange={(v) => { setMapelFilter(v ?? "all"); setPage(1) }}>
+        <Select value={mapelFilter} onValueChange={(v) => { setMapelFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[160px]">
             <SelectValue placeholder="Mata Pelajaran" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Semua Mapel</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((m) => (
               <SelectItem key={m} value={m}>{m}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={guruFilter} onValueChange={(v) => { setGuruFilter(v ?? "all"); setPage(1) }}>
+        <Select value={guruFilter} onValueChange={(v) => { setGuruFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Guru" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Guru</SelectItem>
+            <SelectItem value="semua">Semua Guru</SelectItem>
             {GURU_OPTIONS.map((g) => (
               <SelectItem key={g} value={g}>{g}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={kelasFilter} onValueChange={(v) => { setKelasFilter(v ?? "all"); setPage(1) }}>
+        <Select value={kelasFilter} onValueChange={(v) => { setKelasFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[130px]">
             <SelectValue placeholder="Kelas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {KELAS_OPTIONS.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}

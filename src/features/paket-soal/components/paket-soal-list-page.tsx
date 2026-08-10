@@ -26,9 +26,9 @@ import type { PaketSoal, PaketSoalFormData } from "../types/paket-soal"
 export function PaketSoalListPage() {
   const router = useRouter()
   const [search, setSearch] = useState("")
-  const [mapelFilter, setMapelFilter] = useState<string>("all")
-  const [guruFilter, setGuruFilter] = useState<string>("all")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [mapelFilter, setMapelFilter] = useState<string>("semua")
+  const [guruFilter, setGuruFilter] = useState<string>("semua")
+  const [statusFilter, setStatusFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -46,9 +46,9 @@ export function PaketSoalListPage() {
       item.mata_pelajaran.toLowerCase().includes(search.toLowerCase()) ||
       item.guru_nama.toLowerCase().includes(search.toLowerCase()) ||
       item.deskripsi.toLowerCase().includes(search.toLowerCase())
-    const matchesMapel = mapelFilter === "all" || item.mata_pelajaran === mapelFilter
-    const matchesGuru = guruFilter === "all" || item.guru_nama === guruFilter
-    const matchesStatus = statusFilter === "all" || item.status === statusFilter
+    const matchesMapel = mapelFilter === "semua" || item.mata_pelajaran === mapelFilter
+    const matchesGuru = guruFilter === "semua" || item.guru_nama === guruFilter
+    const matchesStatus = statusFilter === "semua" || item.status === statusFilter
     return matchesSearch && matchesMapel && matchesGuru && matchesStatus
   })
 
@@ -158,21 +158,21 @@ export function PaketSoalListPage() {
         <Select value={mapelFilter} onValueChange={(v) => { if (v) { setMapelFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Mapel" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Semua Mapel</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={guruFilter} onValueChange={(v) => { if (v) { setGuruFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Guru" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Guru</SelectItem>
+            <SelectItem value="semua">Semua Guru</SelectItem>
             {GURU_PAKET_SOAL_OPTIONS.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Semua Status" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             {STATUS_PAKET_SOAL_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
           </SelectContent>
         </Select>

@@ -40,7 +40,7 @@ const EMPTY_FORM: FormData = {
 
 export default function SubjectsPage() {
   const [search, setSearch] = useState("")
-  const [activeFilter, setActiveFilter] = useState<string>("all")
+  const [activeFilter, setActiveFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -51,7 +51,7 @@ export default function SubjectsPage() {
 
   const { data, isLoading } = useSubjects({
     search: search || undefined,
-    is_active: activeFilter === "all" ? undefined : activeFilter === "true",
+    is_active: activeFilter === "semua" ? undefined : activeFilter === "true",
     page,
   })
 
@@ -204,7 +204,7 @@ export default function SubjectsPage() {
         <Select
           value={activeFilter}
           onValueChange={(value) => {
-            setActiveFilter(value ?? "all")
+            setActiveFilter(value ?? "semua")
             setPage(1)
           }}
         >
@@ -212,7 +212,7 @@ export default function SubjectsPage() {
             <SelectValue placeholder="Semua Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             <SelectItem value="true">Aktif</SelectItem>
             <SelectItem value="false">Nonaktif</SelectItem>
           </SelectContent>

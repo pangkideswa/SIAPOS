@@ -33,9 +33,9 @@ import type { KelasMengajar, KelasMengajarFormData } from "@/features/kelas-meng
 
 export function KelasMengajarListPage() {
   const [search, setSearch] = useState("")
-  const [guruFilter, setGuruFilter] = useState<string>("all")
-  const [kelasFilter, setKelasFilter] = useState<string>("all")
-  const [tahunFilter, setTahunFilter] = useState<string>("all")
+  const [guruFilter, setGuruFilter] = useState<string>("semua")
+  const [kelasFilter, setKelasFilter] = useState<string>("semua")
+  const [tahunFilter, setTahunFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -246,7 +246,7 @@ export function KelasMengajarListPage() {
         <Select
           value={guruFilter}
           onValueChange={(value) => {
-            setGuruFilter(value ?? "all")
+            setGuruFilter(value ?? "semua")
             setPage(1)
           }}
         >
@@ -254,7 +254,7 @@ export function KelasMengajarListPage() {
             <SelectValue placeholder="Semua Guru" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Guru</SelectItem>
+            <SelectItem value="semua">Semua Guru</SelectItem>
             {teacherOptions.map((t) => (
               <SelectItem key={t.id} value={t.nama_lengkap}>
                 {t.nama_lengkap}
@@ -267,7 +267,7 @@ export function KelasMengajarListPage() {
         <Select
           value={kelasFilter}
           onValueChange={(value) => {
-            setKelasFilter(value ?? "all")
+            setKelasFilter(value ?? "semua")
             setPage(1)
           }}
         >
@@ -275,7 +275,7 @@ export function KelasMengajarListPage() {
             <SelectValue placeholder="Semua Kelas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {classOptions.map((c) => (
               <SelectItem key={c.id} value={c.name}>
                 {c.name}
@@ -287,7 +287,7 @@ export function KelasMengajarListPage() {
         <Select
           value={tahunFilter}
           onValueChange={(value) => {
-            setTahunFilter(value ?? "all")
+            setTahunFilter(value ?? "semua")
             setPage(1)
           }}
         >
@@ -295,7 +295,7 @@ export function KelasMengajarListPage() {
             <SelectValue placeholder="Semua Tahun" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Tahun</SelectItem>
+            <SelectItem value="semua">Semua Tahun</SelectItem>
             {TAHUN_AJARAN_OPTIONS.map((t) => (
               <SelectItem key={t} value={t}>
                 {t}

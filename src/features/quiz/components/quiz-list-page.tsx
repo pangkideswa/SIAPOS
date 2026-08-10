@@ -28,10 +28,10 @@ import type { Quiz, QuizFormData } from "../types/quiz"
 export function QuizListPage() {
   const router = useRouter()
   const [search, setSearch] = useState("")
-  const [mapelFilter, setMapelFilter] = useState<string>("all")
-  const [guruFilter, setGuruFilter] = useState<string>("all")
-  const [kelasFilter, setKelasFilter] = useState<string>("all")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [mapelFilter, setMapelFilter] = useState<string>("semua")
+  const [guruFilter, setGuruFilter] = useState<string>("semua")
+  const [kelasFilter, setKelasFilter] = useState<string>("semua")
+  const [statusFilter, setStatusFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -48,10 +48,10 @@ export function QuizListPage() {
       item.judul.toLowerCase().includes(search.toLowerCase()) ||
       item.kelas.toLowerCase().includes(search.toLowerCase()) ||
       item.deskripsi.toLowerCase().includes(search.toLowerCase())
-    const matchesMapel = mapelFilter === "all" || getPaketSoal(item.paket_soal_id)?.mata_pelajaran === mapelFilter
-    const matchesGuru = guruFilter === "all" || getPaketSoal(item.paket_soal_id)?.guru_nama === guruFilter
-    const matchesKelas = kelasFilter === "all" || item.kelas === kelasFilter
-    const matchesStatus = statusFilter === "all" || item.status === statusFilter
+    const matchesMapel = mapelFilter === "semua" || getPaketSoal(item.paket_soal_id)?.mata_pelajaran === mapelFilter
+    const matchesGuru = guruFilter === "semua" || getPaketSoal(item.paket_soal_id)?.guru_nama === guruFilter
+    const matchesKelas = kelasFilter === "semua" || item.kelas === kelasFilter
+    const matchesStatus = statusFilter === "semua" || item.status === statusFilter
     return matchesSearch && matchesMapel && matchesGuru && matchesKelas && matchesStatus
   })
 
@@ -175,28 +175,28 @@ export function QuizListPage() {
         <Select value={mapelFilter} onValueChange={(v) => { if (v) { setMapelFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Mapel" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Semua Mapel</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={guruFilter} onValueChange={(v) => { if (v) { setGuruFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Guru" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Guru</SelectItem>
+            <SelectItem value="semua">Semua Guru</SelectItem>
             {GURU_QUIZ_OPTIONS.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={kelasFilter} onValueChange={(v) => { if (v) { setKelasFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="Semua Kelas" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {KELAS_OPTIONS.map((k) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Semua Status" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
+            <SelectItem value="semua">Semua Status</SelectItem>
             {STATUS_QUIZ_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
           </SelectContent>
         </Select>

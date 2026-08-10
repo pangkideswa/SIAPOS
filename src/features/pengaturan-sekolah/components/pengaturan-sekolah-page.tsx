@@ -24,7 +24,7 @@ import {
   ZONA_WAKTU_OPTIONS,
   TAHUN_AJARAN_OPTIONS,
 } from "@/features/pengaturan-sekolah/constants/pengaturan-sekolah.constants"
-import { DUMMY_SEKOLAH_SETTINGS } from "@/features/pengaturan-sekolah/dummy/pengaturan-sekolah.data"
+import { useSettings } from "@/contexts/settings-context"
 import type { SekolahFormData } from "@/features/pengaturan-sekolah/types/pengaturan-sekolah"
 import {
   School,
@@ -125,7 +125,8 @@ function SectionHeader({ icon: Icon, title, description }: { icon: React.Compone
 }
 
 export function PengaturanSekolahPage() {
-  const [form, setForm] = useState<SekolahFormData>(() => structuredClone(DUMMY_SEKOLAH_SETTINGS))
+  const { settings: initialSettings, refreshSettings } = useSettings()
+  const [form, setForm] = useState<SekolahFormData>(() => structuredClone(initialSettings))
   const [isSaving, setIsSaving] = useState(false)
 
   function handleGroupChange<K extends keyof SekolahFormData>(
@@ -144,9 +145,27 @@ export function PengaturanSekolahPage() {
 
   async function handleSave() {
     setIsSaving(true)
-    // TODO: Replace with backend API call
-    await new Promise((r) => setTimeout(r, 800))
-    setIsSaving(false)
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      })
+      
+      if (!response.ok) {
+        throw new Error('Gagal menyimpan pengaturan')
+      }
+      
+      await refreshSettings()
+      alert('Pengaturan berhasil disimpan!')
+    } catch (error) {
+      console.error(error)
+      alert('Terjadi kesalahan saat menyimpan pengaturan')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (

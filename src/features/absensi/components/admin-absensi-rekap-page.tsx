@@ -28,7 +28,7 @@ interface RekapRow extends RekapAbsensi, Record<string, unknown> {}
 export function AdminAbsensiRekapPage() {
   const router = useRouter()
   const [search, setSearch] = useState("")
-  const [kelasFilter, setKelasFilter] = useState<string>("all")
+  const [kelasFilter, setKelasFilter] = useState<string>("semua")
   const [isExporting, setIsExporting] = useState(false)
   const [page, setPage] = useState(1)
   const perPage = 15
@@ -59,7 +59,7 @@ export function AdminAbsensiRekapPage() {
     return rekapData.filter((item) => {
       const matchesSearch = !search ||
         item.siswa_nama.toLowerCase().includes(search.toLowerCase())
-      const matchesKelas = kelasFilter === "all" || item.siswa_kelas === kelasFilter
+      const matchesKelas = kelasFilter === "semua" || item.siswa_kelas === kelasFilter
       return matchesSearch && matchesKelas
     })
   }, [rekapData, search, kelasFilter])
@@ -250,13 +250,13 @@ export function AdminAbsensiRekapPage() {
         </div>
         <Select
           value={kelasFilter}
-          onValueChange={(v) => { setKelasFilter(v ?? "all"); setPage(1) }}
+          onValueChange={(v) => { setKelasFilter(v ?? "semua"); setPage(1) }}
         >
           <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Semua Kelas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Semua Kelas</SelectItem>
             {classes.map((k) => (
               <SelectItem key={k.id} value={k.name}>{k.name}</SelectItem>
             ))}

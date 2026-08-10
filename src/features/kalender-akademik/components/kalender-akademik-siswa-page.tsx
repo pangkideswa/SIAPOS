@@ -27,8 +27,8 @@ import { KalenderEventDetailDialog } from "./kalender-event-detail-dialog"
 export function KalenderAkademikSiswaPage() {
   const [events] = useState<KalenderEvent[]>(DUMMY_KALENDER_EVENTS)
   const [search, setSearch] = useState("")
-  const [kategoriFilter, setKategoriFilter] = useState("all")
-  const [bulanFilter, setBulanFilter] = useState("all")
+  const [kategoriFilter, setKategoriFilter] = useState("semua")
+  const [bulanFilter, setBulanFilter] = useState("semua")
   const [viewMode, setViewMode] = useState("month")
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<KalenderEvent | null>(null)
@@ -39,10 +39,10 @@ export function KalenderAkademikSiswaPage() {
       const q = search.toLowerCase()
       data = data.filter((e) => e.nama_event.toLowerCase().includes(q))
     }
-    if (kategoriFilter !== "all") {
+    if (kategoriFilter !== "semua") {
       data = data.filter((e) => e.kategori === kategoriFilter)
     }
-    if (bulanFilter !== "all") {
+    if (bulanFilter !== "semua") {
       const month = Number.parseInt(bulanFilter)
       data = data.filter((e) => {
         const d = new Date(e.tanggal_mulai + "T00:00:00")
@@ -96,23 +96,23 @@ export function KalenderAkademikSiswaPage() {
             className="pl-9"
           />
         </div>
-        <Select value={kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "all")}>
+        <Select value={kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Semua Kategori" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kategori</SelectItem>
+            <SelectItem value="semua">Semua Kategori</SelectItem>
             {KATEGORI_OPTIONS.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={bulanFilter} onValueChange={(v) => setBulanFilter(v ?? "all")}>
+        <Select value={bulanFilter} onValueChange={(v) => setBulanFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[130px]">
             <SelectValue placeholder="Bulan" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Bulan</SelectItem>
+            <SelectItem value="semua">Semua Bulan</SelectItem>
             {BULAN_OPTIONS.map((b) => (
               <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>
             ))}

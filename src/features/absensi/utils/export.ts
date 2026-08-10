@@ -8,8 +8,8 @@ export async function exportAbsensiToExcel(filters: {
 }, filename: string = "Rekap_Absensi") {
   try {
     const params = new URLSearchParams()
-    if (filters.kelas && filters.kelas !== "all") params.append("kelas", filters.kelas)
-    if (filters.mata_pelajaran && filters.mata_pelajaran !== "all") params.append("mata_pelajaran", filters.mata_pelajaran)
+    if (filters.kelas && filters.kelas !== "semua") params.append("kelas", filters.kelas)
+    if (filters.mata_pelajaran && filters.mata_pelajaran !== "semua") params.append("mata_pelajaran", filters.mata_pelajaran)
     if (filters.tanggal_mulai) params.append("tanggal_mulai", filters.tanggal_mulai)
     if (filters.tanggal_selesai) params.append("tanggal_selesai", filters.tanggal_selesai)
 

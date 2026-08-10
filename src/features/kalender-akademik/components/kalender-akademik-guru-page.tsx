@@ -29,10 +29,10 @@ import { KalenderEventDetailDialog } from "./kalender-event-detail-dialog"
 export function KalenderAkademikGuruPage() {
   const [events] = useState<KalenderEvent[]>(DUMMY_KALENDER_EVENTS)
   const [search, setSearch] = useState("")
-  const [kategoriFilter, setKategoriFilter] = useState("all")
-  const [semesterFilter, setSemesterFilter] = useState("all")
-  const [tahunAjaranFilter, setTahunAjaranFilter] = useState("all")
-  const [bulanFilter, setBulanFilter] = useState("all")
+  const [kategoriFilter, setKategoriFilter] = useState("semua")
+  const [semesterFilter, setSemesterFilter] = useState("semua")
+  const [tahunAjaranFilter, setTahunAjaranFilter] = useState("semua")
+  const [bulanFilter, setBulanFilter] = useState("semua")
   const [viewMode, setViewMode] = useState("month")
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<KalenderEvent | null>(null)
@@ -43,16 +43,16 @@ export function KalenderAkademikGuruPage() {
       const q = search.toLowerCase()
       data = data.filter((e) => e.nama_event.toLowerCase().includes(q))
     }
-    if (kategoriFilter !== "all") {
+    if (kategoriFilter !== "semua") {
       data = data.filter((e) => e.kategori === kategoriFilter)
     }
-    if (semesterFilter !== "all") {
+    if (semesterFilter !== "semua") {
       data = data.filter((e) => e.semester === semesterFilter)
     }
-    if (tahunAjaranFilter !== "all") {
+    if (tahunAjaranFilter !== "semua") {
       data = data.filter((e) => e.tahun_ajaran === tahunAjaranFilter)
     }
-    if (bulanFilter !== "all") {
+    if (bulanFilter !== "semua") {
       const month = Number.parseInt(bulanFilter)
       data = data.filter((e) => {
         const d = new Date(e.tanggal_mulai + "T00:00:00")
@@ -106,45 +106,45 @@ export function KalenderAkademikGuruPage() {
             className="pl-9"
           />
         </div>
-        <Select value={kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "all")}>
+        <Select value={kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Semua Kategori" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Kategori</SelectItem>
+            <SelectItem value="semua">Semua Kategori</SelectItem>
             {KATEGORI_OPTIONS.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={semesterFilter} onValueChange={(v) => setSemesterFilter(v ?? "all")}>
+        <Select value={semesterFilter} onValueChange={(v) => setSemesterFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[130px]">
             <SelectValue placeholder="Semester" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Semester</SelectItem>
+            <SelectItem value="semua">Semua Semester</SelectItem>
             {SEMESTER_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>{s}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={tahunAjaranFilter} onValueChange={(v) => setTahunAjaranFilter(v ?? "all")}>
+        <Select value={tahunAjaranFilter} onValueChange={(v) => setTahunAjaranFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[130px]">
             <SelectValue placeholder="Tahun Ajaran" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua TA</SelectItem>
+            <SelectItem value="semua">Semua TA</SelectItem>
             {TAHUN_AJARAN_OPTIONS.map((t) => (
               <SelectItem key={t} value={t}>{t}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={bulanFilter} onValueChange={(v) => setBulanFilter(v ?? "all")}>
+        <Select value={bulanFilter} onValueChange={(v) => setBulanFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[130px]">
             <SelectValue placeholder="Bulan" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Bulan</SelectItem>
+            <SelectItem value="semua">Semua Bulan</SelectItem>
             {BULAN_OPTIONS.map((b) => (
               <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>
             ))}
