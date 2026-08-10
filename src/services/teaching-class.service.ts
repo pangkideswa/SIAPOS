@@ -1,6 +1,7 @@
 import "server-only"
 import { teachingClassRepository, teachingClassAssignmentRepository } from "@/repositories/teaching-class.repository"
 import { teacherRepository } from "@/repositories/teacher.repository"
+import { AppError } from "@/lib/api-utils"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 import type { TeacherSubject, User, Subject, SchoolClass, PaginatedResponse } from "@/types"
 
@@ -234,23 +235,35 @@ export const teachingClassService = {
   async createAssignment(
     data: TeacherSubjectCreateInput
   ): Promise<TeacherSubject> {
-    let teacher: { id: number; nama_lengkap: string } | null = null
-    const user = await teachingClassAssignmentRepository.getUserById(data.teacher_id)
-    if (user) {
-      teacher = await teachingClassAssignmentRepository.getTeacherByUserId(user.id)
+    let teacher: { id: number; nama_lengkap: string } | null =
+      await teachingClassAssignmentRepository.getTeacherById(data.teacher_id)
+    if (!teacher) {
+      const user = await teachingClassAssignmentRepository.getUserById(data.teacher_id)
+      if (user) {
+        teacher = await teachingClassAssignmentRepository.getTeacherByUserId(user.id)
+      }
     }
     if (!teacher) {
-      teacher = await teachingClassAssignmentRepository.getTeacherById(data.teacher_id)
+      throw new AppError(
+        "Guru tidak ditemukan. Pastikan guru sudah terdaftar pada Data Guru.",
+        422
+      )
     }
     const subject = await teachingClassAssignmentRepository.getSubjectById(data.subject_id)
+    if (!subject) {
+      throw new AppError("Mata pelajaran tidak ditemukan.", 422)
+    }
     const classroom = await teachingClassAssignmentRepository.getClassroomById(data.class_id)
+    if (!classroom) {
+      throw new AppError("Kelas tidak ditemukan.", 422)
+    }
     const row = await teachingClassRepository.createWithRelations({
-      teacher_id: teacher?.id ?? null,
+      teacher_id: teacher.id,
       subject_id: data.subject_id,
       classroom_id: data.class_id,
-      guru_nama: teacher?.nama_lengkap ?? user?.name ?? "",
-      mata_pelajaran: subject?.name ?? "",
-      kelas: classroom?.name ?? "",
+      guru_nama: teacher.nama_lengkap,
+      mata_pelajaran: subject.name,
+      kelas: classroom.name,
       tahun_ajaran: "2026/2027",
       semester: "Ganjil",
       status: "Aktif",

@@ -27,9 +27,9 @@ import {
   JENIS_KELAMIN_OPTIONS,
   STATUS_KEPEGAWAIAN_OPTIONS,
   PENDIDIKAN_OPTIONS,
-  MATA_PELAJARAN_OPTIONS,
   EMPTY_GURU_FORM,
 } from "@/features/guru/constants/guru.constants"
+import { useSubjects } from "@/hooks/use-subjects"
 import type { Guru, GuruFormData } from "@/features/guru/types/guru"
 
 interface GuruFormDialogProps {
@@ -49,6 +49,13 @@ export function GuruFormDialog({
 }: GuruFormDialogProps) {
   const [form, setForm] = useState<GuruFormData>(EMPTY_GURU_FORM)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
+
+  const { data: subjectData } = useSubjects({ is_active: true, per_page: 100 })
+  const activeSubjectNames = subjectData?.data?.map((s) => s.name) ?? []
+  const mataPelajaranOptions = [
+    ...activeSubjectNames,
+    ...form.mata_pelajaran.filter((mp) => !activeSubjectNames.includes(mp)),
+  ]
 
   useEffect(() => {
     if (editingGuru) {
@@ -356,7 +363,7 @@ export function GuruFormDialog({
               Mata Pelajaran *
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {MATA_PELAJARAN_OPTIONS.map((mp) => (
+              {mataPelajaranOptions.map((mp) => (
                 <label
                   key={mp}
                   className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors ${

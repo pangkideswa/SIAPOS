@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select"
 import { Plus, Trash2, Loader2 } from "lucide-react"
 import { useTeacherSubjects, useCreateTeacherSubject, useDeleteTeacherSubject } from "@/hooks/use-teacher-subjects"
-import { useUsers } from "@/hooks/use-users"
+import { useTeachers } from "@/hooks/use-teachers"
 import { useSubjects } from "@/hooks/use-subjects"
 import { useClasses } from "@/hooks/use-classes"
 import type { TeacherSubject } from "@/types"
@@ -48,7 +48,7 @@ export default function TeacherAssignmentsPage() {
   const [form, setForm] = useState<FormData>(EMPTY_FORM)
   const [errors, setErrors] = useState<Record<string, string[]>>({})
 
-  const { data: teacherData } = useUsers({ role: "guru", per_page: 100 })
+  const { data: teacherData } = useTeachers()
   const { data: subjectData } = useSubjects({ is_active: true, per_page: 100 })
   const { data: classData } = useClasses({ per_page: 100 })
 
@@ -59,7 +59,7 @@ export default function TeacherAssignmentsPage() {
   const assignments = data?.data ?? []
   const meta = data?.meta
 
-  const teachers = teacherData?.data ?? []
+  const teachers = teacherData ?? []
   const subjects = subjectData?.data ?? []
   const classes = classData?.data ?? []
 
@@ -208,7 +208,7 @@ export default function TeacherAssignmentsPage() {
                 <SelectContent>
                   {teachers.map((t) => (
                     <SelectItem key={t.id} value={String(t.id)}>
-                      {t.name}
+                      {t.nama_lengkap}
                     </SelectItem>
                   ))}
                 </SelectContent>
