@@ -48,7 +48,7 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${jakartaSans.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
           <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>
       </body>

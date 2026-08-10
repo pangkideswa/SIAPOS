@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
+import { useTheme } from "next-themes"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,7 +34,7 @@ import { apiFetch } from "@/lib/client-api"
 
 export function PengaturanPage() {
   const { logout } = useAuth()
-  const [theme, setTheme] = useState<"light" | "dark">("light")
+  const { theme, setTheme } = useTheme()
   const [notifications, setNotifications] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [passwordOpen, setPasswordOpen] = useState(false)
@@ -45,12 +46,6 @@ export function PengaturanPage() {
     confirmPassword: "",
   })
 
-  async function handleSaveTheme() {
-    setIsSaving(true)
-    await new Promise((r) => setTimeout(r, 300))
-    setIsSaving(false)
-    toast.success("Pengaturan tema berhasil disimpan")
-  }
 
   async function handleChangePassword() {
     if (!passwords.oldPassword || !passwords.newPassword) {
@@ -154,7 +149,6 @@ export function PengaturanPage() {
                 checked={theme === "dark"}
                 onCheckedChange={(checked) => {
                   setTheme(checked ? "dark" : "light")
-                  handleSaveTheme()
                 }}
               />
               <Moon className="h-4 w-4 text-muted-foreground" />
