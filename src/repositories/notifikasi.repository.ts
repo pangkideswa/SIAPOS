@@ -15,9 +15,9 @@ export const notifikasiRepository = {
     })
   },
 
-  async findAllByRoles(roles: string[]): Promise<Notifikasi[]> {
+  async findAllByUserId(userId: number): Promise<Notifikasi[]> {
     return prisma.notifikasi.findMany({
-      where: { targetRoles: { hasSome: roles } },
+      where: { user_id: userId },
       orderBy: { created_at: "desc" },
     })
   },
@@ -30,6 +30,11 @@ export const notifikasiRepository = {
     return prisma.notifikasi.create({ data })
   },
 
+  async createMany(data: NotifikasiCreateData[]): Promise<number> {
+    const result = await prisma.notifikasi.createMany({ data })
+    return result.count
+  },
+
   async update(
     id: number,
     data: NotifikasiUpdateData
@@ -37,17 +42,25 @@ export const notifikasiRepository = {
     return prisma.notifikasi.update({ where: { id }, data })
   },
 
-  async markListRead(ids: number[]): Promise<number> {
+  async markReadOwned(id: number, userId: number): Promise<boolean> {
     const result = await prisma.notifikasi.updateMany({
-      where: { id: { in: ids }, is_read: false },
+      where: { id, user_id: userId, is_read: false },
+      data: { is_read: true },
+    })
+    return result.count > 0
+  },
+
+  async markListReadOwned(ids: number[], userId: number): Promise<number> {
+    const result = await prisma.notifikasi.updateMany({
+      where: { id: { in: ids }, user_id: userId, is_read: false },
       data: { is_read: true },
     })
     return result.count
   },
 
-  async markAllReadByRoles(roles: string[]): Promise<number> {
+  async markAllReadByUserId(userId: number): Promise<number> {
     const result = await prisma.notifikasi.updateMany({
-      where: { targetRoles: { hasSome: roles }, is_read: false },
+      where: { user_id: userId, is_read: false },
       data: { is_read: true },
     })
     return result.count

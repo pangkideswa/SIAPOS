@@ -18,7 +18,7 @@ export function KelasAnggotaTab({ kelasMengajar }: KelasAnggotaTabProps) {
   const [search, setSearch] = useState("")
 
   const classroom = useClassroom()
-  const anggota = classroom.getAnggotaKelas(kelasMengajar.kelas).filter(
+  const anggota = classroom.getAnggotaKelas(kelasMengajar.kelas, kelasMengajar.classroom_id).filter(
     (s) =>
       !search ||
       s.nama_lengkap.toLowerCase().includes(search.toLowerCase()) ||

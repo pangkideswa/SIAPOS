@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Search, Users, BookOpen, AlertTriangle, Clock, Heart, TrendingUp } from "lucide-react"
+import { ArrowLeft, Search, Users, BookOpen, AlertTriangle, Clock, Heart, TrendingUp, Download } from "lucide-react"
+import { toast } from "sonner"
+import { exportAbsensiToExcel } from "@/features/absensi/utils/export"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
@@ -26,6 +28,7 @@ export function GuruAbsensiRekapPage() {
   const router = useRouter()
   const [search, setSearch] = useState("")
   const [kelasFilter, setKelasFilter] = useState<string>("all")
+  const [isExporting, setIsExporting] = useState(false)
   const [page, setPage] = useState(1)
   const perPage = 15
 
@@ -137,6 +140,27 @@ export function GuruAbsensiRekapPage() {
           title="Rekap Absensi"
           description="Rekapitulasi kehadiran siswa pada kelas Anda"
         />
+        <div className="ml-auto flex gap-2">
+          <Button
+            variant="outline"
+            className="hidden sm:flex"
+            onClick={async () => {
+              try {
+                setIsExporting(true)
+                await exportAbsensiToExcel({ kelas: kelasFilter }, "Rekap_Absensi_Guru")
+                toast.success("Data berhasil diexport")
+              } catch {
+                toast.error("Gagal mengexport data")
+              } finally {
+                setIsExporting(false)
+              }
+            }}
+            disabled={isExporting || rekapData.length === 0}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            {isExporting ? "Mengekspor..." : "Export Excel"}
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">

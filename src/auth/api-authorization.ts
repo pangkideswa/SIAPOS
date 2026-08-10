@@ -18,8 +18,16 @@ export async function requireAdmin(): Promise<ApiUser> {
   return requireRole(...ADMIN_ROLES)
 }
 
+export async function requireSuperAdmin(): Promise<ApiUser> {
+  return requireRole("super_admin")
+}
+
 export function isAdmin(user: ApiUser): boolean {
   return ADMIN_ROLES.includes(user.role)
+}
+
+export function isSuperAdmin(user: ApiUser): boolean {
+  return user.role === "super_admin"
 }
 
 export async function getTeacherId(user: ApiUser): Promise<number | null> {

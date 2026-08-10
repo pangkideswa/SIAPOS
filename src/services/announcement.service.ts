@@ -1,6 +1,8 @@
 import "server-only"
 import { Prisma, type Announcement } from "@/generated/prisma/client"
 import { announcementRepository } from "@/repositories/announcement.repository"
+import { notifikasiService } from "@/services/notifikasi.service"
+import { prisma } from "@/lib/prisma"
 import {
   toAnnouncementStatus,
   toAnnouncementStatusDb,
@@ -67,6 +69,45 @@ export const announcementService = {
 
   async create(data: AnnouncementCreateInput): Promise<Pengumuman> {
     const row = await announcementRepository.create(toPengumumanCreate(data))
+
+    try {
+      if (row.status === "PUBLISHED") {
+        let userIds: number[] = []
+        if (row.target === "Semua Pengguna") {
+          const users = await prisma.user.findMany({ select: { id: true } })
+          userIds = users.map((u) => u.id)
+        } else if (row.target === "Guru") {
+          const users = await prisma.user.findMany({ where: { role: "GURU" }, select: { id: true } })
+          userIds = users.map((u) => u.id)
+        } else if (row.target === "Siswa") {
+          if (row.kelas) {
+             const students = await prisma.student.findMany({
+               where: { kelas: row.kelas },
+               select: { user_id: true }
+             })
+             userIds = students.map((s) => s.user_id).filter(Boolean) as number[]
+          } else {
+             const users = await prisma.user.findMany({ where: { role: "SISWA" }, select: { id: true } })
+             userIds = users.map((u) => u.id)
+          }
+        } else if (row.target === "Wali Murid") {
+          const users = await prisma.user.findMany({ where: { role: "WALI" }, select: { id: true } })
+          userIds = users.map((u) => u.id)
+        }
+
+        if (userIds.length > 0) {
+          await notifikasiService.createForUsers({
+             user_ids: userIds,
+             tipe: "pengumuman",
+             judul: "Pengumuman Baru",
+             pesan: row.judul,
+          })
+        }
+      }
+    } catch (e) {
+      console.error("Failed to send announcement notification:", e)
+    }
+
     return toPengumuman(row)
   },
 

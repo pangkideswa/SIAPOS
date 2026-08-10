@@ -84,7 +84,7 @@ function StatusIcon({ status }: { status: string }) {
     case "Salah":
       return <XCircle className="h-4 w-4 text-red-600" />
     case "Tidak Dijawab":
-      return <MinusCircle className="h-4 w-4 text-gray-400" />
+      return <MinusCircle className="h-4 w-4 text-muted-foreground" />
     default:
       return null
   }
@@ -314,14 +314,14 @@ export function HasilUjianDetailPage({
                     {hasil.jumlah_salah}
                   </p>
                 </div>
-                <div className="p-3 rounded-lg bg-gray-50 border border-gray-100">
+                <div className="p-3 rounded-lg bg-muted/50 border border-border">
                   <div className="flex items-center gap-2 mb-1">
-                    <MinusCircle className="h-4 w-4 text-gray-500" />
-                    <span className="text-xs text-gray-600 font-medium">
+                    <MinusCircle className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground font-medium">
                       Kosong
                     </span>
                   </div>
-                  <p className="text-xl font-bold text-gray-600">
+                  <p className="text-xl font-bold text-muted-foreground">
                     {hasil.jumlah_kosong}
                   </p>
                 </div>
@@ -408,7 +408,7 @@ export function HasilUjianDetailPage({
                                   ? "bg-green-100 text-green-800"
                                   : soal.status === "Salah"
                                     ? "bg-red-100 text-red-800"
-                                    : "bg-gray-100 text-gray-600"
+                                    : "bg-muted text-muted-foreground"
                               }
                             >
                               {soal.status}

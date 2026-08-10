@@ -239,7 +239,7 @@ function SidebarContent({
       {onToggleCollapse && (
         <button
           onClick={onToggleCollapse}
-          className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-white border border-border shadow-sm flex items-center justify-center hover:bg-muted transition-colors z-10"
+          className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border shadow-sm flex items-center justify-center hover:bg-muted transition-colors z-10"
           aria-label={collapsed ? "Perluas menu" : "Ciutkan menu"}
         >
           {collapsed ? (
@@ -266,7 +266,7 @@ export function Sidebar({
     <>
       <aside
         className={cn(
-          "hidden md:flex flex-col h-screen bg-white border-r border-border transition-all duration-300 sticky top-0",
+          "hidden md:flex flex-col h-screen bg-card border-r border-border transition-all duration-300 sticky top-0",
           collapsed ? "w-[68px]" : "w-64"
         )}
       >
@@ -293,7 +293,7 @@ export function Sidebar({
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "tween", duration: 0.25, ease: "easeOut" }}
-              className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-white shadow-xl flex flex-col"
+              className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-card shadow-xl flex flex-col"
             >
               <button
                 onClick={() => onOpenChange(false)}

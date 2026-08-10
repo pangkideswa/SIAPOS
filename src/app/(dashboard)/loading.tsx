@@ -12,7 +12,7 @@ export default function DashboardLoading() {
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-xl border border-border/60 bg-white p-4 space-y-3"
+            className="rounded-xl border border-border/60 bg-card p-4 space-y-3"
           >
             <Skeleton className="h-8 w-8 rounded-lg" />
             <Skeleton className="h-6 w-24" />
@@ -22,7 +22,7 @@ export default function DashboardLoading() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 rounded-xl border border-border/60 bg-white p-5 space-y-4">
+        <div className="lg:col-span-2 rounded-xl border border-border/60 bg-card p-5 space-y-4">
           <Skeleton className="h-5 w-40" />
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3">
@@ -34,7 +34,7 @@ export default function DashboardLoading() {
             </div>
           ))}
         </div>
-        <div className="rounded-xl border border-border/60 bg-white p-5 space-y-4">
+        <div className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
           <Skeleton className="h-5 w-32" />
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-10 w-full" />

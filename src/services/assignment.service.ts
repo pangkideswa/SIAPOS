@@ -1,6 +1,9 @@
 import "server-only"
 import { Prisma, type Assignment } from "@/generated/prisma/client"
 import { assignmentRepository } from "@/repositories/assignment.repository"
+import { teachingClassRepository } from "@/repositories/teaching-class.repository"
+import { studentRepository } from "@/repositories/student.repository"
+import { notifikasiService } from "@/services/notifikasi.service"
 import {
   toAssignmentStatus,
   toAssignmentStatusDb,
@@ -67,6 +70,28 @@ export const assignmentService = {
 
   async create(data: TugasFormData): Promise<Tugas> {
     const row = await assignmentRepository.create(toTugasCreate(data))
+    
+    try {
+      if (row.teaching_class_id) {
+        const tc = await teachingClassRepository.findById(row.teaching_class_id)
+        if (tc?.classroom_id) {
+          const students = await studentRepository.findByClassroomId(tc.classroom_id)
+          const userIds = students.map((s) => s.user_id).filter(Boolean) as number[]
+          if (userIds.length > 0) {
+            await notifikasiService.createForUsers({
+              user_ids: userIds,
+              tipe: "tugas",
+              judul: "Tugas Baru",
+              pesan: `Tugas baru "${row.judul}" ditambahkan pada mata pelajaran ${row.mata_pelajaran || tc.mata_pelajaran}.`,
+              href: `/siswa/tugas/${row.id}`
+            })
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to send assignment notification:", e)
+    }
+
     return toTugas(row)
   },
 

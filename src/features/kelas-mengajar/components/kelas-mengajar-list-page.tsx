@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { Button } from "@/components/ui/button"
@@ -19,8 +19,6 @@ import { KelasMengajarDeleteDialog } from "./kelas-mengajar-delete-dialog"
 import {
   STATUS_COLORS,
   SEMESTER_COLORS,
-  GURU_OPTIONS,
-  KELAS_OPTIONS,
   TAHUN_AJARAN_OPTIONS,
 } from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
 import {
@@ -29,6 +27,8 @@ import {
   useUpdateTeachingClass,
   useRemoveTeachingClass,
 } from "@/hooks/use-teaching-classes"
+import { useTeachers } from "@/hooks/use-teachers"
+import { useClasses } from "@/hooks/use-classes"
 import type { KelasMengajar, KelasMengajarFormData } from "@/features/kelas-mengajar/types/kelas-mengajar"
 
 export function KelasMengajarListPage() {
@@ -42,6 +42,12 @@ export function KelasMengajarListPage() {
   const [editingItem, setEditingItem] = useState<KelasMengajar | null>(null)
   const [deletingItem, setDeletingItem] = useState<KelasMengajar | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+
+  // Load filter options dari API
+  const { data: teachersData } = useTeachers()
+  const { data: classesData } = useClasses({ per_page: 200 })
+  const teacherOptions = useMemo(() => teachersData ?? [], [teachersData])
+  const classOptions = useMemo(() => classesData?.data ?? [], [classesData])
 
   const {
     data,
@@ -111,7 +117,7 @@ export function KelasMengajarListPage() {
         const semester = String(item.semester)
         return (
           <span
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${SEMESTER_COLORS[semester] ?? "bg-gray-100 text-gray-800"}`}
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${SEMESTER_COLORS[semester] ?? "bg-muted text-foreground"}`}
           >
             {semester}
           </span>
@@ -125,7 +131,7 @@ export function KelasMengajarListPage() {
         const status = String(item.status)
         return (
           <span
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[status] ?? "bg-gray-100 text-gray-800"}`}
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[status] ?? "bg-muted text-foreground"}`}
           >
             {status}
           </span>
@@ -235,6 +241,8 @@ export function KelasMengajarListPage() {
             className="pl-9"
           />
         </div>
+
+        {/* Filter Guru — dari database */}
         <Select
           value={guruFilter}
           onValueChange={(value) => {
@@ -247,13 +255,15 @@ export function KelasMengajarListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Guru</SelectItem>
-            {GURU_OPTIONS.map((g) => (
-              <SelectItem key={g} value={g}>
-                {g}
+            {teacherOptions.map((t) => (
+              <SelectItem key={t.id} value={t.nama_lengkap}>
+                {t.nama_lengkap}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+
+        {/* Filter Kelas — dari database */}
         <Select
           value={kelasFilter}
           onValueChange={(value) => {
@@ -266,13 +276,14 @@ export function KelasMengajarListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Kelas</SelectItem>
-            {KELAS_OPTIONS.map((k) => (
-              <SelectItem key={k} value={k}>
-                {k}
+            {classOptions.map((c) => (
+              <SelectItem key={c.id} value={c.name}>
+                {c.name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+
         <Select
           value={tahunFilter}
           onValueChange={(value) => {

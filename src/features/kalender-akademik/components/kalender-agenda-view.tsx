@@ -38,7 +38,7 @@ export function KalenderAgendaView({ events, onEventClick }: AgendaViewProps) {
   }
 
   return (
-    <div className="rounded-lg border border-border bg-white overflow-hidden">
+    <div className="rounded-lg border border-border bg-card overflow-hidden">
       <div className="divide-y divide-border">
         {entries.map(([tanggal, dayEvents]) => (
           <div key={tanggal} className="p-4">

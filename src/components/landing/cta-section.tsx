@@ -30,7 +30,7 @@ export function CtaSection() {
               <Button
                 size="lg"
                 variant="secondary"
-                className="px-8 bg-white text-primary hover:bg-white/90 shadow-lg w-full sm:w-auto"
+                className="px-8 bg-card text-primary hover:bg-card/90 shadow-lg w-full sm:w-auto"
               >
                 Daftar Gratis
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -40,7 +40,7 @@ export function CtaSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="px-8 border-white/30 text-white hover:bg-white/10 w-full sm:w-auto"
+                className="px-8 border-white/30 text-white hover:bg-card/10 w-full sm:w-auto"
               >
                 Masuk ke Akun
               </Button>

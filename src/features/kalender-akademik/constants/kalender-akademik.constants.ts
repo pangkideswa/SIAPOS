@@ -41,14 +41,14 @@ export const KATEGORI_COLORS: Record<KategoriEvent, string> = {
   PKL: "bg-cyan-100 text-cyan-800",
   Pengumuman: "bg-green-100 text-green-800",
   "Kegiatan Sekolah": "bg-teal-100 text-teal-800",
-  "Rapat Guru": "bg-gray-100 text-gray-800",
+  "Rapat Guru": "bg-muted text-foreground",
   "Hari Besar Nasional": "bg-rose-100 text-rose-800",
-  Lainnya: "bg-slate-100 text-slate-800",
+  Lainnya: "bg-muted text-foreground",
 }
 
 export const STATUS_EVENT_COLORS: Record<StatusEvent, string> = {
   Aktif: "bg-green-100 text-green-800",
-  Selesai: "bg-gray-100 text-gray-800",
+  Selesai: "bg-muted text-foreground",
   "Akan Datang": "bg-blue-100 text-blue-800",
 }
 

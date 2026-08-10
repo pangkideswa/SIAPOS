@@ -5,7 +5,7 @@ import { ok, apiError, notFound, parseWithSchema } from "@/lib/api-utils"
 import { scheduleSchema } from "@/lib/validations/schedule.schemas"
 import {
   assertScheduleAccess,
-  requireAdmin,
+  requireSuperAdmin,
   requireApiUser,
 } from "@/auth/api-authorization"
 import type { ScheduleCreateInput } from "@/services/schedule.service"
@@ -31,7 +31,7 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await requireAdmin()
+    const user = await requireSuperAdmin()
     const { id } = await context.params
     await assertScheduleAccess(user, Number(id))
     const body = parseWithSchema(scheduleSchema, await request.json())
@@ -50,7 +50,7 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await requireAdmin()
+    const user = await requireSuperAdmin()
     const { id } = await context.params
     await assertScheduleAccess(user, Number(id))
     await scheduleService.remove(Number(id))

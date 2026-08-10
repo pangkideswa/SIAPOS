@@ -57,14 +57,14 @@ export const KATEGORI_PENGUMUMAN_COLORS: Record<KategoriPengumuman, string> = {
   PKL: "bg-cyan-100 text-cyan-800",
   "Kegiatan Sekolah": "bg-teal-100 text-teal-800",
   Libur: "bg-orange-100 text-orange-800",
-  "Informasi Umum": "bg-gray-100 text-gray-800",
-  Lainnya: "bg-slate-100 text-slate-800",
+  "Informasi Umum": "bg-muted text-foreground",
+  Lainnya: "bg-muted text-foreground",
 }
 
 export const STATUS_PENGUMUMAN_COLORS: Record<StatusPengumuman, string> = {
   Draft: "bg-yellow-100 text-yellow-800",
   Dipublikasikan: "bg-green-100 text-green-800",
-  Diarsipkan: "bg-gray-100 text-gray-800",
+  Diarsipkan: "bg-muted text-foreground",
 }
 
 export const TARGET_COLORS: Record<TargetPengumuman, string> = {

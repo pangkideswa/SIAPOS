@@ -17,10 +17,7 @@ export async function GET() {
   try {
     const user = await getCurrentUser()
     if (!user) return unauthorized()
-    const notifications =
-      user.role === "super_admin"
-        ? await notifikasiService.getAllForSuperAdmin()
-        : await notifikasiService.getAll([user.role])
+    const notifications = await notifikasiService.getAllByUserId(user.id)
     return ok(notifications)
   } catch (error) {
     return apiError(error)

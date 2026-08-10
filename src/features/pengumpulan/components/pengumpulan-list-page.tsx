@@ -15,10 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Eye, Search, Users } from "lucide-react"
-import {
-  GURU_OPTIONS,
-  KELAS_OPTIONS,
-} from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
+import { useClasses } from "@/hooks/use-classes"
+import { useTeachers } from "@/hooks/use-teachers"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
 import { useAssignments } from "@/hooks/use-assignments"
 import { useSubmissions } from "@/hooks/use-submissions"
@@ -43,6 +41,10 @@ export function PengumpulanListPage() {
     isError,
     refetch,
   } = useAssignments()
+
+  const { data: classesData } = useClasses({ per_page: 200 })
+  const classes = classesData?.data ?? []
+  const { data: teachers } = useTeachers()
   const { data: submissions = [] } = useSubmissions()
   const [search, setSearch] = useState("")
   const [guruFilter, setGuruFilter] = useState<string>("all")
@@ -211,9 +213,9 @@ export function PengumpulanListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Guru</SelectItem>
-            {GURU_OPTIONS.map((guru: string) => (
-              <SelectItem key={guru} value={guru}>
-                {guru}
+            {teachers?.map((guru) => (
+              <SelectItem key={guru.id} value={guru.nama_lengkap}>
+                {guru.nama_lengkap}
               </SelectItem>
             ))}
           </SelectContent>
@@ -230,9 +232,9 @@ export function PengumpulanListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Kelas</SelectItem>
-            {KELAS_OPTIONS.map((kelas: string) => (
-              <SelectItem key={kelas} value={kelas}>
-                {kelas}
+            {classes.map((kelas) => (
+              <SelectItem key={kelas.id} value={kelas.name}>
+                {kelas.name}
               </SelectItem>
             ))}
           </SelectContent>

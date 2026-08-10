@@ -79,7 +79,7 @@ export function KelasDetailPage({
     )
   }
 
-  const jumlahSiswa = classroom.getAnggotaKelas(kelasMengajar.kelas).length
+  const jumlahSiswa = classroom.getAnggotaKelas(kelasMengajar.kelas, kelasMengajar.classroom_id).length
   const jumlahMateri = classroom.getKelasMateri(kelasMengajar.id).length
   const jumlahTugas = classroom.getKelasTugas(kelasMengajar.id).length
 

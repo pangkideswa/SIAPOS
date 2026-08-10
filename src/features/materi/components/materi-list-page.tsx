@@ -18,10 +18,8 @@ import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react"
 import { MateriFormDialog } from "./materi-form-dialog"
 import { MateriDeleteDialog } from "./materi-delete-dialog"
 import { STATUS_MATERI_COLORS } from "@/features/materi/constants/materi.constants"
-import {
-  GURU_OPTIONS,
-  KELAS_OPTIONS,
-} from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
+import { useClasses } from "@/hooks/use-classes"
+import { useTeachers } from "@/hooks/use-teachers"
 import {
   useMaterials,
   useCreateMaterial,
@@ -38,6 +36,10 @@ export function MateriListPage() {
     isError,
     refetch,
   } = useMaterials()
+  
+  const { data: classesData } = useClasses({ per_page: 200 })
+  const classes = classesData?.data ?? []
+  const { data: teachers } = useTeachers()
   const createMutation = useCreateMaterial()
   const updateMutation = useUpdateMaterial()
   const removeMutation = useRemoveMaterial()
@@ -253,9 +255,9 @@ export function MateriListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Guru</SelectItem>
-            {GURU_OPTIONS.map((guru: string) => (
-              <SelectItem key={guru} value={guru}>
-                {guru}
+            {teachers?.map((guru) => (
+              <SelectItem key={guru.id} value={guru.nama_lengkap}>
+                {guru.nama_lengkap}
               </SelectItem>
             ))}
           </SelectContent>
@@ -272,9 +274,9 @@ export function MateriListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Kelas</SelectItem>
-            {KELAS_OPTIONS.map((kelas: string) => (
-              <SelectItem key={kelas} value={kelas}>
-                {kelas}
+            {classes.map((kelas) => (
+              <SelectItem key={kelas.id} value={kelas.name}>
+                {kelas.name}
               </SelectItem>
             ))}
           </SelectContent>

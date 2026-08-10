@@ -64,7 +64,7 @@ function formatWaktu(dateStr: string) {
 }
 
 const MY_STATUS_BADGE: Record<string, string> = {
-  "Belum Mengumpulkan": "bg-gray-100 text-gray-800",
+  "Belum Mengumpulkan": "bg-muted text-foreground",
   "Sudah Mengumpulkan": "bg-green-100 text-green-800",
   Terlambat: "bg-red-100 text-red-800",
 }
@@ -197,7 +197,7 @@ export function SiswaKelasTugasTab({
                       {mySubmission.status}
                     </Badge>
                   ) : (
-                    <Badge className="bg-gray-100 text-gray-800">
+                    <Badge className="bg-muted text-foreground">
                       Belum Mengumpulkan
                     </Badge>
                   )}
@@ -258,7 +258,7 @@ export function SiswaKelasTugasTab({
                     )}
                   </div>
                   {mySubmission.feedback && (
-                    <div className="mt-2 flex items-start gap-2 rounded-md bg-white/70 p-2.5">
+                    <div className="mt-2 flex items-start gap-2 rounded-md bg-card/70 p-2.5">
                       <MessageSquareText className="h-4 w-4 text-green-700 shrink-0 mt-0.5" />
                       <div>
                         <p className="text-xs font-medium text-green-800">

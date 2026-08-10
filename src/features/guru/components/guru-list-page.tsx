@@ -122,7 +122,7 @@ export function GuruListPage() {
         const status = String(item.status_kepegawaian)
         return (
           <span
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_KEPEGAWAIAN_COLORS[status] ?? "bg-gray-100 text-gray-800"}`}
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_KEPEGAWAIAN_COLORS[status] ?? "bg-muted text-foreground"}`}
           >
             {status}
           </span>

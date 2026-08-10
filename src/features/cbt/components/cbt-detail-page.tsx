@@ -183,31 +183,31 @@ export function CBTDetailPage({ id }: CBTDetailPageProps) {
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Acak Soal</span>
-                <Badge className={cbt.acak_soal ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                <Badge className={cbt.acak_soal ? "bg-green-100 text-green-800" : "bg-muted text-foreground"}>
                   {cbt.acak_soal ? "Ya" : "Tidak"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Acak Jawaban</span>
-                <Badge className={cbt.acak_jawaban ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                <Badge className={cbt.acak_jawaban ? "bg-green-100 text-green-800" : "bg-muted text-foreground"}>
                   {cbt.acak_jawaban ? "Ya" : "Tidak"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Tampilkan Nilai</span>
-                <Badge className={cbt.tampilkan_nilai ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                <Badge className={cbt.tampilkan_nilai ? "bg-green-100 text-green-800" : "bg-muted text-foreground"}>
                   {cbt.tampilkan_nilai ? "Ya" : "Tidak"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Izinkan Kembali</span>
-                <Badge className={cbt.izinkan_kembali ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                <Badge className={cbt.izinkan_kembali ? "bg-green-100 text-green-800" : "bg-muted text-foreground"}>
                   {cbt.izinkan_kembali ? "Ya" : "Tidak"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Auto Submit</span>
-                <Badge className={cbt.auto_submit ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                <Badge className={cbt.auto_submit ? "bg-green-100 text-green-800" : "bg-muted text-foreground"}>
                   {cbt.auto_submit ? "Ya" : "Tidak"}
                 </Badge>
               </div>

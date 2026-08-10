@@ -193,7 +193,7 @@ export function CBTFormDialog({
                 onClick={() => handleChange("acak_soal", !form.acak_soal)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.acak_soal ? "bg-primary" : "bg-muted"}`}
               >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.acak_soal ? "translate-x-6" : "translate-x-1"}`} />
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-card transition-transform ${form.acak_soal ? "translate-x-6" : "translate-x-1"}`} />
               </button>
             </div>
             <div className="flex items-center justify-between rounded-lg border p-3">
@@ -206,7 +206,7 @@ export function CBTFormDialog({
                 onClick={() => handleChange("acak_jawaban", !form.acak_jawaban)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.acak_jawaban ? "bg-primary" : "bg-muted"}`}
               >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.acak_jawaban ? "translate-x-6" : "translate-x-1"}`} />
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-card transition-transform ${form.acak_jawaban ? "translate-x-6" : "translate-x-1"}`} />
               </button>
             </div>
             <div className="flex items-center justify-between rounded-lg border p-3">
@@ -219,7 +219,7 @@ export function CBTFormDialog({
                 onClick={() => handleChange("tampilkan_nilai", !form.tampilkan_nilai)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.tampilkan_nilai ? "bg-primary" : "bg-muted"}`}
               >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.tampilkan_nilai ? "translate-x-6" : "translate-x-1"}`} />
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-card transition-transform ${form.tampilkan_nilai ? "translate-x-6" : "translate-x-1"}`} />
               </button>
             </div>
             <div className="flex items-center justify-between rounded-lg border p-3">
@@ -232,7 +232,7 @@ export function CBTFormDialog({
                 onClick={() => handleChange("izinkan_kembali", !form.izinkan_kembali)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.izinkan_kembali ? "bg-primary" : "bg-muted"}`}
               >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.izinkan_kembali ? "translate-x-6" : "translate-x-1"}`} />
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-card transition-transform ${form.izinkan_kembali ? "translate-x-6" : "translate-x-1"}`} />
               </button>
             </div>
             <div className="flex items-center justify-between rounded-lg border p-3">
@@ -245,7 +245,7 @@ export function CBTFormDialog({
                 onClick={() => handleChange("auto_submit", !form.auto_submit)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.auto_submit ? "bg-primary" : "bg-muted"}`}
               >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.auto_submit ? "translate-x-6" : "translate-x-1"}`} />
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-card transition-transform ${form.auto_submit ? "translate-x-6" : "translate-x-1"}`} />
               </button>
             </div>
           </div>

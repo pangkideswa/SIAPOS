@@ -96,8 +96,16 @@ export function useClassroom() {
               b.tanggal_publish.localeCompare(a.tanggal_publish)
           )
 
-      const getAnggotaKelas = (kelas: string): Siswa[] =>
-        students.filter((s) => s.kelas === kelas && s.status === "Aktif")
+      const getAnggotaKelas = (kelas: string, classroomId?: number | null): Siswa[] => {
+        if (classroomId != null) {
+          // Filter utama berdasarkan classroom_id (relasi DB yang benar)
+          const byId = students.filter((s) => s.classroom_id === classroomId && s.status === "Aktif")
+          // Jika ada hasil, kembalikan
+          if (byId.length > 0) return byId
+        }
+        // Fallback ke nama kelas string (untuk data lama yang belum punya classroom_id)
+        return students.filter((s) => s.kelas === kelas && s.status === "Aktif")
+      }
 
       const getSiswaByNama = (nama: string): Siswa | undefined =>
         students.find(

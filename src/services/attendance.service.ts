@@ -21,7 +21,10 @@ type AttendanceSessionCreateData = z.input<typeof attendanceSessionCreateSchema>
 export interface AttendanceFilters {
   guru?: string
   kelas?: string
+  mata_pelajaran?: string
   tanggal?: string
+  tanggal_mulai?: string
+  tanggal_selesai?: string
   teaching_class_id?: number
 }
 
@@ -151,6 +154,7 @@ export const attendanceService = {
     const where: Prisma.AttendanceSessionWhereInput = {
       ...(filters.guru ? { guru_nama: filters.guru } : {}),
       ...(filters.kelas ? { kelas: filters.kelas } : {}),
+      ...(filters.mata_pelajaran ? { mata_pelajaran: filters.mata_pelajaran } : {}),
       ...(filters.teaching_class_id
         ? { teaching_class_id: filters.teaching_class_id }
         : {}),
@@ -160,6 +164,16 @@ export const attendanceService = {
       const end = new Date(start)
       end.setDate(start.getDate() + 1)
       where.tanggal = { gte: start, lt: end }
+    } else if (filters.tanggal_mulai || filters.tanggal_selesai) {
+      where.tanggal = {}
+      if (filters.tanggal_mulai) {
+        where.tanggal.gte = new Date(filters.tanggal_mulai + "T00:00:00")
+      }
+      if (filters.tanggal_selesai) {
+        const end = new Date(filters.tanggal_selesai + "T00:00:00")
+        end.setDate(end.getDate() + 1)
+        where.tanggal.lt = end
+      }
     }
     const rows = await attendanceRepository.findSessions(where)
     return rows.map(toSesiAbsensi)
@@ -237,6 +251,51 @@ export const attendanceService = {
     return Array.from(siswaMap.values()).filter(
       (r) => r.total_pertemuan > 0
     )
+  },
+
+  async getExportData(filters: AttendanceFilters = {}) {
+    const where: Prisma.AttendanceSessionWhereInput = {
+      ...(filters.guru ? { guru_nama: filters.guru } : {}),
+      ...(filters.kelas ? { kelas: filters.kelas } : {}),
+      ...(filters.mata_pelajaran ? { mata_pelajaran: filters.mata_pelajaran } : {}),
+      ...(filters.teaching_class_id
+        ? { teaching_class_id: filters.teaching_class_id }
+        : {}),
+    }
+    if (filters.tanggal_mulai || filters.tanggal_selesai) {
+      where.tanggal = {}
+      if (filters.tanggal_mulai) {
+        where.tanggal.gte = new Date(filters.tanggal_mulai + "T00:00:00")
+      }
+      if (filters.tanggal_selesai) {
+        const end = new Date(filters.tanggal_selesai + "T00:00:00")
+        end.setDate(end.getDate() + 1)
+        where.tanggal.lt = end
+      }
+    }
+    
+    const sessions = await attendanceRepository.findSessions(where)
+    
+    const result = []
+    let no = 1
+    for (const session of sessions) {
+      const tgl = toDateOnly(session.tanggal)
+      for (const record of session.records) {
+        result.push({
+          No: no++,
+          NIS: record.student?.nis ?? "-",
+          NISN: record.student?.nisn ?? "-",
+          "Nama Siswa": record.student?.nama_lengkap ?? "-",
+          Kelas: record.student?.kelas ?? "-",
+          "Mata Pelajaran": session.mata_pelajaran ?? "-",
+          Tanggal: tgl,
+          "Jam Mulai": session.jam_mulai ?? "-",
+          "Jam Selesai": session.jam_selesai ?? "-",
+          Status: STATUS_KEHADIRAN_DB[record.status],
+        })
+      }
+    }
+    return result
   },
 
   async create(data: AttendanceSessionCreateData): Promise<SesiAbsensi> {

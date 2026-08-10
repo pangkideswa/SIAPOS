@@ -19,11 +19,9 @@ import {
   STATUS_SESI_COLORS,
 } from "@/features/absensi/constants/absensi.constants"
 import { useAttendanceList } from "@/hooks/use-attendance"
-import {
-  KELAS_OPTIONS,
-  GURU_OPTIONS,
-  MATA_PELAJARAN_OPTIONS,
-} from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
+import { useClasses } from "@/hooks/use-classes"
+import { useTeachers } from "@/hooks/use-teachers"
+import { useSubjects } from "@/hooks/use-subjects"
 
 const PER_PAGE = 10
 
@@ -57,6 +55,12 @@ export function AdminAbsensiListPage() {
     isError,
     refetch,
   } = useAttendanceList()
+
+  const { data: classesData } = useClasses({ per_page: 200 })
+  const classes = useMemo(() => classesData?.data ?? [], [classesData])
+  const { data: teachers } = useTeachers()
+  const { data: subjectsData } = useSubjects({ per_page: 200 })
+  const subjects = useMemo(() => subjectsData?.data ?? [], [subjectsData])
 
   const [search, setSearch] = useState("")
   const [kelasFilter, setKelasFilter] = useState("all")
@@ -217,9 +221,9 @@ export function AdminAbsensiListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Kelas</SelectItem>
-            {KELAS_OPTIONS.map((k) => (
-              <SelectItem key={k} value={k}>
-                {k}
+            {classes.map((k) => (
+              <SelectItem key={k.id} value={k.name}>
+                {k.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -236,9 +240,9 @@ export function AdminAbsensiListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Guru</SelectItem>
-            {GURU_OPTIONS.map((g) => (
-              <SelectItem key={g} value={g}>
-                {g}
+            {teachers?.map((g) => (
+              <SelectItem key={g.id} value={g.nama_lengkap}>
+                {g.nama_lengkap}
               </SelectItem>
             ))}
           </SelectContent>
@@ -255,9 +259,9 @@ export function AdminAbsensiListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Mapel</SelectItem>
-            {MATA_PELAJARAN_OPTIONS.map((m) => (
-              <SelectItem key={m} value={m}>
-                {m}
+            {subjects.map((m) => (
+              <SelectItem key={m.id} value={m.name}>
+                {m.name}
               </SelectItem>
             ))}
           </SelectContent>

@@ -27,7 +27,7 @@ const HARI_COLORS: Record<string, string> = {
   Kamis: "bg-purple-100 text-purple-700",
   Jumat: "bg-red-100 text-red-700",
   Sabtu: "bg-orange-100 text-orange-700",
-  Minggu: "bg-gray-100 text-gray-700",
+  Minggu: "bg-muted text-foreground",
 }
 
 export function KelasJadwalTab({ kelasMengajar }: KelasJadwalTabProps) {
@@ -59,7 +59,7 @@ export function KelasJadwalTab({ kelasMengajar }: KelasJadwalTabProps) {
             <CardTitle className="flex items-center gap-2 text-base">
               <span
                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                  HARI_COLORS[group.hari] ?? "bg-gray-100 text-gray-700"
+                  HARI_COLORS[group.hari] ?? "bg-muted text-foreground"
                 }`}
               >
                 {group.hari}

@@ -85,7 +85,7 @@ export default function SubjectsPage() {
           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
             item.is_active
               ? "bg-green-100 text-green-800"
-              : "bg-gray-100 text-gray-800"
+              : "bg-muted text-foreground"
           }`}
         >
           {item.is_active ? "Aktif" : "Nonaktif"}

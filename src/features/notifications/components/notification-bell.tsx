@@ -31,7 +31,7 @@ const TIPE_ICON: Record<NotifikasiTipe, { icon: LucideIcon; className: string; l
   tugas: { icon: ClipboardList, className: "bg-orange-100 text-orange-700", label: "Tugas" },
   penilaian: { icon: GraduationCap, className: "bg-green-100 text-green-700", label: "Penilaian" },
   pengumuman: { icon: Megaphone, className: "bg-purple-100 text-purple-700", label: "Pengumuman" },
-  sistem: { icon: Info, className: "bg-gray-100 text-gray-700", label: "Sistem" },
+  sistem: { icon: Info, className: "bg-muted text-foreground", label: "Sistem" },
 }
 
 function formatDateTime(dateStr: string) {
@@ -48,12 +48,7 @@ export function NotificationBell() {
   const { notifications, markRead, markListRead } = useNotifikasi()
   const router = useRouter()
 
-  const visible = user
-    ? notifications.filter(
-        (n) =>
-          user.role === "super_admin" || n.target_roles.includes(user.role)
-      )
-    : []
+  const visible = user ? notifications : []
 
   const visibleUnread = visible.filter((n) => !n.is_read)
   const visibleUnreadCount = visibleUnread.length

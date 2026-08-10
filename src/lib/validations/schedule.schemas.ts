@@ -25,5 +25,14 @@ export const scheduleSchema = z.object({
     .optional(),
   guru_id: z.number().int("Guru tidak valid").nullable().optional(),
   ruang: z.string().max(50, "Ruang maksimal 50 karakter").nullable().optional(),
-})
+}).refine(
+  (data) => {
+    if (!data.jam_mulai || !data.jam_selesai) return true
+    return data.jam_mulai < data.jam_selesai
+  },
+  {
+    message: "Jam mulai harus lebih kecil dari jam selesai",
+    path: ["jam_mulai"],
+  }
+)
 export type ScheduleInput = z.infer<typeof scheduleSchema>

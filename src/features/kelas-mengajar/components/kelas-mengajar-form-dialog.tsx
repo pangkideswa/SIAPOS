@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -21,14 +21,14 @@ import {
 } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
 import {
-  GURU_OPTIONS,
-  MATA_PELAJARAN_OPTIONS,
-  KELAS_OPTIONS,
   TAHUN_AJARAN_OPTIONS,
   SEMESTER_OPTIONS,
   STATUS_OPTIONS,
   EMPTY_KELAS_MENGAJAR_FORM,
 } from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
+import { useTeachers } from "@/hooks/use-teachers"
+import { useSubjects } from "@/hooks/use-subjects"
+import { useClasses } from "@/hooks/use-classes"
 import type { KelasMengajar, KelasMengajarFormData } from "@/features/kelas-mengajar/types/kelas-mengajar"
 
 interface KelasMengajarFormDialogProps {
@@ -47,11 +47,24 @@ export function KelasMengajarFormDialog({
   isLoading = false,
 }: KelasMengajarFormDialogProps) {
   const [form, setForm] = useState<KelasMengajarFormData>(EMPTY_KELAS_MENGAJAR_FORM)
+  const [errors, setErrors] = useState<Record<string, string[]>>({})
+
+  // Data dari API
+  const { data: teachersData, isLoading: teachersLoading } = useTeachers()
+  const { data: subjectsData, isLoading: subjectsLoading } = useSubjects({ is_active: true, per_page: 100 })
+  const { data: classesData, isLoading: classesLoading } = useClasses({ per_page: 200 })
+
+  const teachers = useMemo(() => teachersData ?? [], [teachersData])
+  const subjects = useMemo(() => subjectsData?.data ?? [], [subjectsData])
+  const classrooms = useMemo(() => classesData?.data ?? [], [classesData])
 
   useEffect(() => {
+    if (!open) return
     if (editingItem) {
       setForm({
         teacher_id: editingItem.teacher_id ?? null,
+        subject_id: editingItem.subject_id ?? null,
+        classroom_id: editingItem.classroom_id ?? null,
         guru_nama: editingItem.guru_nama,
         mata_pelajaran: editingItem.mata_pelajaran,
         kelas: editingItem.kelas,
@@ -62,16 +75,69 @@ export function KelasMengajarFormDialog({
     } else {
       setForm(EMPTY_KELAS_MENGAJAR_FORM)
     }
+    setErrors({})
   }, [editingItem, open])
 
-  function handleChange(field: string, value: string) {
+  function handleSimpleChange(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  function handleTeacherChange(value: string) {
+    const id = Number(value)
+    const teacher = teachers.find((t) => t.id === id)
+    if (!teacher) return
+    setForm((prev) => ({
+      ...prev,
+      teacher_id: teacher.id,
+      guru_nama: teacher.nama_lengkap,
+    }))
+    if (errors.guru_nama) setErrors((prev) => { const n = { ...prev }; delete n.guru_nama; return n })
+  }
+
+  function handleSubjectChange(value: string) {
+    const id = Number(value)
+    const subject = subjects.find((s) => s.id === id)
+    if (!subject) return
+    setForm((prev) => ({
+      ...prev,
+      subject_id: subject.id,
+      mata_pelajaran: subject.name,
+    }))
+    if (errors.mata_pelajaran) setErrors((prev) => { const n = { ...prev }; delete n.mata_pelajaran; return n })
+  }
+
+  function handleClassroomChange(value: string) {
+    const id = Number(value)
+    const classroom = classrooms.find((c) => c.id === id)
+    if (!classroom) return
+    setForm((prev) => ({
+      ...prev,
+      classroom_id: classroom.id,
+      kelas: classroom.name,
+    }))
+    if (errors.kelas) setErrors((prev) => { const n = { ...prev }; delete n.kelas; return n })
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    await onSubmit(form)
+    // Validasi manual
+    const nextErrors: Record<string, string[]> = {}
+    if (!form.guru_nama) nextErrors.guru_nama = ["Guru wajib dipilih"]
+    if (!form.mata_pelajaran) nextErrors.mata_pelajaran = ["Mata pelajaran wajib dipilih"]
+    if (!form.kelas) nextErrors.kelas = ["Kelas wajib dipilih"]
+    setErrors(nextErrors)
+    if (Object.keys(nextErrors).length > 0) return
+    try {
+      await onSubmit(form)
+    } catch (err: unknown) {
+      const apiErr = err as { response?: { data?: { errors?: Record<string, string[]> } } }
+      if (apiErr.response?.data?.errors) {
+        setErrors(apiErr.response.data.errors)
+      }
+    }
   }
+
+  const isDataLoading = teachersLoading || subjectsLoading || classesLoading
 
   return (
     <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
@@ -95,64 +161,94 @@ export function KelasMengajarFormDialog({
               Informasi Kelas
             </h3>
             <div className="space-y-4">
+              {/* Guru */}
               <div className="space-y-2">
                 <Label>Guru *</Label>
                 <Select
-                  value={form.guru_nama}
-                  onValueChange={(v) => v && handleChange("guru_nama", v)}
-                  disabled={isLoading}
+                  value={form.teacher_id != null ? String(form.teacher_id) : ""}
+                  onValueChange={(v) => v && handleTeacherChange(v)}
+                  disabled={isLoading || teachersLoading}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih Guru" />
+                    <SelectValue
+                      placeholder={
+                        teachersLoading
+                          ? "Memuat data guru..."
+                          : form.guru_nama || "Pilih Guru"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    {GURU_OPTIONS.map((g) => (
-                      <SelectItem key={g} value={g}>
-                        {g}
+                    {teachers.map((t) => (
+                      <SelectItem key={t.id} value={String(t.id)}>
+                        {t.nama_lengkap}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.guru_nama && (
+                  <p className="text-xs text-destructive">{errors.guru_nama[0]}</p>
+                )}
               </div>
 
+              {/* Mata Pelajaran */}
               <div className="space-y-2">
                 <Label>Mata Pelajaran *</Label>
                 <Select
-                  value={form.mata_pelajaran}
-                  onValueChange={(v) => v && handleChange("mata_pelajaran", v)}
-                  disabled={isLoading}
+                  value={form.subject_id != null ? String(form.subject_id) : ""}
+                  onValueChange={(v) => v && handleSubjectChange(v)}
+                  disabled={isLoading || subjectsLoading}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih Mata Pelajaran" />
+                    <SelectValue
+                      placeholder={
+                        subjectsLoading
+                          ? "Memuat mata pelajaran..."
+                          : form.mata_pelajaran || "Pilih Mata Pelajaran"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    {MATA_PELAJARAN_OPTIONS.map((mp) => (
-                      <SelectItem key={mp} value={mp}>
-                        {mp}
+                    {subjects.map((s) => (
+                      <SelectItem key={s.id} value={String(s.id)}>
+                        {s.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.mata_pelajaran && (
+                  <p className="text-xs text-destructive">{errors.mata_pelajaran[0]}</p>
+                )}
               </div>
 
+              {/* Kelas */}
               <div className="space-y-2">
                 <Label>Kelas *</Label>
                 <Select
-                  value={form.kelas}
-                  onValueChange={(v) => v && handleChange("kelas", v)}
-                  disabled={isLoading}
+                  value={form.classroom_id != null ? String(form.classroom_id) : ""}
+                  onValueChange={(v) => v && handleClassroomChange(v)}
+                  disabled={isLoading || classesLoading}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih Kelas" />
+                    <SelectValue
+                      placeholder={
+                        classesLoading
+                          ? "Memuat data kelas..."
+                          : form.kelas || "Pilih Kelas"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    {KELAS_OPTIONS.map((k) => (
-                      <SelectItem key={k} value={k}>
-                        {k}
+                    {classrooms.map((c) => (
+                      <SelectItem key={c.id} value={String(c.id)}>
+                        {c.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.kelas && (
+                  <p className="text-xs text-destructive">{errors.kelas[0]}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -160,7 +256,7 @@ export function KelasMengajarFormDialog({
                   <Label>Tahun Ajaran *</Label>
                   <Select
                     value={form.tahun_ajaran}
-                    onValueChange={(v) => v && handleChange("tahun_ajaran", v)}
+                    onValueChange={(v) => v && handleSimpleChange("tahun_ajaran", v)}
                     disabled={isLoading}
                   >
                     <SelectTrigger>
@@ -179,7 +275,7 @@ export function KelasMengajarFormDialog({
                   <Label>Semester *</Label>
                   <Select
                     value={form.semester}
-                    onValueChange={(v) => v && handleChange("semester", v)}
+                    onValueChange={(v) => v && handleSimpleChange("semester", v)}
                     disabled={isLoading}
                   >
                     <SelectTrigger>
@@ -200,7 +296,7 @@ export function KelasMengajarFormDialog({
                 <Label>Status *</Label>
                 <Select
                   value={form.status}
-                  onValueChange={(v) => v && handleChange("status", v)}
+                  onValueChange={(v) => v && handleSimpleChange("status", v)}
                   disabled={isLoading}
                 >
                   <SelectTrigger>
@@ -233,7 +329,7 @@ export function KelasMengajarFormDialog({
             <Button
               type="submit"
               className="w-full sm:w-auto bg-primary hover:bg-primary/90"
-              disabled={isLoading}
+              disabled={isLoading || isDataLoading}
             >
               {isLoading ? (
                 <>

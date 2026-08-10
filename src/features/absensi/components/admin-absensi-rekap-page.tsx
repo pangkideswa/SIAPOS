@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Search, Users, BookOpen, AlertTriangle, Clock, Heart, TrendingUp } from "lucide-react"
+import { ArrowLeft, Search, Users, BookOpen, AlertTriangle, Clock, Heart, TrendingUp, Download } from "lucide-react"
+import { toast } from "sonner"
+import { exportAbsensiToExcel } from "@/features/absensi/utils/export"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
@@ -18,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useAttendanceRekap } from "@/hooks/use-attendance"
-import { KELAS_OPTIONS } from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
+import { useClasses } from "@/hooks/use-classes"
 import type { RekapAbsensi } from "@/features/absensi/types/absensi"
 
 interface RekapRow extends RekapAbsensi, Record<string, unknown> {}
@@ -27,6 +29,7 @@ export function AdminAbsensiRekapPage() {
   const router = useRouter()
   const [search, setSearch] = useState("")
   const [kelasFilter, setKelasFilter] = useState<string>("all")
+  const [isExporting, setIsExporting] = useState(false)
   const [page, setPage] = useState(1)
   const perPage = 15
 
@@ -36,6 +39,9 @@ export function AdminAbsensiRekapPage() {
     isError,
     refetch,
   } = useAttendanceRekap()
+
+  const { data: classesData } = useClasses({ per_page: 200 })
+  const classes = useMemo(() => classesData?.data ?? [], [classesData])
 
   const summaryData = useMemo(() => {
     const totalPertemuan = Math.max(...rekapData.map((r) => r.total_pertemuan), 0)
@@ -128,6 +134,27 @@ export function AdminAbsensiRekapPage() {
           title="Rekap Absensi"
           description="Rekapitulasi kehadiran siswa"
         />
+        <div className="ml-auto flex gap-2">
+          <Button
+            variant="outline"
+            className="hidden sm:flex"
+            onClick={async () => {
+              try {
+                setIsExporting(true)
+                await exportAbsensiToExcel({ kelas: kelasFilter }, "Rekap_Absensi_Admin")
+                toast.success("Data berhasil diexport")
+              } catch {
+                toast.error("Gagal mengexport data")
+              } finally {
+                setIsExporting(false)
+              }
+            }}
+            disabled={isExporting || rekapData.length === 0}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            {isExporting ? "Mengekspor..." : "Export Excel"}
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -230,8 +257,8 @@ export function AdminAbsensiRekapPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Kelas</SelectItem>
-            {KELAS_OPTIONS.map((k) => (
-              <SelectItem key={k} value={k}>{k}</SelectItem>
+            {classes.map((k) => (
+              <SelectItem key={k.id} value={k.name}>{k.name}</SelectItem>
             ))}
           </SelectContent>
         </Select>

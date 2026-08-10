@@ -23,11 +23,9 @@ import {
   TrendingUp,
   ClipboardCheck,
 } from "lucide-react"
-import {
-  GURU_OPTIONS,
-  KELAS_OPTIONS,
-  MATA_PELAJARAN_OPTIONS,
-} from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
+import { useClasses } from "@/hooks/use-classes"
+import { useTeachers } from "@/hooks/use-teachers"
+import { useSubjects } from "@/hooks/use-subjects"
 import {
   STATUS_PENILAIAN_COLORS,
 } from "@/features/penilaian/constants/penilaian.constants"
@@ -41,6 +39,12 @@ export function PenilaianListPage() {
     isError,
     refetch,
   } = usePenilaian()
+
+  const { data: classesData } = useClasses({ per_page: 200 })
+  const classes = classesData?.data ?? []
+  const { data: teachers } = useTeachers()
+  const { data: subjectsData } = useSubjects({ per_page: 200 })
+  const subjects = subjectsData?.data ?? []
   const [search, setSearch] = useState("")
   const [guruFilter, setGuruFilter] = useState<string>("all")
   const [kelasFilter, setKelasFilter] = useState<string>("all")
@@ -285,9 +289,9 @@ export function PenilaianListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Guru</SelectItem>
-            {GURU_OPTIONS.map((guru: string) => (
-              <SelectItem key={guru} value={guru}>
-                {guru}
+            {teachers?.map((guru) => (
+              <SelectItem key={guru.id} value={guru.nama_lengkap}>
+                {guru.nama_lengkap}
               </SelectItem>
             ))}
           </SelectContent>
@@ -304,9 +308,9 @@ export function PenilaianListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Kelas</SelectItem>
-            {KELAS_OPTIONS.map((kelas: string) => (
-              <SelectItem key={kelas} value={kelas}>
-                {kelas}
+            {classes.map((kelas) => (
+              <SelectItem key={kelas.id} value={kelas.name}>
+                {kelas.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -323,9 +327,9 @@ export function PenilaianListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Mapel</SelectItem>
-            {MATA_PELAJARAN_OPTIONS.map((mapel: string) => (
-              <SelectItem key={mapel} value={mapel}>
-                {mapel}
+            {subjects.map((mapel) => (
+              <SelectItem key={mapel.id} value={mapel.name}>
+                {mapel.name}
               </SelectItem>
             ))}
           </SelectContent>

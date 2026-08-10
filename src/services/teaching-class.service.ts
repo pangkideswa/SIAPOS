@@ -1,6 +1,7 @@
 import "server-only"
 import { teachingClassRepository, teachingClassAssignmentRepository } from "@/repositories/teaching-class.repository"
 import { teacherRepository } from "@/repositories/teacher.repository"
+import { tahunAkademikRepository } from "@/repositories/tahun-akademik.repository"
 import { AppError } from "@/lib/api-utils"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 import type { TeacherSubject, User, Subject, SchoolClass, PaginatedResponse } from "@/types"
@@ -257,6 +258,9 @@ export const teachingClassService = {
     if (!classroom) {
       throw new AppError("Kelas tidak ditemukan.", 422)
     }
+    const activeTahunAkademik = await tahunAkademikRepository.findActive()
+    const tahunAjaran = activeTahunAkademik ? activeTahunAkademik.nama : "2026/2027"
+
     const row = await teachingClassRepository.createWithRelations({
       teacher_id: teacher.id,
       subject_id: data.subject_id,
@@ -264,7 +268,7 @@ export const teachingClassService = {
       guru_nama: teacher.nama_lengkap,
       mata_pelajaran: subject.name,
       kelas: classroom.name,
-      tahun_ajaran: "2026/2027",
+      tahun_ajaran: tahunAjaran,
       semester: "Ganjil",
       status: "Aktif",
     })

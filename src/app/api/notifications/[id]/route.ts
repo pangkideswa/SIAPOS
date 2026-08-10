@@ -12,7 +12,7 @@ export async function PATCH(
     const user = await getCurrentUser()
     if (!user) return unauthorized()
     const { id } = await context.params
-    const updated = await notifikasiService.markRead(Number(id))
+    const updated = await notifikasiService.markRead(Number(id), user.id)
     if (!updated) return notFound("Notifikasi tidak ditemukan")
     return ok(true, "Notifikasi ditandai sudah dibaca")
   } catch (error) {

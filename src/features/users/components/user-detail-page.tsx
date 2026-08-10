@@ -201,7 +201,7 @@ export function UserDetailPage({ params }: { params: Promise<{ id: string }> }) 
               <h2 className="text-lg font-bold">{user.name}</h2>
               <p className="text-sm text-muted-foreground">@{user.username}</p>
               <span
-                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mt-3 ${ROLE_COLORS[user.role] ?? "bg-gray-100 text-gray-800"}`}
+                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mt-3 ${ROLE_COLORS[user.role] ?? "bg-muted text-foreground"}`}
               >
                 {ROLE_LABELS[user.role] ?? user.role}
               </span>

@@ -18,11 +18,9 @@ import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react"
 import { TugasFormDialog } from "./tugas-form-dialog"
 import { TugasDeleteDialog } from "./tugas-delete-dialog"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
-import {
-  GURU_OPTIONS,
-  MATA_PELAJARAN_OPTIONS,
-  KELAS_OPTIONS,
-} from "@/features/kelas-mengajar/constants/kelas-mengajar.constants"
+import { useClasses } from "@/hooks/use-classes"
+import { useTeachers } from "@/hooks/use-teachers"
+import { useSubjects } from "@/hooks/use-subjects"
 import {
   useAssignments,
   useCreateAssignment,
@@ -39,6 +37,12 @@ export function TugasListPage() {
     isError,
     refetch,
   } = useAssignments()
+  
+  const { data: classesData } = useClasses({ per_page: 200 })
+  const classes = classesData?.data ?? []
+  const { data: teachers } = useTeachers()
+  const { data: subjectsData } = useSubjects({ per_page: 200 })
+  const subjects = subjectsData?.data ?? []
   const createMutation = useCreateAssignment()
   const updateMutation = useUpdateAssignment()
   const removeMutation = useRemoveAssignment()
@@ -276,9 +280,9 @@ export function TugasListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Guru</SelectItem>
-            {GURU_OPTIONS.map((guru: string) => (
-              <SelectItem key={guru} value={guru}>
-                {guru}
+            {teachers?.map((guru) => (
+              <SelectItem key={guru.id} value={guru.nama_lengkap}>
+                {guru.nama_lengkap}
               </SelectItem>
             ))}
           </SelectContent>
@@ -295,9 +299,9 @@ export function TugasListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Mapel</SelectItem>
-            {MATA_PELAJARAN_OPTIONS.map((mapel: string) => (
-              <SelectItem key={mapel} value={mapel}>
-                {mapel}
+            {subjects.map((mapel) => (
+              <SelectItem key={mapel.id} value={mapel.name}>
+                {mapel.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -314,9 +318,9 @@ export function TugasListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Kelas</SelectItem>
-            {KELAS_OPTIONS.map((kelas: string) => (
-              <SelectItem key={kelas} value={kelas}>
-                {kelas}
+            {classes.map((kelas) => (
+              <SelectItem key={kelas.id} value={kelas.name}>
+                {kelas.name}
               </SelectItem>
             ))}
           </SelectContent>

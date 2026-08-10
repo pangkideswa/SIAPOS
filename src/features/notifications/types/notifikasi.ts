@@ -1,5 +1,3 @@
-import type { UserRole } from "@/types/auth"
-
 export type NotifikasiTipe =
   | "materi"
   | "tugas"
@@ -13,7 +11,6 @@ export interface Notifikasi {
   judul: string
   pesan: string
   href?: string
-  target_roles: UserRole[]
   is_read: boolean
   created_at: string
 }

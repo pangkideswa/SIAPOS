@@ -19,7 +19,7 @@ export function PengumumanSummaryCards({ data }: SummaryCardsProps) {
     { label: "Total Pengumuman", value: total, icon: Megaphone, color: "text-blue-600 bg-blue-100" },
     { label: "Draft", value: draft, icon: FileEdit, color: "text-yellow-600 bg-yellow-100" },
     { label: "Dipublikasikan", value: published, icon: CheckCircle, color: "text-green-600 bg-green-100" },
-    { label: "Diarsipkan", value: archived, icon: Archive, color: "text-gray-600 bg-gray-100" },
+    { label: "Diarsipkan", value: archived, icon: Archive, color: "text-muted-foreground bg-muted" },
     { label: "Pengumuman Penting", value: pinned, icon: Pin, color: "text-red-600 bg-red-100" },
   ]
 

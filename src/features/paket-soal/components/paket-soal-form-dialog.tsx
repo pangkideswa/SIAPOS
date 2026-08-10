@@ -237,7 +237,7 @@ export function PaketSoalFormDialog({
                           type="checkbox"
                           checked={allFilteredSelected}
                           onChange={() => toggleAllSoal(filteredBankSoal)}
-                          className="h-4 w-4 rounded border-gray-300"
+                          className="h-4 w-4 rounded border-border"
                         />
                       </th>
                       <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">Pertanyaan</th>
@@ -260,7 +260,7 @@ export function PaketSoalFormDialog({
                             checked={selectedSoalIds.includes(soal.id)}
                             onChange={() => toggleSoal(soal.id)}
                             onClick={(e) => e.stopPropagation()}
-                            className="h-4 w-4 rounded border-gray-300"
+                            className="h-4 w-4 rounded border-border"
                           />
                         </td>
                         <td className="px-3 py-2.5">

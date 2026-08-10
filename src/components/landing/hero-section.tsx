@@ -103,7 +103,7 @@ export function HeroSection() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 + card.delay, duration: 0.5 }}
-                  className={`absolute ${card.position} inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-white shadow-lg shadow-black/5 border border-border/50`}
+                  className={`absolute ${card.position} inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-card shadow-lg shadow-black/5 border border-border/50`}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${card.color}`}>
                     <card.icon className="h-4 w-4" />

@@ -9,7 +9,7 @@ import {
   getStudentProfile,
   getTeacherProfile,
   isAdmin,
-  requireAdmin,
+  requireSuperAdmin,
   requireApiUser,
   allowedTeachingClassIdsFor,
 } from "@/auth/api-authorization"
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    await requireAdmin()
+    await requireSuperAdmin()
     const body = parseWithSchema(scheduleSchema, await request.json())
     const schedule = await scheduleService.create(
       body as unknown as ScheduleCreateInput

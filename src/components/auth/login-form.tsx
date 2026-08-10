@@ -115,7 +115,7 @@ export function LoginForm() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border/60 bg-white p-6 sm:p-8 shadow-sm">
+      <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 shadow-sm">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {serverError && (
             <motion.div
@@ -211,7 +211,7 @@ export function LoginForm() {
             <span className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="bg-white px-3 text-muted-foreground">
+            <span className="bg-card px-3 text-muted-foreground">
               Atau masuk dengan
             </span>
           </div>

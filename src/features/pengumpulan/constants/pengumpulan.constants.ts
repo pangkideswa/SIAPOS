@@ -7,7 +7,7 @@ export const STATUS_PENGUMPULAN_OPTIONS = [
 ] as const
 
 export const STATUS_PENGUMPULAN_COLORS: Record<string, string> = {
-  "Belum Mengumpulkan": "bg-gray-100 text-gray-800",
+  "Belum Mengumpulkan": "bg-muted text-foreground",
   "Sudah Mengumpulkan": "bg-green-100 text-green-800",
   Terlambat: "bg-red-100 text-red-800",
 }

@@ -5,7 +5,7 @@ export const STATUS_CBT_OPTIONS = ["Draft", "Publish", "Selesai"] as const
 export const STATUS_CBT_COLORS: Record<string, string> = {
   Draft: "bg-yellow-100 text-yellow-800",
   Publish: "bg-green-100 text-green-800",
-  Selesai: "bg-gray-100 text-gray-800",
+  Selesai: "bg-muted text-foreground",
 }
 
 export const MATA_PELAJARAN_OPTIONS = [
@@ -31,7 +31,7 @@ export const KELAS_OPTIONS = [
 ] as const
 
 export const STATUS_PARTISIPAN_CBT_COLORS: Record<string, string> = {
-  "Belum Mengerjakan": "bg-gray-100 text-gray-800",
+  "Belum Mengerjakan": "bg-muted text-foreground",
   "Sedang Mengerjakan": "bg-blue-100 text-blue-800",
   Selesai: "bg-green-100 text-green-800",
 }

@@ -24,7 +24,7 @@ const JENIS_META: Record<
   Video: { icon: Video, className: "bg-red-100 text-red-700" },
   Drive: { icon: HardDrive, className: "bg-yellow-100 text-yellow-700" },
   URL: { icon: Link2, className: "bg-indigo-100 text-indigo-700" },
-  Lainnya: { icon: Type, className: "bg-gray-100 text-gray-700" },
+  Lainnya: { icon: Type, className: "bg-muted text-foreground" },
 }
 
 interface MateriJenisBadgeProps {

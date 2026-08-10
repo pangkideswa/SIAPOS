@@ -28,11 +28,12 @@ import {
   AGAMA_OPTIONS,
   STATUS_SISWA_OPTIONS,
   TAHUN_AJARAN_OPTIONS,
-  JURUSAN_OPTIONS,
   EMPTY_SISWA_FORM,
 } from "@/features/siswa/constants/siswa.constants"
 import type { Siswa, SiswaFormData } from "@/features/siswa/types/siswa"
 import { useClasses } from "@/hooks/use-classes"
+
+import { useJurusans } from "@/hooks/use-jurusan"
 
 interface SiswaFormDialogProps {
   open: boolean
@@ -65,6 +66,9 @@ export function SiswaFormDialog({
 
   const { data: classesData, isLoading: classesLoading } = useClasses()
   const classrooms = useMemo(() => classesData?.data ?? [], [classesData])
+
+  const { data: jurusansData, isLoading: jurusansLoading } = useJurusans()
+  const jurusans = useMemo(() => jurusansData?.data ?? [], [jurusansData])
 
   useEffect(() => {
     if (editingSiswa) {
@@ -401,13 +405,13 @@ export function SiswaFormDialog({
                     onValueChange={(v) =>
                       v && handleChange("jurusan_id", Number(v))
                     }
-                    disabled={isLoading}
+                    disabled={isLoading || jurusansLoading}
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder={jurusansLoading ? "Memuat jurusan..." : "Pilih Jurusan"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {JURUSAN_OPTIONS.map((j) => (
+                      {jurusans.map((j) => (
                         <SelectItem key={j.id} value={String(j.id)}>
                           {j.code} - {j.name}
                         </SelectItem>

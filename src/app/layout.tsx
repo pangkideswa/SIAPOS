@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Plus_Jakarta_Sans } from "next/font/google"
 import { QueryProvider } from '@/providers/query-provider'
+import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
 const jakartaSans = Plus_Jakarta_Sans({
@@ -45,9 +46,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="id" className={`${jakartaSans.variable} h-full antialiased`}>
+    <html lang="id" className={`${jakartaSans.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans">
-        <QueryProvider>{children}</QueryProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <QueryProvider>{children}</QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

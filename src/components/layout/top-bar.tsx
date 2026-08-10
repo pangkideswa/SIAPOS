@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/auth-context"
 import { NotificationBell } from "@/features/notifications/components/notification-bell"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -140,7 +141,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   })
 
   return (
-    <header className="h-16 border-b border-border bg-white flex items-center justify-between px-4 md:px-6 shrink-0">
+    <header className="h-16 border-b border-border bg-background flex items-center justify-between px-4 md:px-6 shrink-0">
       <div className="flex items-center gap-3">
         <div className="md:hidden flex items-center gap-2">
           <Button
@@ -191,6 +192,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           )}
         </div>
 
+        <ThemeToggle />
         <NotificationBell />
 
         <span className="hidden lg:block text-xs text-muted-foreground px-2 py-1 rounded-lg bg-muted">

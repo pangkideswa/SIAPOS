@@ -6,14 +6,21 @@ import type {
   Notifikasi,
   NotifikasiTipe,
 } from "@/features/notifications/types/notifikasi"
-import type { UserRole } from "@/types/auth"
 
 export interface NotifikasiCreateInput {
+  user_id: number
   tipe: NotifikasiTipe
   judul: string
   pesan: string
   href?: string
-  target_roles: UserRole[]
+}
+
+export interface NotifikasiCreateManyInput {
+  user_ids: number[]
+  tipe: NotifikasiTipe
+  judul: string
+  pesan: string
+  href?: string
 }
 
 function toNotifikasi(row: DbNotifikasi): Notifikasi {
@@ -23,15 +30,14 @@ function toNotifikasi(row: DbNotifikasi): Notifikasi {
     judul: row.judul,
     pesan: row.pesan,
     href: row.href ?? undefined,
-    target_roles: row.targetRoles as Notifikasi["target_roles"],
     is_read: row.is_read,
     created_at: row.created_at.toISOString(),
   }
 }
 
 export const notifikasiService = {
-  async getAll(roles: string[]): Promise<Notifikasi[]> {
-    const rows = await notifikasiRepository.findAllByRoles(roles)
+  async getAllByUserId(userId: number): Promise<Notifikasi[]> {
+    const rows = await notifikasiRepository.findAllByUserId(userId)
     return rows.map(toNotifikasi)
   },
 
@@ -42,26 +48,41 @@ export const notifikasiService = {
 
   async create(data: NotifikasiCreateInput): Promise<Notifikasi> {
     const row = await notifikasiRepository.create({
+      user_id: data.user_id,
       tipe: toNotifikasiTipeDb(data.tipe),
       judul: data.judul,
       pesan: data.pesan,
       href: data.href ?? null,
-      targetRoles: data.target_roles,
+      targetRoles: [],
       is_read: false,
     })
     return toNotifikasi(row)
   },
 
-  async markRead(id: number): Promise<boolean> {
-    const row = await notifikasiRepository.update(id, { is_read: true })
-    return row !== null
+  async createForUsers(data: NotifikasiCreateManyInput): Promise<number> {
+    if (!data.user_ids.length) return 0
+    const tipeDb = toNotifikasiTipeDb(data.tipe)
+    const records = data.user_ids.map((uid) => ({
+      user_id: uid,
+      tipe: tipeDb,
+      judul: data.judul,
+      pesan: data.pesan,
+      href: data.href ?? null,
+      targetRoles: [],
+      is_read: false,
+    }))
+    return notifikasiRepository.createMany(records)
   },
 
-  async markListRead(ids: number[]): Promise<number> {
-    return notifikasiRepository.markListRead(ids)
+  async markRead(id: number, userId: number): Promise<boolean> {
+    return notifikasiRepository.markReadOwned(id, userId)
   },
 
-  async markAllRead(roles: string[]): Promise<number> {
-    return notifikasiRepository.markAllReadByRoles(roles)
+  async markListRead(ids: number[], userId: number): Promise<number> {
+    return notifikasiRepository.markListReadOwned(ids, userId)
+  },
+
+  async markAllReadByUserId(userId: number): Promise<number> {
+    return notifikasiRepository.markAllReadByUserId(userId)
   },
 }

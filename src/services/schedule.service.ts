@@ -1,6 +1,8 @@
 import "server-only"
 import { type Prisma, type Schedule } from "@/generated/prisma/client"
 import { scheduleRepository } from "@/repositories/schedule.repository"
+import { notifikasiService } from "@/services/notifikasi.service"
+import { prisma } from "@/lib/prisma"
 import { toScheduleDay } from "@/lib/db-mappers"
 import type { JadwalPelajaran } from "@/features/jadwal-pelajaran/types/jadwal-pelajaran"
 
@@ -84,6 +86,41 @@ export const scheduleService = {
 
   async create(data: ScheduleCreateInput): Promise<JadwalPelajaran> {
     const row = await scheduleRepository.create(toJadwalCreate(data))
+
+    try {
+      const userIds: number[] = []
+      
+      if (row.kelas) {
+        const students = await prisma.student.findMany({
+          where: { kelas: row.kelas },
+          select: { user_id: true },
+        })
+        const studentUserIds = students.map((s) => s.user_id).filter(Boolean) as number[]
+        userIds.push(...studentUserIds)
+      }
+
+      if (row.guru_nama) {
+        const teacher = await prisma.teacher.findFirst({
+          where: { nama_lengkap: row.guru_nama },
+          select: { user_id: true },
+        })
+        if (teacher?.user_id) {
+          userIds.push(teacher.user_id)
+        }
+      }
+
+      if (userIds.length > 0) {
+        await notifikasiService.createForUsers({
+          user_ids: userIds,
+          tipe: "sistem",
+          judul: "Jadwal Pelajaran Baru",
+          pesan: `Jadwal baru ditambahkan untuk mata pelajaran ${row.mata_pelajaran} pada hari ${row.hari}.`,
+        })
+      }
+    } catch (e) {
+      console.error("Failed to send schedule notification:", e)
+    }
+
     return toJadwal(row)
   },
 
@@ -92,6 +129,43 @@ export const scheduleService = {
     data: ScheduleCreateInput
   ): Promise<JadwalPelajaran | null> {
     const row = await scheduleRepository.update(id, toJadwalCreate(data))
+    
+    if (row) {
+      try {
+        const userIds: number[] = []
+        
+        if (row.kelas) {
+          const students = await prisma.student.findMany({
+            where: { kelas: row.kelas },
+            select: { user_id: true },
+          })
+          const studentUserIds = students.map((s) => s.user_id).filter(Boolean) as number[]
+          userIds.push(...studentUserIds)
+        }
+
+        if (row.guru_nama) {
+          const teacher = await prisma.teacher.findFirst({
+            where: { nama_lengkap: row.guru_nama },
+            select: { user_id: true },
+          })
+          if (teacher?.user_id) {
+            userIds.push(teacher.user_id)
+          }
+        }
+
+        if (userIds.length > 0) {
+          await notifikasiService.createForUsers({
+            user_ids: userIds,
+            tipe: "sistem",
+            judul: "Perubahan Jadwal Pelajaran",
+            pesan: `Terdapat perubahan pada jadwal mata pelajaran ${row.mata_pelajaran} di hari ${row.hari}.`,
+          })
+        }
+      } catch (e) {
+        console.error("Failed to send schedule notification:", e)
+      }
+    }
+
     return row ? toJadwal(row) : null
   },
 

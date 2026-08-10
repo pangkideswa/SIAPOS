@@ -2299,13 +2299,15 @@ export type NilaiScalarFieldEnum = (typeof NilaiScalarFieldEnum)[keyof typeof Ni
 
 export const NotifikasiScalarFieldEnum = {
   id: 'id',
+  user_id: 'user_id',
   tipe: 'tipe',
   judul: 'judul',
   pesan: 'pesan',
   href: 'href',
   targetRoles: 'targetRoles',
   is_read: 'is_read',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
 export type NotifikasiScalarFieldEnum = (typeof NotifikasiScalarFieldEnum)[keyof typeof NotifikasiScalarFieldEnum]

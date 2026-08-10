@@ -1,6 +1,8 @@
 import "server-only"
 import { Prisma } from "@/generated/prisma/client"
+import { prisma } from "@/lib/prisma"
 import { submissionRepository, type SubmissionRow } from "@/repositories/submission.repository"
+import { notifikasiService } from "@/services/notifikasi.service"
 import { toSubmissionStatus } from "@/lib/db-mappers"
 import type {
   PengumpulanTugas,
@@ -73,6 +75,30 @@ export const submissionService = {
     const row = await submissionRepository.create(
       toPengumpulanCreate(data, assignmentId, studentId)
     )
+
+    try {
+      const assignment = await prisma.assignment.findUnique({
+        where: { id: assignmentId },
+        include: {
+          teaching_class: {
+            include: { teacher: { select: { user_id: true } } },
+          },
+        },
+      })
+      const teacherUserId = assignment?.teaching_class?.teacher?.user_id
+      if (teacherUserId) {
+        await notifikasiService.create({
+          user_id: teacherUserId,
+          tipe: "penilaian",
+          judul: "Pengumpulan Tugas Baru",
+          pesan: `Siswa ${row.student?.nama_lengkap || "Anonim"} mengumpulkan tugas "${assignment.judul}".`,
+          href: `/guru/pengumpulan/${row.id}`
+        })
+      }
+    } catch (e) {
+      console.error("Failed to send submission notification:", e)
+    }
+
     return toPengumpulan(row)
   },
 

@@ -1,36 +1,7 @@
 import type { KelasMengajarFormData } from "../types/kelas-mengajar"
 
-export const GURU_OPTIONS = [
-  "Asep Nugraha",
-  "Rina Wulandari",
-  "Budi Santoso",
-  "Siti Rahayu",
-  "Andi Wijaya",
-  "Dewi Sartika",
-] as const
-
-export const MATA_PELAJARAN_OPTIONS = [
-  "Informatika",
-  "Dasar Jaringan",
-  "Administrasi Sistem Jaringan",
-  "Pemrograman Web",
-  "Basis Data",
-  "Sistem Operasi",
-  "Komputer dan Jaringan Dasar",
-] as const
-
-export const KELAS_OPTIONS = [
-  "X TKJ 1",
-  "X TKJ 2",
-  "XI TKJ 1",
-  "XI TKJ 2",
-  "X TBSM 1",
-  "X TBSM 2",
-  "XI TBSM 1",
-  "XI TBSM 2",
-  "XII TKJ 1",
-  "XII TKJ 2",
-] as const
+// GURU_OPTIONS, MATA_PELAJARAN_OPTIONS, KELAS_OPTIONS sengaja tidak hardcoded.
+// Data guru, mata pelajaran, dan kelas harus diambil dari API/database.
 
 export const TAHUN_AJARAN_OPTIONS = [
   "2024/2025",
@@ -54,6 +25,8 @@ export const STATUS_COLORS: Record<string, string> = {
 
 export const EMPTY_KELAS_MENGAJAR_FORM: KelasMengajarFormData = {
   teacher_id: null,
+  subject_id: null,
+  classroom_id: null,
   guru_nama: "",
   mata_pelajaran: "",
   kelas: "",

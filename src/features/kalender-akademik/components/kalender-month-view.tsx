@@ -40,7 +40,7 @@ export function KalenderMonthView({ events, onEventClick }: MonthViewProps) {
   }
 
   return (
-    <div className="rounded-lg border border-border bg-white overflow-hidden">
+    <div className="rounded-lg border border-border bg-card overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <Button variant="outline" size="icon-sm" onClick={prevMonth} aria-label="Bulan sebelumnya">
           <ChevronLeft className="h-4 w-4" />

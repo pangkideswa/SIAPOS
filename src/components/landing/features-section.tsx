@@ -70,7 +70,7 @@ const itemVariants = {
 
 export function FeaturesSection() {
   return (
-    <section id="fitur" className="py-20 md:py-28 bg-white">
+    <section id="fitur" className="py-20 md:py-28 bg-card">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -99,7 +99,7 @@ export function FeaturesSection() {
             <motion.div
               key={feature.title}
               variants={itemVariants}
-              className="group p-6 rounded-2xl border border-border/60 bg-white hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-0.5"
+              className="group p-6 rounded-2xl border border-border/60 bg-card hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-0.5"
             >
               <div
                 className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${feature.bg} ${feature.color} mb-4`}

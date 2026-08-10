@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -25,6 +25,7 @@ import {
 } from "lucide-react"
 import { SiswaFormDialog } from "./siswa-form-dialog"
 import { SiswaDeleteDialog } from "./siswa-delete-dialog"
+import { SiswaImportDialog } from "./siswa-import-dialog"
 import {
   STATUS_SISWA_COLORS,
   STATUS_SISWA_OPTIONS,
@@ -37,12 +38,10 @@ import {
   useRemoveStudent,
 } from "@/hooks/use-students"
 import { useClasses } from "@/hooks/use-classes"
-import { studentService } from "@/lib/services/student.service"
 import type { Siswa, SiswaFormData } from "@/features/siswa/types/siswa"
 
 export function SiswaListPage() {
   const router = useRouter()
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const [search, setSearch] = useState("")
   const [jurusanFilter, setJurusanFilter] = useState<string>("all")
   const [kelasFilter, setKelasFilter] = useState<string>("all")
@@ -53,6 +52,7 @@ export function SiswaListPage() {
   const [editingSiswa, setEditingSiswa] = useState<Siswa | null>(null)
   const [deletingSiswa, setDeletingSiswa] = useState<Siswa | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [importDialogOpen, setImportDialogOpen] = useState(false)
 
   const {
     data,
@@ -126,7 +126,7 @@ export function SiswaListPage() {
         const status = String(item.status)
         return (
           <span
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_SISWA_COLORS[status] ?? "bg-gray-100 text-gray-800"}`}
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_SISWA_COLORS[status] ?? "bg-muted text-foreground"}`}
           >
             {status}
           </span>
@@ -188,56 +188,17 @@ export function SiswaListPage() {
   }
 
   function handleImport() {
-    fileInputRef.current?.click()
+    setImportDialogOpen(true)
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (file) {
-      // TODO: Replace with actual import logic
-      alert(`File "${file.name}" akan diimport (fitur belum tersedia)`)
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
-  }
+  function handleExport() {
+    const params = new URLSearchParams()
+    if (search) params.append("search", search)
+    if (jurusanFilter !== "all") params.append("jurusan_id", jurusanFilter)
+    if (kelasFilter !== "all") params.append("kelas", kelasFilter)
+    if (statusFilter !== "all") params.append("status", statusFilter)
 
-  async function handleExport() {
-    const result = await studentService.getAllPaginated({
-      search: search || undefined,
-      jurusan_id:
-        jurusanFilter === "all" ? undefined : Number(jurusanFilter),
-      kelas: kelasFilter === "all" ? undefined : kelasFilter,
-      status: statusFilter === "all" ? undefined : statusFilter,
-      page: 1,
-      per_page: 10000,
-    })
-    const headers = [
-      "NIS",
-      "NISN",
-      "Nama Lengkap",
-      "Jenis Kelamin",
-      "Kelas",
-      "Jurusan",
-      "Status",
-    ]
-    const rows = result.data.map((s) => [
-      s.nis,
-      s.nisn,
-      s.nama_lengkap,
-      s.jenis_kelamin,
-      s.kelas,
-      s.jurusan_nama ?? "",
-      s.status,
-    ])
-    const csv = [headers, ...rows].map((r) => r.join(",")).join("\n")
-    const blob = new Blob([csv], { type: "text/csv" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "data-siswa.csv"
-    a.click()
-    URL.revokeObjectURL(url)
+    window.location.href = `/api/students/export?${params.toString()}`
   }
 
   const handleFormSubmit = useCallback(
@@ -279,13 +240,6 @@ export function SiswaListPage() {
         description="Kelola data siswa di SMK Wahana Bakti"
         action={
           <div className="flex flex-wrap gap-2">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv,.xlsx,.xls"
-              className="hidden"
-              onChange={handleFileChange}
-            />
             <Button
               variant="outline"
               size="sm"
@@ -389,13 +343,6 @@ export function SiswaListPage() {
 
       {/* Mobile Import/Export */}
       <div className="flex sm:hidden gap-2">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".csv,.xlsx,.xls"
-          className="hidden"
-          onChange={handleFileChange}
-        />
         <Button variant="outline" size="sm" onClick={handleImport} className="flex-1">
           <Upload className="mr-2 h-4 w-4" />
           Import
@@ -465,6 +412,11 @@ export function SiswaListPage() {
         siswa={deletingSiswa}
         onConfirm={handleDelete}
         isLoading={isLoading}
+      />
+
+      <SiswaImportDialog 
+        open={importDialogOpen} 
+        onOpenChange={setImportDialogOpen} 
       />
     </div>
   )

@@ -1,6 +1,9 @@
 import "server-only"
 import { Prisma, type Material } from "@/generated/prisma/client"
 import { materialRepository } from "@/repositories/material.repository"
+import { teachingClassRepository } from "@/repositories/teaching-class.repository"
+import { studentRepository } from "@/repositories/student.repository"
+import { notifikasiService } from "@/services/notifikasi.service"
 import {
   toMaterialStatus,
   toMaterialStatusDb,
@@ -73,6 +76,28 @@ export const materialService = {
 
   async create(data: MateriFormData): Promise<Materi> {
     const row = await materialRepository.create(toMateriCreate(data))
+
+    try {
+      if (row.teaching_class_id) {
+        const tc = await teachingClassRepository.findById(row.teaching_class_id)
+        if (tc?.classroom_id) {
+          const students = await studentRepository.findByClassroomId(tc.classroom_id)
+          const userIds = students.map((s) => s.user_id).filter(Boolean) as number[]
+          if (userIds.length > 0) {
+            await notifikasiService.createForUsers({
+              user_ids: userIds,
+              tipe: "materi",
+              judul: "Materi Baru",
+              pesan: `Materi baru "${row.judul}" ditambahkan pada mata pelajaran ${row.mata_pelajaran || tc.mata_pelajaran}.`,
+              href: `/siswa/materi/${row.id}`
+            })
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to send material notification:", e)
+    }
+
     return toMateri(row)
   },
 

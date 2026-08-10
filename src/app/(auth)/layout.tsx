@@ -16,7 +16,7 @@ function AuthSkeleton() {
         <Skeleton className="h-7 w-32" />
         <Skeleton className="h-4 w-64" />
       </div>
-      <div className="rounded-2xl border border-border/60 bg-white p-6 sm:p-8 space-y-4">
+      <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 space-y-4">
         <Skeleton className="h-11 w-full rounded-lg" />
         <Skeleton className="h-11 w-full rounded-lg" />
         <Skeleton className="h-11 w-full rounded-lg" />
@@ -36,7 +36,7 @@ export default function AuthLayout({
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
         <div className="relative text-center">
           <Link href="/" className="inline-flex items-center gap-3 mb-8">
-            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-white/20 text-white font-bold text-xl shadow-lg backdrop-blur-sm">
+            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-card/20 text-white font-bold text-xl shadow-lg backdrop-blur-sm">
               SI
             </div>
             <span className="font-bold text-3xl tracking-tight text-white">

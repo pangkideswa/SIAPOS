@@ -68,7 +68,7 @@ export function UserListPage() {
         const role = item.role as UserRole
         return (
           <span
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[role] ?? "bg-gray-100 text-gray-800"}`}
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[role] ?? "bg-muted text-foreground"}`}
           >
             {ROLE_LABELS[role] ?? role}
           </span>

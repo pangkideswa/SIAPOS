@@ -5,7 +5,7 @@ export const STATUS_PAKET_SOAL_OPTIONS = ["Draft", "Aktif", "Arsip"] as const
 export const STATUS_PAKET_SOAL_COLORS: Record<string, string> = {
   Draft: "bg-yellow-100 text-yellow-800",
   Aktif: "bg-green-100 text-green-800",
-  Arsip: "bg-gray-100 text-gray-800",
+  Arsip: "bg-muted text-foreground",
 }
 
 export const MATA_PELAJARAN_OPTIONS = [

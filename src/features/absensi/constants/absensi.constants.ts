@@ -21,5 +21,5 @@ export const STATUS_SESI_OPTIONS = ["Selesai", "Berlangsung", "Belum"] as const
 export const STATUS_SESI_COLORS: Record<string, string> = {
   Selesai: "bg-green-100 text-green-800",
   Berlangsung: "bg-blue-100 text-blue-800",
-  Belum: "bg-gray-100 text-gray-800",
+  Belum: "bg-muted text-foreground",
 }

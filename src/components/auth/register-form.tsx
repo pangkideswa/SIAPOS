@@ -153,7 +153,7 @@ export function RegisterForm() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border/60 bg-white p-6 sm:p-8 shadow-sm">
+      <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 shadow-sm">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {serverError && (
             <motion.div
@@ -179,7 +179,7 @@ export function RegisterForm() {
                       "relative flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-200",
                       isActive
                         ? role.activeColor
-                        : "border-border hover:border-muted-foreground/30 bg-white"
+                        : "border-border hover:border-muted-foreground/30 bg-card"
                     )}
                   >
                     <role.icon

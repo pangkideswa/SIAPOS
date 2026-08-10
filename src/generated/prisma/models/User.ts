@@ -329,6 +329,7 @@ export type UserWhereInput = {
   announcements?: Prisma.AnnouncementListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
+  notifikasis?: Prisma.NotifikasiListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -355,6 +356,7 @@ export type UserOrderByWithRelationInput = {
   announcements?: Prisma.AnnouncementOrderByRelationAggregateInput
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
+  notifikasis?: Prisma.NotifikasiOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -384,6 +386,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   announcements?: Prisma.AnnouncementListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
+  notifikasis?: Prisma.NotifikasiListRelationFilter
 }, "id" | "email" | "username" | "nip" | "nisn">
 
 export type UserOrderByWithAggregationInput = {
@@ -459,6 +462,7 @@ export type UserCreateInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  notifikasis?: Prisma.NotifikasiCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -485,6 +489,7 @@ export type UserUncheckedCreateInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  notifikasis?: Prisma.NotifikasiUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -510,6 +515,7 @@ export type UserUpdateInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  notifikasis?: Prisma.NotifikasiUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -536,6 +542,7 @@ export type UserUncheckedUpdateInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  notifikasis?: Prisma.NotifikasiUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -791,6 +798,22 @@ export type UserUpdateOneWithoutAnnouncementsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAnnouncementsInput, Prisma.UserUpdateWithoutAnnouncementsInput>, Prisma.UserUncheckedUpdateWithoutAnnouncementsInput>
 }
 
+export type UserCreateNestedOneWithoutNotifikasisInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotifikasisInput, Prisma.UserUncheckedCreateWithoutNotifikasisInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotifikasisInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutNotifikasisNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotifikasisInput, Prisma.UserUncheckedCreateWithoutNotifikasisInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotifikasisInput
+  upsert?: Prisma.UserUpsertWithoutNotifikasisInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotifikasisInput, Prisma.UserUpdateWithoutNotifikasisInput>, Prisma.UserUncheckedUpdateWithoutNotifikasisInput>
+}
+
 export type UserCreateWithoutAccountsInput = {
   name: string
   email?: string | null
@@ -813,6 +836,7 @@ export type UserCreateWithoutAccountsInput = {
   student?: Prisma.StudentCreateNestedOneWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  notifikasis?: Prisma.NotifikasiCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -838,6 +862,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  notifikasis?: Prisma.NotifikasiUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -878,6 +903,7 @@ export type UserUpdateWithoutAccountsInput = {
   student?: Prisma.StudentUpdateOneWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  notifikasis?: Prisma.NotifikasiUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -903,6 +929,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  notifikasis?: Prisma.NotifikasiUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -927,6 +954,7 @@ export type UserCreateWithoutSessionsInput = {
   student?: Prisma.StudentCreateNestedOneWithoutUserInput
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  notifikasis?: Prisma.NotifikasiCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -952,6 +980,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  notifikasis?: Prisma.NotifikasiUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -992,6 +1021,7 @@ export type UserUpdateWithoutSessionsInput = {
   student?: Prisma.StudentUpdateOneWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  notifikasis?: Prisma.NotifikasiUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1017,6 +1047,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  notifikasis?: Prisma.NotifikasiUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTeacherInput = {
@@ -1041,6 +1072,7 @@ export type UserCreateWithoutTeacherInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  notifikasis?: Prisma.NotifikasiCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTeacherInput = {
@@ -1066,6 +1098,7 @@ export type UserUncheckedCreateWithoutTeacherInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  notifikasis?: Prisma.NotifikasiUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTeacherInput = {
@@ -1106,6 +1139,7 @@ export type UserUpdateWithoutTeacherInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  notifikasis?: Prisma.NotifikasiUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTeacherInput = {
@@ -1131,6 +1165,7 @@ export type UserUncheckedUpdateWithoutTeacherInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  notifikasis?: Prisma.NotifikasiUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutStudentInput = {
@@ -1155,6 +1190,7 @@ export type UserCreateWithoutStudentInput = {
   announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  notifikasis?: Prisma.NotifikasiCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStudentInput = {
@@ -1180,6 +1216,7 @@ export type UserUncheckedCreateWithoutStudentInput = {
   announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  notifikasis?: Prisma.NotifikasiUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStudentInput = {
@@ -1220,6 +1257,7 @@ export type UserUpdateWithoutStudentInput = {
   announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  notifikasis?: Prisma.NotifikasiUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStudentInput = {
@@ -1245,6 +1283,7 @@ export type UserUncheckedUpdateWithoutStudentInput = {
   announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  notifikasis?: Prisma.NotifikasiUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAnnouncementsInput = {
@@ -1269,6 +1308,7 @@ export type UserCreateWithoutAnnouncementsInput = {
   student?: Prisma.StudentCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  notifikasis?: Prisma.NotifikasiCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAnnouncementsInput = {
@@ -1294,6 +1334,7 @@ export type UserUncheckedCreateWithoutAnnouncementsInput = {
   student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  notifikasis?: Prisma.NotifikasiUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAnnouncementsInput = {
@@ -1334,6 +1375,7 @@ export type UserUpdateWithoutAnnouncementsInput = {
   student?: Prisma.StudentUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  notifikasis?: Prisma.NotifikasiUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAnnouncementsInput = {
@@ -1359,6 +1401,125 @@ export type UserUncheckedUpdateWithoutAnnouncementsInput = {
   student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  notifikasis?: Prisma.NotifikasiUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutNotifikasisInput = {
+  name: string
+  email?: string | null
+  password?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  provider?: string
+  providerId?: string | null
+  image?: string | null
+  emailVerified?: Date | string | null
+  username?: string | null
+  nip?: string | null
+  nisn?: string | null
+  avatar?: string | null
+  login_count?: number
+  last_login?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  teacher?: Prisma.TeacherCreateNestedOneWithoutUserInput
+  student?: Prisma.StudentCreateNestedOneWithoutUserInput
+  announcements?: Prisma.AnnouncementCreateNestedManyWithoutAuthorInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutNotifikasisInput = {
+  id?: number
+  name: string
+  email?: string | null
+  password?: string | null
+  role?: $Enums.Role
+  status?: $Enums.AccountStatus
+  provider?: string
+  providerId?: string | null
+  image?: string | null
+  emailVerified?: Date | string | null
+  username?: string | null
+  nip?: string | null
+  nisn?: string | null
+  avatar?: string | null
+  login_count?: number
+  last_login?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  teacher?: Prisma.TeacherUncheckedCreateNestedOneWithoutUserInput
+  student?: Prisma.StudentUncheckedCreateNestedOneWithoutUserInput
+  announcements?: Prisma.AnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutNotifikasisInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotifikasisInput, Prisma.UserUncheckedCreateWithoutNotifikasisInput>
+}
+
+export type UserUpsertWithoutNotifikasisInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutNotifikasisInput, Prisma.UserUncheckedUpdateWithoutNotifikasisInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotifikasisInput, Prisma.UserUncheckedCreateWithoutNotifikasisInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutNotifikasisInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutNotifikasisInput, Prisma.UserUncheckedUpdateWithoutNotifikasisInput>
+}
+
+export type UserUpdateWithoutNotifikasisInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nisn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  login_count?: Prisma.IntFieldUpdateOperationsInput | number
+  last_login?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  teacher?: Prisma.TeacherUpdateOneWithoutUserNestedInput
+  student?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUpdateManyWithoutAuthorNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutNotifikasisInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  provider?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nisn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  login_count?: Prisma.IntFieldUpdateOperationsInput | number
+  last_login?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  teacher?: Prisma.TeacherUncheckedUpdateOneWithoutUserNestedInput
+  student?: Prisma.StudentUncheckedUpdateOneWithoutUserNestedInput
+  announcements?: Prisma.AnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1370,12 +1531,14 @@ export type UserCountOutputType = {
   announcements: number
   accounts: number
   sessions: number
+  notifikasis: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   announcements?: boolean | UserCountOutputTypeCountAnnouncementsArgs
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
+  notifikasis?: boolean | UserCountOutputTypeCountNotifikasisArgs
 }
 
 /**
@@ -1409,6 +1572,13 @@ export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.SessionWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountNotifikasisArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotifikasiWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1434,6 +1604,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   announcements?: boolean | Prisma.User$announcementsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  notifikasis?: boolean | Prisma.User$notifikasisArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1507,6 +1678,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   announcements?: boolean | Prisma.User$announcementsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  notifikasis?: boolean | Prisma.User$notifikasisArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1520,6 +1692,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     announcements: Prisma.$AnnouncementPayload<ExtArgs>[]
     accounts: Prisma.$AccountPayload<ExtArgs>[]
     sessions: Prisma.$SessionPayload<ExtArgs>[]
+    notifikasis: Prisma.$NotifikasiPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1939,6 +2112,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   announcements<T extends Prisma.User$announcementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$announcementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnouncementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifikasis<T extends Prisma.User$notifikasisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notifikasisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotifikasiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2486,6 +2660,30 @@ export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[]
+}
+
+/**
+ * User.notifikasis
+ */
+export type User$notifikasisArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notifikasi
+   */
+  select?: Prisma.NotifikasiSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notifikasi
+   */
+  omit?: Prisma.NotifikasiOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotifikasiInclude<ExtArgs> | null
+  where?: Prisma.NotifikasiWhereInput
+  orderBy?: Prisma.NotifikasiOrderByWithRelationInput | Prisma.NotifikasiOrderByWithRelationInput[]
+  cursor?: Prisma.NotifikasiWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotifikasiScalarFieldEnum | Prisma.NotifikasiScalarFieldEnum[]
 }
 
 /**

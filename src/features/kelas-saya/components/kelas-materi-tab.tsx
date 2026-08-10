@@ -63,7 +63,7 @@ function getJenisIkon(materi: Materi) {
     return { icon: FileText, label: "File", className: "text-blue-600 bg-blue-600/10" }
   if (materi.isi_materi)
     return { icon: Type, label: "Teks", className: "text-purple-600 bg-purple-600/10" }
-  return { icon: Globe, label: "Lainnya", className: "text-gray-600 bg-gray-600/10" }
+  return { icon: Globe, label: "Lainnya", className: "text-muted-foreground bg-gray-600/10" }
 }
 
 export function KelasMateriTab({ kelasMengajar }: KelasMateriTabProps) {

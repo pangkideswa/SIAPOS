@@ -203,7 +203,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
                           ? "bg-green-500 text-white"
                           : status === "ditandai"
                             ? "bg-yellow-500 text-white"
-                            : "bg-white border text-muted-foreground hover:border-primary"
+                            : "bg-card border text-muted-foreground hover:border-primary"
                     }`}
                   >
                     {idx + 1}
@@ -226,7 +226,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
         {/* Main Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Top Bar - Timer & Progress */}
-          <div className="border-b bg-white p-4 space-y-3">
+          <div className="border-b bg-card p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => router.push("/siswa/cbt")}>
@@ -343,7 +343,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
           </div>
 
           {/* Bottom Navigation */}
-          <div className="border-t bg-white p-4">
+          <div className="border-t bg-card p-4">
             <div className="max-w-3xl mx-auto flex items-center justify-between">
               <Button
                 variant="outline"

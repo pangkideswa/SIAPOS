@@ -240,7 +240,7 @@ export function GuruAbsensiInputPage() {
         </Button>
       </div>
 
-      <div className="rounded-lg border border-border bg-white overflow-hidden">
+      <div className="rounded-lg border border-border bg-card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-muted/50">

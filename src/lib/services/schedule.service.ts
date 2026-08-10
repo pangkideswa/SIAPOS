@@ -23,4 +23,21 @@ export const scheduleService = {
   getById: async (id: number) => {
     return apiFetch<JadwalPelajaran>(`/api/schedules/${id}`)
   },
+  create: async (data: unknown) => {
+    return apiFetch<JadwalPelajaran>(`/api/schedules`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    })
+  },
+  update: async (id: number, data: unknown) => {
+    return apiFetch<JadwalPelajaran>(`/api/schedules/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    })
+  },
+  remove: async (id: number) => {
+    return apiFetch<unknown>(`/api/schedules/${id}`, {
+      method: "DELETE",
+    })
+  },
 }

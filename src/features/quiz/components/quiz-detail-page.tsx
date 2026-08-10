@@ -183,19 +183,19 @@ export function QuizDetailPage({ id }: QuizDetailPageProps) {
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Acak Urutan Soal</span>
-                <Badge className={quiz.acak_urutan_soal ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                <Badge className={quiz.acak_urutan_soal ? "bg-green-100 text-green-800" : "bg-muted text-foreground"}>
                   {quiz.acak_urutan_soal ? "Ya" : "Tidak"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Acak Urutan Jawaban</span>
-                <Badge className={quiz.acak_urutan_jawaban ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                <Badge className={quiz.acak_urutan_jawaban ? "bg-green-100 text-green-800" : "bg-muted text-foreground"}>
                   {quiz.acak_urutan_jawaban ? "Ya" : "Tidak"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Tampilkan Nilai</span>
-                <Badge className={quiz.tampilkan_nilai ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                <Badge className={quiz.tampilkan_nilai ? "bg-green-100 text-green-800" : "bg-muted text-foreground"}>
                   {quiz.tampilkan_nilai ? "Ya" : "Tidak"}
                 </Badge>
               </div>

@@ -192,7 +192,7 @@ export function QuizFormDialog({
                 onClick={() => handleChange("acak_urutan_soal", !form.acak_urutan_soal)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.acak_urutan_soal ? "bg-primary" : "bg-muted"}`}
               >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.acak_urutan_soal ? "translate-x-6" : "translate-x-1"}`} />
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-card transition-transform ${form.acak_urutan_soal ? "translate-x-6" : "translate-x-1"}`} />
               </button>
             </div>
             <div className="flex items-center justify-between rounded-lg border p-3">
@@ -205,7 +205,7 @@ export function QuizFormDialog({
                 onClick={() => handleChange("acak_urutan_jawaban", !form.acak_urutan_jawaban)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.acak_urutan_jawaban ? "bg-primary" : "bg-muted"}`}
               >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.acak_urutan_jawaban ? "translate-x-6" : "translate-x-1"}`} />
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-card transition-transform ${form.acak_urutan_jawaban ? "translate-x-6" : "translate-x-1"}`} />
               </button>
             </div>
             <div className="flex items-center justify-between rounded-lg border p-3">
@@ -218,7 +218,7 @@ export function QuizFormDialog({
                 onClick={() => handleChange("tampilkan_nilai", !form.tampilkan_nilai)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.tampilkan_nilai ? "bg-primary" : "bg-muted"}`}
               >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.tampilkan_nilai ? "translate-x-6" : "translate-x-1"}`} />
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-card transition-transform ${form.tampilkan_nilai ? "translate-x-6" : "translate-x-1"}`} />
               </button>
             </div>
           </div>

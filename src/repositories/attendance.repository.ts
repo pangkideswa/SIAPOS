@@ -15,7 +15,7 @@ export type AttendanceSessionWhere = Prisma.AttendanceSessionWhereInput
 const SESSION_INCLUDE = {
   records: {
     include: {
-      student: { select: { nama_lengkap: true, kelas: true } },
+      student: { select: { nama_lengkap: true, kelas: true, nis: true, nisn: true } },
     },
   },
 } as const
