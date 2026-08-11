@@ -142,14 +142,8 @@ export function RegisterForm() {
     >
       <div className="mb-8 text-center lg:text-left">
         <div className="flex flex-col items-center gap-2 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            {settings.logo?.logo_siapos ? (
-              <img src={settings.logo.logo_siapos} alt="Logo" className="w-12 h-12 object-contain rounded-xl" />
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/>
-              </svg>
-            )}
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden">
+            <img src={settings.logo?.logo_siapos || "/favicon.png"} alt="Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Daftar Akun {settings.pengaturan_sistem?.nama_aplikasi || "SIAPOS"}</h1>
           <p className="mt-2 text-sm text-muted-foreground">

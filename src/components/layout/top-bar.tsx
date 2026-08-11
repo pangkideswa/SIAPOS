@@ -147,15 +147,9 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
           >
             <Menu className="h-5 w-5 text-muted-foreground" />
           </Button>
-          {settings.logo?.logo_siapos ? (
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0 overflow-hidden">
-              <img src={settings.logo.logo_siapos} alt="Logo" className="w-full h-full object-contain" />
-            </div>
-          ) : (
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white font-bold text-sm shrink-0">
-              {settings.pengaturan_sistem?.nama_aplikasi?.substring(0, 2).toUpperCase() || "SI"}
-            </div>
-          )}
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0 overflow-hidden">
+            <img src={settings.logo?.logo_siapos || "/favicon.png"} alt="Logo" className="w-full h-full object-contain" />
+          </div>
           <span className="font-bold text-lg tracking-tight line-clamp-1">{settings.pengaturan_sistem?.nama_aplikasi || "SIAPOS"}</span>
         </div>
         <div className="hidden md:block">
