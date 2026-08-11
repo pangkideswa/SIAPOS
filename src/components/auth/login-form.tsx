@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -14,7 +14,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { motion } from "framer-motion"
 import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogBody, ResponsiveDialogFooter } from "@/components/ui/responsive-dialog"
-import { signIn, getSession } from "next-auth/react"
+import { signIn } from "next-auth/react"
+import { useSearchParams } from "next/navigation"
 
 const loginSchema = z.object({
   identifier: z
@@ -35,6 +36,13 @@ export function LoginForm() {
   const [serverError, setServerError] = useState("")
   const [googleError, setGoogleError] = useState(false)
   const [googleErrorLoading, setGoogleErrorLoading] = useState(false)
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams?.get("error") === "AccessDenied") {
+      setGoogleError(true)
+    }
+  }, [searchParams])
 
   const {
     register,
@@ -67,30 +75,11 @@ export function LoginForm() {
     setServerError("")
     setGoogleErrorLoading(true)
     try {
-      const result = await signIn("google", {
-        callbackUrl: "/",
-        redirect: false,
+      await signIn("google", {
+        callbackUrl: "/masuk",
       })
-      if (result?.error) {
-        setGoogleError(true)
-        return
-      }
-      const session = await getSession()
-      const role = session?.user?.role
-      const dashboard =
-        role === "admin" || role === "super_admin"
-          ? "/admin"
-          : role === "guru"
-            ? "/guru"
-            : role === "wali"
-              ? "/wali"
-              : role === "siswa"
-                ? "/siswa"
-                : "/"
-      window.location.href = result.url ?? dashboard
     } catch {
       setGoogleError(true)
-    } finally {
       setGoogleErrorLoading(false)
     }
   }
