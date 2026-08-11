@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   // Fetch app settings for metadata
   let appName = "SIAPOS - Education Operating System"
   const description = "SIAPOS adalah Education Operating System yang mengintegrasikan pembelajaran, penilaian, administrasi akademik, dan komunikasi sekolah dalam satu platform."
-  let favicon = "/favicon.svg"
+  let favicon = "/favicon.png"
 
   try {
     const settingsData = await prisma.appSetting.findMany({

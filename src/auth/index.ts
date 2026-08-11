@@ -46,12 +46,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const email = user.email
         if (!email) return false
         try {
-          await authService.googleLogin({
+          const dbUser = await authService.googleLogin({
             email,
             name: user.name,
             image: user.image,
             providerId: account.providerAccountId,
           })
+          user.id = String(dbUser.id)
+          user.role = dbUser.role
           return true
         } catch {
           return false
