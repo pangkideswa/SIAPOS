@@ -45,10 +45,10 @@ function formatDateTime(dateStr: string) {
 
 export function NotificationBell() {
   const { user } = useAuth()
-  const { notifications, markRead, markListRead } = useNotifikasi()
+  const { notifications, isLoading, isError, markRead, markListRead } = useNotifikasi()
   const router = useRouter()
 
-  const visible = user ? notifications : []
+  const visible = user && !isError ? notifications : []
 
   const visibleUnread = visible.filter((n) => !n.is_read)
   const visibleUnreadCount = visibleUnread.length
@@ -68,7 +68,7 @@ export function NotificationBell() {
         render={
           <Button variant="ghost" size="icon-sm" className="relative" aria-label="Notifikasi">
             <Bell className="h-4 w-4 text-muted-foreground" />
-            {visibleUnreadCount > 0 && (
+            {visibleUnreadCount > 0 && !isError && (
               <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 text-[9px] font-semibold text-white">
                 {visibleUnreadCount > 9 ? "9+" : visibleUnreadCount}
               </span>
@@ -81,7 +81,7 @@ export function NotificationBell() {
           <DropdownMenuLabel className="p-0 text-sm font-semibold text-foreground">
             Notifikasi
           </DropdownMenuLabel>
-          {visibleUnreadCount > 0 && (
+          {visibleUnreadCount > 0 && !isError && (
             <button
               onClick={handleMarkAllRead}
               className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
@@ -93,7 +93,17 @@ export function NotificationBell() {
         </div>
 
         <div className="max-h-[26rem] overflow-y-auto py-1">
-          {visible.length === 0 && (
+          {isLoading && (
+            <div className="px-4 py-8 flex justify-center">
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            </div>
+          )}
+          {!isLoading && isError && (
+            <div className="px-4 py-8 text-center text-sm text-destructive font-medium">
+              Gagal memuat notifikasi
+            </div>
+          )}
+          {!isLoading && !isError && visible.length === 0 && (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
               Tidak ada notifikasi
             </div>

@@ -25,6 +25,7 @@ import { ROLE_LABELS, ROLE_COLORS, EMPTY_USER_FORM } from "@/features/users/cons
 import { userService } from "@/lib/services/user.service"
 import type { UserRole } from "@/types/auth"
 import type { User as UserType } from "@/types/auth"
+import { getInitials } from "@/lib/utils"
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -32,15 +33,6 @@ function formatDate(dateStr: string): string {
     month: "long",
     year: "numeric",
   })
-}
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2)
 }
 
 interface InfoRowProps {

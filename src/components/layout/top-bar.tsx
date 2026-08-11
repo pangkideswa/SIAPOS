@@ -19,15 +19,7 @@ import { LogOut, User, Search, Settings, Menu, Clock } from "lucide-react"
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import type { UserRole } from "@/types/auth"
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2)
-}
+import { getInitials } from "@/lib/utils"
 
 function getRoleLabel(role: UserRole): string {
   const labels: Record<UserRole, string> = {

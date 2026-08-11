@@ -24,11 +24,7 @@ function emit() {
 let cache: Notifikasi[] = []
 
 export async function getNotifikasi(): Promise<Notifikasi[]> {
-  try {
-    cache = await notificationService.getAll()
-  } catch {
-    cache = []
-  }
+  cache = await notificationService.getAll()
   return cache
 }
 

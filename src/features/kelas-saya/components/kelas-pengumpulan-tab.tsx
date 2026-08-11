@@ -21,9 +21,9 @@ import { EmptyState } from "@/components/ui/empty-state"
 import { JawabanDetailDialog } from "@/features/pengumpulan/components/jawaban-detail-dialog"
 import { pushNotifikasi } from "@/features/notifications/lib/notifikasi-service"
 import {
-  getInitials,
   formatWaktuPengumpulan,
 } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { getInitials } from "@/lib/utils"
 import { useClassroom } from "@/hooks/use-classroom"
 import type { PengumpulanTugas } from "@/features/pengumpulan/types/pengumpulan"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"

@@ -18,6 +18,16 @@ export const userRepository = {
     return prisma.user.findUnique({ where: { id } })
   },
 
+  async findUserIdsByRoles(roles: string[]): Promise<number[]> {
+    if (!roles || roles.length === 0) return []
+    const prismaRoles = roles.map(r => r.toUpperCase() as import("@/generated/prisma/client").Role)
+    const users = await prisma.user.findMany({
+      where: { role: { in: prismaRoles } },
+      select: { id: true }
+    })
+    return users.map(u => u.id)
+  },
+
   async findFirst(where: UserWhere): Promise<User | null> {
     return prisma.user.findFirst({ where })
   },

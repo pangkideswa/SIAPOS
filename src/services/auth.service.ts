@@ -1,9 +1,10 @@
 import "server-only"
 import { compare, hash } from "bcryptjs"
 import { userRepository } from "@/repositories/user.repository"
-import { toUser, toRole } from "@/lib/db-mappers"
+import { toUser } from "@/lib/db-mappers"
 import { AppError, NotFoundError } from "@/lib/api-utils"
 import type { User, UserRole } from "@/types/auth"
+import { prisma } from "@/lib/prisma"
 
 interface RegisterInput {
   name: string
@@ -36,6 +37,10 @@ export const authService = {
   },
 
   async register(data: RegisterInput): Promise<User> {
+    if (data.role !== "siswa") {
+      throw new AppError("Pendaftaran publik hanya diizinkan untuk siswa.", 403)
+    }
+
     const existing = await userRepository.findFirst({
       OR: [{ email: data.email.toLowerCase() }, { username: data.username ?? undefined }],
     })
@@ -43,16 +48,33 @@ export const authService = {
       throw new AppError("Email atau username sudah terdaftar", 422)
     }
     const hashed = await hash(data.password, 10)
-    const user = await userRepository.create({
-      name: data.name,
-      email: data.email.toLowerCase(),
-      password: hashed,
-      role: toRole(data.role),
-      username: data.username ?? null,
-      nip: data.nip ?? null,
-      nisn: data.nisn ?? null,
+    
+    const result = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          name: data.name,
+          email: data.email.toLowerCase(),
+          password: hashed,
+          role: "SISWA",
+          username: data.username ?? null,
+          nip: data.nip ?? null,
+          nisn: data.nisn ?? null,
+        }
+      })
+
+      await tx.student.create({
+        data: {
+          user_id: user.id,
+          nama_lengkap: user.name,
+          nis: user.nisn || `NIS-${Date.now()}`,
+          nisn: user.nisn || `NISN-${Date.now()}`,
+        }
+      })
+
+      return user
     })
-    return toUser(user)
+
+    return toUser(result)
   },
 
   async getUserById(id: number): Promise<User | null> {

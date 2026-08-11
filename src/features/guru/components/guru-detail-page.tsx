@@ -30,6 +30,7 @@ import {
 } from "@/features/guru/constants/guru.constants"
 import { useTeacher, useUpdateTeacher, useRemoveTeacher } from "@/hooks/use-teachers"
 import type { GuruFormData } from "@/features/guru/types/guru"
+import { getInitials } from "@/lib/utils"
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -45,15 +46,6 @@ function formatShortDate(dateStr: string): string {
     month: "short",
     year: "numeric",
   })
-}
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2)
 }
 
 function calculateAge(dateStr: string): string {

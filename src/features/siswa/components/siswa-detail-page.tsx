@@ -27,6 +27,7 @@ import { SiswaDeleteDialog } from "./siswa-delete-dialog"
 import { STATUS_SISWA_COLORS } from "@/features/siswa/constants/siswa.constants"
 import { useStudent, useUpdateStudent, useRemoveStudent } from "@/hooks/use-students"
 import type { SiswaFormData } from "@/features/siswa/types/siswa"
+import { getInitials } from "@/lib/utils"
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -42,15 +43,6 @@ function formatShortDate(dateStr: string): string {
     month: "short",
     year: "numeric",
   })
-}
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2)
 }
 
 function calculateAge(dateStr: string): string {

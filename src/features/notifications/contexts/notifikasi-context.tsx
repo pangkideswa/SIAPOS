@@ -20,6 +20,8 @@ import type { Notifikasi } from "@/features/notifications/types/notifikasi"
 interface NotifikasiContextType {
   notifications: Notifikasi[]
   unreadCount: number
+  isLoading: boolean
+  isError: boolean
   markRead: (id: number) => void
   markAllRead: () => void
   markListRead: (ids: number[]) => void
@@ -29,10 +31,20 @@ const NotifikasiContext = createContext<NotifikasiContextType | null>(null)
 
 export function NotifikasiProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notifikasi[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isError, setIsError] = useState(false)
 
   useEffect(() => {
-    const sync = () => {
-      getNotifikasi().then((list) => setNotifications(list))
+    const sync = async () => {
+      try {
+        setIsError(false)
+        const list = await getNotifikasi()
+        setNotifications(list)
+      } catch {
+        setIsError(true)
+      } finally {
+        setIsLoading(false)
+      }
     }
     sync()
     return subscribeNotifikasi(sync)
@@ -46,7 +58,7 @@ export function NotifikasiProvider({ children }: { children: ReactNode }) {
 
   return (
     <NotifikasiContext.Provider
-      value={{ notifications, unreadCount, markRead, markAllRead, markListRead }}
+      value={{ notifications, unreadCount, isLoading, isError, markRead, markAllRead, markListRead }}
     >
       {children}
     </NotifikasiContext.Provider>

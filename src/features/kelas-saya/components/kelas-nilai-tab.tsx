@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Award, Search, TrendingUp, TrendingDown, Minus } from "lucide-react"
-import { getInitials } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { getInitials } from "@/lib/utils"
 import { useClassroom } from "@/hooks/use-classroom"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 

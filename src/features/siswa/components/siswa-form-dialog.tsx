@@ -32,8 +32,8 @@ import {
 } from "@/features/siswa/constants/siswa.constants"
 import type { Siswa, SiswaFormData } from "@/features/siswa/types/siswa"
 import { useClasses } from "@/hooks/use-classes"
-
 import { useJurusans } from "@/hooks/use-jurusan"
+import { getInitials } from "@/lib/utils"
 
 interface SiswaFormDialogProps {
   open: boolean
@@ -41,15 +41,6 @@ interface SiswaFormDialogProps {
   editingSiswa: Siswa | null
   onSubmit: (data: SiswaFormData) => Promise<void>
   isLoading?: boolean
-}
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2)
 }
 
 export function SiswaFormDialog({

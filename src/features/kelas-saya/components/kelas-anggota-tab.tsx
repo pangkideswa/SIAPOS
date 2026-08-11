@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Users, Search, Phone, Hash } from "lucide-react"
 import { useState } from "react"
 import { EmptyState } from "@/components/ui/empty-state"
-import { getInitials } from "@/features/kelas-saya/lib/kelas-saya-helpers"
+import { getInitials } from "@/lib/utils"
 import { useClassroom } from "@/hooks/use-classroom"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 

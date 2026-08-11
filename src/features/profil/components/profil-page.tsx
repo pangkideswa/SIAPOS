@@ -31,15 +31,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import { apiFetch } from "@/lib/client-api"
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2)
-}
+import { getInitials } from "@/lib/utils"
 
 function getRoleLabel(role: string): string {
   const labels: Record<string, string> = {

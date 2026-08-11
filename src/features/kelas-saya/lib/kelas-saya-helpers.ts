@@ -5,14 +5,7 @@ export interface KelasAktivitas {
   timestamp: string
 }
 
-export function getInitials(nama: string): string {
-  return nama
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2)
-}
+
 
 export function formatTanggal(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("id-ID", {
