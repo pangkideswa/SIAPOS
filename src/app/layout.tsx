@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { SettingsProvider } from "@/contexts/settings-context"
 import { prisma } from "@/lib/prisma"
 import "./globals.css"
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 const jakartaSans = Plus_Jakarta_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -96,6 +96,7 @@ export default async function RootLayout({
             <QueryProvider>{children}</QueryProvider>
           </SettingsProvider>
         </ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   )
