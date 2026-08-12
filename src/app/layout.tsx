@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google"
 import { QueryProvider } from '@/providers/query-provider'
 import { ThemeProvider } from "@/components/theme-provider"
 import { SettingsProvider } from "@/contexts/settings-context"
-import { prisma } from "@/lib/prisma"
+import { getCachedSettings } from "@/lib/settings"
 import "./globals.css"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 const jakartaSans = Plus_Jakarta_Sans({
@@ -19,9 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   let favicon = "/favicon.png"
 
   try {
-    const settingsData = await prisma.appSetting.findMany({
-      where: { key: { in: ['pengaturan_sistem', 'logo'] } }
-    })
+    const settingsData = await getCachedSettings()
     
     settingsData.forEach((s: { key: string; value: string }) => {
       if (s.key === 'pengaturan_sistem') {
@@ -74,7 +72,7 @@ export default async function RootLayout({
 }>) {
   let initialSettings = undefined
   try {
-    const settings = await prisma.appSetting.findMany()
+    const settings = await getCachedSettings()
     const config: Record<string, unknown> = {}
     settings.forEach((s: { key: string; value: string }) => {
       try {

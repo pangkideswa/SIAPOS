@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-
+import { getCachedSettings } from "@/lib/settings"
+import { revalidateTag } from "next/cache"
 export async function GET() {
   try {
-    const settings = await prisma.appSetting.findMany()
+    const settings = await getCachedSettings()
     const config: Record<string, unknown> = {}
     
     settings.forEach((setting) => {
@@ -41,6 +42,7 @@ export async function POST(req: Request) {
     })
 
     await Promise.all(upsertPromises)
+    revalidateTag("settings")
 
     return NextResponse.json({ message: "Pengaturan berhasil disimpan" })
   } catch (error) {
