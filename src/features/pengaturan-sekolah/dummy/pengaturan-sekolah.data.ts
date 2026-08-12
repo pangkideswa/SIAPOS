@@ -17,7 +17,7 @@ export const DUMMY_SEKOLAH_SETTINGS: SekolahSettings = {
   },
   logo: {
     logo_sekolah: "",
-    logo_siapos: "",
+
     favicon: "",
   },
   tahun_akademik: {

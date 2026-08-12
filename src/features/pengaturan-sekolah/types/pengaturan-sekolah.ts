@@ -15,7 +15,7 @@ export interface SekolahSettings {
   }
   logo: {
     logo_sekolah: string
-    logo_siapos: string
+
     favicon: string
   }
   tahun_akademik: {

@@ -24,8 +24,8 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="sm:col-span-2 lg:col-span-2">
             <Link href="/" className="flex items-center gap-2.5">
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white font-bold text-xs shadow-md shadow-primary/25">
-                  SI
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg shadow-md shadow-primary/25 overflow-hidden">
+                  <img src="/favicon.png" alt="Logo SIAPOS" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-semibold text-lg tracking-tight text-foreground">
                   SIAPOS

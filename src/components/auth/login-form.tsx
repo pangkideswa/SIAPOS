@@ -94,7 +94,7 @@ export function LoginForm() {
       <div className="mb-8 text-center lg:text-left">
         <div className="flex flex-col items-center gap-2 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden">
-            <img src={settings.logo?.logo_siapos || "/favicon.png"} alt="Logo" className="w-full h-full object-contain" />
+            <img src="/favicon.png" alt="Logo SIAPOS" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Selamat Datang di {settings.pengaturan_sistem?.nama_aplikasi || "SIAPOS"}</h1>
           <p className="mt-2 text-sm text-muted-foreground">

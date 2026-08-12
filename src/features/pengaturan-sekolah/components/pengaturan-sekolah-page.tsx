@@ -353,13 +353,7 @@ export function PengaturanSekolahPage() {
               onRemove={() => handleGroupChange("logo", "logo_sekolah", "")}
               sizeClass="w-32 h-32"
             />
-            <ImageUpload
-              label="Logo SIAPOS"
-              currentImage={form.logo.logo_siapos}
-              onUpload={(dataUrl) => handleGroupChange("logo", "logo_siapos", dataUrl)}
-              onRemove={() => handleGroupChange("logo", "logo_siapos", "")}
-              sizeClass="w-32 h-32"
-            />
+
             <ImageUpload
               label="Favicon"
               currentImage={form.logo.favicon}

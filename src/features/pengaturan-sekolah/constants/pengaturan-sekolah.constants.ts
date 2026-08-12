@@ -59,7 +59,7 @@ export const EMPTY_SEKOLAH_FORM: SekolahFormData = {
   },
   logo: {
     logo_sekolah: "",
-    logo_siapos: "",
+
     favicon: "",
   },
   tahun_akademik: {

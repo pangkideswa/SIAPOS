@@ -36,8 +36,8 @@ export default function AuthLayout({
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
         <div className="relative text-center">
           <Link href="/" className="inline-flex items-center gap-3 mb-8">
-            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-card/20 text-white font-bold text-xl shadow-lg backdrop-blur-sm">
-              SI
+            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-card/20 shadow-lg backdrop-blur-sm overflow-hidden p-1">
+              <img src="/favicon.png" alt="Logo SIAPOS" className="w-full h-full object-contain" />
             </div>
             <span className="font-bold text-3xl tracking-tight text-white">
               SIAPOS

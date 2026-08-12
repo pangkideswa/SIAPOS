@@ -158,7 +158,7 @@ function SidebarContent({
     <>
       <div className="flex items-center gap-2.5 px-4 h-16 border-b border-border shrink-0">
         <div className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0 overflow-hidden">
-          <img src={settings.logo?.logo_siapos || "/favicon.png"} alt="Logo" className="w-full h-full object-contain" />
+          <img src="/favicon.png" alt="Logo SIAPOS" className="w-full h-full object-contain" />
         </div>
         {!collapsed && (
           <div className="flex flex-col">
