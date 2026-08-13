@@ -72,6 +72,7 @@ export function TugasFormDialog({
   const { data: activeKelasMengajar = [] } = useTeachingClasses()
   const [form, setForm] = useState<TugasFormData>(EMPTY_TUGAS_FORM)
   const [errors, setErrors] = useState<TugasFormErrors>({})
+  const [isUploading, setIsUploading] = useState(false)
 
   useEffect(() => {
     if (editingItem) {
@@ -163,6 +164,7 @@ export function TugasFormDialog({
         nama: file.name,
         ukuran: formatFileSize(file.size),
         tipe: file.type,
+        file: file // Save the raw file for upload on submit
       })
     )
 
@@ -217,17 +219,77 @@ export function TugasFormDialog({
     return true
   }
 
+  async function uploadFileDirectly(file: File, assignmentId?: number): Promise<string> {
+     const res = await fetch('/api/assignments/upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+           filename: file.name,
+           contentType: file.type,
+           size: file.size,
+           kelas_mengajar_id: form.kelas_mengajar_id,
+           assignmentId: assignmentId || undefined
+        })
+     })
+     
+     if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || `Gagal mendapatkan url upload untuk ${file.name}`)
+     }
+     
+     const { uploadUrl, storagePath } = await res.json()
+     
+     const uploadRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: {
+           'Content-Type': file.type,
+        },
+        body: file
+     })
+     
+     if (!uploadRes.ok) {
+        throw new Error(`Gagal mengupload ${file.name}`)
+     }
+     
+     return storagePath
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!validate()) return
-    await onSubmit(form)
+    
+    setIsUploading(true)
+    const payload = { ...form }
+    
+    try {
+      // Upload Lampirans
+      payload.lampiran = await Promise.all(
+         payload.lampiran.map(async (lamp) => {
+            if (lamp.file) {
+               const storage_path = await uploadFileDirectly(lamp.file, editingItem?.id)
+               const { file: _file, ...lampWithoutFile } = lamp
+               return { ...lampWithoutFile, storage_path }
+            }
+            return lamp
+         })
+      )
+      
+      await onSubmit(payload)
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Terjadi kesalahan yang tidak diketahui"
+      toast.error("Upload gagal", {
+         description: msg
+      })
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   return (
     <ResponsiveDialog
       open={open}
       onOpenChange={(next) => {
-        if (!isLoading) onOpenChange(next)
+        if (!isLoading && !isUploading) onOpenChange(next)
       }}
     >
       <ResponsiveDialogContent className="sm:max-w-2xl">
@@ -259,7 +321,7 @@ export function TugasFormDialog({
                     placeholder="Contoh: Tugas Jaringan Topologi"
                     value={form.judul}
                     onChange={(e) => handleChange("judul", e.target.value)}
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                     aria-invalid={!!errors.judul}
                     className={errors.judul ? "border-destructive" : ""}
                   />
@@ -272,7 +334,7 @@ export function TugasFormDialog({
                     placeholder="Deskripsi singkat tentang tugas ini..."
                     value={form.deskripsi}
                     onChange={(e) => handleChange("deskripsi", e.target.value)}
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                     rows={3}
                   />
                 </div>
@@ -288,7 +350,7 @@ export function TugasFormDialog({
                         : ""
                     }
                     onValueChange={handleKelasMengajarSelect}
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                   >
                     <SelectTrigger
                       className={
@@ -349,7 +411,7 @@ export function TugasFormDialog({
                         onChange={(e) =>
                           handleChange("tanggal_dibuka", e.target.value)
                         }
-                        disabled={isLoading}
+                        disabled={isLoading || isUploading}
                         aria-invalid={!!errors.tanggal_dibuka}
                         className={cn(
                           "pl-9",
@@ -375,7 +437,7 @@ export function TugasFormDialog({
                         onChange={(e) =>
                           handleChange("tenggat_waktu", e.target.value)
                         }
-                        disabled={isLoading}
+                        disabled={isLoading || isUploading}
                         min={form.tanggal_dibuka || undefined}
                         aria-invalid={!!errors.tenggat_waktu}
                         className={cn(
@@ -401,7 +463,7 @@ export function TugasFormDialog({
                     onChange={(e) =>
                       handleChange("tenggat_jam", e.target.value || null)
                     }
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                     aria-invalid={!!errors.tenggat_jam}
                     className={errors.tenggat_jam ? "border-destructive" : ""}
                   />
@@ -424,7 +486,7 @@ export function TugasFormDialog({
                     hint="PDF, DOCX, PPTX, XLSX, ZIP (maks. 20MB per file)"
                     accept={ALLOWED_TUGAS_FILE_EXTENSIONS}
                     multiple
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                     onFiles={handleFileUpload}
                   />
                   {form.lampiran.length > 0 && (
@@ -450,7 +512,7 @@ export function TugasFormDialog({
                             variant="ghost"
                             size="icon-sm"
                             onClick={() => removeLampiran(file.id)}
-                            disabled={isLoading}
+                            disabled={isLoading || isUploading}
                             aria-label={`Hapus ${file.nama}`}
                           >
                             <X className="h-4 w-4" />
@@ -482,7 +544,7 @@ export function TugasFormDialog({
                         Math.max(1, Number(e.target.value))
                       )
                     }
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                     aria-invalid={!!errors.nilai_maksimal}
                     className={
                       errors.nilai_maksimal ? "border-destructive" : ""
@@ -513,7 +575,7 @@ export function TugasFormDialog({
                           | "Ditutup"
                       )
                     }
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -536,20 +598,20 @@ export function TugasFormDialog({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={isLoading || isUploading}
               className="w-full sm:w-auto"
             >
               Batal
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isUploading}
               className="w-full sm:w-auto bg-primary hover:bg-primary/90"
             >
-              {isLoading ? (
+              {(isLoading || isUploading) ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Menyimpan...
+                  {isUploading ? "Mengunggah..." : "Menyimpan..."}
                 </>
               ) : editingItem ? (
                 "Simpan Perubahan"

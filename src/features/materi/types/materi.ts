@@ -3,6 +3,9 @@ export interface Lampiran {
   nama: string
   ukuran: string
   tipe: string
+  url?: string
+  storage_path?: string
+  file?: File // Used temporarily for frontend state before direct upload
 }
 
 export type JenisMateri =

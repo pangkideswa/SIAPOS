@@ -74,6 +74,8 @@ export function MateriFormDialog({
   const [form, setForm] = useState<MateriFormData>(EMPTY_MATERI_FORM)
   const [errors, setErrors] = useState<MateriFormErrors>({})
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
 
   useEffect(() => {
     if (editingItem) {
@@ -112,6 +114,7 @@ export function MateriFormDialog({
         setForm(EMPTY_MATERI_FORM)
       }
       setThumbnailPreview(null)
+      setThumbnailFile(null)
     }
     setErrors({})
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -170,7 +173,8 @@ export function MateriFormDialog({
     }
     const url = URL.createObjectURL(file)
     setThumbnailPreview(url)
-    handleChange("thumbnail_url", url)
+    setThumbnailFile(file)
+    // We don't set thumbnail_url in form state yet, it will be set after direct upload
   }
 
   function handleFileUpload(files: FileList) {
@@ -185,14 +189,19 @@ export function MateriFormDialog({
       return
     }
 
-    const newLampiran: Lampiran[] = Array.from(files).map((file, idx) => ({
+    const newFiles = Array.from(files)
+    const newLampirans: Lampiran[] = newFiles.map((file, idx) => ({
       id: Date.now() + idx,
       nama: file.name,
       ukuran: formatFileSize(file.size),
       tipe: file.type,
+      file: file // Save the raw file for upload on submit
     }))
-
-    handleChange("lampiran", [...form.lampiran, ...newLampiran])
+    
+    setForm((prev) => ({
+      ...prev,
+      lampiran: [...prev.lampiran, ...newLampirans],
+    }))
   }
 
   function removeLampiran(id: number) {
@@ -204,6 +213,7 @@ export function MateriFormDialog({
 
   function removeThumbnail() {
     setThumbnailPreview(null)
+    setThumbnailFile(null)
     handleChange("thumbnail_url", null)
   }
 
@@ -249,17 +259,84 @@ export function MateriFormDialog({
     return true
   }
 
+  async function uploadFileDirectly(file: File, materialId?: number): Promise<string> {
+     // Request upload URL
+     const res = await fetch('/api/materials/upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+           filename: file.name,
+           contentType: file.type,
+           size: file.size,
+           kelas_mengajar_id: form.kelas_mengajar_id,
+           materialId: materialId || undefined
+        })
+     })
+     
+     if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || `Gagal mendapatkan url upload untuk ${file.name}`)
+     }
+     
+     const { uploadUrl, storagePath } = await res.json()
+     
+     // Direct PUT to Supabase
+     const uploadRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: {
+           'Content-Type': file.type,
+        },
+        body: file
+     })
+     
+     if (!uploadRes.ok) {
+        throw new Error(`Gagal mengupload ${file.name}`)
+     }
+     
+     return storagePath
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!validate()) return
-    await onSubmit(form)
+    
+    setIsUploading(true)
+    const payload = { ...form }
+    
+    try {
+      // 1. Upload Thumbnail
+      if (thumbnailFile) {
+         payload.thumbnail_url = await uploadFileDirectly(thumbnailFile, editingItem?.id)
+      }
+
+      // 2. Upload Lampirans
+      payload.lampiran = await Promise.all(
+         payload.lampiran.map(async (lamp) => {
+            if (lamp.file) {
+               const storage_path = await uploadFileDirectly(lamp.file, editingItem?.id)
+               const { file: _file, ...lampWithoutFile } = lamp
+               return { ...lampWithoutFile, storage_path }
+            }
+            return lamp
+         })
+      )
+      
+      await onSubmit(payload)
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Terjadi kesalahan yang tidak diketahui"
+      toast.error("Upload gagal", {
+         description: msg
+      })
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   return (
     <ResponsiveDialog
       open={open}
       onOpenChange={(next) => {
-        if (!isLoading) onOpenChange(next)
+        if (!isLoading && !isUploading) onOpenChange(next)
       }}
     >
       <ResponsiveDialogContent className="sm:max-w-2xl">
@@ -291,7 +368,7 @@ export function MateriFormDialog({
                     placeholder="Contoh: Pengenalan Jaringan Komputer"
                     value={form.judul}
                     onChange={(e) => handleChange("judul", e.target.value)}
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                     aria-invalid={!!errors.judul}
                     className={errors.judul ? "border-destructive" : ""}
                   />
@@ -315,7 +392,7 @@ export function MateriFormDialog({
                             : Math.max(1, Number(e.target.value))
                         )
                       }
-                      disabled={isLoading}
+                      disabled={isLoading || isUploading}
                       aria-invalid={!!errors.pertemuan}
                       className={errors.pertemuan ? "border-destructive" : ""}
                     />
@@ -331,7 +408,7 @@ export function MateriFormDialog({
                           (v ?? "Lainnya") as JenisMateri
                         )
                       }
-                      disabled={isLoading}
+                      disabled={isLoading || isUploading}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Pilih jenis materi" />
@@ -359,7 +436,7 @@ export function MateriFormDialog({
                         : ""
                     }
                     onValueChange={handleKelasMengajarSelect}
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                   >
                     <SelectTrigger
                       className={
@@ -413,7 +490,7 @@ export function MateriFormDialog({
                     placeholder="Deskripsi singkat tentang materi ini..."
                     value={form.deskripsi}
                     onChange={(e) => handleChange("deskripsi", e.target.value)}
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                     rows={3}
                   />
                 </div>
@@ -424,7 +501,7 @@ export function MateriFormDialog({
                     placeholder="Tuliskan konten materi pembelajaran di sini. Gunakan HTML untuk formatting: <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>."
                     value={form.isi_materi}
                     onChange={(e) => handleChange("isi_materi", e.target.value)}
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                     rows={6}
                     className="font-mono text-sm"
                   />
@@ -463,7 +540,7 @@ export function MateriFormDialog({
                         size="icon-sm"
                         className="absolute top-2 right-2"
                         onClick={removeThumbnail}
-                        disabled={isLoading}
+                        disabled={isLoading || isUploading}
                         aria-label="Hapus thumbnail"
                       >
                         <X className="h-4 w-4" />
@@ -476,7 +553,7 @@ export function MateriFormDialog({
                         hint="JPG, PNG (maks. 2MB)"
                         accept="image/jpeg,image/png"
                         multiple={false}
-                        disabled={isLoading}
+                        disabled={isLoading || isUploading}
                         onFiles={handleThumbnailUpload}
                       />
                       <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -494,7 +571,7 @@ export function MateriFormDialog({
                     hint="PDF, DOCX, PPTX, JPG, PNG (maks. 20MB per file)"
                     accept={ALLOWED_FILE_EXTENSIONS}
                     multiple
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                     onFiles={handleFileUpload}
                   />
                   {form.lampiran.length > 0 && (
@@ -520,7 +597,7 @@ export function MateriFormDialog({
                             variant="ghost"
                             size="icon-sm"
                             onClick={() => removeLampiran(file.id)}
-                            disabled={isLoading}
+                            disabled={isLoading || isUploading}
                             aria-label={`Hapus ${file.nama}`}
                           >
                             <X className="h-4 w-4" />
@@ -542,7 +619,7 @@ export function MateriFormDialog({
                       onChange={(e) =>
                         handleChange("video_url", e.target.value || null)
                       }
-                      disabled={isLoading}
+                      disabled={isLoading || isUploading}
                       aria-invalid={!!errors.video_url}
                       className={cn(
                         "pl-9",
@@ -564,7 +641,7 @@ export function MateriFormDialog({
                       onChange={(e) =>
                         handleChange("link_drive", e.target.value || null)
                       }
-                      disabled={isLoading}
+                      disabled={isLoading || isUploading}
                       aria-invalid={!!errors.link_drive}
                       className={cn(
                         "pl-9",
@@ -586,7 +663,7 @@ export function MateriFormDialog({
                       onChange={(e) =>
                         handleChange("link_eksternal", e.target.value || null)
                       }
-                      disabled={isLoading}
+                      disabled={isLoading || isUploading}
                       aria-invalid={!!errors.link_eksternal}
                       className={cn(
                         "pl-9",
@@ -616,7 +693,7 @@ export function MateriFormDialog({
                         (v ?? "Draft") as "Draft" | "Publish"
                       )
                     }
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -639,20 +716,20 @@ export function MateriFormDialog({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={isLoading || isUploading}
               className="w-full sm:w-auto"
             >
               Batal
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isUploading}
               className="w-full sm:w-auto bg-primary hover:bg-primary/90"
             >
-              {isLoading ? (
+              {(isLoading || isUploading) ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Menyimpan...
+                  {isUploading ? "Mengunggah..." : "Menyimpan..."}
                 </>
               ) : editingItem ? (
                 "Simpan Perubahan"

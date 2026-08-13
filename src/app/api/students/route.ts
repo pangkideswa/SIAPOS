@@ -69,10 +69,28 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin()
-    const body = parseWithSchema(studentSchema, await request.json())
-    const student = await studentService.create(body as unknown as SiswaFormData)
-    return created(student, "Siswa berhasil ditambahkan")
-  } catch (error) {
-    return apiError(error, 422)
+    const body = parseWithSchema(studentSchema, await request.json()) as unknown as SiswaFormData
+    
+    if (body.foto && !body.foto.startsWith('http')) {
+      const { assertValidAvatarPath } = await import("@/lib/storage/path-validator")
+      if (!assertValidAvatarPath(body.foto, 'students')) {
+         return apiError(new Error("Invalid avatar storage path"), 400)
+      }
+    }
+
+    try {
+      const student = await studentService.create(body)
+      return created(student, "Siswa berhasil ditambahkan")
+    } catch (dbError) {
+      if (body.foto && !body.foto.startsWith('http')) {
+         const { deleteAvatarIfFromStorage } = await import("@/lib/storage/avatar-helper")
+         const { BUCKETS } = await import("@/lib/storage/supabase-server")
+         await deleteAvatarIfFromStorage(body.foto, BUCKETS.AVATARS)
+      }
+      throw dbError
+    }
+  } catch (error: unknown) {
+    const msg = error instanceof Error && error.message.includes("exceeds") ? error.message : undefined
+    return apiError(msg ? new Error(msg) : error, 422)
   }
 }

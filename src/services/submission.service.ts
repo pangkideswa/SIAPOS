@@ -114,6 +114,19 @@ export const submissionService = {
     return row ? toPengumpulan(row) : null
   },
 
+  async resubmit(
+    id: number,
+    data: PengumpulanTugasFormData
+  ): Promise<PengumpulanTugas> {
+    const row = await submissionRepository.update(id, {
+      file_jawaban: data.file_jawaban as unknown as Prisma.InputJsonValue,
+      catatan: data.catatan || null,
+      waktu_pengumpulan: new Date(),
+      status: "SUBMITTED"
+    })
+    return toPengumpulan(row!)
+  },
+
   async remove(id: number): Promise<boolean> {
     await submissionRepository.delete(id)
     return true

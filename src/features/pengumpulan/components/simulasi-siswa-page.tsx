@@ -58,6 +58,7 @@ export function SimulasiSiswaPage() {
   const [selectedTugas, setSelectedTugas] = useState<Tugas | null>(null)
   const [file, setFile] = useState<PengumpulanFile | null>(null)
   const [catatan, setCatatan] = useState("")
+  const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const {
@@ -140,6 +141,7 @@ export function SimulasiSiswaPage() {
             ? (f.size / 1024).toFixed(0) + " KB"
             : (f.size / (1024 * 1024)).toFixed(1) + " MB",
       tipe: f.type,
+      file: f,
     })
     if (fileInputRef.current) fileInputRef.current.value = ""
   }
@@ -166,18 +168,70 @@ export function SimulasiSiswaPage() {
       return
     }
 
-    await createSubmission.mutateAsync({
-      assignment_id: selectedTugas.id,
-      student_id: currentStudent.id,
-      data: {
-        file_jawaban: file ? { ...file } : null,
-        catatan: catatan.trim() || null,
-      },
-    })
+    setIsUploading(true)
+    try {
+      if (!file.file) {
+         throw new Error("File tidak ditemukan")
+      }
 
-    setFile(null)
-    setCatatan("")
-    setSelectedTugas(null)
+      // 1. Get upload URL
+      const uploadUrlRes = await fetch("/api/submissions/upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          assignment_id: selectedTugas.id,
+          filename: file.file.name,
+          contentType: file.file.type,
+          size: file.file.size
+        })
+      })
+
+      if (!uploadUrlRes.ok) {
+         const err = await uploadUrlRes.json()
+         throw new Error(err.message || "Gagal mendapatkan URL upload")
+      }
+      
+      const { uploadUrl, storagePath } = await uploadUrlRes.json()
+
+      // 2. Upload to Supabase Storage
+      const uploadRes = await fetch(uploadUrl, {
+         method: "PUT",
+         body: file.file,
+         headers: {
+            "Content-Type": file.file.type
+         }
+      })
+
+      if (!uploadRes.ok) {
+         throw new Error("Gagal mengunggah file ke server penyimpanan")
+      }
+
+      // 3. Save to DB
+      await createSubmission.mutateAsync({
+        assignment_id: selectedTugas.id,
+        student_id: currentStudent.id,
+        data: {
+          file_jawaban: {
+             nama: file.nama,
+             ukuran: file.ukuran,
+             tipe: file.tipe,
+             storage_path: storagePath
+          },
+          catatan: catatan.trim() || null,
+        },
+      })
+
+      setFile(null)
+      setCatatan("")
+      setSelectedTugas(null)
+      toast.success("Tugas berhasil dikirim")
+    } catch (error) {
+      toast.error("Gagal mengirim tugas", {
+        description: error instanceof Error ? error.message : "Terjadi kesalahan",
+      })
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   if (selectedTugas) {
@@ -230,9 +284,22 @@ export function SimulasiSiswaPage() {
               )}
               {existing && (
                 <div className="p-3 rounded-lg bg-green-50 border border-green-200">
-                  <div className="flex items-center gap-2 text-sm text-green-700">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span className="font-medium">Sudah mengumpulkan</span>
+                  <div className="flex items-center justify-between">
+                     <div className="flex items-center gap-2 text-sm text-green-700">
+                       <CheckCircle2 className="h-4 w-4" />
+                       <span className="font-medium">Sudah mengumpulkan</span>
+                     </div>
+                     {existing.file_jawaban?.storage_path && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-8 text-xs bg-white text-green-700 border-green-200 hover:bg-green-100"
+                          onClick={() => window.open(`/api/submissions/${existing.id}/download?path=${encodeURIComponent(existing.file_jawaban!.storage_path!)}`, "_blank")}
+                        >
+                          <FileText className="h-3 w-3 mr-1" />
+                          Unduh
+                        </Button>
+                     )}
                   </div>
                   <p className="text-xs text-green-600 mt-1">
                     {existing.waktu_pengumpulan &&
@@ -316,18 +383,18 @@ export function SimulasiSiswaPage() {
               {/* Submit */}
               <Button
                 onClick={handleSubmit}
-                disabled={createSubmission.isPending || deadline || !file}
+                disabled={createSubmission.isPending || isUploading || deadline || !file}
                 className="w-full bg-primary hover:bg-primary/90"
               >
-                {createSubmission.isPending ? (
+                {createSubmission.isPending || isUploading ? (
                   <>
                     <Clock className="mr-2 h-4 w-4 animate-spin" />
-                    Mengirim...
+                    {isUploading ? "Mengunggah..." : "Menyimpan..."}
                   </>
                 ) : (
                   <>
                     <Send className="mr-2 h-4 w-4" />
-                    Kirim Tugas
+                    {existing ? "Kirim Ulang Tugas" : "Kirim Tugas"}
                   </>
                 )}
               </Button>
@@ -413,17 +480,13 @@ export function SimulasiSiswaPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      {submission ? (
+                      {submission && (
                         <Badge className="bg-green-100 text-green-800">
                           <CheckCircle2 className="mr-1 h-3 w-3" />
                           Sudah Dikirim
                         </Badge>
-                      ) : deadline ? (
-                        <Badge className="bg-red-100 text-red-800">
-                          <AlertCircle className="mr-1 h-3 w-3" />
-                          Deadline Lewat
-                        </Badge>
-                      ) : (
+                      )}
+                      {!deadline && (
                         <Button
                           size="sm"
                           className="bg-primary hover:bg-primary/90"
@@ -433,8 +496,14 @@ export function SimulasiSiswaPage() {
                           }}
                         >
                           <Send className="mr-2 h-4 w-4" />
-                          Kirim Tugas
+                          {submission ? "Edit Tugas" : "Kirim Tugas"}
                         </Button>
+                      )}
+                      {deadline && !submission && (
+                        <Badge className="bg-red-100 text-red-800">
+                          <AlertCircle className="mr-1 h-3 w-3" />
+                          Deadline Lewat
+                        </Badge>
                       )}
                     </div>
                   </div>

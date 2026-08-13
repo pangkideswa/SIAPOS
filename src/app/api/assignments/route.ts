@@ -1,6 +1,7 @@
 import "server-only"
 import { NextRequest } from "next/server"
 import { assignmentService } from "@/services/assignment.service"
+import type { TugasLampiran } from "@/features/tugas/types/tugas"
 import { ok, created, apiError, parseWithSchema } from "@/lib/api-utils"
 import { assignmentSchema } from "@/lib/validations/assignment.schemas"
 import {
@@ -38,10 +39,35 @@ export async function POST(request: NextRequest) {
     const user = await requireApiUser("super_admin", "admin", "guru")
     const body = parseWithSchema(assignmentSchema, await request.json())
     await assertTeachingClassAccess(user, body.kelas_mengajar_id)
-    const assignment = await assignmentService.create(
-      body as unknown as TugasFormData
-    )
-    return created(assignment, "Tugas berhasil ditambahkan")
+    
+    // Validate storage paths
+    if (body.lampiran && Array.isArray(body.lampiran)) {
+       for (const lamp of (body.lampiran as unknown as TugasLampiran[])) {
+          if (lamp.storage_path) {
+             if (!lamp.storage_path.startsWith('assignments/temp-')) {
+                return apiError(new Error(`Invalid storage path for ${lamp.nama}. Must use a temporary namespace for new assignments.`), 400)
+             }
+          }
+       }
+    }
+    
+    try {
+      const assignment = await assignmentService.create(
+        body as unknown as TugasFormData
+      )
+      return created(assignment, "Tugas berhasil ditambahkan")
+    } catch (dbError) {
+      // Orphan cleanup on DB failure
+      if (body.lampiran && Array.isArray(body.lampiran)) {
+         const { deleteAssignmentFileIfStorage } = await import("@/lib/storage/assignment-helper")
+         for (const lamp of (body.lampiran as unknown as TugasLampiran[])) {
+            if (lamp.storage_path) {
+               await deleteAssignmentFileIfStorage(lamp.storage_path)
+            }
+         }
+      }
+      throw dbError
+    }
   } catch (error) {
     return apiError(error, 422)
   }

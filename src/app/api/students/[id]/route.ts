@@ -29,14 +29,40 @@ export async function PUT(
   try {
     await requireAdmin()
     const { id } = await context.params
-    const body = parseWithSchema(studentSchema, await request.json())
-    const student = await studentService.update(
-      Number(id),
-      body as unknown as SiswaFormData
-    )
-    return ok(student, "Siswa berhasil diperbarui")
-  } catch (error) {
-    return apiError(error)
+    const body = parseWithSchema(studentSchema, await request.json()) as unknown as SiswaFormData
+    
+    const oldStudent = await studentService.getById(Number(id))
+    
+    if (body.foto && !body.foto.startsWith('http') && body.foto !== oldStudent?.foto) {
+      const { assertValidAvatarPath } = await import("@/lib/storage/path-validator")
+      if (!assertValidAvatarPath(body.foto, 'students', Number(id))) {
+         return apiError(new Error("Invalid avatar storage path. Namespace mismatch."), 400)
+      }
+    }
+
+    try {
+      const student = await studentService.update(
+        Number(id),
+        body
+      )
+      
+      if (body.foto !== oldStudent?.foto && oldStudent?.foto) {
+        const { deleteAvatarIfFromStorage } = await import("@/lib/storage/avatar-helper")
+        const { BUCKETS } = await import("@/lib/storage/supabase-server")
+        await deleteAvatarIfFromStorage(oldStudent.foto, BUCKETS.AVATARS)
+      }
+      return ok(student, "Siswa berhasil diperbarui")
+    } catch (dbError) {
+      if (body.foto && !body.foto.startsWith('http') && body.foto !== oldStudent?.foto) {
+        const { deleteAvatarIfFromStorage } = await import("@/lib/storage/avatar-helper")
+        const { BUCKETS } = await import("@/lib/storage/supabase-server")
+        await deleteAvatarIfFromStorage(body.foto, BUCKETS.AVATARS)
+      }
+      throw dbError
+    }
+  } catch (error: unknown) {
+    const msg = error instanceof Error && error.message.includes("exceeds") ? error.message : undefined
+    return apiError(msg ? new Error(msg) : error)
   }
 }
 
@@ -47,6 +73,16 @@ export async function DELETE(
   try {
     await requireAdmin()
     const { id } = await context.params
+    
+    // --- PHASE 3: CLEANUP AVATAR ---
+    const oldStudent = await studentService.getById(Number(id))
+    if (oldStudent?.foto) {
+      const { deleteAvatarIfFromStorage } = await import("@/lib/storage/avatar-helper")
+      const { BUCKETS } = await import("@/lib/storage/supabase-server")
+      await deleteAvatarIfFromStorage(oldStudent.foto, BUCKETS.AVATARS)
+    }
+    // -------------------------------
+
     await studentService.remove(Number(id))
     return ok(true, "Siswa berhasil dihapus")
   } catch (error) {

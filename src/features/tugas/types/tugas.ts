@@ -3,6 +3,9 @@ export interface TugasLampiran {
   nama: string
   ukuran: string
   tipe: string
+  storage_path?: string
+  url?: string
+  file?: File // Frontend only
 }
 
 export interface Tugas {

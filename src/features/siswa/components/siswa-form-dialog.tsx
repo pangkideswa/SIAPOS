@@ -54,6 +54,7 @@ export function SiswaFormDialog({
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [fotoPreview, setFotoPreview] = useState<string | null>(null)
+  const [fileToUpload, setFileToUpload] = useState<File | null>(null)
 
   const { data: classesData, isLoading: classesLoading } = useClasses()
   const classrooms = useMemo(() => classesData?.data ?? [], [classesData])
@@ -89,9 +90,11 @@ export function SiswaFormDialog({
         alamat_ortu: editingSiswa.alamat_ortu ?? "",
       })
       setFotoPreview(editingSiswa.foto)
+      setFileToUpload(null)
     } else {
       setForm(EMPTY_SISWA_FORM)
       setFotoPreview(null)
+      setFileToUpload(null)
     }
     setErrors({})
   }, [editingSiswa, open, classrooms, classesLoading])
@@ -136,11 +139,14 @@ export function SiswaFormDialog({
   function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+         alert("Ukuran maksimal 2MB")
+         return
+      }
+      setFileToUpload(file)
       const reader = new FileReader()
       reader.onloadend = () => {
-        const result = reader.result as string
-        setFotoPreview(result)
-        setForm((prev) => ({ ...prev, foto: result }))
+        setFotoPreview(reader.result as string)
       }
       reader.readAsDataURL(file)
     }
@@ -148,6 +154,7 @@ export function SiswaFormDialog({
 
   function handleRemoveFoto() {
     setFotoPreview(null)
+    setFileToUpload(null)
     setForm((prev) => ({ ...prev, foto: null }))
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
@@ -162,8 +169,40 @@ export function SiswaFormDialog({
     }
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
+    
+    let submitForm = { ...form }
+    
+    if (fileToUpload) {
+       try {
+         const res = await fetch('/api/students/avatar/upload-url', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+             filename: fileToUpload.name,
+             contentType: fileToUpload.type,
+             size: fileToUpload.size,
+             studentId: editingSiswa?.id
+           })
+         })
+         if (!res.ok) throw new Error("Gagal upload foto")
+         const { data } = await res.json()
+         
+         const uploadRes = await fetch(data.uploadUrl, {
+           method: 'PUT',
+           headers: { 'Content-Type': fileToUpload.type },
+           body: fileToUpload
+         })
+         if (!uploadRes.ok) throw new Error("Gagal mengunggah ke storage")
+         
+         submitForm = { ...form, foto: data.storagePath }
+       } catch (err) {
+         setErrors({ foto: ["Gagal mengunggah foto profil"] })
+         return
+       }
+    }
+    
     try {
-      await onSubmit(form)
+      await onSubmit(submitForm)
     } catch (err: unknown) {
       const apiErr = err as {
         response?: { data?: { errors?: Record<string, string[]> } }

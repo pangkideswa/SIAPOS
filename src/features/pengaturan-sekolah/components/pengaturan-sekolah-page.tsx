@@ -54,18 +54,41 @@ function ImageUpload({
   aspect?: string
   sizeClass?: string
 }) {
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
     if (file.size > 2 * 1024 * 1024) {
       alert("Ukuran gambar maksimal 2MB")
       return
     }
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      onUpload(reader.result as string)
+    
+    try {
+      const res = await fetch('/api/settings/upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filename: file.name,
+          contentType: file.type,
+          size: file.size,
+          settingKey: label === 'Logo Sekolah' ? 'logo_sekolah' : 'favicon'
+        })
+      })
+      if (!res.ok) throw new Error("Gagal mendapatkan upload URL")
+      
+      const { data } = await res.json()
+      
+      const uploadRes = await fetch(data.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file
+      })
+      if (!uploadRes.ok) throw new Error("Gagal mengunggah gambar")
+      
+      onUpload(data.publicUrl)
+    } catch (error) {
+      console.error(error)
+      alert("Terjadi kesalahan saat mengunggah gambar")
     }
-    reader.readAsDataURL(file)
   }
 
   if (currentImage) {

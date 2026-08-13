@@ -27,7 +27,8 @@ import {
   useUpdateAssignment,
   useRemoveAssignment,
 } from "@/hooks/use-assignments"
-import type { TugasFormData } from "@/features/tugas/types/tugas"
+import type { TugasFormData, TugasLampiran } from "@/features/tugas/types/tugas"
+import { toast } from "sonner"
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -106,6 +107,15 @@ export function TugasDetailPage({
       },
       onSettled: () => setIsLoading(false),
     })
+  }
+
+  function handleDownload(file: TugasLampiran) {
+    if (!tugas) return
+    if (!file.storage_path) {
+      toast.error("File tidak memiliki path penyimpanan")
+      return
+    }
+    window.open(`/api/assignments/${tugas.id}/download?path=${encodeURIComponent(file.storage_path)}`, "_blank")
   }
 
   if (isDetailLoading) {
@@ -285,7 +295,12 @@ export function TugasDetailPage({
                           </p>
                         </div>
                       </div>
-                      <Button variant="ghost" size="icon-sm">
+                      <Button 
+                         variant="ghost" 
+                         size="icon-sm"
+                         onClick={() => handleDownload(file)}
+                         title="Unduh File"
+                      >
                         <Download className="h-4 w-4" />
                       </Button>
                     </div>

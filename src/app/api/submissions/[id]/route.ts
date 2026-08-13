@@ -52,7 +52,23 @@ export async function DELETE(
     const user = await requireApiUser("super_admin", "admin", "siswa")
     const { id } = await context.params
     await assertSubmissionAccess(user, Number(id))
+    const submission = await submissionService.getById(Number(id))
+    if (!submission) return notFound("Pengumpulan tidak ditemukan")
+    
+    const storagePath = submission.file_jawaban?.storage_path
+
     await submissionService.remove(Number(id))
+    
+    // Cleanup file from storage
+    if (storagePath) {
+       try {
+          const { deleteSubmissionFileIfStorage } = await import("@/lib/storage/submission-helper")
+          await deleteSubmissionFileIfStorage(storagePath)
+       } catch (e) {
+          console.error("Failed to delete submission file from storage:", e)
+       }
+    }
+
     return ok(true, "Pengumpulan berhasil dihapus")
   } catch (error) {
     return apiError(error)
