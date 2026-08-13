@@ -27,9 +27,24 @@ const secret =
       })()
     : "dev-secret-change-me-in-production")
 
+const useSecureCookies = process.env.NODE_ENV === "production"
+const cookiePrefix = useSecureCookies ? "__Secure-" : ""
+
 export const authConfig = {
   secret,
   trustHost: true,
+  useSecureCookies,
+  cookies: {
+    sessionToken: {
+      name: `${cookiePrefix}authjs.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+      },
+    },
+  },
   providers: [],
   session: {
     strategy: "jwt",
