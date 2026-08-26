@@ -237,7 +237,8 @@ export function TugasFormDialog({
         throw new Error(errorData.error || `Gagal mendapatkan url upload untuk ${file.name}`)
      }
      
-     const { uploadUrl, storagePath } = await res.json()
+     const responseData = await res.json()
+     const { uploadUrl, storagePath } = responseData.data || responseData
      
      const uploadRes = await fetch(uploadUrl, {
         method: 'PUT',

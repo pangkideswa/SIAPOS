@@ -278,7 +278,8 @@ export function MateriFormDialog({
         throw new Error(errorData.error || `Gagal mendapatkan url upload untuk ${file.name}`)
      }
      
-     const { uploadUrl, storagePath } = await res.json()
+     const responseData = await res.json()
+     const { uploadUrl, storagePath } = responseData.data || responseData
      
      // Direct PUT to Supabase
      const uploadRes = await fetch(uploadUrl, {
