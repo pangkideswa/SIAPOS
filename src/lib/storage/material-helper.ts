@@ -4,7 +4,7 @@ export function extractMaterialStoragePath(urlOrPath: string): string | null {
   if (urlOrPath.includes(`/storage/v1/object/public/materials/`)) {
     return urlOrPath.split(`/storage/v1/object/public/materials/`)[1]
   }
-  if (!urlOrPath.startsWith("http") && urlOrPath.includes("/")) {
+  if (!urlOrPath.startsWith("http")) {
      return urlOrPath
   }
   return null

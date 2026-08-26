@@ -28,6 +28,7 @@ export async function GET(
     
     let targetPath: string | null = null
     let fallbackUrl: string | null = null
+    let lampiranData: any = null
 
     if (type === "thumbnail") {
        if (!material.thumbnail_url) return notFound("Thumbnail tidak ada")
@@ -38,6 +39,7 @@ export async function GET(
        const lampiran = material.lampiran.find(l => l.id === Number(lampiranId))
        if (!lampiran) return notFound("Lampiran tidak ditemukan")
        
+       lampiranData = lampiran
        targetPath = lampiran.storage_path || (lampiran.url ? extractMaterialStoragePath(lampiran.url) : null)
        fallbackUrl = lampiran.url || null
     }
@@ -46,7 +48,7 @@ export async function GET(
       if (fallbackUrl && fallbackUrl.startsWith("http")) {
          return NextResponse.redirect(fallbackUrl)
       }
-      return notFound("Storage path tidak ditemukan atau file tidak kompatibel")
+      return notFound(`Storage path tidak ditemukan atau file tidak kompatibel. Lampiran: ${JSON.stringify(lampiranData)}`)
     }
     
     // Generate signed URL (expires in 1 hour)
