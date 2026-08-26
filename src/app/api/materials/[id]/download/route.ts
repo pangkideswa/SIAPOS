@@ -28,7 +28,7 @@ export async function GET(
     
     let targetPath: string | null = null
     let fallbackUrl: string | null = null
-    let lampiranData: any = null
+    let lampiranData: unknown = null
 
     if (type === "thumbnail") {
        if (!material.thumbnail_url) return notFound("Thumbnail tidak ada")
