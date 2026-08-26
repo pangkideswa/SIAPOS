@@ -131,7 +131,11 @@ export function MateriViewDialog({
                       </p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon-sm">
+                  <Button 
+                    variant="ghost" 
+                    size="icon-sm"
+                    onClick={() => window.open(`/api/materials/${materi.id}/download?lampiranId=${file.id}`, "_blank")}
+                  >
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>
