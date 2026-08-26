@@ -121,28 +121,67 @@ export function SiswaKelasTugasTab({
         nama: file.name,
         ukuran: formatFileSize(file.size),
         tipe: file.type,
+        file: file,
       },
     }))
   }
 
   async function handleUpload(tugas: Tugas) {
-    const file = selectedFiles[tugas.id]
-    if (!file) {
+    const fileMeta = selectedFiles[tugas.id]
+    if (!fileMeta || !fileMeta.file) {
       toast.error("Pilih file terlebih dahulu")
       return
     }
     setUploadingId(tugas.id)
     try {
+      // 1. Get upload URL
+      const uploadUrlRes = await fetch("/api/submissions/upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          assignment_id: tugas.id,
+          filename: fileMeta.file.name,
+          contentType: fileMeta.file.type,
+          size: fileMeta.file.size
+        })
+      })
+
+      if (!uploadUrlRes.ok) {
+         const err = await uploadUrlRes.json()
+         throw new Error(err.message || "Gagal mendapatkan URL upload")
+      }
+      
+      const { uploadUrl, storagePath } = await uploadUrlRes.json()
+
+      // 2. Upload to Supabase Storage
+      const uploadRes = await fetch(uploadUrl, {
+         method: "PUT",
+         body: fileMeta.file,
+         headers: {
+            "Content-Type": fileMeta.file.type
+         }
+      })
+
+      if (!uploadRes.ok) {
+         throw new Error("Gagal mengunggah file ke server penyimpanan")
+      }
+
+      // 3. Save to DB
+      const { file: rawFile, ...fileMetaWithoutFile } = fileMeta
       await createSubmission.mutateAsync({
         assignment_id: tugas.id,
         student_id: siswa.id,
         data: {
-          file_jawaban: { ...file },
+          file_jawaban: { ...fileMetaWithoutFile, storage_path: storagePath },
           catatan: catatans[tugas.id] || null,
         },
       })
       setSelectedFiles((prev) => ({ ...prev, [tugas.id]: null }))
       setCatatans((prev) => ({ ...prev, [tugas.id]: "" }))
+    } catch (error) {
+      toast.error("Gagal mengirim tugas", {
+        description: error instanceof Error ? error.message : "Terjadi kesalahan",
+      })
     } finally {
       setUploadingId(null)
     }
