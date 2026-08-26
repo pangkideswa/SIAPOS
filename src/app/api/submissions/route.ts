@@ -1,6 +1,7 @@
 import "server-only"
 import { NextRequest } from "next/server"
 import { submissionService } from "@/services/submission.service"
+import { prisma } from "@/lib/prisma"
 import { ok, created, apiError, parseWithSchema } from "@/lib/api-utils"
 import { submissionCreateSchema } from "@/lib/validations/submission.schemas"
 import {
@@ -64,6 +65,26 @@ export async function POST(request: NextRequest) {
 
     const existingRows = await submissionService.getByAssignment(body.assignment_id)
     const existingSubmission = existingRows.find(r => r.siswa_id === effectiveStudentId)
+
+    // Check if graded but NOT allowed to resubmit
+    if (existingSubmission && existingSubmission.nilai !== null && !existingSubmission.allow_resubmit) {
+      return apiError(new Error("Tugas yang sudah dinilai tidak dapat diubah"), 400)
+    }
+    
+    // Check deadline
+    const assignment = await prisma.assignment.findUnique({
+      where: { id: body.assignment_id },
+      select: { tenggat_waktu: true, tenggat_jam: true }
+    })
+    
+    let isLate = false
+    if (assignment && assignment.tenggat_waktu) {
+      const deadlineDate = new Date(`${assignment.tenggat_waktu.toISOString().split("T")[0]}T${assignment.tenggat_jam || "23:59:59"}`)
+      if (new Date() > deadlineDate) {
+        isLate = true
+      }
+    }
+    const submissionStatus = isLate ? "LATE" : "SUBMITTED"
     
     let submission
     let oldStoragePath = null
@@ -73,13 +94,15 @@ export async function POST(request: NextRequest) {
         oldStoragePath = (existingSubmission.file_jawaban as unknown as PengumpulanFile)?.storage_path
         submission = await submissionService.resubmit(
           existingSubmission.id,
-          body.data! as unknown as PengumpulanTugasFormData
+          body.data! as unknown as PengumpulanTugasFormData,
+          submissionStatus
         )
       } else {
         submission = await submissionService.create(
           body.data! as unknown as PengumpulanTugasFormData,
           body.assignment_id,
-          effectiveStudentId
+          effectiveStudentId,
+          submissionStatus
         )
       }
     } catch (dbError) {

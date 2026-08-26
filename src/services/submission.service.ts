@@ -1,5 +1,5 @@
 import "server-only"
-import { Prisma } from "@/generated/prisma/client"
+import { Prisma, SubmissionStatus } from "@/generated/prisma/client"
 import { prisma } from "@/lib/prisma"
 import { submissionRepository, type SubmissionRow } from "@/repositories/submission.repository"
 import { notifikasiService } from "@/services/notifikasi.service"
@@ -23,6 +23,7 @@ function toPengumpulan(row: SubmissionRow): PengumpulanTugas {
     status: toSubmissionStatus(row.status),
     nilai: row.nilai,
     feedback: row.feedback,
+    allow_resubmit: row.allow_resubmit,
     riwayat_pengumpulan: [
       {
         id: row.id,
@@ -33,21 +34,6 @@ function toPengumpulan(row: SubmissionRow): PengumpulanTugas {
     ],
     created_at: row.created_at.toISOString(),
     updated_at: row.updated_at.toISOString(),
-  }
-}
-
-function toPengumpulanCreate(
-  data: PengumpulanTugasFormData,
-  assignmentId: number,
-  studentId: number
-) {
-  return {
-    assignment_id: assignmentId,
-    student_id: studentId,
-    file_jawaban: data.file_jawaban as unknown as Prisma.InputJsonValue,
-    catatan: data.catatan || null,
-    waktu_pengumpulan: new Date(),
-    status: "SUBMITTED" as const,
   }
 }
 
@@ -70,11 +56,17 @@ export const submissionService = {
   async create(
     data: PengumpulanTugasFormData,
     assignmentId: number,
-    studentId: number
+    studentId: number,
+    status: SubmissionStatus = "SUBMITTED"
   ): Promise<PengumpulanTugas> {
-    const row = await submissionRepository.create(
-      toPengumpulanCreate(data, assignmentId, studentId)
-    )
+    const row = await submissionRepository.create({
+      assignment_id: assignmentId,
+      student_id: studentId,
+      file_jawaban: data.file_jawaban as unknown as Prisma.InputJsonValue,
+      catatan: data.catatan || null,
+      waktu_pengumpulan: new Date(),
+      status: status
+    })
 
     try {
       const assignment = await prisma.assignment.findUnique({
@@ -105,24 +97,27 @@ export const submissionService = {
   async grade(
     id: number,
     nilai: number | null,
-    feedback?: string | null
+    feedback?: string | null,
+    allow_resubmit: boolean = false
   ): Promise<PengumpulanTugas | null> {
     const row = await submissionRepository.update(id, {
       nilai,
       feedback: feedback ?? null,
+      allow_resubmit,
     })
     return row ? toPengumpulan(row) : null
   },
 
   async resubmit(
     id: number,
-    data: PengumpulanTugasFormData
+    data: PengumpulanTugasFormData,
+    status: SubmissionStatus = "SUBMITTED"
   ): Promise<PengumpulanTugas> {
     const row = await submissionRepository.update(id, {
       file_jawaban: data.file_jawaban as unknown as Prisma.InputJsonValue,
       catatan: data.catatan || null,
       waktu_pengumpulan: new Date(),
-      status: "SUBMITTED"
+      status: status
     })
     return toPengumpulan(row!)
   },

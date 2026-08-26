@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import DOMPurify from "isomorphic-dompurify"
 import {
   Bold,
   Italic,
@@ -151,5 +152,5 @@ export function RichTextEditor({
 export function RichTextContent({ html }: { html: string }) {
   const isEmpty = html.replace(/<[^>]*>/g, "").trim().length === 0
   if (isEmpty) return <p className="text-sm text-muted-foreground italic">Tidak ada isi pengumuman.</p>
-  return <div className="rich-text-content text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: html }} />
+  return <div className="rich-text-content text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />
 }

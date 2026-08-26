@@ -1,16 +1,26 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import {
-  Bell,
-  CheckCheck,
-  BookOpen,
-  ClipboardList,
-  GraduationCap,
-  Megaphone,
-  Info,
-  type LucideIcon,
-} from "lucide-react"
+import React from "react"
+import { Bell, CheckCheck, BookOpen, ClipboardList, GraduationCap, Megaphone, Info, type LucideIcon } from "lucide-react"
+
+class BellErrorBoundary extends React.Component<{children: React.ReactNode}, {error: unknown}> {
+  constructor(props: {children: React.ReactNode}) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error: unknown) {
+    return { error };
+  }
+  render() {
+    if (this.state.error) {
+      const err = this.state.error as Error
+      return <div className="p-4 text-red-500 text-xs break-words">{String(err.stack || err)}</div>;
+    }
+    return this.props.children;
+  }
+}
+
 import { useAuth } from "@/contexts/auth-context"
 import { useNotifikasi } from "@/features/notifications/contexts/notifikasi-context"
 import { Button } from "@/components/ui/button"
@@ -19,7 +29,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -76,11 +85,12 @@ export function NotificationBell() {
           </Button>
         }
       />
-      <DropdownMenuContent align="end" className="w-80 max-w-[calc(100vw-2rem)] p-0">
-        <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-          <DropdownMenuLabel className="p-0 text-sm font-semibold text-foreground">
+      <DropdownMenuContent align="end" className="w-80 p-0 rounded-xl overflow-hidden shadow-xl border-border/50">
+        <BellErrorBoundary>
+        <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border-b border-border/50">
+          <div className="p-0 text-sm font-semibold text-foreground cursor-default">
             Notifikasi
-          </DropdownMenuLabel>
+          </div>
           {visibleUnreadCount > 0 && !isError && (
             <button
               onClick={handleMarkAllRead}
@@ -109,7 +119,8 @@ export function NotificationBell() {
             </div>
           )}
           {visible.map((n) => {
-            const meta = TIPE_ICON[n.tipe]
+            const tipeKey = (n.tipe?.toLowerCase() || "sistem") as NotifikasiTipe
+            const meta = TIPE_ICON[tipeKey] || TIPE_ICON.sistem
             const Icon = meta.icon
             return (
               <DropdownMenuItem
@@ -155,6 +166,7 @@ export function NotificationBell() {
             {visibleUnreadCount} belum dibaca
           </Badge>
         </div>
+        </BellErrorBoundary>
       </DropdownMenuContent>
     </DropdownMenu>
   )

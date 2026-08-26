@@ -5,6 +5,7 @@ export interface PenilaianUpdateData {
   nilai: number | null
   feedback?: string | null
   status_penilaian: Penilaian['status_penilaian']
+  allow_resubmit: boolean
 }
 
 export const penilaianService = {

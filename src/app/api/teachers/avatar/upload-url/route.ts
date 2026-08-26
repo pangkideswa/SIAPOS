@@ -11,7 +11,7 @@ const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireAdmin() // only admin can update teacher avatars
+    await requireAdmin() // only admin can update teacher avatars
     const body = await request.json()
     
     const { filename, contentType, size, teacherId } = body

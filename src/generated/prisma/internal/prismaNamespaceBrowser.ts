@@ -316,6 +316,7 @@ export const SubmissionScalarFieldEnum = {
   status: 'status',
   nilai: 'nilai',
   feedback: 'feedback',
+  allow_resubmit: 'allow_resubmit',
   created_at: 'created_at',
   updated_at: 'updated_at'
 } as const

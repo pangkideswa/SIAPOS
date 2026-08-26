@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import {
   ArrowLeft,
   User,
@@ -85,6 +86,7 @@ export function PenilaianDetailPage({
   const [nilai, setNilai] = useState<string>("")
   const [feedback, setFeedback] = useState<string>("")
   const [statusPenilaian, setStatusPenilaian] = useState<string>("")
+  const [allowResubmit, setAllowResubmit] = useState<boolean>(false)
   const [isSaving, setIsSaving] = useState(false)
   const [initialized, setInitialized] = useState(false)
 
@@ -103,6 +105,7 @@ export function PenilaianDetailPage({
     setNilai(penilaian.nilai !== null ? String(penilaian.nilai) : "")
     setFeedback(penilaian.feedback_guru)
     setStatusPenilaian(penilaian.status_penilaian)
+    setAllowResubmit(penilaian.allow_resubmit ?? false)
     setInitialized(true)
   }
 
@@ -129,6 +132,7 @@ export function PenilaianDetailPage({
           feedback: feedback,
           status_penilaian:
             statusPenilaian as Penilaian["status_penilaian"],
+          allow_resubmit: allowResubmit,
         },
       })
       router.push("/guru/penilaian")
@@ -385,6 +389,19 @@ export function PenilaianDetailPage({
                   </Select>
                 </div>
               </div>
+
+              {statusPenilaian === "Sudah Dinilai" && (
+                <div className="flex items-center space-x-2 pt-2">
+                  <Switch
+                    id="allow-resubmit"
+                    checked={allowResubmit}
+                    onCheckedChange={setAllowResubmit}
+                  />
+                  <Label htmlFor="allow-resubmit" className="font-normal">
+                    Izinkan siswa merevisi tugas ini
+                  </Label>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="feedback">Feedback Guru</Label>

@@ -37,4 +37,5 @@ export const gradeSubmissionSchema = z.object({
     .max(2000, "Feedback maksimal 2000 karakter")
     .nullable()
     .optional(),
+  allow_resubmit: z.boolean().default(false).optional(),
 })

@@ -11,7 +11,7 @@ const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireApiUser("super_admin", "admin")
+    await requireApiUser("super_admin", "admin")
     const body = await request.json()
     
     const { filename, contentType, size, settingKey } = body

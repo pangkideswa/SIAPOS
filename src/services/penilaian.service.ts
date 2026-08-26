@@ -36,6 +36,7 @@ function toPenilaian(row: SubmissionRow): Penilaian {
     nilai: row.nilai,
     feedback_guru: row.feedback ?? "",
     status_penilaian: toStatusPenilaian(row.nilai, row.feedback),
+    allow_resubmit: row.allow_resubmit,
     created_at: row.created_at.toISOString(),
     updated_at: row.updated_at.toISOString(),
   }
@@ -59,6 +60,7 @@ export const penilaianService = {
     const row = await submissionRepository.update(id, {
       nilai,
       feedback: data.feedback ?? null,
+      allow_resubmit: data.allow_resubmit ?? false,
     })
     if (!row) return null
 

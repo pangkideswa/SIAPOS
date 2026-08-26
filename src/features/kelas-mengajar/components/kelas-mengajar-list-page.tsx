@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback, useMemo } from "react"
+import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { Button } from "@/components/ui/button"
@@ -13,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Plus, Pencil, Trash2, Search } from "lucide-react"
+import { Plus, Pencil, Trash2, Search, ArrowRight } from "lucide-react"
 import { KelasMengajarFormDialog } from "./kelas-mengajar-form-dialog"
 import { KelasMengajarDeleteDialog } from "./kelas-mengajar-delete-dialog"
 import {
@@ -32,6 +33,7 @@ import { useClasses } from "@/hooks/use-classes"
 import type { KelasMengajar, KelasMengajarFormData } from "@/features/kelas-mengajar/types/kelas-mengajar"
 
 export function KelasMengajarListPage() {
+  const router = useRouter()
   const [search, setSearch] = useState("")
   const [guruFilter, setGuruFilter] = useState<string>("semua")
   const [kelasFilter, setKelasFilter] = useState<string>("semua")
@@ -167,6 +169,15 @@ export function KelasMengajarListPage() {
             }}
           >
             <Trash2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            title="Masuk Kelas"
+            onClick={() => router.push(`/admin/kelas-mengajar/${item.id}`)}
+          >
+            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       ),
@@ -309,6 +320,7 @@ export function KelasMengajarListPage() {
         columns={columns}
         data={items as unknown as Record<string, unknown>[]}
         loading={isTableLoading}
+        onRowClick={(item) => router.push(`/admin/kelas-mengajar/${item.id}`)}
         emptyMessage={
           isError
             ? "Gagal memuat data kelas mengajar"

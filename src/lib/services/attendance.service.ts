@@ -103,4 +103,9 @@ export const attendanceService = {
       body: JSON.stringify({ records }),
     })
   },
+  deleteSession: async (id: number) => {
+    return apiFetch<void>(`/api/attendance/${id}`, {
+      method: 'DELETE',
+    })
+  },
 }

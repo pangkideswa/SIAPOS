@@ -204,6 +204,7 @@ export function SiswaKelasTugasTab({
         const selectedFile = selectedFiles[tugas.id] ?? null
         const riwayat = mySubmission?.riwayat_pengumpulan ?? []
         const isSubmitting = uploadingId === tugas.id
+        const isGraded = mySubmission?.nilai !== null && !mySubmission?.allow_resubmit
 
         return (
           <Card key={tugas.id}>
@@ -339,12 +340,18 @@ export function SiswaKelasTugasTab({
                 </div>
               )}
 
-              <div className="rounded-lg border border-border p-4 space-y-3">
-                <p className="text-sm font-medium">
-                  {mySubmission?.file_jawaban
-                    ? "Ganti Jawaban (masih dapat dikumpulkan)"
-                    : "Kumpulkan Jawaban"}
-                </p>
+              {!isGraded ? (
+                <div className="rounded-lg border border-border p-4 space-y-3">
+                  {mySubmission?.allow_resubmit && (
+                    <div className="rounded-md bg-blue-50 border border-blue-200 p-2.5 text-blue-700 text-xs mb-2">
+                      Guru telah mengizinkan Anda untuk merevisi jawaban tugas ini.
+                    </div>
+                  )}
+                  <p className="text-sm font-medium">
+                    {mySubmission?.file_jawaban
+                      ? "Ganti Jawaban (masih dapat dikumpulkan)"
+                      : "Kumpulkan Jawaban"}
+                  </p>
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">
                     File Jawaban (PDF, DOC, DOCX, PPT, PPTX, ZIP)
@@ -384,24 +391,33 @@ export function SiswaKelasTugasTab({
                   />
                 </div>
               </div>
+              ) : (
+                <div className="rounded-lg border border-orange-200 bg-orange-50 p-4 text-center">
+                  <p className="text-sm font-medium text-orange-800">
+                    Tugas ini sudah dinilai. Anda tidak dapat mengubah jawaban lagi.
+                  </p>
+                </div>
+              )}
             </CardContent>
 
-            <CardFooter>
-              <Button
-                className="bg-primary hover:bg-primary/90 ml-auto"
-                disabled={!selectedFile || isSubmitting}
-                onClick={() => handleUpload(tugas)}
-              >
-                {isSubmitting ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Upload className="mr-2 h-4 w-4" />
-                )}
-                {mySubmission?.file_jawaban
-                  ? "Perbarui Jawaban"
-                  : "Kumpulkan"}
-              </Button>
-            </CardFooter>
+            {!isGraded && (
+              <CardFooter>
+                <Button
+                  className="bg-primary hover:bg-primary/90 ml-auto"
+                  disabled={!selectedFile || isSubmitting}
+                  onClick={() => handleUpload(tugas)}
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="mr-2 h-4 w-4" />
+                  )}
+                  {mySubmission?.file_jawaban
+                    ? "Perbarui Jawaban"
+                    : "Kumpulkan"}
+                </Button>
+              </CardFooter>
+            )}
           </Card>
         )
       })}

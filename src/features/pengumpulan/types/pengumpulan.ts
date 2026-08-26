@@ -26,6 +26,7 @@ export interface PengumpulanTugas {
   status: "Belum Mengumpulkan" | "Sudah Mengumpulkan" | "Terlambat"
   nilai: number | null
   feedback?: string | null
+  allow_resubmit?: boolean
   riwayat_pengumpulan?: PengumpulanRiwayat[]
   created_at: string
   updated_at: string

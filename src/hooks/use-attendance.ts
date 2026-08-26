@@ -135,3 +135,16 @@ export function useSaveAttendanceRecords(id: number) {
     onError: (err) => toast.error(getErrorMessage(err)),
   })
 }
+
+export function useDeleteAttendanceSession() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => attendanceService.deleteSession(id),
+    onSuccess: () => {
+      toast.success('Absensi berhasil dihapus!')
+      queryClient.invalidateQueries({ queryKey: ['attendance-sessions'] })
+      queryClient.invalidateQueries({ queryKey: ['attendance-rekap'] })
+    },
+    onError: (err) => toast.error(getErrorMessage(err)),
+  })
+}

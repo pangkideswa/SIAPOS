@@ -369,6 +369,7 @@ model Submission {
   status            SubmissionStatus @default(NOT_SUBMITTED)
   nilai             Int?
   feedback          String?
+  allow_resubmit    Boolean          @default(false)
   created_at        DateTime         @default(now())
   updated_at        DateTime         @updatedAt
 

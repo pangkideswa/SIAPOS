@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Search } from "lucide-react"
+import { Search, Trash2 } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
+import { Button } from "@/components/ui/button"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -18,7 +19,7 @@ import {
 import {
   STATUS_SESI_COLORS,
 } from "@/features/absensi/constants/absensi.constants"
-import { useAttendanceList } from "@/hooks/use-attendance"
+import { useAttendanceList, useDeleteAttendanceSession } from "@/hooks/use-attendance"
 import { useClasses } from "@/hooks/use-classes"
 import { useTeachers } from "@/hooks/use-teachers"
 import { useSubjects } from "@/hooks/use-subjects"
@@ -55,6 +56,7 @@ export function AdminAbsensiListPage() {
     isError,
     refetch,
   } = useAttendanceList()
+  const deleteMutation = useDeleteAttendanceSession()
 
   const { data: classesData } = useClasses({ per_page: 200 })
   const classes = useMemo(() => classesData?.data ?? [], [classesData])
@@ -156,6 +158,32 @@ export function AdminAbsensiListPage() {
         <Badge className={STATUS_SESI_COLORS[item.status] ?? ""}>
           {item.status}
         </Badge>
+      ),
+    },
+    {
+      key: "aksi",
+      header: "",
+      render: (item) => (
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            disabled={deleteMutation.isPending}
+            onClick={(e) => {
+              e.stopPropagation()
+              if (
+                window.confirm(
+                  "Apakah Anda yakin ingin menghapus sesi absensi ini beserta semua data di dalamnya?"
+                )
+              ) {
+                deleteMutation.mutate(item.id)
+              }
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       ),
     },
   ]

@@ -18,4 +18,5 @@ export const penilaianUpdateSchema = z.object({
     .nullable()
     .optional(),
   status_penilaian: penilaianStatusSchema.default("Belum Dinilai"),
+  allow_resubmit: z.boolean().default(false).optional(),
 })

@@ -11,6 +11,7 @@ export interface Penilaian {
   nilai: number | null
   feedback_guru: string
   status_penilaian: "Belum Dinilai" | "Sudah Dinilai" | "Revisi"
+  allow_resubmit: boolean
   created_at: string
   updated_at: string
 }
