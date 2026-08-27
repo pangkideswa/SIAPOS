@@ -17,7 +17,8 @@ export const GDRIVE_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID
 export async function createResumableUpload(
   filename: string,
   contentType: string,
-  size?: number
+  size?: number,
+  origin?: string | null
 ): Promise<{ uploadUrl: string }> {
   const drive = getDriveClient()
   
@@ -41,14 +42,18 @@ export async function createResumableUpload(
     parents: [GDRIVE_FOLDER_ID],
   }
 
+  const headers: Record<string, string> = {
+    "Authorization": `Bearer ${token.token}`,
+    "X-Upload-Content-Type": contentType,
+    "Content-Type": "application/json",
+  }
+  
+  if (size) headers["X-Upload-Content-Length"] = size.toString()
+  if (origin) headers["Origin"] = origin
+
   const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable", {
     method: "POST",
-    headers: {
-      "Authorization": `Bearer ${token.token}`,
-      "X-Upload-Content-Type": contentType,
-      "Content-Type": "application/json",
-      ...(size ? { "X-Upload-Content-Length": size.toString() } : {})
-    },
+    headers,
     body: JSON.stringify(metadata)
   })
 

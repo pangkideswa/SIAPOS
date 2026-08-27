@@ -50,6 +50,9 @@ export async function GET(
        })
 
     if (error || !data?.signedUrl) {
+       if (error?.message?.includes("Object not found") || error?.message?.includes("NoSuchKey")) {
+          return apiError(new Error("File tidak ditemukan di server penyimpanan"), 404)
+       }
        throw new Error(error?.message || "Failed to generate download URL")
     }
 

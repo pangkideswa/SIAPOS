@@ -45,8 +45,15 @@ export async function GET(
     }
 
     // 4. Generate signed URL for legacy Supabase Storage
-    const signedUrl = await createSignedUrl(BUCKETS.SUBMISSIONS, storagePath, 3600)
-    return NextResponse.redirect(signedUrl)
+    try {
+      const signedUrl = await createSignedUrl(BUCKETS.SUBMISSIONS, storagePath, 3600)
+      return NextResponse.redirect(signedUrl)
+    } catch (err: any) {
+      if (err.message?.includes("Object not found") || err.message?.includes("NoSuchKey")) {
+        return apiError(new Error("File tidak ditemukan di server penyimpanan"), 404)
+      }
+      throw err
+    }
   } catch (error) {
     return apiError(error)
   }

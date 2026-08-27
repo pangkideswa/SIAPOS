@@ -61,7 +61,8 @@ export async function POST(request: NextRequest) {
     const finalFilename = `submission_${targetStudentId}_${assignment_id}_${Date.now()}_${safeName}`
     
     // 4. Generate GDrive Resumable Upload URL
-    const { uploadUrl } = await createResumableUpload(finalFilename, contentType, size)
+    const origin = request.headers.get("origin")
+    const { uploadUrl } = await createResumableUpload(finalFilename, contentType, size, origin)
 
     return ok({
        uploadUrl: uploadUrl,
