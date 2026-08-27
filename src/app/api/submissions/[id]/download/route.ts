@@ -38,7 +38,13 @@ export async function GET(
        return apiError(new Error("Storage path mismatch. Access denied."), 403)
     }
 
-    // 4. Generate signed URL
+    if (!storagePath.includes("/")) {
+      const { getWebViewLink } = await import("@/lib/storage/google-drive")
+      const link = await getWebViewLink(storagePath)
+      return NextResponse.redirect(link)
+    }
+
+    // 4. Generate signed URL for legacy Supabase Storage
     const signedUrl = await createSignedUrl(BUCKETS.SUBMISSIONS, storagePath, 3600)
     return NextResponse.redirect(signedUrl)
   } catch (error) {

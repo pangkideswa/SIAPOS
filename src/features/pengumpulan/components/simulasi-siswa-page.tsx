@@ -51,7 +51,8 @@ function formatDateTime(dateStr: string) {
 }
 
 function isAfterDeadline(tenggat: string): boolean {
-  return new Date() > new Date(tenggat + "T23:59:59")
+  const baseDate = tenggat.split('T')[0];
+  return new Date() > new Date(baseDate + "T23:59:59")
 }
 
 export function SimulasiSiswaPage() {
@@ -187,6 +188,7 @@ export function SimulasiSiswaPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           assignment_id: selectedTugas.id,
+          student_id: currentStudent.id,
           filename: file.file.name,
           contentType: file.file.type,
           size: file.file.size
@@ -198,15 +200,15 @@ export function SimulasiSiswaPage() {
          throw new Error(err.message || "Gagal mendapatkan URL upload")
       }
       
-      const { uploadUrl, storagePath, token } = await uploadUrlRes.json()
+      const resJson = await uploadUrlRes.json()
+      const { uploadUrl, storagePath } = resJson.data
 
-      // 2. Upload to Supabase Storage
+      // 2. Upload to Google Drive
       const uploadRes = await fetch(uploadUrl, {
          method: "PUT",
          body: file.file,
          headers: {
             "Content-Type": file.file.type,
-            "Authorization": `Bearer ${token}`
          }
       })
 
@@ -214,18 +216,17 @@ export function SimulasiSiswaPage() {
          throw new Error("Gagal mengunggah file ke server penyimpanan")
       }
 
+      const driveData = await uploadRes.json()
+      const finalStoragePath = driveData.id || storagePath
+
       // 3. Save to DB
+      const { file: rawFile, ...fileMetaWithoutFile } = file
       await createSubmission.mutateAsync({
         assignment_id: selectedTugas.id,
         student_id: currentStudent.id,
         data: {
-          file_jawaban: {
-             nama: file.nama,
-             ukuran: file.ukuran,
-             tipe: file.tipe,
-             storage_path: storagePath
-          },
-          catatan: catatan.trim() || null,
+          file_jawaban: { ...fileMetaWithoutFile, storage_path: finalStoragePath },
+          catatan: catatan || null,
         },
       })
 
@@ -245,6 +246,7 @@ export function SimulasiSiswaPage() {
   if (selectedTugas) {
     const existing = getSiswaSubmission(selectedTugas.id)
     const deadline = isAfterDeadline(selectedTugas.tenggat_waktu)
+    const isGraded = existing ? existing.nilai !== null && !existing.allow_resubmit : false
 
     return (
       <div className="space-y-6">

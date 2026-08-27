@@ -51,9 +51,17 @@ export async function GET(
       return notFound(`Storage path tidak ditemukan atau file tidak kompatibel. Lampiran: ${JSON.stringify(lampiranData)}`)
     }
     
-    // Generate signed URL (expires in 1 hour)
-    const signedUrl = await createSignedUrl(BUCKETS.MATERIALS, targetPath, 3600)
-    return NextResponse.redirect(signedUrl)
+    // Generate download/view link
+    if (!targetPath.includes("/")) {
+      // Google Drive File ID doesn't have slashes
+      const { getWebViewLink } = await import("@/lib/storage/google-drive")
+      const link = await getWebViewLink(targetPath)
+      return NextResponse.redirect(link)
+    } else {
+      // Legacy Supabase Storage Path
+      const signedUrl = await createSignedUrl(BUCKETS.MATERIALS, targetPath, 3600)
+      return NextResponse.redirect(signedUrl)
+    }
   } catch (error) {
     return apiError(error)
   }

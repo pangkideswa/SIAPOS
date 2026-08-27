@@ -45,7 +45,8 @@ function formatFileSize(bytes: number): string {
 }
 
 function formatDeadline(dateStr: string, jam?: string | null) {
-  const date = new Date(dateStr + "T00:00:00").toLocaleDateString("id-ID", {
+  const baseDate = dateStr.split('T')[0];
+  const date = new Date(baseDate + "T00:00:00").toLocaleDateString("id-ID", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -151,15 +152,15 @@ export function SiswaKelasTugasTab({
          throw new Error(err.message || "Gagal mendapatkan URL upload")
       }
       
-      const { uploadUrl, storagePath, token } = await uploadUrlRes.json()
+      const resJson = await uploadUrlRes.json()
+      const { uploadUrl, storagePath } = resJson.data
 
-      // 2. Upload to Supabase Storage
+      // 2. Upload to Google Drive
       const uploadRes = await fetch(uploadUrl, {
          method: "PUT",
          body: fileMeta.file,
          headers: {
             "Content-Type": fileMeta.file.type,
-            "Authorization": `Bearer ${token}`
          }
       })
 
@@ -167,13 +168,16 @@ export function SiswaKelasTugasTab({
          throw new Error("Gagal mengunggah file ke server penyimpanan")
       }
 
+      const driveData = await uploadRes.json()
+      const finalStoragePath = driveData.id || storagePath
+
       // 3. Save to DB
       const { file: rawFile, ...fileMetaWithoutFile } = fileMeta
       await createSubmission.mutateAsync({
         assignment_id: tugas.id,
         student_id: siswa.id,
         data: {
-          file_jawaban: { ...fileMetaWithoutFile, storage_path: storagePath },
+          file_jawaban: { ...fileMetaWithoutFile, storage_path: finalStoragePath },
           catatan: catatans[tugas.id] || null,
         },
       })
@@ -205,7 +209,7 @@ export function SiswaKelasTugasTab({
         const selectedFile = selectedFiles[tugas.id] ?? null
         const riwayat = mySubmission?.riwayat_pengumpulan ?? []
         const isSubmitting = uploadingId === tugas.id
-        const isGraded = mySubmission?.nilai !== null && !mySubmission?.allow_resubmit
+        const isGraded = mySubmission ? mySubmission.nilai !== null && !mySubmission.allow_resubmit : false
 
         return (
           <Card key={tugas.id}>
@@ -270,9 +274,11 @@ export function SiswaKelasTugasTab({
                           {file.ukuran}
                         </span>
                       </div>
-                      <Button variant="ghost" size="icon-sm">
-                        <Download className="h-4 w-4" />
-                      </Button>
+                      <a href={`/api/assignments/${tugas.id}/download?path=${encodeURIComponent(file.storage_path || "")}`} target="_blank" rel="noopener noreferrer">
+                        <Button variant="ghost" size="icon-sm">
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </a>
                     </div>
                   ))}
                 </div>
@@ -292,11 +298,18 @@ export function SiswaKelasTugasTab({
                         </p>
                       </div>
                     </div>
-                    {mySubmission.nilai !== null && (
-                      <Badge className="bg-green-700 text-white font-semibold">
-                        {mySubmission.nilai}
-                      </Badge>
-                    )}
+                    <div className="flex items-center gap-3">
+                      {mySubmission.nilai !== null && (
+                        <Badge className="bg-green-700 text-white font-semibold">
+                          {mySubmission.nilai}
+                        </Badge>
+                      )}
+                      <a href={`/api/submissions/${mySubmission.id}/download?path=${encodeURIComponent(mySubmission.file_jawaban.storage_path || "")}`} target="_blank" rel="noopener noreferrer">
+                        <Button variant="ghost" size="icon-sm" className="text-green-700 hover:text-green-800 hover:bg-green-100">
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </a>
+                    </div>
                   </div>
                   {mySubmission.feedback && (
                     <div className="mt-2 flex items-start gap-2 rounded-md bg-card/70 p-2.5">

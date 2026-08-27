@@ -267,9 +267,11 @@ export function KelasPengumpulanTab({ kelasMengajar }: KelasPengumpulanTabProps)
 
                 <div>
                   {row.submission.file_jawaban ? (
-                    <Button variant="ghost" size="icon-sm" title="Unduh">
-                      <FileText className="h-4 w-4 text-primary" />
-                    </Button>
+                    <a href={`/api/submissions/${row.submission.id}/download?path=${encodeURIComponent(row.submission.file_jawaban.storage_path)}`} target="_blank" rel="noopener noreferrer">
+                      <Button variant="ghost" size="icon-sm" title="Unduh">
+                        <FileText className="h-4 w-4 text-primary" />
+                      </Button>
+                    </a>
                   ) : (
                     <span className="text-xs text-muted-foreground">-</span>
                   )}

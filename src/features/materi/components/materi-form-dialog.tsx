@@ -279,14 +279,13 @@ export function MateriFormDialog({
      }
      
      const responseData = await res.json()
-     const { uploadUrl, storagePath, token } = responseData.data || responseData
+     const { uploadUrl, storagePath } = responseData.data || responseData
      
-     // Direct PUT to Supabase
+     // Direct PUT to Google Drive
      const uploadRes = await fetch(uploadUrl, {
         method: 'PUT',
         headers: {
            'Content-Type': file.type,
-           'Authorization': `Bearer ${token}`
         },
         body: file
      })
@@ -295,7 +294,8 @@ export function MateriFormDialog({
         throw new Error(`Gagal mengupload ${file.name}`)
      }
      
-     return storagePath
+     const driveData = await uploadRes.json()
+     return driveData.id || storagePath
   }
 
   async function handleSubmit(e: React.FormEvent) {

@@ -2,7 +2,7 @@ import "server-only"
 import { NextRequest } from "next/server"
 import { apiError, ok } from "@/lib/api-utils"
 import { requireApiUser, assertTeachingClassAccess } from "@/auth/api-authorization"
-import { createSignedUploadUrl, BUCKETS } from "@/lib/storage/supabase-server"
+import { createResumableUpload } from "@/lib/storage/google-drive"
 import path from "path"
 
 const ALLOWED_MIME_TYPES = [
@@ -68,15 +68,15 @@ export async function POST(request: NextRequest) {
       materialNamespace = `temp-${crypto.randomUUID()}`
     }
     
-    const storagePath = `materials/${materialNamespace}/${Date.now()}-${safeName}`
+    const finalFilename = `material_${materialNamespace}_${Date.now()}_${safeName}`
     
-    // 4. Generate signed upload URL
-    const uploadData = await createSignedUploadUrl(BUCKETS.MATERIALS, storagePath)
+    // 4. Generate GDrive Resumable Upload URL
+    const { uploadUrl } = await createResumableUpload(finalFilename, contentType, size)
 
     return ok({
-       uploadUrl: uploadData.signedUrl,
-       storagePath,
-       token: uploadData.token
+       uploadUrl: uploadUrl,
+       storagePath: "", // Will be assigned by frontend from GDrive response
+       token: "" // Token is included in the uploadUrl for GDrive
     })
   } catch (error) {
     return apiError(error)

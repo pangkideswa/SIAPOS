@@ -56,7 +56,8 @@ interface KelasAbsensiTabProps {
 }
 
 function formatTanggalID(dateStr: string): string {
-  const d = new Date(dateStr + "T00:00:00")
+  const baseDate = dateStr.split('T')[0];
+  const d = new Date(baseDate + "T00:00:00")
   return d.toLocaleDateString("id-ID", {
     weekday: "short",
     day: "numeric",

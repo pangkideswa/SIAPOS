@@ -119,9 +119,10 @@ export function KelasTugasTab({ kelasMengajar }: KelasTugasTabProps) {
   }
 
   function formatDeadline(dateStr: string, jam?: string | null) {
-    const date = new Date(dateStr + "T00:00:00").toLocaleDateString("id-ID", {
+    const baseDate = dateStr.split('T')[0];
+    const date = new Date(baseDate + "T00:00:00").toLocaleDateString("id-ID", {
       day: "numeric",
-      month: "short",
+      month: "long",
       year: "numeric",
     })
     return jam ? `${date} ${jam}` : date

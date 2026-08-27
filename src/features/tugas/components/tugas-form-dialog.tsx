@@ -238,13 +238,12 @@ export function TugasFormDialog({
      }
      
      const responseData = await res.json()
-     const { uploadUrl, storagePath, token } = responseData.data || responseData
+     const { uploadUrl, storagePath } = responseData.data || responseData
      
      const uploadRes = await fetch(uploadUrl, {
         method: 'PUT',
         headers: {
            'Content-Type': file.type,
-           'Authorization': `Bearer ${token}`
         },
         body: file
      })
@@ -253,7 +252,8 @@ export function TugasFormDialog({
         throw new Error(`Gagal mengupload ${file.name}`)
      }
      
-     return storagePath
+     const driveData = await uploadRes.json()
+     return driveData.id || storagePath
   }
 
   async function handleSubmit(e: React.FormEvent) {

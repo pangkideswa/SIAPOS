@@ -2,7 +2,7 @@ import "server-only"
 import { NextRequest } from "next/server"
 import { apiError, ok } from "@/lib/api-utils"
 import { requireApiUser, assertAssignmentAccess, getStudentId } from "@/auth/api-authorization"
-import { createSignedUploadUrl, BUCKETS } from "@/lib/storage/supabase-server"
+import { createResumableUpload } from "@/lib/storage/google-drive"
 import path from "path"
 
 const ALLOWED_MIME_TYPES = [
@@ -19,16 +19,22 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB limit for submissions
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireApiUser("siswa")
-    const studentId = await getStudentId(user)
+    const user = await requireApiUser()
     
-    if (!studentId) {
-       return apiError(new Error("Hanya siswa yang dapat meminta URL upload submission"), 403)
+    const body = await request.json()
+    const { filename, contentType, size, assignment_id, student_id } = body
+    
+    let targetStudentId = await getStudentId(user)
+
+    if (user.role === "admin" || user.role === "super_admin" || user.role === "guru") {
+       if (!student_id) return apiError(new Error("student_id required for admin/teacher"), 400)
+       targetStudentId = Number(student_id)
     }
 
-    const body = await request.json()
-    const { filename, contentType, size, assignment_id } = body
-    
+    if (!targetStudentId) {
+       return apiError(new Error("Tidak dapat mengidentifikasi siswa"), 403)
+    }
+
     if (!filename || !contentType || !size || !assignment_id) {
        return apiError(new Error("Missing required parameters"), 400)
     }
@@ -50,18 +56,17 @@ export async function POST(request: NextRequest) {
        return apiError(new Error("File size exceeds the limit of 5MB."), 400)
     }
 
-    // 3. Generate secure path
+    // 3. Generate secure path (for Google Drive we just generate a unique name)
     const safeName = filename.replace(/[^a-zA-Z0-9.-]/g, '_')
-    // Namespace format: submissions/{studentId}/{assignmentId}/{timestamp}-{safeFilename}
-    const storagePath = `submissions/${studentId}/${assignment_id}/${Date.now()}-${safeName}`
+    const finalFilename = `submission_${targetStudentId}_${assignment_id}_${Date.now()}_${safeName}`
     
-    // 4. Generate signed upload URL
-    const uploadData = await createSignedUploadUrl(BUCKETS.SUBMISSIONS, storagePath)
+    // 4. Generate GDrive Resumable Upload URL
+    const { uploadUrl } = await createResumableUpload(finalFilename, contentType, size)
 
     return ok({
-       uploadUrl: uploadData.signedUrl,
-       storagePath,
-       token: uploadData.token
+       uploadUrl: uploadUrl,
+       storagePath: "", // Will be assigned by frontend from GDrive response
+       token: "" // Token is included in the uploadUrl for GDrive
     })
   } catch (error) {
     return apiError(error)

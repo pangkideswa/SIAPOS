@@ -35,6 +35,12 @@ export async function GET(
        return apiError(new Error("File is not attached to this assignment or unauthorized access"), 403)
     }
 
+    if (!storagePath.includes("/")) {
+      const { getWebViewLink } = await import("@/lib/storage/google-drive")
+      const link = await getWebViewLink(storagePath)
+      return NextResponse.redirect(link)
+    }
+
     // 3. Generate Signed Download URL (valid for 60 seconds)
     const supabase = getSupabaseAdmin()
     const { data, error } = await supabase.storage

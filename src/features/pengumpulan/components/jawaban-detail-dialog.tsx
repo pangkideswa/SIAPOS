@@ -167,9 +167,11 @@ export function JawabanDetailDialog({
                       </p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon-sm">
-                    <Download className="h-4 w-4" />
-                  </Button>
+                  <a href={`/api/submissions/${submission.id}/download?path=${encodeURIComponent(submission.file_jawaban.storage_path)}`} target="_blank" rel="noopener noreferrer">
+                    <Button variant="ghost" size="icon-sm">
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </a>
                 </div>
               </div>
             )}
