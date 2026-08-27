@@ -116,7 +116,7 @@ export function TugasDetailDialog({
                       </p>
                     </div>
                   </div>
-                  <a href={`/api/assignments/${tugas.id}/download?path=${encodeURIComponent(file.storage_path)}`} target="_blank" rel="noopener noreferrer">
+                  <a href={`/api/assignments/${tugas.id}/download?path=${encodeURIComponent(file.storage_path || "")}`} target="_blank" rel="noopener noreferrer">
                     <Button variant="ghost" size="icon-sm">
                       <Download className="h-4 w-4" />
                     </Button>
