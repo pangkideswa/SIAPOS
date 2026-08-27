@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   FileText,
   Upload,
@@ -55,6 +56,8 @@ function isAfterDeadline(tenggat: string): boolean {
 
 export function SimulasiSiswaPage() {
   const { user } = useAuth()
+  const isAdminOrTeacher = user?.role === "admin" || user?.role === "super_admin" || user?.role === "guru"
+  const [selectedStudentId, setSelectedStudentId] = useState<string>("auto")
   const [selectedTugas, setSelectedTugas] = useState<Tugas | null>(null)
   const [file, setFile] = useState<PengumpulanFile | null>(null)
   const [catatan, setCatatan] = useState("")
@@ -76,7 +79,7 @@ export function SimulasiSiswaPage() {
   const { data: allSubmissions = [] } = useSubmissions()
   const createSubmission = useCreateSubmission()
 
-  const currentStudent =
+  const loggedInStudent =
     allStudents.find((siswa) => siswa.user_id === user?.id) ??
     allStudents.find((siswa) => user?.nisn && siswa.nisn === user.nisn) ??
     allStudents.find(
@@ -84,6 +87,10 @@ export function SimulasiSiswaPage() {
         siswa.nama_lengkap.toLowerCase() === (user?.name ?? "").toLowerCase()
     ) ??
     null
+
+  const currentStudent = isAdminOrTeacher
+    ? (selectedStudentId !== "auto" ? allStudents.find(s => s.id === Number(selectedStudentId)) ?? null : null)
+    : loggedInStudent
 
   const siswaTugas = currentStudent
     ? allTugas.filter(
@@ -191,14 +198,15 @@ export function SimulasiSiswaPage() {
          throw new Error(err.message || "Gagal mendapatkan URL upload")
       }
       
-      const { uploadUrl, storagePath } = await uploadUrlRes.json()
+      const { uploadUrl, storagePath, token } = await uploadUrlRes.json()
 
       // 2. Upload to Supabase Storage
       const uploadRes = await fetch(uploadUrl, {
          method: "PUT",
          body: file.file,
          headers: {
-            "Content-Type": file.file.type
+            "Content-Type": file.file.type,
+            "Authorization": `Bearer ${token}`
          }
       })
 
@@ -416,6 +424,31 @@ export function SimulasiSiswaPage() {
         }
       />
 
+      {isAdminOrTeacher && (
+        <Card>
+          <CardHeader className="py-4">
+            <CardTitle className="text-sm">Simulasi sebagai Siswa</CardTitle>
+          </CardHeader>
+          <CardContent className="pb-4">
+            <Select value={selectedStudentId} onValueChange={(val) => {
+              setSelectedStudentId(val ?? "auto")
+              setSelectedTugas(null)
+              setFile(null)
+            }}>
+              <SelectTrigger className="w-full sm:w-[300px]">
+                <SelectValue placeholder="Pilih Siswa" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="auto">-- Pilih Siswa --</SelectItem>
+                {allStudents.map(s => (
+                  <SelectItem key={s.id} value={s.id.toString()}>{s.nama_lengkap} ({s.kelas})</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="space-y-4">
         {isLoading || isStudentsLoading ? (
           <Card>
@@ -443,8 +476,9 @@ export function SimulasiSiswaPage() {
         ) : !currentStudent ? (
           <Card>
             <CardContent className="pt-6 text-center text-muted-foreground py-12">
-              Data siswa untuk akun ini belum ditemukan di database. Hubungi admin
-              sekolah untuk menghubungkan akun Anda dengan data siswa.
+              {isAdminOrTeacher 
+                ? "Silakan pilih siswa dari dropdown di atas untuk melihat dan mengelola tugas mereka."
+                : "Data siswa untuk akun ini belum ditemukan di database. Hubungi admin sekolah untuk menghubungkan akun Anda dengan data siswa."}
             </CardContent>
           </Card>
         ) : siswaTugas.length === 0 ? (

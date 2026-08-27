@@ -25,6 +25,9 @@ export const scheduleSchema = z.object({
     .optional(),
   guru_id: z.number().int("Guru tidak valid").nullable().optional(),
   ruang: z.string().max(50, "Ruang maksimal 50 karakter").nullable().optional(),
+  kelas: z.string().optional(),
+  guru_nama: z.string().optional(),
+  status: z.string().optional(),
 }).refine(
   (data) => {
     if (!data.jam_mulai || !data.jam_selesai) return true

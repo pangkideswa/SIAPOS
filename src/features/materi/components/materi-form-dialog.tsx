@@ -96,7 +96,7 @@ export function MateriFormDialog({
         isi_materi: editingItem.isi_materi,
         status: editingItem.status,
       })
-      setThumbnailPreview(editingItem.thumbnail_url)
+      setThumbnailPreview(editingItem.thumbnail_url ? `/api/materials/${editingItem.id}/download?type=thumbnail` : null)
     } else {
       const defaultKm =
         defaultKelasMengajarId !== undefined
@@ -279,13 +279,14 @@ export function MateriFormDialog({
      }
      
      const responseData = await res.json()
-     const { uploadUrl, storagePath } = responseData.data || responseData
+     const { uploadUrl, storagePath, token } = responseData.data || responseData
      
      // Direct PUT to Supabase
      const uploadRes = await fetch(uploadUrl, {
         method: 'PUT',
         headers: {
            'Content-Type': file.type,
+           'Authorization': `Bearer ${token}`
         },
         body: file
      })

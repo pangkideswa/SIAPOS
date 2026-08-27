@@ -238,12 +238,13 @@ export function TugasFormDialog({
      }
      
      const responseData = await res.json()
-     const { uploadUrl, storagePath } = responseData.data || responseData
+     const { uploadUrl, storagePath, token } = responseData.data || responseData
      
      const uploadRes = await fetch(uploadUrl, {
         method: 'PUT',
         headers: {
            'Content-Type': file.type,
+           'Authorization': `Bearer ${token}`
         },
         body: file
      })

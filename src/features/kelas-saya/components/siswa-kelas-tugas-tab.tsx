@@ -151,14 +151,15 @@ export function SiswaKelasTugasTab({
          throw new Error(err.message || "Gagal mendapatkan URL upload")
       }
       
-      const { uploadUrl, storagePath } = await uploadUrlRes.json()
+      const { uploadUrl, storagePath, token } = await uploadUrlRes.json()
 
       // 2. Upload to Supabase Storage
       const uploadRes = await fetch(uploadUrl, {
          method: "PUT",
          body: fileMeta.file,
          headers: {
-            "Content-Type": fileMeta.file.type
+            "Content-Type": fileMeta.file.type,
+            "Authorization": `Bearer ${token}`
          }
       })
 

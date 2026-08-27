@@ -79,7 +79,10 @@ function ImageUpload({
       
       const uploadRes = await fetch(data.uploadUrl, {
         method: 'PUT',
-        headers: { 'Content-Type': file.type },
+        headers: { 
+          'Content-Type': file.type,
+          'Authorization': `Bearer ${data.token}`
+        },
         body: file
       })
       if (!uploadRes.ok) throw new Error("Gagal mengunggah gambar")

@@ -189,7 +189,10 @@ export function SiswaFormDialog({
          
          const uploadRes = await fetch(data.uploadUrl, {
            method: 'PUT',
-           headers: { 'Content-Type': fileToUpload.type },
+           headers: { 
+             'Content-Type': fileToUpload.type,
+             'Authorization': `Bearer ${data.token}`
+           },
            body: fileToUpload
          })
          if (!uploadRes.ok) throw new Error("Gagal mengunggah ke storage")
