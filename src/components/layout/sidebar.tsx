@@ -68,6 +68,7 @@ const navItems: NavEntry[] = [
   { type: "item", label: "CBT", href: "/guru/cbt", icon: Monitor, roles: ["super_admin", "admin"] },
   { type: "item", label: "Hasil Ujian", href: "/guru/hasil-ujian", icon: ClipboardCheck, roles: ["super_admin", "admin"] },
   { type: "item", label: "Analitik", href: "/guru/analitik", icon: BarChart3, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Simulasi Tugas", href: "/admin/simulasi-tugas", icon: ClipboardCheck, roles: ["super_admin", "admin"] },
 
   { type: "item", label: "Dashboard", href: "/guru", icon: LayoutDashboard, roles: ["guru"] },
   { type: "item", label: "Kelas", href: "/guru/kelas", icon: BookOpen, roles: ["guru"] },
