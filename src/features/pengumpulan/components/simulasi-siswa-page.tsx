@@ -131,11 +131,14 @@ export function SimulasiSiswaPage() {
       "application/vnd.openxmlformats-officedocument.presentationml.presentation",
       "application/zip",
       "application/x-zip-compressed",
+      "image/jpeg",
+      "image/png",
+      "image/webp"
     ]
 
     if (!allowedTypes.includes(f.type)) {
       toast.error("Format file tidak didukung", {
-        description: "Format yang diizinkan: PDF, DOCX, PPTX, ZIP",
+        description: "Format yang diizinkan: PDF, DOCX, PPTX, ZIP, JPG, PNG",
       })
       return
     }
@@ -365,14 +368,14 @@ export function SimulasiSiswaPage() {
                       Klik untuk upload file jawaban
                     </span>
                     <span className="text-xs">
-                      PDF, DOCX, PPTX, ZIP (maks. 5MB)
+                      PDF, DOCX, PPTX, ZIP, JPG, PNG (maks. 5MB)
                     </span>
                   </button>
                 )}
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".pdf,.doc,.docx,.ppt,.pptx,.zip"
+                  accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.jpg,.jpeg,.png,.webp"
                   className="hidden"
                   onChange={handleFileUpload}
                 />

@@ -11,7 +11,8 @@ const ALLOWED_MIME_TYPES = [
   'application/vnd.ms-powerpoint',
   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   'application/zip',
-  'application/x-zip-compressed'
+  'application/x-zip-compressed',
+  'image/jpeg', 'image/png', 'image/webp'
 ]
 
 const BLOCKED_EXTENSIONS = ['.exe', '.bat', '.cmd', '.ps1', '.sh', '.js', '.ts', '.php']
