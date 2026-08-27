@@ -62,8 +62,9 @@ export async function GET(
       try {
         const signedUrl = await createSignedUrl(BUCKETS.MATERIALS, targetPath, 3600)
         return NextResponse.redirect(signedUrl)
-      } catch (err: any) {
-        if (err.message?.includes("Object not found") || err.message?.includes("NoSuchKey")) {
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? err.message : String(err)
+        if (errorMsg.includes("Object not found") || errorMsg.includes("NoSuchKey")) {
           return apiError(new Error("File tidak ditemukan di server penyimpanan"), 404)
         }
         throw err
