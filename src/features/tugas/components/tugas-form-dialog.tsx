@@ -277,8 +277,9 @@ export function TugasFormDialog({
       )
       
       await onSubmit(payload)
-    } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : "Terjadi kesalahan yang tidak diketahui"
+    } catch (error: any) {
+      console.error(error)
+      const msg = error?.message || String(error) || "Terjadi kesalahan yang tidak diketahui"
       toast.error("Upload gagal", {
          description: msg
       })
