@@ -45,7 +45,7 @@ export async function GET(
       try {
         const link = await createSignedUrl(BUCKETS.ASSIGNMENTS, storagePath, 60 * 60) // 1 hour
         return NextResponse.redirect(link)
-      } catch (e: any) {
+      } catch (e) {
          console.warn("Supabase signed url failed, falling back to public url for legacy file", e)
          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
          if (!supabaseUrl) throw new Error("Missing Supabase URL")
