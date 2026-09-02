@@ -1,9 +1,11 @@
 import "server-only"
 import { NextRequest, NextResponse } from "next/server"
-import { submissionService } from "@/services/submission.service"
+import { apiError } from "@/lib/api-utils"
 import { requireApiUser, assertSubmissionAccess } from "@/auth/api-authorization"
+import { submissionService } from "@/services/submission.service"
+import { getWebViewLink } from "@/lib/storage/google-drive"
 import { createSignedUrl, BUCKETS } from "@/lib/storage/supabase-server"
-import { apiError, notFound } from "@/lib/api-utils"
+import { notFound } from "@/lib/api-utils"
 
 export async function GET(
   request: NextRequest,
@@ -38,22 +40,25 @@ export async function GET(
        return apiError(new Error("Storage path mismatch. Access denied."), 403)
     }
 
-    if (!storagePath.includes("/")) {
-      const { getWebViewLink } = await import("@/lib/storage/google-drive")
-      const link = await getWebViewLink(storagePath)
-      return NextResponse.redirect(link)
-    }
-
-    // 4. Generate signed URL for legacy Supabase Storage
-    try {
-      const signedUrl = await createSignedUrl(BUCKETS.SUBMISSIONS, storagePath, 3600)
-      return NextResponse.redirect(signedUrl)
-    } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : String(err)
-      if (errorMsg.includes("Object not found") || errorMsg.includes("NoSuchKey")) {
-        return apiError(new Error("File tidak ditemukan di server penyimpanan"), 404)
+    if (storagePath.includes("/")) {
+      // Legacy Supabase Storage (path contains a slash e.g. "submissions/...")
+      try {
+        const link = await createSignedUrl(BUCKETS.SUBMISSIONS, storagePath, 60 * 60) // 1 hour
+        return NextResponse.redirect(link)
+      } catch (e: any) {
+         console.warn("Supabase signed url failed, falling back to public url for legacy file", e)
+         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+         if (!supabaseUrl) throw new Error("Missing Supabase URL")
+         const finalUrl = `${supabaseUrl}/storage/v1/object/public/${BUCKETS.SUBMISSIONS}/${storagePath}`
+         return NextResponse.redirect(finalUrl)
       }
-      throw err
+    } else {
+      // Google Drive (path is an ID without slashes)
+      const webViewLink = await getWebViewLink(storagePath)
+      if (!webViewLink) {
+         return apiError(new Error("Failed to get file link"), 500)
+      }
+      return NextResponse.redirect(webViewLink)
     }
   } catch (error) {
     return apiError(error)

@@ -1,104 +1,98 @@
-import { google, drive_v3 } from "googleapis"
+import { google } from "googleapis"
 
-export const getDriveClient = () => {
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: process.env.GOOGLE_CLIENT_EMAIL,
-      private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-    },
-    scopes: ["https://www.googleapis.com/auth/drive"],
+// Setup Google Drive Auth with OAuth2 (Refresh Token)
+const getDriveAuth = () => {
+  const clientId = process.env.GOOGLE_CLIENT_ID
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET
+  const refreshToken = process.env.GOOGLE_REFRESH_TOKEN
+
+  if (!clientId || !clientSecret || !refreshToken) {
+    throw new Error("Google Drive OAuth credentials are not properly configured in environment variables")
+  }
+
+  const oauth2Client = new google.auth.OAuth2(
+    clientId,
+    clientSecret,
+    "https://developers.google.com/oauthplayground"
+  )
+
+  oauth2Client.setCredentials({
+    refresh_token: refreshToken
   })
 
-  return google.drive({ version: "v3", auth })
+  return {
+    drive: google.drive({ version: "v3", auth: oauth2Client }),
+    oauth2Client
+  }
 }
 
-export const GDRIVE_FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID
-
 export async function createResumableUpload(
-  filename: string,
+  fileName: string,
   contentType: string,
-  size?: number,
-  origin?: string | null
+  size: number,
+  origin: string | null
 ): Promise<{ uploadUrl: string }> {
-  const drive = getDriveClient()
-  
-  // Start resumable upload session
-  
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: process.env.GOOGLE_CLIENT_EMAIL,
-      private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-    },
-    scopes: ["https://www.googleapis.com/auth/drive"],
+  const { oauth2Client } = getDriveAuth()
+  const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID
+
+  if (!folderId) {
+    throw new Error("GOOGLE_DRIVE_FOLDER_ID is not configured")
+  }
+
+  const body = JSON.stringify({
+    name: fileName,
+    parents: [folderId],
   })
 
-  const authClient = await auth.getClient()
-  if (!authClient) throw new Error("Gagal inisialisasi autentikasi Google Drive")
-  const token = await authClient.getAccessToken()
-  if (!token.token) throw new Error("Gagal mendapatkan token Google Drive")
+  const tokenInfo = await oauth2Client.getAccessToken()
+  const token = tokenInfo.token
 
-  const metadata = {
-    name: filename,
-    parents: [GDRIVE_FOLDER_ID],
+  if (!token) {
+     throw new Error("Failed to get Google OAuth Access Token")
   }
 
   const headers: Record<string, string> = {
-    "Authorization": `Bearer ${token.token}`,
-    "X-Upload-Content-Type": contentType,
+    Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
+    "X-Upload-Content-Type": contentType,
   }
-  
-  if (size) headers["X-Upload-Content-Length"] = size.toString()
-  if (origin) headers["Origin"] = origin
+
+  // Include Origin if present for CORS
+  if (origin) {
+    headers["Origin"] = origin
+  }
 
   const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable", {
     method: "POST",
     headers,
-    body: JSON.stringify(metadata)
+    body,
   })
 
   if (!res.ok) {
     const text = await res.text()
-    console.error("Gagal membuat sesi unggahan di Google Drive:", text)
-    throw new Error("Gagal membuat sesi unggahan di Google Drive")
+    console.error("GDrive POST error:", res.status, text)
+    throw new Error(`Failed to generate upload URL: ${res.statusText}`)
   }
 
-  const uploadUrl = res.headers.get("Location")
+  const uploadUrl = res.headers.get("location")
   if (!uploadUrl) {
-    throw new Error("Google Drive tidak mengembalikan URL unggahan")
+    throw new Error("No upload URL returned from Google Drive")
   }
 
   return { uploadUrl }
 }
 
 export async function getWebViewLink(fileId: string): Promise<string> {
-  const drive = getDriveClient()
-  
-  try {
-    const res = await drive.files.get({
-      fileId: fileId,
-      fields: "webViewLink, webContentLink",
-    })
-    
-    if (res.data.webViewLink) {
-      return res.data.webViewLink
-    } else if (res.data.webContentLink) {
-      return res.data.webContentLink
-    }
-    
-    throw new Error("Link tidak tersedia")
-  } catch (error) {
-    console.error("Error getting Drive link:", error)
-    throw new Error("Gagal mendapatkan link dari Google Drive")
-  }
-}
+  const { drive } = getDriveAuth()
 
-export async function deleteDriveFile(fileId: string): Promise<void> {
-  const drive = getDriveClient()
   try {
-    await drive.files.delete({ fileId })
+    const file = await drive.files.get({
+      fileId,
+      fields: "webViewLink",
+    })
+    return file.data.webViewLink || ""
   } catch (error) {
-    console.error(`Gagal menghapus file di Google Drive: ${fileId}`, error)
-    // We intentionally don't throw to avoid breaking cascading deletions in our DB
+    console.error("Error getting file link from Google Drive:", error)
+    throw new Error("Failed to get file link")
   }
 }

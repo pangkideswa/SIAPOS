@@ -1,11 +1,11 @@
 import "server-only"
 import { NextRequest, NextResponse } from "next/server"
+import { apiError } from "@/lib/api-utils"
+import { requireApiUser, assertMaterialAccess } from "@/auth/api-authorization"
 import { materialService } from "@/services/material.service"
-import { apiError, notFound } from "@/lib/api-utils"
-import { assertMaterialAccess, requireApiUser } from "@/auth/api-authorization"
+import { getWebViewLink } from "@/lib/storage/google-drive"
 import { createSignedUrl, BUCKETS } from "@/lib/storage/supabase-server"
-import { extractMaterialStoragePath } from "@/lib/storage/material-helper"
-import type { Materi } from "@/features/materi/types/materi"
+import { notFound } from "@/lib/api-utils"
 
 export async function GET(
   request: NextRequest,
@@ -16,62 +16,61 @@ export async function GET(
     const { id } = await context.params
     const materialId = Number(id)
     
-    // AuthZ
+    // 1. Authorization
     await assertMaterialAccess(user, materialId)
+
+    const type = request.nextUrl.searchParams.get("type") // "thumbnail" or "attachment"
+    const storagePath = request.nextUrl.searchParams.get("path")
     
-    const material = await materialService.getById(materialId) as Materi | null
-    if (!material) return notFound("Materi tidak ditemukan")
-    
-    const searchParams = request.nextUrl.searchParams
-    const lampiranId = searchParams.get("lampiranId")
-    const type = searchParams.get("type") // "thumbnail" or "lampiran"
-    
-    let targetPath: string | null = null
-    let fallbackUrl: string | null = null
-    let lampiranData: unknown = null
+    // 2. Load material
+    const material = await materialService.getById(materialId)
+    if (!material) {
+      return notFound("Material tidak ditemukan")
+    }
+
+    let actualPathToDownload = ""
 
     if (type === "thumbnail") {
-       if (!material.thumbnail_url) return notFound("Thumbnail tidak ada")
-       targetPath = extractMaterialStoragePath(material.thumbnail_url)
-       fallbackUrl = material.thumbnail_url
-    } else {
-       if (!lampiranId) return apiError(new Error("Missing lampiranId"), 400)
-       const lampiran = material.lampiran.find(l => l.id === Number(lampiranId))
-       if (!lampiran) return notFound("Lampiran tidak ditemukan")
+       if (!material.thumbnail_url) return apiError(new Error("No thumbnail"), 404)
+       actualPathToDownload = material.thumbnail_url
+    } else if (type === "attachment") {
+       if (!storagePath) return apiError(new Error("Missing path parameter for attachment"), 400)
        
-       lampiranData = lampiran
-       targetPath = lampiran.storage_path || (lampiran.url ? extractMaterialStoragePath(lampiran.url) : null)
-       fallbackUrl = lampiran.url || null
+       // Verify requested path is actually part of this material's attachments
+       const isPathValid = material.lampiran?.some(l => l.storage_path === storagePath)
+       if (!isPathValid) {
+          return apiError(new Error("Storage path mismatch. Access denied."), 403)
+       }
+       actualPathToDownload = storagePath
+    } else {
+       return apiError(new Error("Invalid type parameter"), 400)
     }
 
-    if (!targetPath) {
-      if (fallbackUrl && fallbackUrl.startsWith("http")) {
-         return NextResponse.redirect(fallbackUrl)
-      }
-      return notFound(`Storage path tidak ditemukan atau file tidak kompatibel. Lampiran: ${JSON.stringify(lampiranData)}`)
+    if (actualPathToDownload.includes("../") || actualPathToDownload.includes("..\\")) {
+       return apiError(new Error("Invalid path"), 400)
     }
-    
-    // Generate download/view link
-    if (!targetPath.includes("/")) {
-      // Google Drive File ID doesn't have slashes
-      const { getWebViewLink } = await import("@/lib/storage/google-drive")
-      const link = await getWebViewLink(targetPath)
-      return NextResponse.redirect(link)
-    } else {
-      // Legacy Supabase Storage Path
+
+    if (actualPathToDownload.includes("/")) {
+      // Legacy Supabase Storage (path contains a slash e.g. "materials/...")
       try {
-        const signedUrl = await createSignedUrl(BUCKETS.MATERIALS, targetPath, 3600)
-        return NextResponse.redirect(signedUrl)
-      } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : String(err)
-        if (errorMsg.includes("Object not found") || errorMsg.includes("NoSuchKey")) {
-          return apiError(new Error("File tidak ditemukan di server penyimpanan"), 404)
-        }
-        throw err
+        const link = await createSignedUrl(BUCKETS.MATERIALS, actualPathToDownload, 60 * 60) // 1 hour
+        return NextResponse.redirect(link)
+      } catch (e: any) {
+         console.warn("Supabase signed url failed, falling back to public url for legacy file", e)
+         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+         if (!supabaseUrl) throw new Error("Missing Supabase URL")
+         const finalUrl = `${supabaseUrl}/storage/v1/object/public/${BUCKETS.MATERIALS}/${actualPathToDownload}`
+         return NextResponse.redirect(finalUrl)
       }
+    } else {
+      // Google Drive (path is an ID without slashes)
+      const webViewLink = await getWebViewLink(actualPathToDownload)
+      if (!webViewLink) {
+         return apiError(new Error("Failed to get file link"), 500)
+      }
+      return NextResponse.redirect(webViewLink)
     }
   } catch (error) {
     return apiError(error)
   }
 }
-

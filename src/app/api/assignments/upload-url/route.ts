@@ -2,6 +2,7 @@ import "server-only"
 import { NextRequest } from "next/server"
 import { apiError, ok } from "@/lib/api-utils"
 import { requireApiUser, assertTeachingClassAccess } from "@/auth/api-authorization"
+import { createResumableUpload } from "@/lib/storage/google-drive"
 import path from "path"
 
 const ALLOWED_MIME_TYPES = [
@@ -18,7 +19,7 @@ const ALLOWED_MIME_TYPES = [
 ]
 
 const BLOCKED_EXTENSIONS = ['.exe', '.bat', '.cmd', '.ps1', '.sh', '.js', '.ts', '.php']
-const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
+const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB limit
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,10 +32,10 @@ export async function POST(request: NextRequest) {
        return apiError(new Error("Missing required parameters"), 400)
     }
 
-    // 1. Authorization
+    // 1. Validate Access
     await assertTeachingClassAccess(user, Number(kelas_mengajar_id))
 
-    // 2. Validation
+    // 2. Validate File
     if (!ALLOWED_MIME_TYPES.includes(contentType)) {
        return apiError(new Error(`File type ${contentType} is not allowed.`), 400)
     }
@@ -50,21 +51,16 @@ export async function POST(request: NextRequest) {
 
     // 3. Generate secure path
     const safeName = filename.replace(/[^a-zA-Z0-9.-]/g, '_')
-    // Temporarily use a temp prefix if assignment ID is not yet created
-    const tempId = `temp-${Date.now()}`
-    const namespace = body.assignmentId ? String(body.assignmentId) : tempId
-    
-    const finalFilename = `assignment_${namespace}_${Date.now()}_${safeName}`
+    const finalFilename = `assignment_${kelas_mengajar_id}_${Date.now()}_${safeName}`
     
     // 4. Generate GDrive Resumable Upload URL
-    const { createResumableUpload } = await import("@/lib/storage/google-drive")
     const origin = request.headers.get("origin")
     const { uploadUrl } = await createResumableUpload(finalFilename, contentType, size, origin)
 
     return ok({
        uploadUrl: uploadUrl,
-       storagePath: "", // Will be assigned by frontend from GDrive response
-       token: ""
+       storagePath: "", // Will be assigned by frontend
+       token: "" 
     })
   } catch (error) {
     return apiError(error)

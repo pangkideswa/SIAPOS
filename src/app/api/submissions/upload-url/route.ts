@@ -6,44 +6,45 @@ import { createResumableUpload } from "@/lib/storage/google-drive"
 import path from "path"
 
 const ALLOWED_MIME_TYPES = [
+  'image/jpeg', 'image/png', 'image/webp', 'image/svg+xml',
   'application/pdf', 'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   'application/vnd.ms-powerpoint',
   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'text/plain',
   'application/zip',
-  'application/x-zip-compressed',
-  'image/jpeg', 'image/png', 'image/webp'
+  'application/x-zip-compressed'
 ]
 
 const BLOCKED_EXTENSIONS = ['.exe', '.bat', '.cmd', '.ps1', '.sh', '.js', '.ts', '.php']
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB limit for submissions
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB limit for students
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireApiUser()
-    
+    const user = await requireApiUser("siswa")
     const body = await request.json()
-    const { filename, contentType, size, assignment_id, student_id } = body
     
-    let targetStudentId = await getStudentId(user)
-
-    if (user.role === "admin" || user.role === "super_admin" || user.role === "guru") {
-       if (!student_id) return apiError(new Error("student_id required for admin/teacher"), 400)
-       targetStudentId = Number(student_id)
-    }
-
-    if (!targetStudentId) {
-       return apiError(new Error("Tidak dapat mengidentifikasi siswa"), 403)
-    }
-
-    if (!filename || !contentType || !size || !assignment_id) {
+    const { assignment_id, student_id, filename, contentType, size } = body
+    
+    if (!assignment_id || !student_id || !filename || !contentType || !size) {
        return apiError(new Error("Missing required parameters"), 400)
     }
 
-    // 1. Authorization
+    // 1. Validate Access
+    // For students, ensure they only upload for themselves
+    const targetStudentId = Number(student_id)
+    if (user.role === "siswa") {
+       const userStudentId = await getStudentId(user)
+       if (userStudentId !== targetStudentId) {
+          return apiError(new Error("Unauthorized student upload access"), 403)
+       }
+    }
+    
     await assertAssignmentAccess(user, Number(assignment_id))
 
-    // 2. Validation
+    // 2. Validate File
     if (!ALLOWED_MIME_TYPES.includes(contentType)) {
        return apiError(new Error(`File type ${contentType} is not allowed.`), 400)
     }
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
        return apiError(new Error("File size exceeds the limit of 5MB."), 400)
     }
 
-    // 3. Generate secure path (for Google Drive we just generate a unique name)
+    // 3. Generate secure path
     const safeName = filename.replace(/[^a-zA-Z0-9.-]/g, '_')
     const finalFilename = `submission_${targetStudentId}_${assignment_id}_${Date.now()}_${safeName}`
     

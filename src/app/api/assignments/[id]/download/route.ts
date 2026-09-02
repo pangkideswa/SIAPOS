@@ -1,10 +1,11 @@
 import "server-only"
 import { NextRequest, NextResponse } from "next/server"
-import { apiError, notFound } from "@/lib/api-utils"
+import { apiError } from "@/lib/api-utils"
 import { requireApiUser, assertAssignmentAccess } from "@/auth/api-authorization"
 import { assignmentService } from "@/services/assignment.service"
-import { BUCKETS } from "@/lib/storage/supabase-server"
-import { getSupabaseAdmin } from "@/lib/storage/supabase-server"
+import { getWebViewLink } from "@/lib/storage/google-drive"
+import { createSignedUrl, BUCKETS } from "@/lib/storage/supabase-server"
+import { notFound } from "@/lib/api-utils"
 
 export async function GET(
   request: NextRequest,
@@ -15,49 +16,50 @@ export async function GET(
     const { id } = await context.params
     const assignmentId = Number(id)
     
-    const searchParams = request.nextUrl.searchParams
-    const storagePath = searchParams.get('path')
+    // 1. Authorization
+    await assertAssignmentAccess(user, assignmentId)
     
+    const storagePath = request.nextUrl.searchParams.get("path")
     if (!storagePath) {
       return apiError(new Error("Missing path parameter"), 400)
     }
 
-    // 1. Validate Access
-    await assertAssignmentAccess(user, assignmentId)
+    if (storagePath.includes("../") || storagePath.includes("..\\")) {
+       return apiError(new Error("Invalid path"), 400)
+    }
+
+    // 2. Load assignment
     const assignment = await assignmentService.getById(assignmentId)
-    if (!assignment) return notFound("Tugas tidak ditemukan")
-
-    // 2. Validate Ownership of Path
-    // Verify that the requested storage path is actually attached to this assignment
-    const isAttached = assignment.lampiran.some(lamp => lamp.storage_path === storagePath)
-    
-    if (!isAttached) {
-       return apiError(new Error("File is not attached to this assignment or unauthorized access"), 403)
+    if (!assignment) {
+      return notFound("Assignment tidak ditemukan")
     }
 
-    if (!storagePath.includes("/")) {
-      const { getWebViewLink } = await import("@/lib/storage/google-drive")
-      const link = await getWebViewLink(storagePath)
-      return NextResponse.redirect(link)
+    // 3. Security Check: verify requested path exactly matches one of the attachments
+    const isPathValid = assignment.lampiran?.some(l => l.storage_path === storagePath)
+    if (!isPathValid) {
+       return apiError(new Error("Storage path mismatch. Access denied."), 403)
     }
 
-    // 3. Generate Signed Download URL (valid for 60 seconds)
-    const supabase = getSupabaseAdmin()
-    const { data, error } = await supabase.storage
-       .from(BUCKETS.ASSIGNMENTS)
-       .createSignedUrl(storagePath, 60, {
-          download: true
-       })
-
-    if (error || !data?.signedUrl) {
-       if (error?.message?.includes("Object not found") || error?.message?.includes("NoSuchKey")) {
-          return apiError(new Error("File tidak ditemukan di server penyimpanan"), 404)
-       }
-       throw new Error(error?.message || "Failed to generate download URL")
+    if (storagePath.includes("/")) {
+      // Legacy Supabase Storage (path contains a slash e.g. "assignments/...")
+      try {
+        const link = await createSignedUrl(BUCKETS.ASSIGNMENTS, storagePath, 60 * 60) // 1 hour
+        return NextResponse.redirect(link)
+      } catch (e: any) {
+         console.warn("Supabase signed url failed, falling back to public url for legacy file", e)
+         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+         if (!supabaseUrl) throw new Error("Missing Supabase URL")
+         const finalUrl = `${supabaseUrl}/storage/v1/object/public/${BUCKETS.ASSIGNMENTS}/${storagePath}`
+         return NextResponse.redirect(finalUrl)
+      }
+    } else {
+      // Google Drive (path is an ID without slashes)
+      const webViewLink = await getWebViewLink(storagePath)
+      if (!webViewLink) {
+         return apiError(new Error("Failed to get file link"), 500)
+      }
+      return NextResponse.redirect(webViewLink)
     }
-
-    // Redirect to the signed URL
-    return NextResponse.redirect(data.signedUrl)
   } catch (error) {
     return apiError(error)
   }

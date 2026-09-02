@@ -13,27 +13,29 @@ const ALLOWED_MIME_TYPES = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   'application/vnd.ms-powerpoint',
   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  'text/plain'
+  'text/plain',
+  'application/zip',
+  'application/x-zip-compressed'
 ]
 
 const BLOCKED_EXTENSIONS = ['.exe', '.bat', '.cmd', '.ps1', '.sh', '.js', '.ts', '.php']
-const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
+const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB limit
 
 export async function POST(request: NextRequest) {
   try {
     const user = await requireApiUser("super_admin", "admin", "guru")
     const body = await request.json()
     
-    const { filename, contentType, size, kelas_mengajar_id, materialId } = body
+    const { filename, contentType, size, kelas_mengajar_id } = body
     
     if (!filename || !contentType || !size || !kelas_mengajar_id) {
        return apiError(new Error("Missing required parameters"), 400)
     }
 
-    // 1. Authorization for Class
+    // 1. Validate Access
     await assertTeachingClassAccess(user, Number(kelas_mengajar_id))
 
-    // 2. Validation
+    // 2. Validate File
     if (!ALLOWED_MIME_TYPES.includes(contentType)) {
        return apiError(new Error(`File type ${contentType} is not allowed.`), 400)
     }
@@ -49,26 +51,7 @@ export async function POST(request: NextRequest) {
 
     // 3. Generate secure path
     const safeName = filename.replace(/[^a-zA-Z0-9.-]/g, '_')
-    let materialNamespace: string
-
-    if (materialId) {
-      // TEMUAN 1: Validate ownership of existing materialId before allowing its namespace
-      const { materialService } = await import("@/services/material.service")
-      const { assertMaterialAccess } = await import("@/auth/api-authorization")
-      
-      const existingMaterial = await materialService.getById(Number(materialId))
-      if (!existingMaterial) {
-         return apiError(new Error("Material not found"), 404)
-      }
-      // Re-assert access specifically to this material
-      await assertMaterialAccess(user, Number(materialId))
-      materialNamespace = String(materialId)
-    } else {
-      const crypto = await import("crypto")
-      materialNamespace = `temp-${crypto.randomUUID()}`
-    }
-    
-    const finalFilename = `material_${materialNamespace}_${Date.now()}_${safeName}`
+    const finalFilename = `material_${kelas_mengajar_id}_${Date.now()}_${safeName}`
     
     // 4. Generate GDrive Resumable Upload URL
     const origin = request.headers.get("origin")
@@ -76,8 +59,8 @@ export async function POST(request: NextRequest) {
 
     return ok({
        uploadUrl: uploadUrl,
-       storagePath: "", // Will be assigned by frontend from GDrive response
-       token: "" // Token is included in the uploadUrl for GDrive
+       storagePath: "", // Will be assigned by frontend
+       token: ""
     })
   } catch (error) {
     return apiError(error)
