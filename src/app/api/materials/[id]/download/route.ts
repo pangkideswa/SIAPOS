@@ -37,7 +37,7 @@ export async function GET(
        actualPathToDownload = material.thumbnail_url
     } else if (lampiranId) {
        const lampiranArray = Array.isArray(material.lampiran) ? material.lampiran : [];
-       const lamp = (lampiranArray as any[]).find(l => String(l.id) === String(lampiranId))
+       const lamp = (lampiranArray as { id: string | number, storage_path: string }[]).find(l => String(l.id) === String(lampiranId))
        if (!lamp) return apiError(new Error("Lampiran not found"), 404)
        actualPathToDownload = lamp.storage_path
     } else if (type === "attachment") {

@@ -316,6 +316,7 @@ export function MateriFormDialog({
          payload.lampiran.map(async (lamp) => {
             if (lamp.file) {
                const storage_path = await uploadFileDirectly(lamp.file, editingItem?.id)
+               // eslint-disable-next-line @typescript-eslint/no-unused-vars
                const { file: _file, ...lampWithoutFile } = lamp
                const url = `https://drive.google.com/file/d/${storage_path}/view`
                return { ...lampWithoutFile, storage_path, url }
@@ -325,9 +326,9 @@ export function MateriFormDialog({
       )
       
       await onSubmit(payload)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error)
-      const msg = error?.message || String(error) || "Terjadi kesalahan yang tidak diketahui"
+      const msg = error instanceof Error ? error.message : String(error) || "Terjadi kesalahan yang tidak diketahui"
       toast.error("Upload gagal", {
          description: msg
       })
