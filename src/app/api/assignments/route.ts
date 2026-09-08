@@ -40,12 +40,12 @@ export async function POST(request: NextRequest) {
     const body = parseWithSchema(assignmentSchema, await request.json())
     await assertTeachingClassAccess(user, body.kelas_mengajar_id)
     
-    // Validate storage paths
+    // Storage paths (Google Drive IDs) are validated generically via path validator.
     if (body.lampiran && Array.isArray(body.lampiran)) {
        for (const lamp of (body.lampiran as unknown as TugasLampiran[])) {
           if (lamp.storage_path) {
-             if (!lamp.storage_path.startsWith('assignments/temp-')) {
-                return apiError(new Error(`Invalid storage path for ${lamp.nama}. Must use a temporary namespace for new assignments.`), 400)
+             if (lamp.storage_path.startsWith('/') || lamp.storage_path.includes('../')) {
+                return apiError(new Error(`Invalid storage path for ${lamp.nama}.`), 400)
              }
           }
        }

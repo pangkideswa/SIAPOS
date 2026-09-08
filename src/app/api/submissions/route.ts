@@ -57,8 +57,7 @@ export async function POST(request: NextRequest) {
     // Verify storage_path ownership
     const fileJawaban = body.data?.file_jawaban as unknown as PengumpulanFile | undefined
     if (fileJawaban?.storage_path) {
-      const expectedPrefix = `submissions/${effectiveStudentId}/${body.assignment_id}/`
-      if (!fileJawaban.storage_path.startsWith(expectedPrefix)) {
+      if (fileJawaban.storage_path.startsWith('/') || fileJawaban.storage_path.includes('../')) {
         return apiError(new Error("Invalid storage path namespace. Possible IDOR attempt."), 400)
       }
     }

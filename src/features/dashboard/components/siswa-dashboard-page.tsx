@@ -198,12 +198,13 @@ export function SiswaDashboardPage() {
 
   const todayHari = new Date().toLocaleDateString("id-ID", { weekday: "long" })
   const jadwalHariIni = (schedules ?? [])
-    .filter((j) => j.kelas === siswaKelas && j.hari === todayHari)
+    .filter((j) => j.kelas === siswa?.kelas && j.hari === todayHari)
     .map((j) => ({
       ...j,
       waktu_mulai: j.jam_mulai,
       waktu_selesai: j.jam_selesai,
     }))
+    .sort((a, b) => a.waktu_mulai.localeCompare(b.waktu_mulai))
 
   const announcements = filterPengumumanByRole(
     "siswa",

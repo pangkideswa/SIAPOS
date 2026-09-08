@@ -44,7 +44,6 @@ export async function POST(request: NextRequest) {
     // Validate storage paths if provided
     
     if (body.thumbnail_url && !body.thumbnail_url.startsWith('http')) {
-       // Must be a valid temp- path for POST
        if (!assertValidMaterialPath(body.thumbnail_url)) {
           return apiError(new Error("Invalid thumbnail storage path"), 400)
        }

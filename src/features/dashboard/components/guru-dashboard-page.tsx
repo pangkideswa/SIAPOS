@@ -144,11 +144,13 @@ export function GuruDashboardPage() {
     },
   ]
 
-  const jadwalHariIni = (schedules ?? []).map((j) => ({
-    ...j,
-    waktu_mulai: j.jam_mulai,
-    waktu_selesai: j.jam_selesai,
-  }))
+  const jadwalHariIni = (schedules ?? [])
+    .map((j) => ({
+      ...j,
+      waktu_mulai: j.jam_mulai,
+      waktu_selesai: j.jam_selesai,
+    }))
+    .sort((a, b) => a.waktu_mulai.localeCompare(b.waktu_mulai))
 
   const pengumpulanTerbaru = [...pengumpulanTugas]
     .sort(

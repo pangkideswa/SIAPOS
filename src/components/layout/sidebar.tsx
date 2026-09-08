@@ -7,15 +7,12 @@ import {
   Users,
   BookOpen,
   GraduationCap,
-  Settings,
-  LogOut,
   ChevronLeft,
   ChevronRight,
   School,
   BookMarked,
   UserCog,
   ClipboardList,
-  User,
   Layers,
   BookOpenCheck,
   Award,
@@ -111,7 +108,7 @@ function SidebarContent({
   onToggleCollapse?: () => void
   onCloseMobile?: () => void
 }) {
-  const { logout, hasRole, user } = useAuth()
+  const { hasRole, user } = useAuth()
   const { settings } = useSettings()
   const pathname = usePathname()
 
@@ -145,15 +142,6 @@ function SidebarContent({
   const handleNavigate = () => {
     onCloseMobile?.()
   }
-
-  const rolePath =
-    userRole === "guru"
-      ? "guru"
-      : userRole === "siswa"
-        ? "siswa"
-        : userRole === "wali"
-          ? "wali"
-          : "admin"
 
   return (
     <>
@@ -206,38 +194,6 @@ function SidebarContent({
         })}
       </nav>
 
-      <div className="px-3 pb-4 space-y-1">
-        <Separator className="mb-2" />
-        <Link
-          href={`/${rolePath}/profil`}
-          onClick={handleNavigate}
-          className={cn(
-            "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
-            "text-muted-foreground hover:bg-muted hover:text-foreground"
-          )}
-        >
-          <User className="h-5 w-5 shrink-0" />
-          {!collapsed && <span>Profil</span>}
-        </Link>
-        <Link
-          href={`/${rolePath}/pengaturan`}
-          onClick={handleNavigate}
-          className={cn(
-            "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
-            "text-muted-foreground hover:bg-muted hover:text-foreground"
-          )}
-        >
-          <Settings className="h-5 w-5 shrink-0" />
-          {!collapsed && <span>Pengaturan</span>}
-        </Link>
-        <button
-          onClick={() => logout()}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors w-full"
-        >
-          <LogOut className="h-5 w-5 shrink-0" />
-          {!collapsed && <span>Keluar</span>}
-        </button>
-      </div>
 
       {onToggleCollapse && (
         <button

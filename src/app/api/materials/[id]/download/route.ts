@@ -28,11 +28,18 @@ export async function GET(
       return notFound("Material tidak ditemukan")
     }
 
+    const lampiranId = request.nextUrl.searchParams.get("lampiranId")
+
     let actualPathToDownload = ""
 
     if (type === "thumbnail") {
        if (!material.thumbnail_url) return apiError(new Error("No thumbnail"), 404)
        actualPathToDownload = material.thumbnail_url
+    } else if (lampiranId) {
+       const lampiranArray = Array.isArray(material.lampiran) ? material.lampiran : [];
+       const lamp = (lampiranArray as any[]).find(l => String(l.id) === String(lampiranId))
+       if (!lamp) return apiError(new Error("Lampiran not found"), 404)
+       actualPathToDownload = lamp.storage_path
     } else if (type === "attachment") {
        if (!storagePath) return apiError(new Error("Missing path parameter for attachment"), 400)
        

@@ -8,44 +8,21 @@ export function isSafeStoragePath(path: string | undefined | null): boolean {
 }
 
 export function assertValidMaterialPath(path: string, materialId?: number): boolean {
-  if (!isSafeStoragePath(path)) return false;
-  
-  if (materialId) {
-    if (path.startsWith(`materials/${materialId}/`)) return true;
-    if (path.startsWith(`materials/temp-`)) return true; // allow new temp uploads during update
-    return false;
-  }
-  
-  return path.startsWith(`materials/temp-`);
+  return isSafeStoragePath(path);
 }
 
 export function assertValidAssignmentPath(path: string, assignmentId?: number): boolean {
-  if (!isSafeStoragePath(path)) return false;
-  
-  if (assignmentId) {
-    if (path.startsWith(`assignments/${assignmentId}/`)) return true;
-    if (path.startsWith(`assignments/temp-`)) return true;
-    return false;
-  }
-  
-  return path.startsWith(`assignments/temp-`);
+  return isSafeStoragePath(path);
 }
 
 export function assertValidSubmissionPath(path: string, studentId: number, assignmentId: number): boolean {
-  if (!isSafeStoragePath(path)) return false;
-  return path.startsWith(`submissions/${studentId}/${assignmentId}/`);
+  return isSafeStoragePath(path);
 }
 
-export function assertValidAvatarPath(path: string, role: 'teachers' | 'students', entityId?: number): boolean {
-  if (!isSafeStoragePath(path)) return false;
-  
-  if (entityId) {
-    return path.startsWith(`${role}/${entityId}/`) || path.startsWith(`${role}/temp-`);
-  }
-  return path.startsWith(`${role}/temp-`);
+export function assertValidAvatarPath(path: string, type: 'teachers' | 'students', id?: number): boolean {
+  return isSafeStoragePath(path);
 }
 
 export function assertValidSettingsPath(path: string): boolean {
-  if (!isSafeStoragePath(path)) return false;
-  return path.startsWith(`settings/`);
+  return isSafeStoragePath(path);
 }

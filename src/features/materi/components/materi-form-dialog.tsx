@@ -317,7 +317,8 @@ export function MateriFormDialog({
             if (lamp.file) {
                const storage_path = await uploadFileDirectly(lamp.file, editingItem?.id)
                const { file: _file, ...lampWithoutFile } = lamp
-               return { ...lampWithoutFile, storage_path }
+               const url = `https://drive.google.com/file/d/${storage_path}/view`
+               return { ...lampWithoutFile, storage_path, url }
             }
             return lamp
          })

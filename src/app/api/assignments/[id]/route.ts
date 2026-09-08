@@ -46,9 +46,7 @@ export async function PUT(
        // Validate new paths
        for (const lamp of (body.lampiran as unknown as TugasLampiran[])) {
           if (lamp.storage_path) {
-             const validPrefix = `assignments/${id}/`
-             const validTempPrefix = `assignments/temp-`
-             if (!lamp.storage_path.startsWith(validPrefix) && !lamp.storage_path.startsWith(validTempPrefix)) {
+             if (lamp.storage_path.startsWith('/') || lamp.storage_path.includes('../')) {
                 return apiError(new Error(`Invalid storage path for ${lamp.nama}. Namespace mismatch.`), 400)
              }
           }

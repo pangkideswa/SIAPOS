@@ -26,9 +26,10 @@ const DAY_DB: Record<string, string> = {
 }
 
 function toJadwal(row: Schedule) {
+  const hariTitleCase = row.hari.charAt(0).toUpperCase() + row.hari.slice(1).toLowerCase();
   return {
     id: row.id,
-    hari: row.hari,
+    hari: hariTitleCase,
     jam_mulai: row.jam_mulai ?? "",
     jam_selesai: row.jam_selesai ?? "",
     mata_pelajaran: row.mata_pelajaran ?? "",

@@ -3,9 +3,9 @@ require('dotenv').config();
 
 async function test() {
   try {
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+    const clientId = process.env.GDRIVE_CLIENT_ID;
+    const clientSecret = process.env.GDRIVE_CLIENT_SECRET;
+    const refreshToken = process.env.GDRIVE_REFRESH_TOKEN;
     const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
     if (!clientId || !clientSecret || !refreshToken) {

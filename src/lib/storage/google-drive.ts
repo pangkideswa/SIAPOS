@@ -2,9 +2,9 @@ import { google } from "googleapis"
 
 // Setup Google Drive Auth with OAuth2 (Refresh Token)
 const getDriveAuth = () => {
-  const clientId = process.env.GOOGLE_CLIENT_ID
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET
-  const refreshToken = process.env.GOOGLE_REFRESH_TOKEN
+  const clientId = process.env.GDRIVE_CLIENT_ID
+  const clientSecret = process.env.GDRIVE_CLIENT_SECRET
+  const refreshToken = process.env.GDRIVE_REFRESH_TOKEN
 
   if (!clientId || !clientSecret || !refreshToken) {
     throw new Error("Google Drive OAuth credentials are not properly configured in environment variables")

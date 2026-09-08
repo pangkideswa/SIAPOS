@@ -10,6 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuGroup,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -18,8 +19,26 @@ import { Input } from "@/components/ui/input"
 import { LogOut, User, Search, Settings, Menu, Clock } from "lucide-react"
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
+import React, { Component, type ReactNode } from "react"
 import type { UserRole } from "@/types/auth"
 import { getInitials } from "@/lib/utils"
+
+class AvatarErrorBoundary extends Component<{children: ReactNode}, {error: unknown}> {
+  constructor(props: {children: ReactNode}) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error: unknown) {
+    return { error };
+  }
+  render() {
+    if (this.state.error) {
+      const err = this.state.error as Error
+      return <div className="p-4 text-red-500 text-xs break-words">{String(err.stack || err)}</div>;
+    }
+    return this.props.children;
+  }
+}
 
 function getRoleLabel(role: UserRole): string {
   const labels: Record<UserRole, string> = {
@@ -194,40 +213,48 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
         </span>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="focus:outline-none">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
-                {user?.name ? getInitials(user.name) : "?"}
-              </AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
+          <DropdownMenuTrigger
+            render={
+              <button className="focus:outline-none rounded-full">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
+                    {user?.name ? getInitials(user.name) : "?"}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            }
+          />
           <DropdownMenuContent align="end" className="w-52">
-            <DropdownMenuLabel>
-              <p className="font-medium text-sm">{user?.name}</p>
-              <p className="text-xs text-muted-foreground font-normal">
-                {user?.email}
-              </p>
-              <span className="inline-block mt-1 text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                {getRoleLabel(user?.role ?? "admin" as UserRole)}
-              </span>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push(`/${user?.role === "guru" ? "guru" : user?.role === "siswa" ? "siswa" : user?.role === "wali" ? "wali" : "admin"}/profil`)}>
-              <User className="mr-2 h-4 w-4" />
-              Profil Saya
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push(`/${user?.role === "guru" ? "guru" : user?.role === "siswa" ? "siswa" : user?.role === "wali" ? "wali" : "admin"}/pengaturan`)}>
-              <Settings className="mr-2 h-4 w-4" />
-              Pengaturan
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => logout()}
-              variant="destructive"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Keluar
-            </DropdownMenuItem>
+            <AvatarErrorBoundary>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>
+                  <p className="font-medium text-sm">{user?.name}</p>
+                  <p className="text-xs text-muted-foreground font-normal">
+                    {user?.email}
+                  </p>
+                  <span className="inline-block mt-1 text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                    {getRoleLabel(user?.role ?? "admin" as UserRole)}
+                  </span>
+                </DropdownMenuLabel>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => router.push(`/${user?.role === "guru" ? "guru" : user?.role === "siswa" ? "siswa" : user?.role === "wali" ? "wali" : "admin"}/profil`)}>
+                <User className="mr-2 h-4 w-4" />
+                Profil Saya
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push(`/${user?.role === "guru" ? "guru" : user?.role === "siswa" ? "siswa" : user?.role === "wali" ? "wali" : "admin"}/pengaturan`)}>
+                <Settings className="mr-2 h-4 w-4" />
+                Pengaturan
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => logout()}
+                variant="destructive"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Keluar
+              </DropdownMenuItem>
+            </AvatarErrorBoundary>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
