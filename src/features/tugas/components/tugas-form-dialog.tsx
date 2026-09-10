@@ -362,7 +362,11 @@ export function TugasFormDialog({
                         errors.kelas_mengajar_id ? "border-destructive" : ""
                       }
                     >
-                      <SelectValue placeholder="Pilih kelas mengajar" />
+                      <SelectValue placeholder="Pilih kelas mengajar">{
+                      form.kelas_mengajar_id
+                        ? String(form.kelas_mengajar_id)
+                        : ""
+                     === "semua" ? "Pilih kelas mengajar" : undefined}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {activeKelasMengajar.map((km) => (

@@ -211,10 +211,10 @@ export function GuruAbsensiHistoryPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Semua Kelas" />
+            <SelectValue placeholder="Kelas">{kelasFilter === "semua" ? "Kelas" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Kelas</SelectItem>
             {uniqueKelas.map((k) => (
               <SelectItem key={k} value={k}>
                 {k}

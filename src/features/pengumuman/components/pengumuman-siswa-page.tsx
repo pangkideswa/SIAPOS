@@ -72,10 +72,10 @@ export function PengumumanSiswaPage() {
         </div>
         <Select value={kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder="Kategori" />
+            <SelectValue placeholder="Kategori">{kategoriFilter === "semua" ? "Kategori" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kategori</SelectItem>
+            <SelectItem value="semua">Kategori</SelectItem>
             {KATEGORI_PENGUMUMAN_OPTIONS.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}

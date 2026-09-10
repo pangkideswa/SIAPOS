@@ -203,7 +203,7 @@ export default function TeacherAssignmentsPage() {
               <Label>Guru *</Label>
               <Select value={form.teacher_id} onValueChange={(value) => setForm({ ...form, teacher_id: value ?? "" })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih guru" />
+                  <SelectValue placeholder="Pilih guru">{form.teacher_id === "semua" ? "Pilih guru" : undefined}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {teachers.map((t) => (
@@ -219,7 +219,7 @@ export default function TeacherAssignmentsPage() {
               <Label>Mata Pelajaran *</Label>
               <Select value={form.subject_id} onValueChange={(value) => setForm({ ...form, subject_id: value ?? "" })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih mata pelajaran" />
+                  <SelectValue placeholder="Pilih mata pelajaran">{String(t.id) === "semua" ? "Pilih mata pelajaran" : undefined}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {subjects.map((s) => (
@@ -235,7 +235,7 @@ export default function TeacherAssignmentsPage() {
               <Label>Kelas *</Label>
               <Select value={form.class_id} onValueChange={(value) => setForm({ ...form, class_id: value ?? "" })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih kelas" />
+                  <SelectValue placeholder="Pilih kelas">{String(s.id) === "semua" ? "Pilih kelas" : undefined}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {classes.map((c) => (

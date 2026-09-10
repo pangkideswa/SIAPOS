@@ -173,30 +173,30 @@ export function QuizListPage() {
           <Input placeholder="Cari judul, kelas, deskripsi..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} className="pl-9" />
         </div>
         <Select value={mapelFilter} onValueChange={(v) => { if (v) { setMapelFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Mapel" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Mapel">{mapelFilter === "semua" ? "Mapel" : undefined}</SelectValue></SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Mapel</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={guruFilter} onValueChange={(v) => { if (v) { setGuruFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Guru" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Guru">{m === "semua" ? "Guru" : undefined}</SelectValue></SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Guru</SelectItem>
+            <SelectItem value="semua">Guru</SelectItem>
             {GURU_QUIZ_OPTIONS.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={kelasFilter} onValueChange={(v) => { if (v) { setKelasFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="Semua Kelas" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="Kelas">{g === "semua" ? "Kelas" : undefined}</SelectValue></SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Kelas</SelectItem>
             {KELAS_OPTIONS.map((k) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Semua Status" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Status">{k === "semua" ? "Status" : undefined}</SelectValue></SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Status</SelectItem>
+            <SelectItem value="semua">Status</SelectItem>
             {STATUS_QUIZ_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
           </SelectContent>
         </Select>

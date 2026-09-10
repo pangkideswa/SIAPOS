@@ -452,7 +452,7 @@ export function HasilUjianDetailPage({
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Pilih status" />
+                      <SelectValue placeholder="Pilih status">{statusHasil === "semua" ? "Pilih status" : undefined}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {STATUS_HASIL_OPTIONS.map((s) => (

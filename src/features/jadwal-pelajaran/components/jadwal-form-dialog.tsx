@@ -147,7 +147,7 @@ export function JadwalFormDialog({
                 onValueChange={(val) => setValue("hari", val as ScheduleInput["hari"])}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih hari" />
+                  <SelectValue placeholder="Pilih hari">{hariValue === "semua" ? "Pilih hari" : undefined}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {HARI_OPTIONS.map((h) => (
@@ -188,7 +188,7 @@ export function JadwalFormDialog({
               onValueChange={(val) => setValue("kelas_id", Number(val))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Pilih kelas" />
+                <SelectValue placeholder="Pilih kelas">{h.value === "semua" ? "Pilih kelas" : undefined}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {classes.map((c) => (
@@ -208,7 +208,7 @@ export function JadwalFormDialog({
               onValueChange={(val) => setValue("mata_pelajaran", val ?? "")}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Pilih mata pelajaran" />
+                <SelectValue placeholder="Pilih mata pelajaran">{String(c.id) === "semua" ? "Pilih mata pelajaran" : undefined}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {subjects.map((s) => (
@@ -228,7 +228,7 @@ export function JadwalFormDialog({
               onValueChange={(val) => setValue("guru_id", Number(val))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Pilih guru" />
+                <SelectValue placeholder="Pilih guru">{s.name === "semua" ? "Pilih guru" : undefined}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {teachers?.map((t) => (

@@ -26,6 +26,10 @@ export const TAHUN_AJARAN_OPTIONS = [
   "2024/2025",
   "2025/2026",
   "2026/2027",
+  "2027/2028",
+  "2028/2029",
+  "2029/2030",
+  "2030/2031",
 ] as const
 
 export const SEMESTER_OPTIONS = ["Ganjil", "Genap"] as const

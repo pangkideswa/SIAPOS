@@ -416,7 +416,7 @@ export function MateriFormDialog({
                       disabled={isLoading || isUploading}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Pilih jenis materi" />
+                        <SelectValue placeholder="Pilih jenis materi">{form.jenis_materi === "semua" ? "Pilih jenis materi" : undefined}</SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         {JENIS_MATERI_OPTIONS.map((jenis) => (
@@ -448,7 +448,7 @@ export function MateriFormDialog({
                         errors.kelas_mengajar_id ? "border-destructive" : ""
                       }
                     >
-                      <SelectValue placeholder="Pilih kelas mengajar" />
+                      <SelectValue placeholder="Pilih kelas mengajar">{jenis === "semua" ? "Pilih kelas mengajar" : undefined}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {activeKelasMengajar.map((km) => (

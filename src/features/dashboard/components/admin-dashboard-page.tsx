@@ -1,5 +1,15 @@
 "use client"
 
+import { useState } from "react"
+import { 
+  ResponsiveDialog, 
+  ResponsiveDialogContent, 
+  ResponsiveDialogHeader, 
+  ResponsiveDialogTitle, 
+  ResponsiveDialogDescription,
+  ResponsiveDialogBody
+} from "@/components/ui/responsive-dialog"
+
 import { useAuth } from "@/contexts/auth-context"
 import Link from "next/link"
 import {
@@ -96,6 +106,7 @@ function AnnouncementIcon({ kategori }: { kategori: string }) {
 
 export function AdminDashboardPage() {
   const { user } = useAuth()
+  const [isActivityOpen, setIsActivityOpen] = useState(false)
 
   const { data: teachers } = useTeachers()
   const { data: students } = useStudents()
@@ -254,53 +265,7 @@ export function AdminDashboardPage() {
         ))}
       </div>
 
-      {/* Statistik Input Nilai */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-        <Card size="sm">
-          <CardContent className="flex items-center gap-3 p-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-100 text-blue-600 shrink-0">
-              <FileSpreadsheet className="h-4 w-4" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Total Nilai</p>
-              <p className="text-lg font-bold">{semuaNilai.length}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card size="sm">
-          <CardContent className="flex items-center gap-3 p-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-green-100 text-green-600 shrink-0">
-              <FileSpreadsheet className="h-4 w-4" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Data Lengkap</p>
-              <p className="text-lg font-bold">{semuaNilai.filter((n) => n.status === "Lengkap").length}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card size="sm">
-          <CardContent className="flex items-center gap-3 p-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-yellow-100 text-yellow-600 shrink-0">
-              <FileSpreadsheet className="h-4 w-4" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Belum Lengkap</p>
-              <p className="text-lg font-bold">{semuaNilai.filter((n) => n.status === "Belum Lengkap").length}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card size="sm">
-          <CardContent className="flex items-center gap-3 p-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-purple-100 text-purple-600 shrink-0">
-              <FileSpreadsheet className="h-4 w-4" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Guru Penginput</p>
-              <p className="text-lg font-bold">{new Set(semuaNilai.map((n) => n.guru_nama)).size}</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+
 
       {/* Section 3 & 4: Aktivitas Terbaru + Status Akademik */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -324,7 +289,7 @@ export function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-0">
-              {activities.map((activity, index) => (
+              {activities.slice(0, 5).map((activity, index) => (
                 <div key={activity.id}>
                   <div className="flex items-start gap-3 py-3">
                     <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted shrink-0 mt-0.5">
@@ -347,9 +312,49 @@ export function AdminDashboardPage() {
                   {index < activities.length - 1 && <Separator />}
                 </div>
               ))}
+              
+              {activities.length > 5 && (
+                <div className="pt-4 flex justify-center">
+                  <Button variant="outline" size="sm" onClick={() => setIsActivityOpen(true)}>
+                    Lihat Selengkapnya ({activities.length})
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
+
+        <ResponsiveDialog open={isActivityOpen} onOpenChange={setIsActivityOpen}>
+          <ResponsiveDialogContent className="sm:max-w-[600px]">
+            <ResponsiveDialogHeader>
+              <ResponsiveDialogTitle>Semua Aktivitas Terbaru</ResponsiveDialogTitle>
+              <ResponsiveDialogDescription>
+                Riwayat lengkap aktivitas pengguna di sistem SIAPOS.
+              </ResponsiveDialogDescription>
+            </ResponsiveDialogHeader>
+            <ResponsiveDialogBody className="space-y-0 px-1 py-1">
+              {activities.map((activity, index) => (
+                <div key={activity.id}>
+                  <div className="flex items-start gap-3 py-3 px-4 sm:px-6">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted shrink-0 mt-0.5">
+                      <ActivityIcon icon={activity.icon} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm">
+                        <span className="font-semibold">{activity.user_name}</span>{" "}
+                        <span className="text-muted-foreground">{activity.action}</span>
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {formatRelativeTime(activity.timestamp)}
+                      </p>
+                    </div>
+                  </div>
+                  {index < activities.length - 1 && <Separator />}
+                </div>
+              ))}
+            </ResponsiveDialogBody>
+          </ResponsiveDialogContent>
+        </ResponsiveDialog>
 
         {/* Section 4: Status Akademik */}
         <Card>

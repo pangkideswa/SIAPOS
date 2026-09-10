@@ -261,10 +261,10 @@ export function PengumumanGuruPage() {
         </div>
         <Select value={kategoriFilter} onValueChange={(v) => { setKategoriFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder="Kategori" />
+            <SelectValue placeholder="Kategori">{kategoriFilter === "semua" ? "Kategori" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kategori</SelectItem>
+            <SelectItem value="semua">Kategori</SelectItem>
             {KATEGORI_PENGUMUMAN_OPTIONS.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}
@@ -272,10 +272,10 @@ export function PengumumanGuruPage() {
         </Select>
         <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder="Status">{k === "semua" ? "Status" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Status</SelectItem>
+            <SelectItem value="semua">Status</SelectItem>
             {STATUS_PENGUMUMAN_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>{s}</SelectItem>
             ))}

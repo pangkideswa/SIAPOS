@@ -228,10 +228,10 @@ export function JurusanListPage() {
           }}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Semua Status" />
+            <SelectValue placeholder="Status">{statusFilter === "semua" ? "Status" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Status</SelectItem>
+            <SelectItem value="semua">Status</SelectItem>
             <SelectItem value="active">Aktif</SelectItem>
             <SelectItem value="inactive">Tidak Aktif</SelectItem>
           </SelectContent>

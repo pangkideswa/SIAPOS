@@ -285,10 +285,10 @@ export function PenilaianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[170px]">
-            <SelectValue placeholder="Semua Guru" />
+            <SelectValue placeholder="Guru">{guruFilter === "semua" ? "Guru" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Guru</SelectItem>
+            <SelectItem value="semua">Guru</SelectItem>
             {teachers?.map((guru) => (
               <SelectItem key={guru.id} value={guru.nama_lengkap}>
                 {guru.nama_lengkap}
@@ -304,10 +304,10 @@ export function PenilaianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Semua Kelas" />
+            <SelectValue placeholder="Kelas">{guru.nama_lengkap === "semua" ? "Kelas" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Kelas</SelectItem>
             {classes.map((kelas) => (
               <SelectItem key={kelas.id} value={kelas.name}>
                 {kelas.name}
@@ -323,10 +323,10 @@ export function PenilaianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Semua Mapel" />
+            <SelectValue placeholder="Mapel">{kelas.name === "semua" ? "Mapel" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Mapel</SelectItem>
             {subjects.map((mapel) => (
               <SelectItem key={mapel.id} value={mapel.name}>
                 {mapel.name}
@@ -342,10 +342,10 @@ export function PenilaianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Semua Status" />
+            <SelectValue placeholder="Status">{mapel.name === "semua" ? "Status" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Status</SelectItem>
+            <SelectItem value="semua">Status</SelectItem>
             <SelectItem value="Belum Dinilai">Belum Dinilai</SelectItem>
             <SelectItem value="Sudah Dinilai">Sudah Dinilai</SelectItem>
             <SelectItem value="Revisi">Revisi</SelectItem>

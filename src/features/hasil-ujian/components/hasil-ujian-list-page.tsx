@@ -402,10 +402,10 @@ export function HasilUjianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder="Semua Kelas" />
+            <SelectValue placeholder="Kelas">{kelasFilter === "semua" ? "Kelas" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Kelas</SelectItem>
             {KELAS_HASIL_OPTIONS.map((kelas: string) => (
               <SelectItem key={kelas} value={kelas}>
                 {kelas}
@@ -421,10 +421,10 @@ export function HasilUjianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Semua Mapel" />
+            <SelectValue placeholder="Mapel">{kelas === "semua" ? "Mapel" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Mapel</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((mapel: string) => (
               <SelectItem key={mapel} value={mapel}>
                 {mapel}
@@ -440,10 +440,10 @@ export function HasilUjianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Semua Jenis" />
+            <SelectValue placeholder="Jenis">{mapel === "semua" ? "Jenis" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Jenis</SelectItem>
+            <SelectItem value="semua">Jenis</SelectItem>
             {JENIS_UJIAN_OPTIONS.map((jenis: string) => (
               <SelectItem key={jenis} value={jenis}>
                 {jenis}
@@ -459,10 +459,10 @@ export function HasilUjianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[170px]">
-            <SelectValue placeholder="Semua Status" />
+            <SelectValue placeholder="Status">{jenis === "semua" ? "Status" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Status</SelectItem>
+            <SelectItem value="semua">Status</SelectItem>
             {STATUS_HASIL_OPTIONS.map((status: string) => (
               <SelectItem key={status} value={status}>
                 {status}
@@ -481,7 +481,7 @@ export function HasilUjianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Urutkan" />
+            <SelectValue placeholder="Urutkan">{status === "semua" ? "Urutkan" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="tanggal-desc">Tanggal Terbaru</SelectItem>

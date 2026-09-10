@@ -108,10 +108,10 @@ export function KalenderAkademikGuruPage() {
         </div>
         <Select value={kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder="Semua Kategori" />
+            <SelectValue placeholder="Kategori">{kategoriFilter === "semua" ? "Kategori" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kategori</SelectItem>
+            <SelectItem value="semua">Kategori</SelectItem>
             {KATEGORI_OPTIONS.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}
@@ -119,10 +119,10 @@ export function KalenderAkademikGuruPage() {
         </Select>
         <Select value={semesterFilter} onValueChange={(v) => setSemesterFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[130px]">
-            <SelectValue placeholder="Semester" />
+            <SelectValue placeholder="Semester">{k === "semua" ? "Semester" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Semester</SelectItem>
+            <SelectItem value="semua">Semester</SelectItem>
             {SEMESTER_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>{s}</SelectItem>
             ))}
@@ -130,10 +130,10 @@ export function KalenderAkademikGuruPage() {
         </Select>
         <Select value={tahunAjaranFilter} onValueChange={(v) => setTahunAjaranFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[130px]">
-            <SelectValue placeholder="Tahun Ajaran" />
+            <SelectValue placeholder="Tahun Ajaran">{s === "semua" ? "Tahun Ajaran" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua TA</SelectItem>
+            <SelectItem value="semua">TA</SelectItem>
             {TAHUN_AJARAN_OPTIONS.map((t) => (
               <SelectItem key={t} value={t}>{t}</SelectItem>
             ))}
@@ -141,10 +141,10 @@ export function KalenderAkademikGuruPage() {
         </Select>
         <Select value={bulanFilter} onValueChange={(v) => setBulanFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[130px]">
-            <SelectValue placeholder="Bulan" />
+            <SelectValue placeholder="Bulan">{t === "semua" ? "Bulan" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Bulan</SelectItem>
+            <SelectItem value="semua">Bulan</SelectItem>
             {BULAN_OPTIONS.map((b) => (
               <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>
             ))}

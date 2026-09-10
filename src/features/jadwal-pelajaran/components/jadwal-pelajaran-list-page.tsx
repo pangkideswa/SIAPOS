@@ -101,10 +101,10 @@ export function JadwalPelajaranListPage() {
         </div>
         <Select value={hariFilter} onValueChange={(v) => setHariFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Semua Hari" />
+            <SelectValue placeholder="Hari">{hariFilter === "semua" ? "Hari" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Hari</SelectItem>
+            <SelectItem value="semua">Hari</SelectItem>
             {HARI_OPTIONS.map((h) => (
               <SelectItem key={h.value} value={h.value}>
                 {h.label}
@@ -114,10 +114,10 @@ export function JadwalPelajaranListPage() {
         </Select>
         <Select value={kelasFilter} onValueChange={(v) => setKelasFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Semua Kelas" />
+            <SelectValue placeholder="Kelas">{h.value === "semua" ? "Kelas" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Kelas</SelectItem>
             {kelasOptions.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}
@@ -125,10 +125,10 @@ export function JadwalPelajaranListPage() {
         </Select>
         <Select value={guruFilter} onValueChange={(v) => setGuruFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Semua Guru" />
+            <SelectValue placeholder="Guru">{k === "semua" ? "Guru" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Guru</SelectItem>
+            <SelectItem value="semua">Guru</SelectItem>
             {guruOptions.map((g) => (
               <SelectItem key={g} value={g}>{g}</SelectItem>
             ))}

@@ -122,7 +122,7 @@ export function BankSoalFormDialog({
           <div className="space-y-2">
             <Label>Tipe Soal *</Label>
             <Select value={form.tipe_soal} onValueChange={(v) => v && handleTipeChange(v)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Pilih Mapel">{form.tipe_soal === "semua" ? "Pilih Mapel" : undefined}</SelectValue></SelectTrigger>
               <SelectContent>
                 {TIPE_SOAL_OPTIONS.map((t) => (
                   <SelectItem key={t} value={t}>{t}</SelectItem>
@@ -210,7 +210,7 @@ export function BankSoalFormDialog({
             <div className="space-y-2">
               <Label>Guru *</Label>
               <Select value={form.guru_nama} onValueChange={(v) => v && handleChange("guru_nama", v)}>
-                <SelectTrigger><SelectValue placeholder="Pilih Guru" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Pilih Guru">{m === "semua" ? "Pilih Guru" : undefined}</SelectValue></SelectTrigger>
                 <SelectContent>
                   {GURU_BANK_SOAL_OPTIONS.map((g) => (
                     <SelectItem key={g} value={g}>{g}</SelectItem>
@@ -225,7 +225,7 @@ export function BankSoalFormDialog({
             <div className="space-y-2">
               <Label>Kelas *</Label>
               <Select value={form.kelas} onValueChange={(v) => v && handleChange("kelas", v)}>
-                <SelectTrigger><SelectValue placeholder="Pilih Kelas" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Pilih Kelas">{g === "semua" ? "Pilih Kelas" : undefined}</SelectValue></SelectTrigger>
                 <SelectContent>
                   {KELAS_OPTIONS.map((k) => (
                     <SelectItem key={k} value={k}>{k}</SelectItem>

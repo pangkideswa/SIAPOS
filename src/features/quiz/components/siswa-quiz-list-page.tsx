@@ -200,9 +200,9 @@ export function SiswaQuizListPage() {
 
       <div className="flex flex-col sm:flex-row gap-3">
         <Select value={mapelFilter} onValueChange={(v) => { if (v) setMapelFilter(v) }}>
-          <SelectTrigger className="w-full sm:w-[180px]"><SelectValue placeholder="Semua Mata Pelajaran" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[180px]"><SelectValue placeholder="Mata Pelajaran">{mapelFilter === "semua" ? "Mata Pelajaran" : undefined}</SelectValue></SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Mata Pelajaran</SelectItem>
+            <SelectItem value="semua">Mata Pelajaran</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>

@@ -253,10 +253,10 @@ export function AdminAbsensiRekapPage() {
           onValueChange={(v) => { setKelasFilter(v ?? "semua"); setPage(1) }}
         >
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Semua Kelas" />
+            <SelectValue placeholder="Kelas">{kelasFilter === "semua" ? "Kelas" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Kelas</SelectItem>
             {classes.map((k) => (
               <SelectItem key={k.id} value={k.name}>{k.name}</SelectItem>
             ))}

@@ -127,7 +127,7 @@ export function KalenderEventFormDialog({
               onValueChange={(v) => setForm({ ...form, kategori: v as KategoriEvent })}
             >
               <SelectTrigger id="kategori">
-                <SelectValue placeholder="Pilih kategori" />
+                <SelectValue placeholder="Pilih kategori">{form.kategori === "semua" ? "Pilih kategori" : undefined}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {KATEGORI_OPTIONS.map((k) => (
@@ -172,7 +172,7 @@ export function KalenderEventFormDialog({
                 onValueChange={(v) => setForm({ ...form, tahun_ajaran: v ?? "" })}
               >
                 <SelectTrigger id="tahun_ajaran">
-                  <SelectValue placeholder="Pilih tahun ajaran" />
+                  <SelectValue placeholder="Pilih tahun ajaran">{k === "semua" ? "Pilih tahun ajaran" : undefined}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {TAHUN_AJARAN_OPTIONS.map((t) => (
@@ -190,7 +190,7 @@ export function KalenderEventFormDialog({
                 onValueChange={(v) => setForm({ ...form, semester: v ?? "" })}
               >
                 <SelectTrigger id="semester">
-                  <SelectValue placeholder="Pilih semester" />
+                  <SelectValue placeholder="Pilih semester">{t === "semua" ? "Pilih semester" : undefined}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {SEMESTER_OPTIONS.map((s) => (
@@ -209,7 +209,7 @@ export function KalenderEventFormDialog({
               onValueChange={(v) => setForm({ ...form, status: v as StatusEvent })}
             >
               <SelectTrigger id="status">
-                <SelectValue placeholder="Pilih status" />
+                <SelectValue placeholder="Pilih status">{s === "semua" ? "Pilih status" : undefined}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {STATUS_EVENT_OPTIONS.map((s) => (

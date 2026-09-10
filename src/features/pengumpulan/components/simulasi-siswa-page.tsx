@@ -441,7 +441,7 @@ export function SimulasiSiswaPage() {
               setFile(null)
             }}>
               <SelectTrigger className="w-full sm:w-[300px]">
-                <SelectValue placeholder="Pilih Siswa" />
+                <SelectValue placeholder="Pilih Siswa">{selectedStudentId === "semua" ? "Pilih Siswa" : undefined}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="auto">-- Pilih Siswa --</SelectItem>

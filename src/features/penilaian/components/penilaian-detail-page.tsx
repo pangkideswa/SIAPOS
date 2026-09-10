@@ -379,7 +379,7 @@ export function PenilaianDetailPage({
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Pilih status" />
+                      <SelectValue placeholder="Pilih status">{statusPenilaian === "semua" ? "Pilih status" : undefined}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Belum Dinilai">Belum Dinilai</SelectItem>

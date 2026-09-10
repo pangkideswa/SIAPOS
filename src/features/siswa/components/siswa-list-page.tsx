@@ -290,10 +290,10 @@ export function SiswaListPage() {
           }}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Semua Jurusan" />
+            <SelectValue placeholder="Jurusan">{jurusanFilter === "semua" ? "Jurusan" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Jurusan</SelectItem>
+            <SelectItem value="semua">Jurusan</SelectItem>
             {JURUSAN_OPTIONS.map((j) => (
               <SelectItem key={j.id} value={String(j.id)}>
                 {j.code}
@@ -309,10 +309,10 @@ export function SiswaListPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Semua Kelas" />
+            <SelectValue placeholder="Kelas">{String(j.id) === "semua" ? "Kelas" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Kelas</SelectItem>
             {kelasOptions.map((k) => (
               <SelectItem key={k.name} value={k.name}>
                 {k.name}
@@ -328,10 +328,10 @@ export function SiswaListPage() {
           }}
         >
           <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Semua Status" />
+            <SelectValue placeholder="Status">{k.name === "semua" ? "Status" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Status</SelectItem>
+            <SelectItem value="semua">Status</SelectItem>
             {STATUS_SISWA_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>
                 {s}

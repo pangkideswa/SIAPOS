@@ -151,10 +151,10 @@ export function NilaiAkademikSiswaPage() {
         </div>
         <Select value={semesterFilter} onValueChange={(v) => { setSemesterFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Semester" />
+            <SelectValue placeholder="Semester">{semesterFilter === "semua" ? "Semester" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Semester</SelectItem>
+            <SelectItem value="semua">Semester</SelectItem>
             {SEMESTER_OPTIONS.map((s) => (
               <SelectItem key={s} value={s}>{s}</SelectItem>
             ))}

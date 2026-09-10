@@ -262,10 +262,10 @@ export function KelasMengajarListPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Semua Guru" />
+            <SelectValue placeholder="Guru">{guruFilter === "semua" ? "Guru" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Guru</SelectItem>
+            <SelectItem value="semua">Guru</SelectItem>
             {teacherOptions.map((t) => (
               <SelectItem key={t.id} value={t.nama_lengkap}>
                 {t.nama_lengkap}
@@ -283,10 +283,10 @@ export function KelasMengajarListPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Semua Kelas" />
+            <SelectValue placeholder="Kelas">{t.nama_lengkap === "semua" ? "Kelas" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Kelas</SelectItem>
             {classOptions.map((c) => (
               <SelectItem key={c.id} value={c.name}>
                 {c.name}
@@ -303,10 +303,10 @@ export function KelasMengajarListPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Semua Tahun" />
+            <SelectValue placeholder="Tahun">{c.name === "semua" ? "Tahun" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Tahun</SelectItem>
+            <SelectItem value="semua">Tahun</SelectItem>
             {TAHUN_AJARAN_OPTIONS.map((t) => (
               <SelectItem key={t} value={t}>
                 {t}

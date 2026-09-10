@@ -209,10 +209,10 @@ export default function SubjectsPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Semua Status" />
+            <SelectValue placeholder="Status">{activeFilter === "semua" ? "Status" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Status</SelectItem>
+            <SelectItem value="semua">Status</SelectItem>
             <SelectItem value="true">Aktif</SelectItem>
             <SelectItem value="false">Nonaktif</SelectItem>
           </SelectContent>

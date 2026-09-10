@@ -212,17 +212,17 @@ export function UserListPage() {
           />
         </div>
         <Select
-          value={roleFilter}
+          value={roleFilter === "semua" ? null : roleFilter}
           onValueChange={(value) => {
             setRoleFilter(value ?? "semua")
             setPage(1)
           }}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Semua Role" />
+            <SelectValue placeholder="Role">{roleFilter === "semua" ? "Role" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Role</SelectItem>
+            <SelectItem value="semua">Role</SelectItem>
             {ADMIN_MANAGEABLE_ROLES.map((role) => (
               <SelectItem key={role} value={role}>
                 {ROLE_LABELS[role]}

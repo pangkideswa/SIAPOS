@@ -113,7 +113,7 @@ export function QuizFormDialog({
           <div className="space-y-2">
             <Label>Paket Soal *</Label>
             <Select value={form.paket_soal_id ? String(form.paket_soal_id) : ""} onValueChange={(v) => v && handleChange("paket_soal_id", Number(v))}>
-              <SelectTrigger><SelectValue placeholder="Pilih Paket Soal" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Pilih Paket Soal">{form.paket_soal_id ? String(form.paket_soal_id) : "" === "semua" ? "Pilih Paket Soal" : undefined}</SelectValue></SelectTrigger>
               <SelectContent>
                 {DUMMY_PAKET_SOAL.map((p) => (
                   <SelectItem key={p.id} value={String(p.id)}>{p.nama_paket} ({p.mata_pelajaran})</SelectItem>
@@ -126,7 +126,7 @@ export function QuizFormDialog({
           <div className="space-y-2">
             <Label>Kelas *</Label>
             <Select value={form.kelas} onValueChange={(v) => v && handleChange("kelas", v)}>
-              <SelectTrigger><SelectValue placeholder="Pilih Kelas" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Pilih Kelas">{String(p.id) === "semua" ? "Pilih Kelas" : undefined}</SelectValue></SelectTrigger>
               <SelectContent>
                 {KELAS_OPTIONS.map((k) => (
                   <SelectItem key={k} value={k}>{k}</SelectItem>

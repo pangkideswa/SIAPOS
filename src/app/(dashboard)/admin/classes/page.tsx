@@ -210,10 +210,10 @@ export default function ClassesPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Semua Tingkat" />
+            <SelectValue placeholder="Tingkat">{gradeFilter === "semua" ? "Tingkat" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Tingkat</SelectItem>
+            <SelectItem value="semua">Tingkat</SelectItem>
             {GRADE_LEVELS.map((g) => (
               <SelectItem key={g} value={g}>
                 {g}

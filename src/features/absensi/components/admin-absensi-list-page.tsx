@@ -245,10 +245,10 @@ export function AdminAbsensiListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Semua Kelas" />
+            <SelectValue placeholder="Kelas">{kelasFilter === "semua" ? "Kelas" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Kelas</SelectItem>
             {classes.map((k) => (
               <SelectItem key={k.id} value={k.name}>
                 {k.name}
@@ -264,10 +264,10 @@ export function AdminAbsensiListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Semua Guru" />
+            <SelectValue placeholder="Guru">{k.name === "semua" ? "Guru" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Guru</SelectItem>
+            <SelectItem value="semua">Guru</SelectItem>
             {teachers?.map((g) => (
               <SelectItem key={g.id} value={g.nama_lengkap}>
                 {g.nama_lengkap}
@@ -283,10 +283,10 @@ export function AdminAbsensiListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Semua Mapel" />
+            <SelectValue placeholder="Mapel">{g.nama_lengkap === "semua" ? "Mapel" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Mapel</SelectItem>
             {subjects.map((m) => (
               <SelectItem key={m.id} value={m.name}>
                 {m.name}

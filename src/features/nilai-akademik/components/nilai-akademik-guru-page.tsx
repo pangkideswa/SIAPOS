@@ -206,10 +206,10 @@ export function NilaiAkademikGuruPage() {
         </div>
         <Select value={mapelFilter} onValueChange={(v) => { setMapelFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Mata Pelajaran" />
+            <SelectValue placeholder="Mata Pelajaran">{mapelFilter === "semua" ? "Mata Pelajaran" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Mapel</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((m) => (
               <SelectItem key={m} value={m}>{m}</SelectItem>
             ))}
@@ -217,10 +217,10 @@ export function NilaiAkademikGuruPage() {
         </Select>
         <Select value={kelasFilter} onValueChange={(v) => { setKelasFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[130px]">
-            <SelectValue placeholder="Kelas" />
+            <SelectValue placeholder="Kelas">{m === "semua" ? "Kelas" : undefined}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Kelas</SelectItem>
+            <SelectItem value="semua">Kelas</SelectItem>
             {KELAS_OPTIONS.map((k) => (
               <SelectItem key={k} value={k}>{k}</SelectItem>
             ))}

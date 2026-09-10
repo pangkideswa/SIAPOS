@@ -159,37 +159,37 @@ export function BankSoalListPage() {
           <Input placeholder="Cari kode, pertanyaan, mapel, guru..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} className="pl-9" />
         </div>
         <Select value={tipeFilter} onValueChange={(v) => { if (v) { setTipeFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Tipe" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Tipe">{tipeFilter === "semua" ? "Tipe" : undefined}</SelectValue></SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Tipe</SelectItem>
+            <SelectItem value="semua">Tipe</SelectItem>
             {TIPE_SOAL_OPTIONS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={mapelFilter} onValueChange={(v) => { if (v) { setMapelFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Mapel" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Mapel">{t === "semua" ? "Mapel" : undefined}</SelectValue></SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Mapel</SelectItem>
+            <SelectItem value="semua">Mapel</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={guruFilter} onValueChange={(v) => { if (v) { setGuruFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Semua Guru" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Guru">{m === "semua" ? "Guru" : undefined}</SelectValue></SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Guru</SelectItem>
+            <SelectItem value="semua">Guru</SelectItem>
             {GURU_BANK_SOAL_OPTIONS.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={kesulitanFilter} onValueChange={(v) => { if (v) { setKesulitanFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Semua Level" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Level">{g === "semua" ? "Level" : undefined}</SelectValue></SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Level</SelectItem>
+            <SelectItem value="semua">Level</SelectItem>
             {KESULITAN_OPTIONS.map((k) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Semua Status" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Status">{k === "semua" ? "Status" : undefined}</SelectValue></SelectTrigger>
           <SelectContent>
-            <SelectItem value="semua">Semua Status</SelectItem>
+            <SelectItem value="semua">Status</SelectItem>
             {STATUS_BANK_SOAL_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
           </SelectContent>
         </Select>

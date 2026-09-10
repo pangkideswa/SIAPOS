@@ -169,7 +169,7 @@ export function KelasPengumpulanTab({ kelasMengajar }: KelasPengumpulanTabProps)
             }}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Pilih tugas" />
+              <SelectValue placeholder="Pilih tugas">{selectedTugasId ? String(selectedTugasId) : "" === "semua" ? "Pilih tugas" : undefined}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {tugasList.map((t) => (
