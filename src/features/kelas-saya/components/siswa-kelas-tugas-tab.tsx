@@ -64,6 +64,13 @@ function formatWaktu(dateStr: string) {
   })
 }
 
+function isDeadlinePassed(dateStr: string, jam?: string | null): boolean {
+  const baseDate = dateStr.split('T')[0];
+  const time = jam || "23:59";
+  const deadlineDate = new Date(`${baseDate}T${time}:00`);
+  return new Date() > deadlineDate;
+}
+
 const MY_STATUS_BADGE: Record<string, string> = {
   "Belum Mengumpulkan": "bg-muted text-foreground",
   "Sudah Mengumpulkan": "bg-green-100 text-green-800",
@@ -210,6 +217,7 @@ export function SiswaKelasTugasTab({
         const riwayat = mySubmission?.riwayat_pengumpulan ?? []
         const isSubmitting = uploadingId === tugas.id
         const isGraded = mySubmission ? mySubmission.nilai !== null && !mySubmission.allow_resubmit : false
+        const isClosed = isDeadlinePassed(tugas.tenggat_waktu, tugas.tenggat_jam)
 
         return (
           <Card key={tugas.id}>
@@ -354,7 +362,7 @@ export function SiswaKelasTugasTab({
                 </div>
               )}
 
-              {!isGraded ? (
+              {!isGraded && !isClosed ? (
                 <div className="rounded-lg border border-border p-4 space-y-3">
                   {mySubmission?.allow_resubmit && (
                     <div className="rounded-md bg-blue-50 border border-blue-200 p-2.5 text-blue-700 text-xs mb-2">
@@ -405,6 +413,12 @@ export function SiswaKelasTugasTab({
                   />
                 </div>
               </div>
+              ) : isClosed && !isGraded ? (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
+                  <p className="text-sm font-medium text-red-800">
+                    Batas waktu pengumpulan telah berakhir.
+                  </p>
+                </div>
               ) : (
                 <div className="rounded-lg border border-orange-200 bg-orange-50 p-4 text-center">
                   <p className="text-sm font-medium text-orange-800">
@@ -414,7 +428,7 @@ export function SiswaKelasTugasTab({
               )}
             </CardContent>
 
-            {!isGraded && (
+            {!isGraded && !isClosed && (
               <CardFooter>
                 <Button
                   className="bg-primary hover:bg-primary/90 ml-auto"

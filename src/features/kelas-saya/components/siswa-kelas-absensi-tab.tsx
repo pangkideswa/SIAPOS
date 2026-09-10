@@ -36,6 +36,13 @@ function formatTanggalID(dateStr: string): string {
   })
 }
 
+function isAbsensiClosed(dateStr: string, jamSelesai?: string | null): boolean {
+  if (!jamSelesai) return false;
+  const baseDate = dateStr.split('T')[0];
+  const deadlineDate = new Date(`${baseDate}T${jamSelesai}:00`);
+  return new Date() > deadlineDate;
+}
+
 export function SiswaKelasAbsensiTab({
   kelasMengajar,
 }: SiswaKelasAbsensiTabProps) {
@@ -88,8 +95,9 @@ export function SiswaKelasAbsensiTab({
         <div className="space-y-3">
           {sortedSessions.map((session) => {
             const isSubmitting = submittingId === session.id
+            const isClosed = isAbsensiClosed(session.tanggal, session.jam_selesai)
             const dapatAbsen =
-              session.status === "Berlangsung" && session.metode === "Siswa"
+              session.status === "Berlangsung" && session.metode === "Siswa" && !isClosed
             return (
               <Card key={session.id}>
                 <CardContent className="p-4">
@@ -163,6 +171,9 @@ export function SiswaKelasAbsensiTab({
                         <Badge variant="outline" className="text-muted-foreground">
                           Belum dibuka
                         </Badge>
+                      )}
+                      {isClosed && session.status === "Berlangsung" && session.metode === "Siswa" && !session.saya_absen && (
+                        <Badge variant="destructive">Waktu Habis</Badge>
                       )}
                     </div>
                   </div>
