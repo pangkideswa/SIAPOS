@@ -278,7 +278,7 @@ export function PenilaianListPage() {
           />
         </div>
         <Select
-          value={guruFilter}
+          value={guruFilter === "semua" ? undefined : guruFilter}
           onValueChange={(v: string | null) => {
             setGuruFilter(v ?? "semua")
             setPage(1)
@@ -297,7 +297,7 @@ export function PenilaianListPage() {
           </SelectContent>
         </Select>
         <Select
-          value={kelasFilter}
+          value={kelasFilter === "semua" ? undefined : kelasFilter}
           onValueChange={(v: string | null) => {
             setKelasFilter(v ?? "semua")
             setPage(1)
@@ -316,7 +316,7 @@ export function PenilaianListPage() {
           </SelectContent>
         </Select>
         <Select
-          value={mapelFilter}
+          value={mapelFilter === "semua" ? undefined : mapelFilter}
           onValueChange={(v: string | null) => {
             setMapelFilter(v ?? "semua")
             setPage(1)
@@ -335,7 +335,7 @@ export function PenilaianListPage() {
           </SelectContent>
         </Select>
         <Select
-          value={statusFilter}
+          value={statusFilter === "semua" ? undefined : statusFilter}
           onValueChange={(v: string | null) => {
             setStatusFilter(v ?? "semua")
             setPage(1)

@@ -203,7 +203,7 @@ export default function ClassesPage() {
           />
         </div>
         <Select
-          value={gradeFilter}
+          value={gradeFilter === "semua" ? undefined : gradeFilter}
           onValueChange={(value) => {
             setGradeFilter(value ?? "semua")
             setPage(1)

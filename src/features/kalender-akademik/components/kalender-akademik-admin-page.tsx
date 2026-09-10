@@ -236,7 +236,7 @@ export function KalenderAkademikAdminPage() {
             className="pl-9"
           />
         </div>
-        <Select value={kategoriFilter} onValueChange={(v) => { setKategoriFilter(v ?? "semua"); setPage(1) }}>
+        <Select value={kategoriFilter === "semua" ? undefined : kategoriFilter} onValueChange={(v) => { setKategoriFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Kategori" />
           </SelectTrigger>
@@ -247,7 +247,7 @@ export function KalenderAkademikAdminPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={semesterFilter} onValueChange={(v) => { setSemesterFilter(v ?? "semua"); setPage(1) }}>
+        <Select value={semesterFilter === "semua" ? undefined : semesterFilter} onValueChange={(v) => { setSemesterFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[130px]">
             <SelectValue placeholder="Semester" />
           </SelectTrigger>
@@ -258,7 +258,7 @@ export function KalenderAkademikAdminPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={tahunAjaranFilter} onValueChange={(v) => { setTahunAjaranFilter(v ?? "semua"); setPage(1) }}>
+        <Select value={tahunAjaranFilter === "semua" ? undefined : tahunAjaranFilter} onValueChange={(v) => { setTahunAjaranFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[130px]">
             <SelectValue placeholder="Tahun Ajaran" />
           </SelectTrigger>
@@ -269,7 +269,7 @@ export function KalenderAkademikAdminPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={bulanFilter} onValueChange={(v) => { setBulanFilter(v ?? "semua"); setPage(1) }}>
+        <Select value={bulanFilter === "semua" ? undefined : bulanFilter} onValueChange={(v) => { setBulanFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[130px]">
             <SelectValue placeholder="Bulan" />
           </SelectTrigger>

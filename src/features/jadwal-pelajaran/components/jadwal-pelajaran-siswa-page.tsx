@@ -69,7 +69,7 @@ export function JadwalPelajaranSiswaPage() {
       />
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-        <Select value={hariFilter} onValueChange={(v) => setHariFilter(v ?? "semua")}>
+        <Select value={hariFilter === "semua" ? undefined : hariFilter} onValueChange={(v) => setHariFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Hari" />
           </SelectTrigger>

@@ -283,7 +283,7 @@ export function SiswaListPage() {
           />
         </div>
         <Select
-          value={jurusanFilter}
+          value={jurusanFilter === "semua" ? undefined : jurusanFilter}
           onValueChange={(value) => {
             setJurusanFilter(value ?? "semua")
             setPage(1)
@@ -302,7 +302,7 @@ export function SiswaListPage() {
           </SelectContent>
         </Select>
         <Select
-          value={kelasFilter}
+          value={kelasFilter === "semua" ? undefined : kelasFilter}
           onValueChange={(value) => {
             setKelasFilter(value ?? "semua")
             setPage(1)
@@ -321,7 +321,7 @@ export function SiswaListPage() {
           </SelectContent>
         </Select>
         <Select
-          value={statusFilter}
+          value={statusFilter === "semua" ? undefined : statusFilter}
           onValueChange={(value) => {
             setStatusFilter(value ?? "semua")
             setPage(1)

@@ -242,7 +242,7 @@ export function GuruListPage() {
           />
         </div>
         <Select
-          value={jkFilter}
+          value={jkFilter === "semua" ? undefined : jkFilter}
           onValueChange={(value) => {
             setJkFilter(value ?? "semua")
             setPage(1)
@@ -261,7 +261,7 @@ export function GuruListPage() {
           </SelectContent>
         </Select>
         <Select
-          value={statusFilter}
+          value={statusFilter === "semua" ? undefined : statusFilter}
           onValueChange={(value) => {
             setStatusFilter(value ?? "semua")
             setPage(1)

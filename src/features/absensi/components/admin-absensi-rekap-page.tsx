@@ -249,7 +249,7 @@ export function AdminAbsensiRekapPage() {
           />
         </div>
         <Select
-          value={kelasFilter}
+          value={kelasFilter === "semua" ? undefined : kelasFilter}
           onValueChange={(v) => { setKelasFilter(v ?? "semua"); setPage(1) }}
         >
           <SelectTrigger className="w-full sm:w-[180px]">

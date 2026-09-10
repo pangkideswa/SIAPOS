@@ -259,7 +259,7 @@ export function PengumumanGuruPage() {
             className="pl-9"
           />
         </div>
-        <Select value={kategoriFilter} onValueChange={(v) => { setKategoriFilter(v ?? "semua"); setPage(1) }}>
+        <Select value={kategoriFilter === "semua" ? undefined : kategoriFilter} onValueChange={(v) => { setKategoriFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Kategori" />
           </SelectTrigger>
@@ -270,7 +270,7 @@ export function PengumumanGuruPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v ?? "semua"); setPage(1) }}>
+        <Select value={statusFilter === "semua" ? undefined : statusFilter} onValueChange={(v) => { setStatusFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[140px]">
             <SelectValue placeholder="Status" />
           </SelectTrigger>

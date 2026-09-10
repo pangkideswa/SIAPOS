@@ -314,7 +314,7 @@ export function PengumumanAdminPage() {
             className="pl-9"
           />
         </div>
-        <Select value={kategoriFilter} onValueChange={(v) => { setKategoriFilter(v ?? "semua"); setPage(1) }}>
+        <Select value={kategoriFilter === "semua" ? undefined : kategoriFilter} onValueChange={(v) => { setKategoriFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Kategori" />
           </SelectTrigger>
@@ -325,7 +325,7 @@ export function PengumumanAdminPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v ?? "semua"); setPage(1) }}>
+        <Select value={statusFilter === "semua" ? undefined : statusFilter} onValueChange={(v) => { setStatusFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[140px]">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
@@ -336,7 +336,7 @@ export function PengumumanAdminPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={targetFilter} onValueChange={(v) => { setTargetFilter(v ?? "semua"); setPage(1) }}>
+        <Select value={targetFilter === "semua" ? undefined : targetFilter} onValueChange={(v) => { setTargetFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Target" />
           </SelectTrigger>
@@ -347,7 +347,7 @@ export function PengumumanAdminPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={pinnedFilter} onValueChange={(v) => { setPinnedFilter(v ?? "semua"); setPage(1) }}>
+        <Select value={pinnedFilter === "semua" ? undefined : pinnedFilter} onValueChange={(v) => { setPinnedFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[140px]">
             <SelectValue placeholder="Pin" />
           </SelectTrigger>

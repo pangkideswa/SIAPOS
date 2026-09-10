@@ -96,7 +96,7 @@ export function KalenderAkademikSiswaPage() {
             className="pl-9"
           />
         </div>
-        <Select value={kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "semua")}>
+        <Select value={kategoriFilter === "semua" ? undefined : kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Kategori" />
           </SelectTrigger>
@@ -107,7 +107,7 @@ export function KalenderAkademikSiswaPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={bulanFilter} onValueChange={(v) => setBulanFilter(v ?? "semua")}>
+        <Select value={bulanFilter === "semua" ? undefined : bulanFilter} onValueChange={(v) => setBulanFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[130px]">
             <SelectValue placeholder="Bulan" />
           </SelectTrigger>

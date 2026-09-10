@@ -255,7 +255,7 @@ export function KelasMengajarListPage() {
 
         {/* Filter Guru — dari database */}
         <Select
-          value={guruFilter}
+          value={guruFilter === "semua" ? undefined : guruFilter}
           onValueChange={(value) => {
             setGuruFilter(value ?? "semua")
             setPage(1)
@@ -276,7 +276,7 @@ export function KelasMengajarListPage() {
 
         {/* Filter Kelas — dari database */}
         <Select
-          value={kelasFilter}
+          value={kelasFilter === "semua" ? undefined : kelasFilter}
           onValueChange={(value) => {
             setKelasFilter(value ?? "semua")
             setPage(1)
@@ -296,7 +296,7 @@ export function KelasMengajarListPage() {
         </Select>
 
         <Select
-          value={tahunFilter}
+          value={tahunFilter === "semua" ? undefined : tahunFilter}
           onValueChange={(value) => {
             setTahunFilter(value ?? "semua")
             setPage(1)

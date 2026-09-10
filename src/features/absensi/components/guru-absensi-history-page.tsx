@@ -204,7 +204,7 @@ export function GuruAbsensiHistoryPage() {
           />
         </div>
         <Select
-          value={kelasFilter}
+          value={kelasFilter === "semua" ? undefined : kelasFilter}
           onValueChange={(v) => {
             setKelasFilter(v ?? "semua")
             setPage(1)

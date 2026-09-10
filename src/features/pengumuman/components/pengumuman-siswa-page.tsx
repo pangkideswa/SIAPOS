@@ -70,7 +70,7 @@ export function PengumumanSiswaPage() {
             className="pl-9"
           />
         </div>
-        <Select value={kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "semua")}>
+        <Select value={kategoriFilter === "semua" ? undefined : kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[150px]">
             <SelectValue placeholder="Kategori" />
           </SelectTrigger>

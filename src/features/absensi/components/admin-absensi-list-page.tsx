@@ -238,7 +238,7 @@ export function AdminAbsensiListPage() {
           />
         </div>
         <Select
-          value={kelasFilter}
+          value={kelasFilter === "semua" ? undefined : kelasFilter}
           onValueChange={(v) => {
             setKelasFilter(v ?? "semua")
             setPage(1)
@@ -257,7 +257,7 @@ export function AdminAbsensiListPage() {
           </SelectContent>
         </Select>
         <Select
-          value={guruFilter}
+          value={guruFilter === "semua" ? undefined : guruFilter}
           onValueChange={(v) => {
             setGuruFilter(v ?? "semua")
             setPage(1)
@@ -276,7 +276,7 @@ export function AdminAbsensiListPage() {
           </SelectContent>
         </Select>
         <Select
-          value={mapelFilter}
+          value={mapelFilter === "semua" ? undefined : mapelFilter}
           onValueChange={(v) => {
             setMapelFilter(v ?? "semua")
             setPage(1)

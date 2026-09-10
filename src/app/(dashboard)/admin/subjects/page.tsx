@@ -202,7 +202,7 @@ export default function SubjectsPage() {
           />
         </div>
         <Select
-          value={activeFilter}
+          value={activeFilter === "semua" ? undefined : activeFilter}
           onValueChange={(value) => {
             setActiveFilter(value ?? "semua")
             setPage(1)

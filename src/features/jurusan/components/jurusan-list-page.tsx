@@ -221,7 +221,7 @@ export function JurusanListPage() {
           />
         </div>
         <Select
-          value={statusFilter}
+          value={statusFilter === "semua" ? undefined : statusFilter}
           onValueChange={(value) => {
             setStatusFilter(value ?? "semua")
             setPage(1)
