@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
+import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -31,6 +32,9 @@ import type { Tugas, TugasFormData } from "@/features/tugas/types/tugas"
 
 export function TugasListPage() {
   const router = useRouter()
+  const { user } = useAuth()
+  const guruName = user?.name ?? ""
+
   const {
     data: allAssignments = [],
     isLoading: isTableLoading,
@@ -40,14 +44,12 @@ export function TugasListPage() {
   
   const { data: classesData } = useClasses({ per_page: 200 })
   const classes = classesData?.data ?? []
-  const { data: teachers } = useTeachers()
   const { data: subjectsData } = useSubjects({ per_page: 200 })
   const subjects = subjectsData?.data ?? []
   const createMutation = useCreateAssignment()
   const updateMutation = useUpdateAssignment()
   const removeMutation = useRemoveAssignment()
   const [search, setSearch] = useState("")
-  const [guruFilter, setGuruFilter] = useState<string>("semua")
   const [mapelFilter, setMapelFilter] = useState<string>("semua")
   const [kelasFilter, setKelasFilter] = useState<string>("semua")
   const [statusFilter, setStatusFilter] = useState<string>("semua")
@@ -58,17 +60,20 @@ export function TugasListPage() {
   const [deletingItem, setDeletingItem] = useState<Tugas | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
+  // Only show assignments by the logged-in teacher
+  const myAssignments = useMemo(
+    () => (guruName ? allAssignments.filter((a) => a.guru_nama === guruName) : allAssignments),
+    [allAssignments, guruName]
+  )
+
   const perPage = 10
 
-  const filteredData = allAssignments.filter((item) => {
+  const filteredData = myAssignments.filter((item) => {
     const matchesSearch =
       !search ||
       item.judul.toLowerCase().includes(search.toLowerCase()) ||
       item.mata_pelajaran.toLowerCase().includes(search.toLowerCase()) ||
-      item.guru_nama.toLowerCase().includes(search.toLowerCase()) ||
       item.kelas.toLowerCase().includes(search.toLowerCase())
-    const matchesGuru =
-      guruFilter === "semua" || item.guru_nama === guruFilter
     const matchesMapel =
       mapelFilter === "semua" || item.mata_pelajaran === mapelFilter
     const matchesKelas =
@@ -77,7 +82,6 @@ export function TugasListPage() {
       statusFilter === "semua" || item.status === statusFilter
     return (
       matchesSearch &&
-      matchesGuru &&
       matchesMapel &&
       matchesKelas &&
       matchesStatus
@@ -123,11 +127,7 @@ export function TugasListPage() {
         <Badge variant="outline">{String(item.kelas)}</Badge>
       ),
     },
-    {
-      key: "guru_nama",
-      header: "Guru",
-      render: (item) => String(item.guru_nama),
-    },
+
     {
       key: "tenggat_waktu",
       header: "Tenggat",
@@ -259,7 +259,7 @@ export function TugasListPage() {
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari judul, guru, mapel, atau kelas..."
+            placeholder="Cari judul, mapel, atau kelas..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -268,25 +268,6 @@ export function TugasListPage() {
             className="pl-9"
           />
         </div>
-        <Select
-          value={guruFilter === "semua" ? undefined : guruFilter}
-          onValueChange={(v: string | null) => {
-            setGuruFilter(v ?? "semua")
-            setPage(1)
-          }}
-        >
-          <SelectTrigger className="w-full sm:w-[170px]">
-            <SelectValue placeholder="Guru" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="semua">Guru</SelectItem>
-            {teachers?.map((guru) => (
-              <SelectItem key={guru.id} value={guru.nama_lengkap}>
-                {guru.nama_lengkap}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         <Select
           value={mapelFilter === "semua" ? undefined : mapelFilter}
           onValueChange={(v: string | null) => {

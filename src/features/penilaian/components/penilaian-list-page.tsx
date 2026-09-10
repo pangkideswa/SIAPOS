@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -33,6 +34,9 @@ import { usePenilaian } from "@/hooks/use-penilaian"
 
 export function PenilaianListPage() {
   const router = useRouter()
+  const { user } = useAuth()
+  const guruName = user?.name ?? ""
+
   const {
     data: allPenilaian = [],
     isLoading: isTableLoading,
@@ -42,11 +46,9 @@ export function PenilaianListPage() {
 
   const { data: classesData } = useClasses({ per_page: 200 })
   const classes = classesData?.data ?? []
-  const { data: teachers } = useTeachers()
   const { data: subjectsData } = useSubjects({ per_page: 200 })
   const subjects = subjectsData?.data ?? []
   const [search, setSearch] = useState("")
-  const [guruFilter, setGuruFilter] = useState<string>("semua")
   const [kelasFilter, setKelasFilter] = useState<string>("semua")
   const [mapelFilter, setMapelFilter] = useState<string>("semua")
   const [statusFilter, setStatusFilter] = useState<string>("semua")
@@ -54,15 +56,21 @@ export function PenilaianListPage() {
 
   const perPage = 10
 
+  // Only show penilaian by the logged-in teacher
+  const myPenilaian = useMemo(
+    () => (guruName ? allPenilaian.filter((p) => p.guru_nama === guruName) : allPenilaian),
+    [allPenilaian, guruName]
+  )
+
   const summaryData = useMemo(() => {
-    const total = allPenilaian.length
-    const sudahDinilai = allPenilaian.filter(
+    const total = myPenilaian.length
+    const sudahDinilai = myPenilaian.filter(
       (p) => p.status_penilaian === "Sudah Dinilai"
     ).length
-    const belumDinilai = allPenilaian.filter(
+    const belumDinilai = myPenilaian.filter(
       (p) => p.status_penilaian === "Belum Dinilai"
     ).length
-    const graded = allPenilaian.filter(
+    const graded = myPenilaian.filter(
       (p) => p.status_penilaian === "Sudah Dinilai" && p.nilai !== null
     )
     const rataRata =
@@ -73,23 +81,21 @@ export function PenilaianListPage() {
           )
         : 0
     return { total, sudahDinilai, belumDinilai, rataRata }
-  }, [allPenilaian])
+  }, [myPenilaian])
 
-  const filteredData = allPenilaian.filter((item) => {
+  const filteredData = myPenilaian.filter((item) => {
     const matchesSearch =
       !search ||
       item.siswa_nama.toLowerCase().includes(search.toLowerCase()) ||
       item.tugas_judul.toLowerCase().includes(search.toLowerCase()) ||
       item.mata_pelajaran.toLowerCase().includes(search.toLowerCase())
-    const matchesGuru =
-      guruFilter === "semua" || item.guru_nama === guruFilter
     const matchesKelas =
       kelasFilter === "semua" || item.siswa_kelas === kelasFilter
     const matchesMapel =
       mapelFilter === "semua" || item.mata_pelajaran === mapelFilter
     const matchesStatus =
       statusFilter === "semua" || item.status_penilaian === statusFilter
-    return matchesSearch && matchesGuru && matchesKelas && matchesMapel && matchesStatus
+    return matchesSearch && matchesKelas && matchesMapel && matchesStatus
   })
 
   const totalPages = Math.ceil(filteredData.length / perPage)
@@ -277,25 +283,6 @@ export function PenilaianListPage() {
             className="pl-9"
           />
         </div>
-        <Select
-          value={guruFilter === "semua" ? undefined : guruFilter}
-          onValueChange={(v: string | null) => {
-            setGuruFilter(v ?? "semua")
-            setPage(1)
-          }}
-        >
-          <SelectTrigger className="w-full sm:w-[170px]">
-            <SelectValue placeholder="Guru" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="semua">Guru</SelectItem>
-            {teachers?.map((guru) => (
-              <SelectItem key={guru.id} value={guru.nama_lengkap}>
-                {guru.nama_lengkap}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         <Select
           value={kelasFilter === "semua" ? undefined : kelasFilter}
           onValueChange={(v: string | null) => {

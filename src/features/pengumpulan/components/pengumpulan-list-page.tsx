@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -35,6 +36,9 @@ interface TugasWithCount {
 
 export function PengumpulanListPage() {
   const router = useRouter()
+  const { user } = useAuth()
+  const guruName = user?.name ?? ""
+
   const {
     data: assignments = [],
     isLoading: isTableLoading,
@@ -44,18 +48,22 @@ export function PengumpulanListPage() {
 
   const { data: classesData } = useClasses({ per_page: 200 })
   const classes = classesData?.data ?? []
-  const { data: teachers } = useTeachers()
   const { data: submissions = [] } = useSubmissions()
   const [search, setSearch] = useState("")
-  const [guruFilter, setGuruFilter] = useState<string>("semua")
   const [kelasFilter, setKelasFilter] = useState<string>("semua")
   const [statusFilter, setStatusFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
 
   const perPage = 10
 
+  // Only show assignments by the logged-in teacher
+  const myAssignments = useMemo(
+    () => (guruName ? assignments.filter((a) => a.guru_nama === guruName) : assignments),
+    [assignments, guruName]
+  )
+
   const tugasData: TugasWithCount[] = useMemo(() => {
-    return assignments.map((t) => {
+    return myAssignments.map((t) => {
       const itemSubmissions = submissions.filter(
         (p) => p.tugas_id === t.id
       )
@@ -80,15 +88,12 @@ export function PengumpulanListPage() {
     const matchesSearch =
       !search ||
       item.judul.toLowerCase().includes(search.toLowerCase()) ||
-      item.mata_pelajaran.toLowerCase().includes(search.toLowerCase()) ||
-      item.guru_nama.toLowerCase().includes(search.toLowerCase())
-    const matchesGuru =
-      guruFilter === "semua" || item.guru_nama === guruFilter
+      item.mata_pelajaran.toLowerCase().includes(search.toLowerCase())
     const matchesKelas =
       kelasFilter === "semua" || item.kelas === kelasFilter
     const matchesStatus =
       statusFilter === "semua" || item.status === statusFilter
-    return matchesSearch && matchesGuru && matchesKelas && matchesStatus
+    return matchesSearch && matchesKelas && matchesStatus
   })
 
   const totalPages = Math.ceil(filteredData.length / perPage)
@@ -118,11 +123,7 @@ export function PengumpulanListPage() {
         </div>
       ),
     },
-    {
-      key: "guru_nama",
-      header: "Guru",
-      render: (item) => String(item.guru_nama),
-    },
+
     {
       key: "jumlah_pengumpul",
       header: "Pengumpul",
@@ -192,7 +193,7 @@ export function PengumpulanListPage() {
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari judul tugas, guru, atau mapel..."
+            placeholder="Cari judul tugas atau mapel..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -201,25 +202,6 @@ export function PengumpulanListPage() {
             className="pl-9"
           />
         </div>
-        <Select
-          value={guruFilter === "semua" ? undefined : guruFilter}
-          onValueChange={(v: string | null) => {
-            setGuruFilter(v ?? "semua")
-            setPage(1)
-          }}
-        >
-          <SelectTrigger className="w-full sm:w-[170px]">
-            <SelectValue placeholder="Guru" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="semua">Guru</SelectItem>
-            {teachers?.map((guru) => (
-              <SelectItem key={guru.id} value={guru.nama_lengkap}>
-                {guru.nama_lengkap}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         <Select
           value={kelasFilter === "semua" ? undefined : kelasFilter}
           onValueChange={(v: string | null) => {
