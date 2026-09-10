@@ -316,7 +316,7 @@ export function PengumumanAdminPage() {
         </div>
         <Select value={kategoriFilter} onValueChange={(v) => { setKategoriFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder="Kategori">{kategoriFilter === "semua" ? "Kategori" : undefined}</SelectValue>
+            <SelectValue placeholder="Kategori" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kategori</SelectItem>
@@ -327,7 +327,7 @@ export function PengumumanAdminPage() {
         </Select>
         <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Status">{k === "semua" ? "Status" : undefined}</SelectValue>
+            <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Status</SelectItem>
@@ -338,7 +338,7 @@ export function PengumumanAdminPage() {
         </Select>
         <Select value={targetFilter} onValueChange={(v) => { setTargetFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder="Target">{s === "semua" ? "Target" : undefined}</SelectValue>
+            <SelectValue placeholder="Target" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Target</SelectItem>
@@ -349,7 +349,7 @@ export function PengumumanAdminPage() {
         </Select>
         <Select value={pinnedFilter} onValueChange={(v) => { setPinnedFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Pin">{t === "semua" ? "Pin" : undefined}</SelectValue>
+            <SelectValue placeholder="Pin" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Pin</SelectItem>

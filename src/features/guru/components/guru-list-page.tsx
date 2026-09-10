@@ -249,7 +249,7 @@ export function GuruListPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Jenis Kelamin">{jkFilter === "semua" ? "Jenis Kelamin" : undefined}</SelectValue>
+            <SelectValue placeholder="Jenis Kelamin" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Jenis Kelamin</SelectItem>
@@ -268,7 +268,7 @@ export function GuruListPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Status">{jk === "semua" ? "Status" : undefined}</SelectValue>
+            <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Status</SelectItem>

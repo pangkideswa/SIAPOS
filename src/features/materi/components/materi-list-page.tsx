@@ -251,7 +251,7 @@ export function MateriListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Guru">{guruFilter === "semua" ? "Guru" : undefined}</SelectValue>
+            <SelectValue placeholder="Guru" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Guru</SelectItem>
@@ -270,7 +270,7 @@ export function MateriListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Kelas">{guru.nama_lengkap === "semua" ? "Kelas" : undefined}</SelectValue>
+            <SelectValue placeholder="Kelas" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>
@@ -289,7 +289,7 @@ export function MateriListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Status">{kelas.name === "semua" ? "Status" : undefined}</SelectValue>
+            <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Status</SelectItem>

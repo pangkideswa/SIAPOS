@@ -211,7 +211,7 @@ export function GuruAbsensiHistoryPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Kelas">{kelasFilter === "semua" ? "Kelas" : undefined}</SelectValue>
+            <SelectValue placeholder="Kelas" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>

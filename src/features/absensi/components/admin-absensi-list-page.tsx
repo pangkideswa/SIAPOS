@@ -245,7 +245,7 @@ export function AdminAbsensiListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Kelas">{kelasFilter === "semua" ? "Kelas" : undefined}</SelectValue>
+            <SelectValue placeholder="Kelas" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>
@@ -264,7 +264,7 @@ export function AdminAbsensiListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Guru">{k.name === "semua" ? "Guru" : undefined}</SelectValue>
+            <SelectValue placeholder="Guru" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Guru</SelectItem>
@@ -283,7 +283,7 @@ export function AdminAbsensiListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Mapel">{g.nama_lengkap === "semua" ? "Mapel" : undefined}</SelectValue>
+            <SelectValue placeholder="Mapel" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mapel</SelectItem>

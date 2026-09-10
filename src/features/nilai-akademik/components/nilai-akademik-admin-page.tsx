@@ -174,7 +174,7 @@ export function NilaiAkademikAdminPage() {
         </div>
         <Select value={tahunFilter} onValueChange={(v) => { setTahunFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Tahun Ajaran">{tahunFilter === "semua" ? "Tahun Ajaran" : undefined}</SelectValue>
+            <SelectValue placeholder="Tahun Ajaran" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">TA</SelectItem>
@@ -185,7 +185,7 @@ export function NilaiAkademikAdminPage() {
         </Select>
         <Select value={semesterFilter} onValueChange={(v) => { setSemesterFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[120px]">
-            <SelectValue placeholder="Semester">{t === "semua" ? "Semester" : undefined}</SelectValue>
+            <SelectValue placeholder="Semester" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Semester</SelectItem>
@@ -196,7 +196,7 @@ export function NilaiAkademikAdminPage() {
         </Select>
         <Select value={mapelFilter} onValueChange={(v) => { setMapelFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Mata Pelajaran">{s === "semua" ? "Mata Pelajaran" : undefined}</SelectValue>
+            <SelectValue placeholder="Mata Pelajaran" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mapel</SelectItem>
@@ -207,7 +207,7 @@ export function NilaiAkademikAdminPage() {
         </Select>
         <Select value={guruFilter} onValueChange={(v) => { setGuruFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder="Guru">{m === "semua" ? "Guru" : undefined}</SelectValue>
+            <SelectValue placeholder="Guru" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Guru</SelectItem>
@@ -218,7 +218,7 @@ export function NilaiAkademikAdminPage() {
         </Select>
         <Select value={kelasFilter} onValueChange={(v) => { setKelasFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[130px]">
-            <SelectValue placeholder="Kelas">{g === "semua" ? "Kelas" : undefined}</SelectValue>
+            <SelectValue placeholder="Kelas" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>

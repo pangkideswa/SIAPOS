@@ -238,7 +238,7 @@ export function KalenderAkademikAdminPage() {
         </div>
         <Select value={kategoriFilter} onValueChange={(v) => { setKategoriFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder="Kategori">{kategoriFilter === "semua" ? "Kategori" : undefined}</SelectValue>
+            <SelectValue placeholder="Kategori" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kategori</SelectItem>
@@ -249,7 +249,7 @@ export function KalenderAkademikAdminPage() {
         </Select>
         <Select value={semesterFilter} onValueChange={(v) => { setSemesterFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[130px]">
-            <SelectValue placeholder="Semester">{k === "semua" ? "Semester" : undefined}</SelectValue>
+            <SelectValue placeholder="Semester" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Semester</SelectItem>
@@ -260,7 +260,7 @@ export function KalenderAkademikAdminPage() {
         </Select>
         <Select value={tahunAjaranFilter} onValueChange={(v) => { setTahunAjaranFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[130px]">
-            <SelectValue placeholder="Tahun Ajaran">{s === "semua" ? "Tahun Ajaran" : undefined}</SelectValue>
+            <SelectValue placeholder="Tahun Ajaran" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">TA</SelectItem>
@@ -271,7 +271,7 @@ export function KalenderAkademikAdminPage() {
         </Select>
         <Select value={bulanFilter} onValueChange={(v) => { setBulanFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[130px]">
-            <SelectValue placeholder="Bulan">{t === "semua" ? "Bulan" : undefined}</SelectValue>
+            <SelectValue placeholder="Bulan" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Bulan</SelectItem>

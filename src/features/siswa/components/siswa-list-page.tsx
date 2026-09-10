@@ -290,7 +290,7 @@ export function SiswaListPage() {
           }}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Jurusan">{jurusanFilter === "semua" ? "Jurusan" : undefined}</SelectValue>
+            <SelectValue placeholder="Jurusan" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Jurusan</SelectItem>
@@ -309,7 +309,7 @@ export function SiswaListPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Kelas">{String(j.id) === "semua" ? "Kelas" : undefined}</SelectValue>
+            <SelectValue placeholder="Kelas" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>
@@ -328,7 +328,7 @@ export function SiswaListPage() {
           }}
         >
           <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Status">{k.name === "semua" ? "Status" : undefined}</SelectValue>
+            <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Status</SelectItem>

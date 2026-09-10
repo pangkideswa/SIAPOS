@@ -210,7 +210,7 @@ export default function ClassesPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Tingkat">{gradeFilter === "semua" ? "Tingkat" : undefined}</SelectValue>
+            <SelectValue placeholder="Tingkat" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Tingkat</SelectItem>

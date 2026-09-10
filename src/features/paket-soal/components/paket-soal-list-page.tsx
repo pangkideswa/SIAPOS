@@ -156,21 +156,21 @@ export function PaketSoalListPage() {
           <Input placeholder="Cari nama paket, mapel, guru..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} className="pl-9" />
         </div>
         <Select value={mapelFilter} onValueChange={(v) => { if (v) { setMapelFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Mapel">{mapelFilter === "semua" ? "Mapel" : undefined}</SelectValue></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Mapel" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mapel</SelectItem>
             {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={guruFilter} onValueChange={(v) => { if (v) { setGuruFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Guru">{m === "semua" ? "Guru" : undefined}</SelectValue></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Guru" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Guru</SelectItem>
             {GURU_PAKET_SOAL_OPTIONS.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(1) } }}>
-          <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Status">{g === "semua" ? "Status" : undefined}</SelectValue></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Status</SelectItem>
             {STATUS_PAKET_SOAL_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}

@@ -72,7 +72,7 @@ export function PengumumanSiswaPage() {
         </div>
         <Select value={kategoriFilter} onValueChange={(v) => setKategoriFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder="Kategori">{kategoriFilter === "semua" ? "Kategori" : undefined}</SelectValue>
+            <SelectValue placeholder="Kategori" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kategori</SelectItem>

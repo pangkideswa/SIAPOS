@@ -306,7 +306,7 @@ export function PengumumanFormDialog({
                       disabled={submitting}
                     >
                       <SelectTrigger id="kategori">
-                        <SelectValue placeholder="Pilih kategori">{form.kategori === "semua" ? "Pilih kategori" : undefined}</SelectValue>
+                        <SelectValue placeholder="Pilih kategori" />
                       </SelectTrigger>
                       <SelectContent>
                         {KATEGORI_PENGUMUMAN_OPTIONS.map((k) => (
@@ -330,7 +330,7 @@ export function PengumumanFormDialog({
                       disabled={submitting}
                     >
                       <SelectTrigger id="target">
-                        <SelectValue placeholder="Pilih target">{k === "semua" ? "Pilih target" : undefined}</SelectValue>
+                        <SelectValue placeholder="Pilih target" />
                       </SelectTrigger>
                       <SelectContent>
                         {targetOptions.map((t) => (
@@ -358,7 +358,7 @@ export function PengumumanFormDialog({
                         id="kelas"
                         className={errors.kelas ? "border-destructive" : ""}
                       >
-                        <SelectValue placeholder="Pilih kelas">{t === "semua" ? "Pilih kelas" : undefined}</SelectValue>
+                        <SelectValue placeholder="Pilih kelas" />
                       </SelectTrigger>
                       <SelectContent>
                         {kelasOptions.map((k) => (
@@ -408,7 +408,7 @@ export function PengumumanFormDialog({
                       disabled={submitting}
                     >
                       <SelectTrigger id="status">
-                        <SelectValue placeholder="Pilih status">{k === "semua" ? "Pilih status" : undefined}</SelectValue>
+                        <SelectValue placeholder="Pilih status" />
                       </SelectTrigger>
                       <SelectContent>
                         {statusOptions.map((s) => (

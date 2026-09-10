@@ -149,7 +149,7 @@ export function PaketSoalFormDialog({
               <div className="space-y-2">
                 <Label>Mata Pelajaran *</Label>
                 <Select value={form.mata_pelajaran} onValueChange={(v) => v && handleChange("mata_pelajaran", v)}>
-                  <SelectTrigger><SelectValue placeholder="Pilih Mapel">{form.mata_pelajaran === "semua" ? "Pilih Mapel" : undefined}</SelectValue></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Pilih Mapel" /></SelectTrigger>
                   <SelectContent>
                     {MATA_PELAJARAN_OPTIONS.map((m) => (
                       <SelectItem key={m} value={m}>{m}</SelectItem>
@@ -161,7 +161,7 @@ export function PaketSoalFormDialog({
               <div className="space-y-2">
                 <Label>Guru *</Label>
                 <Select value={form.guru_nama} onValueChange={(v) => v && handleChange("guru_nama", v)}>
-                  <SelectTrigger><SelectValue placeholder="Pilih Guru">{m === "semua" ? "Pilih Guru" : undefined}</SelectValue></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Pilih Guru" /></SelectTrigger>
                   <SelectContent>
                     {GURU_PAKET_SOAL_OPTIONS.map((g) => (
                       <SelectItem key={g} value={g}>{g}</SelectItem>

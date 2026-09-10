@@ -206,7 +206,7 @@ export function NilaiAkademikGuruPage() {
         </div>
         <Select value={mapelFilter} onValueChange={(v) => { setMapelFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Mata Pelajaran">{mapelFilter === "semua" ? "Mata Pelajaran" : undefined}</SelectValue>
+            <SelectValue placeholder="Mata Pelajaran" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mapel</SelectItem>
@@ -217,7 +217,7 @@ export function NilaiAkademikGuruPage() {
         </Select>
         <Select value={kelasFilter} onValueChange={(v) => { setKelasFilter(v ?? "semua"); setPage(1) }}>
           <SelectTrigger className="w-full sm:w-[130px]">
-            <SelectValue placeholder="Kelas">{m === "semua" ? "Kelas" : undefined}</SelectValue>
+            <SelectValue placeholder="Kelas" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>

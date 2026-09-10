@@ -45,7 +45,7 @@ export function AnalyticsFilterBar({ filters, onFilterChange }: AnalyticsFilterB
           }
         >
           <SelectTrigger className="w-full sm:w-[170px]">
-            <SelectValue placeholder="Kelas">{filters.kelas === "semua" ? "Kelas" : undefined}</SelectValue>
+            <SelectValue placeholder="Kelas" />
           </SelectTrigger>
           <SelectContent>
             {KELAS_ANALITIK_OPTIONS.map((kelas) => (
@@ -62,7 +62,7 @@ export function AnalyticsFilterBar({ filters, onFilterChange }: AnalyticsFilterB
           }
         >
           <SelectTrigger className="w-full sm:w-[200px]">
-            <SelectValue placeholder="Mata Pelajaran">{kelas === "semua" ? "Mata Pelajaran" : undefined}</SelectValue>
+            <SelectValue placeholder="Mata Pelajaran" />
           </SelectTrigger>
           <SelectContent>
             {MATA_PELAJARAN_ANALITIK_OPTIONS.map((mapel) => (
@@ -79,7 +79,7 @@ export function AnalyticsFilterBar({ filters, onFilterChange }: AnalyticsFilterB
           }
         >
           <SelectTrigger className="w-full sm:w-[170px]">
-            <SelectValue placeholder="Jenis">{mapel === "semua" ? "Jenis" : undefined}</SelectValue>
+            <SelectValue placeholder="Jenis" />
           </SelectTrigger>
           <SelectContent>
             {JENIS_UJIAN_ANALITIK_OPTIONS.map((jenis) => (

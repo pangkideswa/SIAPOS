@@ -125,7 +125,7 @@ export function AdminJadwalPage() {
         </div>
         <Select value={hariFilter} onValueChange={(v) => setHariFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Hari">{hariFilter === "semua" ? "Hari" : undefined}</SelectValue>
+            <SelectValue placeholder="Hari" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Hari</SelectItem>
@@ -138,7 +138,7 @@ export function AdminJadwalPage() {
         </Select>
         <Select value={kelasFilter} onValueChange={(v) => setKelasFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Kelas">{h.value === "semua" ? "Kelas" : undefined}</SelectValue>
+            <SelectValue placeholder="Kelas" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>
@@ -149,7 +149,7 @@ export function AdminJadwalPage() {
         </Select>
         <Select value={guruFilter} onValueChange={(v) => setGuruFilter(v ?? "semua")}>
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Guru">{k.name === "semua" ? "Guru" : undefined}</SelectValue>
+            <SelectValue placeholder="Guru" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Guru</SelectItem>

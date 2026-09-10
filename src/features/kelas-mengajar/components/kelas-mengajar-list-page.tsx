@@ -262,7 +262,7 @@ export function KelasMengajarListPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Guru">{guruFilter === "semua" ? "Guru" : undefined}</SelectValue>
+            <SelectValue placeholder="Guru" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Guru</SelectItem>
@@ -283,7 +283,7 @@ export function KelasMengajarListPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Kelas">{t.nama_lengkap === "semua" ? "Kelas" : undefined}</SelectValue>
+            <SelectValue placeholder="Kelas" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>
@@ -303,7 +303,7 @@ export function KelasMengajarListPage() {
           }}
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Tahun">{c.name === "semua" ? "Tahun" : undefined}</SelectValue>
+            <SelectValue placeholder="Tahun" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Tahun</SelectItem>

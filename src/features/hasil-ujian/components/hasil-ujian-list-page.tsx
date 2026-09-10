@@ -402,7 +402,7 @@ export function HasilUjianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder="Kelas">{kelasFilter === "semua" ? "Kelas" : undefined}</SelectValue>
+            <SelectValue placeholder="Kelas" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>
@@ -421,7 +421,7 @@ export function HasilUjianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Mapel">{kelas === "semua" ? "Mapel" : undefined}</SelectValue>
+            <SelectValue placeholder="Mapel" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mapel</SelectItem>
@@ -440,7 +440,7 @@ export function HasilUjianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder="Jenis">{mapel === "semua" ? "Jenis" : undefined}</SelectValue>
+            <SelectValue placeholder="Jenis" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Jenis</SelectItem>
@@ -459,7 +459,7 @@ export function HasilUjianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[170px]">
-            <SelectValue placeholder="Status">{jenis === "semua" ? "Status" : undefined}</SelectValue>
+            <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Status</SelectItem>
@@ -481,7 +481,7 @@ export function HasilUjianListPage() {
           }}
         >
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Urutkan">{status === "semua" ? "Urutkan" : undefined}</SelectValue>
+            <SelectValue placeholder="Urutkan" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="tanggal-desc">Tanggal Terbaru</SelectItem>
