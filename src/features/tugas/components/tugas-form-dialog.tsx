@@ -219,24 +219,41 @@ export function TugasFormDialog({
     return true
   }
 
-  async function uploadFileDirectly(file: File): Promise<string> {
-     const formData = new FormData()
-     formData.append('file', file)
-     formData.append('kelas_mengajar_id', String(form.kelas_mengajar_id))
-
+  async function uploadFileDirectly(file: File, assignmentId?: number): Promise<string> {
      const res = await fetch('/api/assignments/upload-url', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+           filename: file.name,
+           contentType: file.type,
+           size: file.size,
+           kelas_mengajar_id: form.kelas_mengajar_id,
+           assignmentId: assignmentId || undefined
+        })
      })
-
+     
      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}))
-        throw new Error(errorData.error || `Gagal mengupload ${file.name}`)
+        const errorData = await res.json()
+        throw new Error(errorData.error || `Gagal mendapatkan url upload untuk ${file.name}`)
      }
-
+     
      const responseData = await res.json()
-     const { fileId } = responseData.data || responseData
-     return fileId
+     const { uploadUrl, storagePath } = responseData.data || responseData
+     
+     const uploadRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: {
+           'Content-Type': file.type,
+        },
+        body: file
+     })
+     
+     if (!uploadRes.ok) {
+        throw new Error(`Gagal mengupload ${file.name}`)
+     }
+     
+     const driveData = await uploadRes.json()
+     return driveData.id || storagePath
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -251,11 +268,11 @@ export function TugasFormDialog({
       payload.lampiran = await Promise.all(
          payload.lampiran.map(async (lamp) => {
             if (lamp.file) {
-               const fileId = await uploadFileDirectly(lamp.file)
+               const storage_path = await uploadFileDirectly(lamp.file, editingItem?.id)
                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                const { file: _file, ...lampWithoutFile } = lamp
-               const url = `https://drive.google.com/file/d/${fileId}/view`
-               return { ...lampWithoutFile, storage_path: fileId, url }
+               const url = `https://drive.google.com/file/d/${storage_path}/view`
+               return { ...lampWithoutFile, storage_path, url }
             }
             return lamp
          })
