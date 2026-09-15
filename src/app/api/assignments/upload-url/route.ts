@@ -2,7 +2,7 @@ import "server-only"
 import { NextRequest } from "next/server"
 import { apiError, ok } from "@/lib/api-utils"
 import { requireApiUser, assertTeachingClassAccess } from "@/auth/api-authorization"
-import { createResumableUpload } from "@/lib/storage/google-drive"
+import { uploadFileToDrive } from "@/lib/storage/google-drive"
 import path from "path"
 
 const ALLOWED_MIME_TYPES = [
@@ -24,44 +24,42 @@ const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB limit
 export async function POST(request: NextRequest) {
   try {
     const user = await requireApiUser("super_admin", "admin", "guru")
-    const body = await request.json()
-    
-    const { filename, contentType, size, kelas_mengajar_id } = body
-    
-    if (!filename || !contentType || !size || !kelas_mengajar_id) {
-       return apiError(new Error("Missing required parameters"), 400)
+
+    const formData = await request.formData()
+    const file = formData.get("file") as File | null
+    const kelas_mengajar_id = formData.get("kelas_mengajar_id") as string | null
+
+    if (!file || !kelas_mengajar_id) {
+      return apiError(new Error("Missing required parameters: file, kelas_mengajar_id"), 400)
     }
 
     // 1. Validate Access
     await assertTeachingClassAccess(user, Number(kelas_mengajar_id))
 
-    // 2. Validate File
-    if (!ALLOWED_MIME_TYPES.includes(contentType)) {
-       return apiError(new Error(`File type ${contentType} is not allowed.`), 400)
+    // 2. Validate File Type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return apiError(new Error(`File type ${file.type} is not allowed.`), 400)
     }
 
-    const ext = path.extname(filename).toLowerCase()
+    const ext = path.extname(file.name).toLowerCase()
     if (BLOCKED_EXTENSIONS.includes(ext) || !ext) {
-       return apiError(new Error(`File extension ${ext} is not allowed.`), 400)
+      return apiError(new Error(`File extension ${ext} is not allowed.`), 400)
     }
 
-    if (size > MAX_FILE_SIZE) {
-       return apiError(new Error("File size exceeds the limit of 20MB."), 400)
+    if (file.size > MAX_FILE_SIZE) {
+      return apiError(new Error("File size exceeds the limit of 20MB."), 400)
     }
 
-    // 3. Generate secure path
-    const safeName = filename.replace(/[^a-zA-Z0-9.-]/g, '_')
+    // 3. Generate secure filename
+    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
     const finalFilename = `assignment_${kelas_mengajar_id}_${Date.now()}_${safeName}`
-    
-    // 4. Generate GDrive Resumable Upload URL
-    const origin = request.headers.get("origin")
-    const { uploadUrl } = await createResumableUpload(finalFilename, contentType, size, origin)
 
-    return ok({
-       uploadUrl: uploadUrl,
-       storagePath: "", // Will be assigned by frontend
-       token: "" 
-    })
+    // 4. Upload langsung ke GDrive dari server (tidak lewat browser, menghindari CORS)
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+    const { fileId } = await uploadFileToDrive(finalFilename, file.type, buffer)
+
+    return ok({ fileId })
   } catch (error) {
     return apiError(error)
   }

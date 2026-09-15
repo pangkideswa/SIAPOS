@@ -29,65 +29,46 @@ const getDriveAuth = () => {
   }
 }
 
-export async function createResumableUpload(
+/**
+ * Upload file ke Google Drive server-side menggunakan Service Account.
+ * Mengembalikan file ID Google Drive.
+ * 
+ * Tidak menggunakan resumable upload URL karena browser tidak bisa
+ * langsung upload ke GDrive dengan Service Account (CORS diblokir).
+ */
+export async function uploadFileToDrive(
   fileName: string,
   contentType: string,
-  size: number,
-  origin: string | null
-): Promise<{ uploadUrl: string }> {
-  const { auth } = getDriveAuth()
+  fileBuffer: Buffer
+): Promise<{ fileId: string }> {
+  const { drive } = getDriveAuth()
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID
 
   if (!folderId) {
     throw new Error("GOOGLE_DRIVE_FOLDER_ID is not configured")
   }
 
-  const body = JSON.stringify({
-    name: fileName,
-    parents: [folderId],
+  const { Readable } = await import("stream")
+  const stream = Readable.from(fileBuffer)
+
+  const res = await drive.files.create({
+    requestBody: {
+      name: fileName,
+      parents: [folderId],
+    },
+    media: {
+      mimeType: contentType,
+      body: stream,
+    },
+    fields: "id",
   })
 
-  // Dapatkan access token dari Service Account (auto-refresh, tidak perlu refresh token manual)
-  // GoogleAuth.getAccessToken() mengembalikan string | null langsung
-  const token = await auth.getAccessToken()
-
-  if (!token) {
-    throw new Error("Failed to get Google Service Account Access Token")
+  const fileId = res.data.id
+  if (!fileId) {
+    throw new Error("Google Drive did not return a file ID after upload")
   }
 
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-    "X-Upload-Content-Type": contentType,
-    "X-Upload-Content-Length": String(size),
-  }
-
-  // Include Origin if present for CORS
-  if (origin) {
-    headers["Origin"] = origin
-  }
-
-  const res = await fetch(
-    "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
-    {
-      method: "POST",
-      headers,
-      body,
-    }
-  )
-
-  if (!res.ok) {
-    const text = await res.text()
-    console.error("GDrive POST error:", res.status, text)
-    throw new Error(`Failed to generate upload URL: ${res.statusText}`)
-  }
-
-  const uploadUrl = res.headers.get("location")
-  if (!uploadUrl) {
-    throw new Error("No upload URL returned from Google Drive")
-  }
-
-  return { uploadUrl }
+  return { fileId }
 }
 
 export async function getWebViewLink(fileId: string): Promise<string> {
@@ -104,4 +85,3 @@ export async function getWebViewLink(fileId: string): Promise<string> {
     throw new Error("Failed to get file link")
   }
 }
-

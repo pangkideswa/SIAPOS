@@ -142,49 +142,32 @@ export function SiswaKelasTugasTab({
     }
     setUploadingId(tugas.id)
     try {
-      // 1. Get upload URL
-      const uploadUrlRes = await fetch("/api/submissions/upload-url", {
+      // Upload file ke server (server yg upload ke GDrive, menghindari CORS)
+      const formData = new FormData()
+      formData.append('file', fileMeta.file)
+      formData.append('assignment_id', String(tugas.id))
+      formData.append('student_id', String(siswa.id))
+
+      const uploadRes = await fetch("/api/submissions/upload-url", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          assignment_id: tugas.id,
-          filename: fileMeta.file.name,
-          contentType: fileMeta.file.type,
-          size: fileMeta.file.size
-        })
-      })
-
-      if (!uploadUrlRes.ok) {
-         const err = await uploadUrlRes.json()
-         throw new Error(err.message || "Gagal mendapatkan URL upload")
-      }
-      
-      const resJson = await uploadUrlRes.json()
-      const { uploadUrl, storagePath } = resJson.data
-
-      // 2. Upload to Google Drive
-      const uploadRes = await fetch(uploadUrl, {
-         method: "PUT",
-         body: fileMeta.file,
-         headers: {
-            "Content-Type": fileMeta.file.type,
-         }
+        body: formData,
       })
 
       if (!uploadRes.ok) {
-         throw new Error("Gagal mengunggah file ke server penyimpanan")
+         const err = await uploadRes.json().catch(() => ({}))
+         throw new Error(err.error || "Gagal mengunggah file")
       }
 
-      const driveData = await uploadRes.json()
-      const finalStoragePath = driveData.id || storagePath
+      const resJson = await uploadRes.json()
+      const { fileId } = resJson.data || resJson
 
-      // 3. Save to DB
+      // Save to DB
       const { file: rawFile, ...fileMetaWithoutFile } = fileMeta
       await createSubmission.mutateAsync({
         assignment_id: tugas.id,
         student_id: siswa.id,
         data: {
-          file_jawaban: { ...fileMetaWithoutFile, storage_path: finalStoragePath },
+          file_jawaban: { ...fileMetaWithoutFile, storage_path: fileId },
           catatan: catatans[tugas.id] || null,
         },
       })
