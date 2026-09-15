@@ -1,28 +1,31 @@
 import { google } from "googleapis"
 
-// Setup Google Drive Auth with OAuth2 (Refresh Token)
+/**
+ * Setup Google Drive Auth menggunakan Service Account.
+ * Lebih stabil dari OAuth2+RefreshToken karena tidak punya expiry manual
+ * dan token di-refresh otomatis oleh library googleapis.
+ */
 const getDriveAuth = () => {
-  const clientId = process.env.GDRIVE_CLIENT_ID
-  const clientSecret = process.env.GDRIVE_CLIENT_SECRET
-  const refreshToken = process.env.GDRIVE_REFRESH_TOKEN
+  const clientEmail = process.env.GOOGLE_CLIENT_EMAIL
+  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n")
 
-  if (!clientId || !clientSecret || !refreshToken) {
-    throw new Error("Google Drive OAuth credentials are not properly configured in environment variables")
+  if (!clientEmail || !privateKey) {
+    throw new Error(
+      "Google Drive Service Account credentials (GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY) are not configured"
+    )
   }
 
-  const oauth2Client = new google.auth.OAuth2(
-    clientId,
-    clientSecret,
-    "https://developers.google.com/oauthplayground"
-  )
-
-  oauth2Client.setCredentials({
-    refresh_token: refreshToken
+  const auth = new google.auth.GoogleAuth({
+    credentials: {
+      client_email: clientEmail,
+      private_key: privateKey,
+    },
+    scopes: ["https://www.googleapis.com/auth/drive"],
   })
 
   return {
-    drive: google.drive({ version: "v3", auth: oauth2Client }),
-    oauth2Client
+    drive: google.drive({ version: "v3", auth }),
+    auth,
   }
 }
 
@@ -32,7 +35,7 @@ export async function createResumableUpload(
   size: number,
   origin: string | null
 ): Promise<{ uploadUrl: string }> {
-  const { oauth2Client } = getDriveAuth()
+  const { auth } = getDriveAuth()
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID
 
   if (!folderId) {
@@ -44,17 +47,19 @@ export async function createResumableUpload(
     parents: [folderId],
   })
 
-  const tokenInfo = await oauth2Client.getAccessToken()
-  const token = tokenInfo.token
+  // Dapatkan access token dari Service Account (auto-refresh, tidak perlu refresh token manual)
+  // GoogleAuth.getAccessToken() mengembalikan string | null langsung
+  const token = await auth.getAccessToken()
 
   if (!token) {
-     throw new Error("Failed to get Google OAuth Access Token")
+    throw new Error("Failed to get Google Service Account Access Token")
   }
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
     "X-Upload-Content-Type": contentType,
+    "X-Upload-Content-Length": String(size),
   }
 
   // Include Origin if present for CORS
@@ -62,11 +67,14 @@ export async function createResumableUpload(
     headers["Origin"] = origin
   }
 
-  const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable", {
-    method: "POST",
-    headers,
-    body,
-  })
+  const res = await fetch(
+    "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable",
+    {
+      method: "POST",
+      headers,
+      body,
+    }
+  )
 
   if (!res.ok) {
     const text = await res.text()
@@ -96,3 +104,4 @@ export async function getWebViewLink(fileId: string): Promise<string> {
     throw new Error("Failed to get file link")
   }
 }
+
