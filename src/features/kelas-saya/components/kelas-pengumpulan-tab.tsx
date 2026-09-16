@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -58,9 +58,20 @@ interface NilaiRow {
 export function KelasPengumpulanTab({ kelasMengajar }: KelasPengumpulanTabProps) {
   const classroom = useClassroom()
   const tugasList = classroom.getKelasTugas(kelasMengajar.id)
-  const [selectedTugasId, setSelectedTugasId] = useState<number>(
-    () => tugasList[0]?.id ?? 0
-  )
+  const sortedTugasList = useMemo(() => {
+    return [...tugasList].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  }, [tugasList])
+
+  const [selectedTugasId, setSelectedTugasId] = useState<number>(0)
+
+  // Auto-select the newest task when tasks are loaded
+  useEffect(() => {
+    if (sortedTugasList.length > 0) {
+      if (selectedTugasId === 0 || !sortedTugasList.find(t => t.id === selectedTugasId)) {
+        setSelectedTugasId(sortedTugasList[0].id)
+      }
+    }
+  }, [sortedTugasList, selectedTugasId])
   const [filter, setFilter] = useState<FilterStatus>("Semua")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedRow, setSelectedRow] = useState<NilaiRow | null>(null)
