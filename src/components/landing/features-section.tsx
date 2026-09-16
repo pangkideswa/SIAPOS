@@ -83,8 +83,7 @@ export function FeaturesSection() {
             Fitur Unggulan
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Dirancang untuk memenuhi kebutuhan pembelajaran digital di SMK
-            Wahana Bakti.
+            Dirancang khusus untuk memenuhi segala kebutuhan pembelajaran digital di sekolah Anda.
           </p>
         </motion.div>
 

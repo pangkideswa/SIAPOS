@@ -10,9 +10,9 @@ export const DUMMY_SEKOLAH_SETTINGS: SekolahSettings = {
     akreditasi: "B",
   },
   kontak: {
-    email: "info@smkwahanabakti.sch.id",
+    email: "info@siapos.my.id",
     no_telepon: "021-56789012",
-    website: "https://smkwahanabakti.sch.id",
+    website: "https://siapos.my.id",
     alamat_lengkap: "Jl. Raya Bogor Km. 23, No. 45, Kecamatan Ciracas, Jakarta Timur 13740, DKI Jakarta",
   },
   logo: {
@@ -30,8 +30,8 @@ export const DUMMY_SEKOLAH_SETTINGS: SekolahSettings = {
     zona_waktu: "Asia/Jakarta",
   },
   sosial_media: {
-    facebook: "https://facebook.com/smkwahanabakti",
-    instagram: "https://instagram.com/smkwahanabakti",
-    youtube: "https://youtube.com/@smkwahanabakti",
+    facebook: "https://facebook.com/siapos",
+    instagram: "https://instagram.com/siapos",
+    youtube: "https://youtube.com/@siapos",
   },
 }

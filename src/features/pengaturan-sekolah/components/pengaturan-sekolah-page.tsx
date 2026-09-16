@@ -326,7 +326,7 @@ export function PengaturanSekolahPage() {
                 type="email"
                 value={form.kontak.email}
                 onChange={(e) => handleGroupChange("kontak", "email", e.target.value)}
-                placeholder="info@smkwahanabakti.sch.id"
+                placeholder="info@siapos.my.id"
               />
             </div>
             <div className="space-y-2">
@@ -345,7 +345,7 @@ export function PengaturanSekolahPage() {
               id="website"
               value={form.kontak.website}
               onChange={(e) => handleGroupChange("kontak", "website", e.target.value)}
-              placeholder="https://smkwahanabakti.sch.id"
+              placeholder="https://siapos.my.id"
             />
           </div>
           <div className="space-y-2">
@@ -512,7 +512,7 @@ export function PengaturanSekolahPage() {
               id="facebook"
               value={form.sosial_media.facebook}
               onChange={(e) => handleGroupChange("sosial_media", "facebook", e.target.value)}
-              placeholder="https://facebook.com/smkwahanabakti"
+              placeholder="https://facebook.com/siapos"
             />
           </div>
           <div className="space-y-2">
@@ -521,7 +521,7 @@ export function PengaturanSekolahPage() {
               id="instagram"
               value={form.sosial_media.instagram}
               onChange={(e) => handleGroupChange("sosial_media", "instagram", e.target.value)}
-              placeholder="https://instagram.com/smkwahanabakti"
+              placeholder="https://instagram.com/siapos"
             />
           </div>
           <div className="space-y-2">
@@ -530,7 +530,7 @@ export function PengaturanSekolahPage() {
               id="youtube"
               value={form.sosial_media.youtube}
               onChange={(e) => handleGroupChange("sosial_media", "youtube", e.target.value)}
-              placeholder="https://youtube.com/@smkwahanabakti"
+              placeholder="https://youtube.com/@siapos"
             />
           </div>
         </CardContent>

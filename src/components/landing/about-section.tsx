@@ -4,10 +4,10 @@ import { motion } from "framer-motion"
 import { CheckCircle } from "lucide-react"
 
 const highlights = [
-  "Platform khusus untuk sekolah",
-  "Mudah digunakan untuk guru dan siswa",
-  "Tersedia di smartphone dan laptop",
-  "Akses materi dan tugas kapan saja",
+  "Ekosistem digital terintegrasi untuk institusi pendidikan",
+  "Antarmuka intuitif dan ramah pengguna untuk semua kalangan",
+  "Akses fleksibel lintas perangkat (Desktop, Tablet, Mobile)",
+  "Pembelajaran interaktif tanpa batasan ruang dan waktu",
 ]
 
 export function AboutSection() {
@@ -25,9 +25,7 @@ export function AboutSection() {
               Tentang SIAPOS
             </h2>
             <p className="mt-4 text-base text-muted-foreground leading-relaxed">
-              SIAPOS adalah Sistem Informaasi Akademik dan Pembelajaran Online Sekolah yang dirancang
-              khusus untuk sekolah. Kami memudahkan proses belajar
-              mengajar dengan teknologi modern yang simpel dan ramah pengguna.
+              SIAPOS (Sistem Informasi Akademik dan Pembelajaran Online Sekolah) hadir sebagai solusi digital terdepan untuk mentransformasi cara sekolah mengelola kegiatan akademik. Kami memadukan teknologi modern dengan kemudahan akses untuk menciptakan pengalaman belajar mengajar yang lebih efisien, interaktif, dan menyenangkan.
             </p>
 
             <div className="mt-8 space-y-3">
