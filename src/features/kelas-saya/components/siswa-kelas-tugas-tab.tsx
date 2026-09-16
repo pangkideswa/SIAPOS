@@ -148,6 +148,7 @@ export function SiswaKelasTugasTab({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           assignment_id: tugas.id,
+          student_id: siswa.id,
           filename: fileMeta.file.name,
           contentType: fileMeta.file.type,
           size: fileMeta.file.size
