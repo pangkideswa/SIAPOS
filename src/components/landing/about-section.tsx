@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { CheckCircle } from "lucide-react"
 
 const highlights = [
-  "Platform khusus SMK Wahana Bakti",
+  "Platform khusus untuk sekolah",
   "Mudah digunakan untuk guru dan siswa",
   "Tersedia di smartphone dan laptop",
   "Akses materi dan tugas kapan saja",
@@ -26,7 +26,7 @@ export function AboutSection() {
             </h2>
             <p className="mt-4 text-base text-muted-foreground leading-relaxed">
               SIAPOS adalah Sistem Informaasi Akademik dan Pembelajaran Online Sekolah yang dirancang
-              khusus untuk SMK Wahana Bakti. Kami memudahkan proses belajar
+              khusus untuk sekolah. Kami memudahkan proses belajar
               mengajar dengan teknologi modern yang simpel dan ramah pengguna.
             </p>
 

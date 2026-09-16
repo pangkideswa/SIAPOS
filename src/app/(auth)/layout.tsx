@@ -50,7 +50,7 @@ export default function AuthLayout({
             Berkembang Lebih Cepat
           </p>
           <p className="mt-4 text-sm text-white/60 max-w-xs mx-auto">
-            Platform pembelajaran digital untuk SMK Wahana Bakti
+            Platform pembelajaran digital untuk sekolah.
           </p>
         </div>
       </div>

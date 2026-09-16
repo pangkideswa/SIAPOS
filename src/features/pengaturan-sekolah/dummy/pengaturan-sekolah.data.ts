@@ -2,7 +2,7 @@ import type { SekolahSettings } from "../types/pengaturan-sekolah"
 
 export const DUMMY_SEKOLAH_SETTINGS: SekolahSettings = {
   informasi_sekolah: {
-    nama_sekolah: "SMK Wahana Bakti",
+    nama_sekolah: "Sekolah Anda",
     npsn: "20228917",
     nss: "5225615",
     jenjang: "SMK",

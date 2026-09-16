@@ -4,7 +4,7 @@
 
 **Sistem Integrasi Akademik dan Pembelajaran Online Sekolah**
 
-> Education Operating System (EduOS) untuk SMK Wahana Bakti
+> Education Operating System (EduOS) untuk sekolah
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://typescriptlang.org)
@@ -268,6 +268,6 @@ MIT License — Lihat [LICENSE](./LICENSE) untuk detail.
 
 **SIAPOS** — Education Operating System
 
-SMK Wahana Bakti © 2026
+Pangki Deswa Rayhandi (PD-Dev) © 2026
 
 </div>

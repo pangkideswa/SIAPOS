@@ -195,7 +195,7 @@ export function JurusanListPage() {
     <div className="space-y-6">
       <PageHeader
         title="Master Data Jurusan"
-        description="Kelola data jurusan di SMK Wahana Bakti"
+        description="Kelola data jurusan di sekolah Anda"
         action={
           <Button
             onClick={openCreate}

@@ -4,7 +4,7 @@
 
 ## Visi
 
-Menjadi Operating System Pendidikan berbasis web yang mempermudah proses belajar mengajar dan pengelolaan akademik di SMK Wahana Bakti.
+Menjadi Operating System Pendidikan berbasis web yang mempermudah proses belajar mengajar dan pengelolaan akademik di sekolah.
 
 ## Misi
 

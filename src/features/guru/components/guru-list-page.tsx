@@ -219,7 +219,7 @@ export function GuruListPage() {
     <div className="space-y-6">
       <PageHeader
         title="Data Guru"
-        description="Kelola data guru di SMK Wahana Bakti"
+        description="Kelola data guru di sekolah Anda"
         action={
           <Button onClick={openCreate} className="bg-primary hover:bg-primary/90">
             <Plus className="mr-2 h-4 w-4" />

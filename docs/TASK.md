@@ -109,7 +109,7 @@ Status : In Progress
 - [x] Backend: AppServiceProvider binds JurusanRepositoryInterface → JurusanRepository
 - [x] Backend: DatabaseSeeder calls JurusanSeeder
 - [x] Frontend: Feature-based `features/jurusan/` (types, constants, dummy data, components)
-- [x] Frontend: Dummy data — 3 jurusan sesuai data nyata SMK Wahana Bakti (TKJ aktif, TBSM aktif, BDP tidak aktif)
+- [x] Frontend: Dummy data — 3 jurusan sesuai data nyata sekolah (TKJ aktif, TBSM aktif, BDP tidak aktif)
 - [x] Frontend: JurusanListPage — search by name/code, status filter, DataTable, row click → detail
 - [x] Frontend: JurusanDetailPage — code badge, name, status, description, timestamps, edit/delete actions
 - [x] Frontend: JurusanFormDialog — name, code (auto-uppercase), is_active select, description textarea
@@ -176,7 +176,7 @@ Status : In Progress
 - [x] Frontend: Feature-based `features/pengaturan-sekolah/` (types, constants, dummy data, components)
 - [x] Frontend: Types — SekolahSettings interface (6 groups: informasi_sekolah, kontak, logo, tahun_akademik, pengaturan_sistem, sosial_media) + SekolahFormData type alias
 - [x] Frontend: Constants — JENJANG_OPTIONS, STATUS_SEKOLAH_OPTIONS, AKREDITASI_OPTIONS, SEMESTER_OPTIONS, BAHASA_OPTIONS, ZONA_WAKTU_OPTIONS, TAHUN_AJARAN_OPTIONS, EMPTY_SEKOLAH_FORM
-- [x] Frontend: Dummy data — DUMMY_SEKOLAH_SETTINGS (SMK Wahana Bakti with realistic data)
+- [x] Frontend: Dummy data — DUMMY_SEKOLAH_SETTINGS (Sekolah Anda with realistic data)
 - [x] Frontend: PengaturanSekolahPage — 6 sections with Cards, responsive grid layout, all fields with save button
   - [x] Section 1: Informasi Sekolah — Nama, NPSN, NSS, Jenjang/Status/Akreditasi selects
   - [x] Section 2: Kontak — Email, Telepon, Website, Alamat textarea

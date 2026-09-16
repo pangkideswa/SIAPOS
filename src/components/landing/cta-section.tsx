@@ -22,7 +22,7 @@ export function CtaSection() {
           </h2>
           <p className="mt-4 text-lg text-white/80 max-w-2xl mx-auto">
             Bergabung dengan SIAPOS sekarang dan rasakan kemudahan belajar
-            digital di SMK Wahana Bakti.
+            digital di sekolah Anda.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">

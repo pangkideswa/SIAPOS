@@ -237,7 +237,7 @@ export function SiswaListPage() {
     <div className="space-y-6">
       <PageHeader
         title="Data Siswa"
-        description="Kelola data siswa di SMK Wahana Bakti"
+        description="Kelola data siswa di sekolah Anda"
         action={
           <div className="flex flex-wrap gap-2">
             <Button

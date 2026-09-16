@@ -6,7 +6,7 @@ Version: 1.0
 
 # Tentang Project
 
-SIAPOS adalah Education Operating System berbasis Progressive Web App (PWA) untuk SMK Wahana Bakti.
+SIAPOS adalah Education Operating System berbasis Progressive Web App (PWA) untuk sekolah.
 
 Target utama:
 

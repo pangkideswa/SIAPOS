@@ -231,7 +231,7 @@ export function PengaturanSekolahPage() {
               id="nama_sekolah"
               value={form.informasi_sekolah.nama_sekolah}
               onChange={(e) => handleGroupChange("informasi_sekolah", "nama_sekolah", e.target.value)}
-              placeholder="Contoh: SMK Wahana Bakti"
+              placeholder="Contoh: SMA Negeri 1"
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -32,7 +32,7 @@ export function Footer() {
                 </span>
             </Link>
             <p className="mt-3 text-sm text-muted-foreground max-w-xs leading-relaxed">
-              Platform pembelajaran digital untuk SMK Wahana Bakti. Belajar
+              Platform pembelajaran digital untuk sekolah. Belajar
               lebih mudah, berkembang lebih cepat.
             </p>
           </div>
@@ -60,7 +60,7 @@ export function Footer() {
 
         <div className="mt-10 pt-6 border-t border-border/60">
           <p className="text-xs text-muted-foreground text-center">
-            &copy; {new Date().getFullYear()} SIAPOS v1.0 - Tim IT SMK Wahana Bakti. Hak
+            &copy; {new Date().getFullYear()} SIAPOS v1.0 - Pangki Deswa Rayhandi (PD-Dev). Hak
             cipta dilindungi.
           </p>
         </div>

@@ -49,7 +49,7 @@ export function HeroSection() {
               className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-6"
             >
               <BookOpen className="h-4 w-4" />
-              SMK Wahana Bakti
+              SIAPOS
             </motion.div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight text-foreground leading-[1.1]">
@@ -60,7 +60,7 @@ export function HeroSection() {
             </h1>
 
             <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              Platform pembelajaran digital untuk SMK Wahana Bakti. Akses materi,
+              Platform pembelajaran digital untuk sekolah. Akses materi,
               kerjakan tugas, dan pantau perkembangan belajar dalam satu tempat.
             </p>
 

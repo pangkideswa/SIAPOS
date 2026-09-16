@@ -135,7 +135,7 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/id/1.1.0/).
   - PengaturanSekolahPage — 6 sections (Informasi, Kontak, Logo, Tahun Akademik, Sistem, Sosial Media)
   - ImageUpload component — preview, 2MB validation
   - SectionHeader component — icon + title
-  - 1 dummy settings (SMK Wahana Bakti)
+  - 1 dummy settings (Sekolah Anda)
 
 ### Sprint 3 — Learning Module
 
