@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
 import { Plus, Search, Pin, Eye, Pencil, Trash2 } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
 import { Button } from "@/components/ui/button"
@@ -58,6 +59,7 @@ function toFormData({ id, created_at, updated_at, ...rest }: Pengumuman): Announ
 
 export function PengumumanGuruPage() {
   const router = useRouter()
+  const { user } = useAuth()
   const {
     data: items = [],
     isLoading,
@@ -79,7 +81,7 @@ export function PengumumanGuruPage() {
 
   const filteredData = useMemo(() => {
     let data = [...items]
-    if (mineOnly) data = data.filter((d) => d.penulis === GURU_PENULIS)
+    if (mineOnly) data = data.filter((d) => user?.name && d.penulis === user.name)
     if (search) {
       const q = search.toLowerCase()
       data = data.filter((d) => d.judul.toLowerCase().includes(q))
@@ -87,7 +89,7 @@ export function PengumumanGuruPage() {
     if (kategoriFilter !== "semua") data = data.filter((d) => d.kategori === kategoriFilter)
     if (statusFilter !== "semua") data = data.filter((d) => d.status === statusFilter)
     return data
-  }, [items, search, kategoriFilter, statusFilter, mineOnly])
+  }, [items, search, kategoriFilter, statusFilter, mineOnly, user?.name])
 
   const totalPages = Math.ceil(filteredData.length / PER_PAGE)
   const paginatedData = filteredData.slice((page - 1) * PER_PAGE, page * PER_PAGE)
@@ -198,7 +200,7 @@ export function PengumumanGuruPage() {
       header: "Aksi",
       className: "w-[180px]",
       render: (item) => {
-        const isMyItem = item.penulis === GURU_PENULIS
+        const isMyItem = user?.name ? item.penulis === user.name : false
         return (
           <div className="flex gap-1 flex-wrap">
             <Button

@@ -25,6 +25,7 @@ import {
   useUpdateAnnouncement,
   useRemoveAnnouncement,
 } from "@/hooks/use-announcements"
+import { useAuth } from "@/contexts/auth-context"
 import { useClassroom } from "@/hooks/use-classroom"
 import { formatTanggalPendek } from "@/features/kelas-saya/lib/kelas-saya-helpers"
 import type { AnnouncementFormData } from "@/lib/services/announcement.service"
@@ -42,7 +43,9 @@ export function KelasPengumumanTab({ kelasMengajar }: KelasPengumumanTabProps) {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletingItem, setDeletingItem] = useState<Pengumuman | null>(null)
 
+  const { user, hasRole } = useAuth()
   const classroom = useClassroom()
+  const isAdmin = hasRole("admin", "super_admin")
   const createAnnouncement = useCreateAnnouncement()
   const updateAnnouncement = useUpdateAnnouncement()
   const removeAnnouncement = useRemoveAnnouncement()
@@ -177,42 +180,45 @@ export function KelasPengumumanTab({ kelasMengajar }: KelasPengumumanTabProps) {
                     {formatTanggalPendek(p.tanggal_publish)} · {p.penulis}
                   </p>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    title={p.pinned ? "Lepas Pin" : "Pin"}
-                    onClick={() => togglePin(p)}
-                  >
-                    {p.pinned ? (
-                      <PinOff className="h-4 w-4 text-primary" />
-                    ) : (
-                      <Pin className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    title="Edit"
-                    onClick={() => {
-                      setEditingItem(p)
-                      setFormOpen(true)
-                    }}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    title="Hapus"
-                    onClick={() => {
-                      setDeletingItem(p)
-                      setDeleteOpen(true)
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
+                {/* Hanya pembuat pengumuman atau admin yang bisa edit/hapus */}
+                {(isAdmin || (user?.name && p.penulis === user.name)) && (
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      title={p.pinned ? "Lepas Pin" : "Pin"}
+                      onClick={() => togglePin(p)}
+                    >
+                      {p.pinned ? (
+                        <PinOff className="h-4 w-4 text-primary" />
+                      ) : (
+                        <Pin className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      title="Edit"
+                      onClick={() => {
+                        setEditingItem(p)
+                        setFormOpen(true)
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      title="Hapus"
+                      onClick={() => {
+                        setDeletingItem(p)
+                        setDeleteOpen(true)
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
