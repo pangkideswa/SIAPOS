@@ -17,7 +17,7 @@ export async function POST(
       return apiError(new Error("ID materi tidak valid"), 400)
     }
 
-    if (user.role !== "SISWA") {
+    if (user.role !== "siswa") {
       return ok({ success: true, message: "Ignored for non-students" })
     }
 
