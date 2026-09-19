@@ -29,7 +29,28 @@ const scoped = materials
     (item) =>
       user.role !== "siswa" || item.status === "Publish"
   )
-    return ok(isAdmin(user) ? materials : scoped)
+    let finalMaterials = isAdmin(user) ? materials : scoped
+
+    if (user.role === "siswa") {
+      const student = await import("@/lib/prisma").then(m => m.prisma.student.findUnique({
+        where: { user_id: user.id },
+      }))
+      
+      if (student) {
+        const reads = await import("@/lib/prisma").then(m => m.prisma.materialRead.findMany({
+          where: { student_id: student.id },
+          select: { material_id: true }
+        }))
+        const readIds = new Set(reads.map(r => r.material_id))
+        
+        finalMaterials = finalMaterials.map(m => ({
+          ...m,
+          is_read: readIds.has(m.id)
+        }))
+      }
+    }
+
+    return ok(finalMaterials)
   } catch (error) {
     return apiError(error)
   }

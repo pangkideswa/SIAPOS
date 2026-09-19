@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Plus, Pencil, Trash2, Search, Eye } from "lucide-react"
+import { Plus, Pencil, Trash2, Search, Eye, Download } from "lucide-react"
 import { GuruFormDialog } from "./guru-form-dialog"
 import { GuruDeleteDialog } from "./guru-delete-dialog"
 import {
@@ -221,10 +221,35 @@ export function GuruListPage() {
         title="Data Guru"
         description="Kelola data guru di sekolah Anda"
         action={
-          <Button onClick={openCreate} className="bg-primary hover:bg-primary/90">
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah Guru
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              disabled={isLoading}
+              onClick={async () => {
+                try {
+                  setIsLoading(true)
+                  const res = await fetch("/api/teachers/kinerja/export")
+                  if (!res.ok) throw new Error("Gagal mengambil data")
+                  const { data } = await res.json()
+                  
+                  import("@/lib/excel-export").then((m) => {
+                    m.exportToExcel(data, "Laporan_Kinerja_Guru")
+                  })
+                } catch (error) {
+                  console.error(error)
+                } finally {
+                  setIsLoading(false)
+                }
+              }}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export Excel
+            </Button>
+            <Button onClick={openCreate} className="bg-primary hover:bg-primary/90">
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah Guru
+            </Button>
+          </div>
         }
       />
 

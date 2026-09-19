@@ -97,6 +97,11 @@ export type TeachingClass = Prisma.TeachingClassModel
  */
 export type Material = Prisma.MaterialModel
 /**
+ * Model MaterialRead
+ * 
+ */
+export type MaterialRead = Prisma.MaterialReadModel
+/**
  * Model Assignment
  * 
  */

@@ -66,19 +66,37 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   if (allowedRoles && !hasRole(...allowedRoles)) return null
 
   return (
-    <div className="flex min-h-screen bg-muted/30">
+    <div className="flex min-h-screen relative overflow-hidden bg-background">
+      {/* Premium Background Elements */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Subtle Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+        {/* Top left glow */}
+        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[120px]"></div>
+        {/* Bottom right glow */}
+        <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-accent/5 blur-[120px]"></div>
+      </div>
+
       <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
-      <div className="flex-1 flex flex-col min-h-screen min-w-0">
+      <div className="flex-1 flex flex-col min-h-screen min-w-0 z-10">
         <TopBar onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          <motion.div
-            key={pathname}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-          >
-            {children}
-          </motion.div>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 flex flex-col">
+          <div className="flex-1">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
+              {children}
+            </motion.div>
+          </div>
+          
+          <footer className="mt-8 pt-6 border-t border-border/50 shrink-0">
+            <p className="text-xs text-muted-foreground text-center">
+              &copy; {new Date().getFullYear()} SIAPOS V2.0 | Hak Cipta Dilindungi | Created by PD-Dev.
+            </p>
+          </footer>
         </main>
       </div>
     </div>

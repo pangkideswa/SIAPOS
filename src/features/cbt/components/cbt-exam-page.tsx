@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress"
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import { ArrowLeft, ArrowRight, Clock, Flag, CheckCircle2, Bookmark, BookmarkCheck } from "lucide-react"
+import { ArrowLeft, ArrowRight, Clock, Flag, CheckCircle2, Bookmark, BookmarkCheck, AlertTriangle, Menu, Maximize, ShieldAlert, Monitor, X } from "lucide-react"
 import { DUMMY_CBT } from "../dummy/cbt.data"
 import { DUMMY_PAKET_SOAL } from "@/features/paket-soal/dummy/paket-soal.data"
 import { DUMMY_BANK_SOAL } from "@/features/bank-soal/dummy/bank-soal.data"
@@ -25,20 +25,54 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
   const cbt = DUMMY_CBT.find((c) => c.id === Number(id))
   const paket = cbt ? DUMMY_PAKET_SOAL.find((p) => p.id === cbt.paket_soal_id) : null
 
-  const soalList: BankSoal[] = paket
-    ? DUMMY_BANK_SOAL.filter((s) => paket.soal_ids.includes(s.id))
-    : []
+  const soalList: BankSoal[] = useMemo(() => {
+    if (!paket) return []
+    let base = DUMMY_BANK_SOAL.filter((s) => paket.soal_ids.includes(s.id))
+    if (cbt?.acak_soal) {
+      base = [...base].sort(() => Math.random() - 0.5)
+    }
+    return base
+  }, [paket, cbt?.acak_soal])
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<CBTAnswer[]>([])
   const [timeLeft, setTimeLeft] = useState(cbt ? cbt.durasi * 60 : 0)
+  const [isStarted, setIsStarted] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isFinished, setIsFinished] = useState(false)
   const [showFinishDialog, setShowFinishDialog] = useState(false)
+  const [violationCount, setViolationCount] = useState(0)
+  const [showViolationDialog, setShowViolationDialog] = useState(false)
 
   useEffect(() => {
+    if (!isStarted || isFinished || !cbt) return
+
+    const handleBlur = () => {
+      setViolationCount((prev) => prev + 1)
+      setShowViolationDialog(true)
+    }
+    
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setViolationCount((prev) => prev + 1)
+        setShowViolationDialog(true)
+      }
+    }
+
+    window.addEventListener("blur", handleBlur)
+    document.addEventListener("fullscreenchange", handleFullscreenChange)
+    
+    return () => {
+      window.removeEventListener("blur", handleBlur)
+      document.removeEventListener("fullscreenchange", handleFullscreenChange)
+    }
+  }, [isStarted, isFinished, cbt])
+
+  useEffect(() => {
+    if (!isStarted || isFinished) return
     if (timeLeft <= 0) {
       if (cbt?.auto_submit) {
-        setIsFinished(true)
+        handleFinish()
       }
       return
     }
@@ -46,7 +80,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer)
-          if (cbt?.auto_submit) setIsFinished(true)
+          if (cbt?.auto_submit) handleFinish()
           return 0
         }
         return prev - 1
@@ -54,7 +88,14 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
     }, 1000)
     return () => clearInterval(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timeLeft])
+  }, [timeLeft, isStarted, isFinished])
+  
+  const startExam = () => {
+    setIsStarted(true)
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(console.error)
+    }
+  }
 
   const currentSoal = soalList[currentIndex]
   const progress = soalList.length > 0 ? ((currentIndex + 1) / soalList.length) * 100 : 0
@@ -87,6 +128,9 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
   function handleFinish() {
     setShowFinishDialog(false)
     setIsFinished(true)
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(console.error)
+    }
   }
 
   function formatTime(seconds: number) {
@@ -108,6 +152,56 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <p className="text-muted-foreground">Ujian CBT tidak ditemukan</p>
         <Button variant="outline" onClick={() => router.push("/siswa/cbt")}>Kembali</Button>
+      </div>
+    )
+  }
+
+  if (!isStarted) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6 py-8 px-4">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="flex items-center justify-center w-20 h-20 rounded-full bg-primary/10">
+            <Monitor className="h-10 w-10 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold">Konfirmasi Kesiapan Ujian</h2>
+            <p className="text-muted-foreground mt-1">{cbt.nama_ujian}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="rounded-lg border p-4 text-center">
+            <p className="text-sm text-muted-foreground">Total Soal</p>
+            <p className="text-2xl font-bold">{soalList.length}</p>
+          </div>
+          <div className="rounded-lg border p-4 text-center">
+            <p className="text-sm text-muted-foreground">Durasi Ujian</p>
+            <p className="text-2xl font-bold">{cbt.durasi} Menit</p>
+          </div>
+        </div>
+
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 text-sm space-y-2">
+          <p className="font-semibold flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4" />
+            Perhatian & Tata Tertib
+          </p>
+          <ul className="list-disc list-inside space-y-1 ml-1">
+            <li>Pastikan koneksi internet Anda stabil sebelum memulai.</li>
+            <li>Ujian akan berjalan dalam mode <strong>Layar Penuh (Fullscreen)</strong>.</li>
+            <li>Sistem akan mendeteksi jika Anda keluar dari layar penuh, membuka tab baru, atau meminimalkan browser. Tindakan tersebut akan dicatat sebagai <strong>Pelanggaran</strong>.</li>
+            <li>Waktu ujian akan otomatis dimulai ketika Anda menekan tombol di bawah.</li>
+          </ul>
+        </div>
+
+        <div className="flex gap-3 justify-center pt-4">
+          <Button variant="outline" onClick={() => router.push("/siswa/cbt")}>
+            Kembali
+          </Button>
+          <Button onClick={startExam} className="bg-primary hover:bg-primary/90 text-white">
+            <Maximize className="mr-2 h-4 w-4" />
+            Mulai Ujian Sekarang
+          </Button>
+        </div>
       </div>
     )
   }
@@ -174,18 +268,24 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
   return (
     <>
       <div className="flex h-[calc(100vh-4rem)]">
-        {/* Sidebar - Soal Navigation */}
-        <div className="hidden lg:flex w-72 border-r bg-muted/30 flex-col">
-          <div className="p-4 border-b space-y-2">
-            <h3 className="font-semibold text-sm">Navigasi Soal</h3>
-            <div className="flex gap-2 text-xs">
-              <span className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded bg-green-500" /> Sudah Dijawab
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded bg-yellow-500" /> Ditandai
-              </span>
+        {/* Sidebar - Soal Navigation (Desktop) & Overlay (Mobile) */}
+        <div className={`fixed inset-0 z-50 bg-background/80 backdrop-blur-sm transition-all lg:hidden ${isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} onClick={() => setIsMobileMenuOpen(false)} />
+        <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-card border-r shadow-lg transform transition-transform duration-300 lg:static lg:transform-none lg:flex lg:flex-col lg:bg-muted/30 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+          <div className="p-4 border-b flex items-center justify-between">
+            <div className="space-y-1">
+              <h3 className="font-semibold text-sm">Navigasi Soal</h3>
+              <div className="flex gap-2 text-xs">
+                <span className="flex items-center gap-1">
+                  <span className="w-3 h-3 rounded bg-green-500" /> Dijawab
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-3 h-3 rounded bg-yellow-500" /> Ditandai
+                </span>
+              </div>
             </div>
+            <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setIsMobileMenuOpen(false)}>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
           <div className="flex-1 overflow-y-auto p-4">
             <div className="grid grid-cols-5 gap-2">
@@ -195,7 +295,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
                 return (
                   <button
                     key={soal.id}
-                    onClick={() => setCurrentIndex(idx)}
+                    onClick={() => { setCurrentIndex(idx); setIsMobileMenuOpen(false); }}
                     className={`w-full aspect-square rounded-lg text-xs font-bold transition-all flex items-center justify-center ${
                       isCurrent
                         ? "bg-primary text-white ring-2 ring-primary/30"
@@ -229,10 +329,10 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
           <div className="border-b bg-card p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => router.push("/siswa/cbt")}>
-                  <ArrowLeft className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setIsMobileMenuOpen(true)}>
+                  <Menu className="h-4 w-4" />
                 </Button>
-                <h2 className="font-semibold text-sm">{cbt.nama_ujian}</h2>
+                <h2 className="font-semibold text-sm line-clamp-1">{cbt.nama_ujian}</h2>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
@@ -406,6 +506,37 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
             <Button onClick={handleFinish} className="bg-green-600 hover:bg-green-700">
               <CheckCircle2 className="mr-2 h-4 w-4" />
               Ya, Selesai
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Violation Alert Dialog */}
+      <Dialog open={showViolationDialog} onOpenChange={setShowViolationDialog}>
+        <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-destructive/10">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+              </div>
+              <div>
+                <DialogTitle className="text-destructive">Peringatan Anti-Curang!</DialogTitle>
+                <DialogDescription>
+                  Sistem mendeteksi Anda berpindah tab atau meminimalkan browser.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="rounded-lg border p-4 bg-muted/50 space-y-2">
+            <p className="text-sm">Tindakan ini tercatat sebagai pelanggaran ujian.</p>
+            <div className="flex justify-between items-center bg-destructive/10 p-3 rounded-md">
+              <span className="text-sm font-medium text-destructive">Total Pelanggaran Anda:</span>
+              <span className="text-xl font-bold text-destructive">{violationCount}</span>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowViolationDialog(false)} className="bg-destructive hover:bg-destructive/90">
+              Saya Mengerti & Kembali ke Ujian
             </Button>
           </DialogFooter>
         </DialogContent>

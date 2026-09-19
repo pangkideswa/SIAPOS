@@ -58,11 +58,11 @@ export function Navbar() {
                 Masuk
               </Button>
             </Link>
-            <Link href="/daftar">
-              <Button size="sm" className="shadow-md shadow-primary/20">
-                Daftar Sekarang
+            <a href="mailto:pangkiajaa@gmail.com">
+              <Button size="sm" className="shadow-md shadow-primary/20 bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                Hubungi Admin
               </Button>
-            </Link>
+            </a>
           </div>
 
           <button
@@ -105,11 +105,11 @@ export function Navbar() {
                     Masuk
                   </Button>
                 </Link>
-                <Link href="/daftar" onClick={() => setMobileOpen(false)}>
-                  <Button className="w-full shadow-md shadow-primary/20" size="sm">
-                    Daftar Sekarang
+                <a href="mailto:pangkiajaa@gmail.com" onClick={() => setMobileOpen(false)}>
+                  <Button className="w-full shadow-md shadow-primary/20 bg-secondary text-secondary-foreground hover:bg-secondary/80" size="sm">
+                    Hubungi Admin
                   </Button>
-                </Link>
+                </a>
               </div>
             </div>
           </motion.div>

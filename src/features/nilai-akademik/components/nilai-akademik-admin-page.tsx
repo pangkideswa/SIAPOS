@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Search, Pencil } from "lucide-react"
+import { Search, Pencil, Download } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -155,10 +155,36 @@ export function NilaiAkademikAdminPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Nilai Akademik"
-        description="Kelola seluruh nilai akademik siswa"
-      />
+      <div className="flex items-center justify-between">
+        <PageHeader
+          title="Nilai Akademik"
+          description="Kelola seluruh nilai akademik siswa"
+        />
+        <Button
+          variant="outline"
+          onClick={() => {
+            import("@/lib/excel-export").then((m) => {
+              m.exportToExcel(
+                filteredData.map((d) => ({
+                  Nama: d.siswa_nama,
+                  Kelas: d.siswa_kelas,
+                  Mata_Pelajaran: d.mata_pelajaran,
+                  Guru: d.guru_nama,
+                  Tugas: d.tugas,
+                  Praktik: d.praktik,
+                  UTS: d.uts,
+                  UAS: d.uas,
+                  Status: d.status,
+                })),
+                "Laporan_Nilai_Akademik"
+              )
+            })
+          }}
+        >
+          <Download className="mr-2 h-4 w-4" />
+          Export Excel
+        </Button>
+      </div>
 
       <NilaiAkademikSummaryCards data={items} />
 

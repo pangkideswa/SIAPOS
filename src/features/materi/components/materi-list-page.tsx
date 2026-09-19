@@ -81,7 +81,14 @@ export function MateriListPage() {
       header: "Judul Materi",
       render: (item) => (
         <div>
-          <p className="font-medium">{String(item.judul)}</p>
+          <div className="flex items-center gap-2">
+            <p className="font-medium">{String(item.judul)}</p>
+            {item.is_read === false && (
+              <Badge variant="destructive" className="h-5 px-1.5 text-[10px] uppercase">
+                Baru
+              </Badge>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground truncate max-w-[250px]">
             {String(item.deskripsi)}
           </p>

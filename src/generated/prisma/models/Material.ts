@@ -325,6 +325,7 @@ export type MaterialWhereInput = {
   created_at?: Prisma.DateTimeFilter<"Material"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Material"> | Date | string
   teaching_class?: Prisma.XOR<Prisma.TeachingClassNullableScalarRelationFilter, Prisma.TeachingClassWhereInput> | null
+  reads?: Prisma.MaterialReadListRelationFilter
 }
 
 export type MaterialOrderByWithRelationInput = {
@@ -347,6 +348,7 @@ export type MaterialOrderByWithRelationInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   teaching_class?: Prisma.TeachingClassOrderByWithRelationInput
+  reads?: Prisma.MaterialReadOrderByRelationAggregateInput
 }
 
 export type MaterialWhereUniqueInput = Prisma.AtLeast<{
@@ -372,6 +374,7 @@ export type MaterialWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"Material"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Material"> | Date | string
   teaching_class?: Prisma.XOR<Prisma.TeachingClassNullableScalarRelationFilter, Prisma.TeachingClassWhereInput> | null
+  reads?: Prisma.MaterialReadListRelationFilter
 }, "id">
 
 export type MaterialOrderByWithAggregationInput = {
@@ -442,6 +445,7 @@ export type MaterialCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   teaching_class?: Prisma.TeachingClassCreateNestedOneWithoutMaterialsInput
+  reads?: Prisma.MaterialReadCreateNestedManyWithoutMaterialInput
 }
 
 export type MaterialUncheckedCreateInput = {
@@ -463,6 +467,7 @@ export type MaterialUncheckedCreateInput = {
   status?: $Enums.MaterialStatus
   created_at?: Date | string
   updated_at?: Date | string
+  reads?: Prisma.MaterialReadUncheckedCreateNestedManyWithoutMaterialInput
 }
 
 export type MaterialUpdateInput = {
@@ -483,6 +488,7 @@ export type MaterialUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teaching_class?: Prisma.TeachingClassUpdateOneWithoutMaterialsNestedInput
+  reads?: Prisma.MaterialReadUpdateManyWithoutMaterialNestedInput
 }
 
 export type MaterialUncheckedUpdateInput = {
@@ -504,6 +510,7 @@ export type MaterialUncheckedUpdateInput = {
   status?: Prisma.EnumMaterialStatusFieldUpdateOperationsInput | $Enums.MaterialStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reads?: Prisma.MaterialReadUncheckedUpdateManyWithoutMaterialNestedInput
 }
 
 export type MaterialCreateManyInput = {
@@ -650,6 +657,11 @@ export type MaterialSumOrderByAggregateInput = {
   pertemuan?: Prisma.SortOrder
 }
 
+export type MaterialScalarRelationFilter = {
+  is?: Prisma.MaterialWhereInput
+  isNot?: Prisma.MaterialWhereInput
+}
+
 export type MaterialCreateNestedManyWithoutTeaching_classInput = {
   create?: Prisma.XOR<Prisma.MaterialCreateWithoutTeaching_classInput, Prisma.MaterialUncheckedCreateWithoutTeaching_classInput> | Prisma.MaterialCreateWithoutTeaching_classInput[] | Prisma.MaterialUncheckedCreateWithoutTeaching_classInput[]
   connectOrCreate?: Prisma.MaterialCreateOrConnectWithoutTeaching_classInput | Prisma.MaterialCreateOrConnectWithoutTeaching_classInput[]
@@ -696,6 +708,20 @@ export type EnumMaterialStatusFieldUpdateOperationsInput = {
   set?: $Enums.MaterialStatus
 }
 
+export type MaterialCreateNestedOneWithoutReadsInput = {
+  create?: Prisma.XOR<Prisma.MaterialCreateWithoutReadsInput, Prisma.MaterialUncheckedCreateWithoutReadsInput>
+  connectOrCreate?: Prisma.MaterialCreateOrConnectWithoutReadsInput
+  connect?: Prisma.MaterialWhereUniqueInput
+}
+
+export type MaterialUpdateOneRequiredWithoutReadsNestedInput = {
+  create?: Prisma.XOR<Prisma.MaterialCreateWithoutReadsInput, Prisma.MaterialUncheckedCreateWithoutReadsInput>
+  connectOrCreate?: Prisma.MaterialCreateOrConnectWithoutReadsInput
+  upsert?: Prisma.MaterialUpsertWithoutReadsInput
+  connect?: Prisma.MaterialWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MaterialUpdateToOneWithWhereWithoutReadsInput, Prisma.MaterialUpdateWithoutReadsInput>, Prisma.MaterialUncheckedUpdateWithoutReadsInput>
+}
+
 export type MaterialCreateWithoutTeaching_classInput = {
   judul: string
   deskripsi?: string | null
@@ -713,6 +739,7 @@ export type MaterialCreateWithoutTeaching_classInput = {
   status?: $Enums.MaterialStatus
   created_at?: Date | string
   updated_at?: Date | string
+  reads?: Prisma.MaterialReadCreateNestedManyWithoutMaterialInput
 }
 
 export type MaterialUncheckedCreateWithoutTeaching_classInput = {
@@ -733,6 +760,7 @@ export type MaterialUncheckedCreateWithoutTeaching_classInput = {
   status?: $Enums.MaterialStatus
   created_at?: Date | string
   updated_at?: Date | string
+  reads?: Prisma.MaterialReadUncheckedCreateNestedManyWithoutMaterialInput
 }
 
 export type MaterialCreateOrConnectWithoutTeaching_classInput = {
@@ -785,6 +813,104 @@ export type MaterialScalarWhereInput = {
   updated_at?: Prisma.DateTimeFilter<"Material"> | Date | string
 }
 
+export type MaterialCreateWithoutReadsInput = {
+  judul: string
+  deskripsi?: string | null
+  guru_nama?: string | null
+  mata_pelajaran?: string | null
+  kelas?: string | null
+  pertemuan?: number | null
+  jenis_materi?: string | null
+  thumbnail_url?: string | null
+  lampiran?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  video_url?: string | null
+  link_drive?: string | null
+  link_eksternal?: string | null
+  isi_materi?: string | null
+  status?: $Enums.MaterialStatus
+  created_at?: Date | string
+  updated_at?: Date | string
+  teaching_class?: Prisma.TeachingClassCreateNestedOneWithoutMaterialsInput
+}
+
+export type MaterialUncheckedCreateWithoutReadsInput = {
+  id?: number
+  teaching_class_id?: number | null
+  judul: string
+  deskripsi?: string | null
+  guru_nama?: string | null
+  mata_pelajaran?: string | null
+  kelas?: string | null
+  pertemuan?: number | null
+  jenis_materi?: string | null
+  thumbnail_url?: string | null
+  lampiran?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  video_url?: string | null
+  link_drive?: string | null
+  link_eksternal?: string | null
+  isi_materi?: string | null
+  status?: $Enums.MaterialStatus
+  created_at?: Date | string
+  updated_at?: Date | string
+}
+
+export type MaterialCreateOrConnectWithoutReadsInput = {
+  where: Prisma.MaterialWhereUniqueInput
+  create: Prisma.XOR<Prisma.MaterialCreateWithoutReadsInput, Prisma.MaterialUncheckedCreateWithoutReadsInput>
+}
+
+export type MaterialUpsertWithoutReadsInput = {
+  update: Prisma.XOR<Prisma.MaterialUpdateWithoutReadsInput, Prisma.MaterialUncheckedUpdateWithoutReadsInput>
+  create: Prisma.XOR<Prisma.MaterialCreateWithoutReadsInput, Prisma.MaterialUncheckedCreateWithoutReadsInput>
+  where?: Prisma.MaterialWhereInput
+}
+
+export type MaterialUpdateToOneWithWhereWithoutReadsInput = {
+  where?: Prisma.MaterialWhereInput
+  data: Prisma.XOR<Prisma.MaterialUpdateWithoutReadsInput, Prisma.MaterialUncheckedUpdateWithoutReadsInput>
+}
+
+export type MaterialUpdateWithoutReadsInput = {
+  judul?: Prisma.StringFieldUpdateOperationsInput | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pertemuan?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  jenis_materi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnail_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lampiran?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  link_drive?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  link_eksternal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isi_materi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumMaterialStatusFieldUpdateOperationsInput | $Enums.MaterialStatus
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  teaching_class?: Prisma.TeachingClassUpdateOneWithoutMaterialsNestedInput
+}
+
+export type MaterialUncheckedUpdateWithoutReadsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  teaching_class_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  judul?: Prisma.StringFieldUpdateOperationsInput | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guru_nama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mata_pelajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pertemuan?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  jenis_materi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnail_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lampiran?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  video_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  link_drive?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  link_eksternal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isi_materi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumMaterialStatusFieldUpdateOperationsInput | $Enums.MaterialStatus
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type MaterialCreateManyTeaching_classInput = {
   id?: number
   judul: string
@@ -822,6 +948,7 @@ export type MaterialUpdateWithoutTeaching_classInput = {
   status?: Prisma.EnumMaterialStatusFieldUpdateOperationsInput | $Enums.MaterialStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reads?: Prisma.MaterialReadUpdateManyWithoutMaterialNestedInput
 }
 
 export type MaterialUncheckedUpdateWithoutTeaching_classInput = {
@@ -842,6 +969,7 @@ export type MaterialUncheckedUpdateWithoutTeaching_classInput = {
   status?: Prisma.EnumMaterialStatusFieldUpdateOperationsInput | $Enums.MaterialStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reads?: Prisma.MaterialReadUncheckedUpdateManyWithoutMaterialNestedInput
 }
 
 export type MaterialUncheckedUpdateManyWithoutTeaching_classInput = {
@@ -865,6 +993,35 @@ export type MaterialUncheckedUpdateManyWithoutTeaching_classInput = {
 }
 
 
+/**
+ * Count Type MaterialCountOutputType
+ */
+
+export type MaterialCountOutputType = {
+  reads: number
+}
+
+export type MaterialCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  reads?: boolean | MaterialCountOutputTypeCountReadsArgs
+}
+
+/**
+ * MaterialCountOutputType without action
+ */
+export type MaterialCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MaterialCountOutputType
+   */
+  select?: Prisma.MaterialCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * MaterialCountOutputType without action
+ */
+export type MaterialCountOutputTypeCountReadsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MaterialReadWhereInput
+}
+
 
 export type MaterialSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -886,6 +1043,8 @@ export type MaterialSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   created_at?: boolean
   updated_at?: boolean
   teaching_class?: boolean | Prisma.Material$teaching_classArgs<ExtArgs>
+  reads?: boolean | Prisma.Material$readsArgs<ExtArgs>
+  _count?: boolean | Prisma.MaterialCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["material"]>
 
 export type MaterialSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -956,6 +1115,8 @@ export type MaterialSelectScalar = {
 export type MaterialOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "teaching_class_id" | "judul" | "deskripsi" | "guru_nama" | "mata_pelajaran" | "kelas" | "pertemuan" | "jenis_materi" | "thumbnail_url" | "lampiran" | "video_url" | "link_drive" | "link_eksternal" | "isi_materi" | "status" | "created_at" | "updated_at", ExtArgs["result"]["material"]>
 export type MaterialInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   teaching_class?: boolean | Prisma.Material$teaching_classArgs<ExtArgs>
+  reads?: boolean | Prisma.Material$readsArgs<ExtArgs>
+  _count?: boolean | Prisma.MaterialCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type MaterialIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   teaching_class?: boolean | Prisma.Material$teaching_classArgs<ExtArgs>
@@ -968,6 +1129,7 @@ export type $MaterialPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   name: "Material"
   objects: {
     teaching_class: Prisma.$TeachingClassPayload<ExtArgs> | null
+    reads: Prisma.$MaterialReadPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1383,6 +1545,7 @@ readonly fields: MaterialFieldRefs;
 export interface Prisma__MaterialClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   teaching_class<T extends Prisma.Material$teaching_classArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Material$teaching_classArgs<ExtArgs>>): Prisma.Prisma__TeachingClassClient<runtime.Types.Result.GetResult<Prisma.$TeachingClassPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  reads<T extends Prisma.Material$readsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Material$readsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MaterialReadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1847,6 +2010,30 @@ export type Material$teaching_classArgs<ExtArgs extends runtime.Types.Extensions
    */
   include?: Prisma.TeachingClassInclude<ExtArgs> | null
   where?: Prisma.TeachingClassWhereInput
+}
+
+/**
+ * Material.reads
+ */
+export type Material$readsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MaterialRead
+   */
+  select?: Prisma.MaterialReadSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MaterialRead
+   */
+  omit?: Prisma.MaterialReadOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MaterialReadInclude<ExtArgs> | null
+  where?: Prisma.MaterialReadWhereInput
+  orderBy?: Prisma.MaterialReadOrderByWithRelationInput | Prisma.MaterialReadOrderByWithRelationInput[]
+  cursor?: Prisma.MaterialReadWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MaterialReadScalarFieldEnum | Prisma.MaterialReadScalarFieldEnum[]
 }
 
 /**

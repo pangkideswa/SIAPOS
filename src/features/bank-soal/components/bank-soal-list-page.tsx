@@ -10,10 +10,19 @@ import { Badge } from "@/components/ui/badge"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Plus, Pencil, Trash2, Eye, Copy, Search } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import { Plus, Pencil, Trash2, Eye, Copy, Search, Sparkles, FileText } from "lucide-react"
 import { toast } from "sonner"
 import { BankSoalFormDialog } from "./bank-soal-form-dialog"
 import { BankSoalDeleteDialog } from "./bank-soal-delete-dialog"
+import { AIGeneratorDialog } from "./ai-generator-dialog"
+import { ImportAIDialog } from "./import-ai-dialog"
 import {
   TIPE_SOAL_COLORS, KESULITAN_COLORS, STATUS_BANK_SOAL_COLORS,
   MATA_PELAJARAN_OPTIONS, GURU_BANK_SOAL_OPTIONS,
@@ -33,6 +42,8 @@ export function BankSoalListPage() {
   const [page, setPage] = useState(1)
   const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [aiDialogOpen, setAiDialogOpen] = useState(false)
+  const [importDialogOpen, setImportDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<BankSoal | null>(null)
   const [deletingItem, setDeletingItem] = useState<BankSoal | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -146,10 +157,37 @@ export function BankSoalListPage() {
         title="Bank Soal"
         description="Kelola soal-soal untuk ujian dan penilaian"
         action={
-          <Button onClick={() => { setEditingItem(null); setFormDialogOpen(true) }}>
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah Soal
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button />}>
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah Soal
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[260px]">
+              <DropdownMenuItem onClick={() => setAiDialogOpen(true)} className="py-2.5 cursor-pointer">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center text-purple-600 font-medium">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generate dari Topik (AI)
+                  </div>
+                  <p className="text-[10px] text-muted-foreground ml-6">Buat soal otomatis dari topik materi</p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setImportDialogOpen(true)} className="py-2.5 cursor-pointer">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center text-blue-600 font-medium">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Import dari Dokumen (AI)
+                  </div>
+                  <p className="text-[10px] text-muted-foreground ml-6">Ekstrak soal dari file PDF / Word</p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => { setEditingItem(null); setFormDialogOpen(true) }} className="cursor-pointer">
+                <Pencil className="mr-2 h-4 w-4 text-muted-foreground" />
+                <span>Tambah Manual (1 Soal)</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         }
       />
 
@@ -216,6 +254,18 @@ export function BankSoalListPage() {
         item={deletingItem}
         onConfirm={handleConfirmDelete}
         isLoading={isLoading}
+      />
+
+      <AIGeneratorDialog
+        open={aiDialogOpen}
+        onOpenChange={setAiDialogOpen}
+        onSuccess={() => {}}
+      />
+
+      <ImportAIDialog
+        open={importDialogOpen}
+        onOpenChange={setImportDialogOpen}
+        onSuccess={() => {}}
       />
     </div>
   )

@@ -35,8 +35,9 @@ export interface Materi {
   link_eksternal: string | null
   isi_materi: string
   status: "Draft" | "Publish"
+  is_read?: boolean
   created_at: string
   updated_at: string
 }
 
-export type MateriFormData = Omit<Materi, "id" | "created_at" | "updated_at">
+export type MateriFormData = Omit<Materi, "id" | "is_read" | "created_at" | "updated_at">

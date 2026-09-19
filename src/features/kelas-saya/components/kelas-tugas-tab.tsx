@@ -8,6 +8,13 @@ import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EmptyState } from "@/components/ui/empty-state"
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import {
   Plus,
   Search,
   Pencil,
@@ -21,7 +28,9 @@ import {
   Copy,
   ArrowUpDown,
   Clock,
+  Sparkles,
 } from "lucide-react"
+import { AITugasGeneratorDialog } from "@/features/tugas/components/ai-tugas-generator-dialog"
 import { TugasFormDialog } from "@/features/tugas/components/tugas-form-dialog"
 import { TugasDeleteDialog } from "@/features/tugas/components/tugas-delete-dialog"
 import { TugasDetailDialog } from "@/features/kelas-saya/components/tugas-detail-dialog"
@@ -61,6 +70,7 @@ export function KelasTugasTab({ kelasMengajar }: KelasTugasTabProps) {
   const [deletingItem, setDeletingItem] = useState<Tugas | null>(null)
   const [detailDialogOpen, setDetailDialogOpen] = useState(false)
   const [detailItem, setDetailItem] = useState<Tugas | null>(null)
+  const [aiDialogOpen, setAiDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
 
@@ -189,16 +199,34 @@ export function KelasTugasTab({ kelasMengajar }: KelasTugasTabProps) {
             className="pl-9"
           />
         </div>
-        <Button
-          onClick={() => {
-            setEditingItem(null)
-            setFormDialogOpen(true)
-          }}
-          className="bg-primary hover:bg-primary/90"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah Tugas
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger render={<Button className="bg-primary hover:bg-primary/90" />}>
+            <Plus className="mr-2 h-4 w-4" />
+            Buat Tugas
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[260px]">
+            <DropdownMenuItem onClick={() => setAiDialogOpen(true)} className="py-2.5 cursor-pointer">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center text-purple-600 font-medium">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Buat dengan AI
+                </div>
+                <p className="text-[10px] text-muted-foreground ml-6">Otomatis buat deskripsi & rubrik tugas</p>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                setEditingItem(null)
+                setFormDialogOpen(true)
+              }}
+              className="cursor-pointer"
+            >
+              <Pencil className="mr-2 h-4 w-4 text-muted-foreground" />
+              <span>Buat Manual</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -416,6 +444,12 @@ export function KelasTugasTab({ kelasMengajar }: KelasTugasTabProps) {
         open={detailDialogOpen}
         onOpenChange={setDetailDialogOpen}
         tugas={detailItem}
+      />
+
+      <AITugasGeneratorDialog
+        open={aiDialogOpen}
+        onOpenChange={setAiDialogOpen}
+        onSuccess={() => {}}
       />
     </div>
   )

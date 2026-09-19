@@ -245,12 +245,12 @@ export function LoginForm() {
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         Belum punya akun?{" "}
-        <Link
-          href="/daftar"
-          className="text-primary hover:underline font-semibold"
+        <a 
+          href="mailto:pangkiajaa@gmail.com?subject=Permohonan%20Pembuatan%20Akun%20SIAPOS"
+          className="text-primary font-semibold hover:underline"
         >
-          Daftar sekarang
-        </Link>
+          Hubungi admin
+        </a>
       </p>
 
       <ResponsiveDialog open={googleError} onOpenChange={setGoogleError}>

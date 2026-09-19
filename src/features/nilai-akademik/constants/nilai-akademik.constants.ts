@@ -53,4 +53,5 @@ export const EMPTY_NILAI_FORM: NilaiAkademikFormData = {
   praktik: "",
   uts: "",
   uas: "",
+  catatan: "",
 }

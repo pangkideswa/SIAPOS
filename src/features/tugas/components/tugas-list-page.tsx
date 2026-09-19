@@ -15,9 +15,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import { Plus, Pencil, Trash2, Eye, Search, Sparkles } from "lucide-react"
 import { TugasFormDialog } from "./tugas-form-dialog"
 import { TugasDeleteDialog } from "./tugas-delete-dialog"
+import { AITugasGeneratorDialog } from "./ai-tugas-generator-dialog"
 import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
 import { useClasses } from "@/hooks/use-classes"
 import { useTeachers } from "@/hooks/use-teachers"
@@ -56,6 +64,7 @@ export function TugasListPage() {
   const [page, setPage] = useState(1)
   const [formDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [aiDialogOpen, setAiDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<Tugas | null>(null)
   const [deletingItem, setDeletingItem] = useState<Tugas | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -245,13 +254,28 @@ export function TugasListPage() {
         title="Tugas"
         description="Kelola tugas pembelajaran untuk siswa."
         action={
-          <Button
-            onClick={openCreate}
-            className="bg-primary hover:bg-primary/90"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah Tugas
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button className="bg-primary hover:bg-primary/90" />}>
+              <Plus className="mr-2 h-4 w-4" />
+              Buat Tugas
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[260px]">
+              <DropdownMenuItem onClick={() => setAiDialogOpen(true)} className="py-2.5 cursor-pointer">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center text-purple-600 font-medium">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Buat dengan AI
+                  </div>
+                  <p className="text-[10px] text-muted-foreground ml-6">Otomatis buat deskripsi & rubrik tugas</p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={openCreate} className="cursor-pointer">
+                <Pencil className="mr-2 h-4 w-4 text-muted-foreground" />
+                <span>Buat Manual</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         }
       />
 
@@ -385,6 +409,12 @@ export function TugasListPage() {
         item={deletingItem}
         onConfirm={handleDelete}
         isLoading={isLoading}
+      />
+
+      <AITugasGeneratorDialog
+        open={aiDialogOpen}
+        onOpenChange={setAiDialogOpen}
+        onSuccess={() => {}}
       />
     </div>
   )

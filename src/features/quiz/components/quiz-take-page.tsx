@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { ArrowLeft, ArrowRight, Clock, CheckCircle2 } from "lucide-react"
+import { ArrowLeft, ArrowRight, Clock, CheckCircle2, Monitor, Maximize, ShieldAlert, AlertTriangle } from "lucide-react"
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog"
 import { DUMMY_QUIZ } from "../dummy/quiz.data"
 import { DUMMY_PAKET_SOAL } from "@/features/paket-soal/dummy/paket-soal.data"
 import { DUMMY_BANK_SOAL } from "@/features/bank-soal/dummy/bank-soal.data"
@@ -29,25 +32,60 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<QuizAnswer[]>([])
   const [timeLeft, setTimeLeft] = useState(quiz ? quiz.durasi * 60 : 0)
+  const [isStarted, setIsStarted] = useState(false)
   const [isFinished, setIsFinished] = useState(false)
+  const [showViolationDialog, setShowViolationDialog] = useState(false)
+  const [violationCount, setViolationCount] = useState(0)
 
   useEffect(() => {
+    if (!isStarted || isFinished || !quiz) return
+
+    const handleBlur = () => {
+      setViolationCount((prev) => prev + 1)
+      setShowViolationDialog(true)
+    }
+    
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setViolationCount((prev) => prev + 1)
+        setShowViolationDialog(true)
+      }
+    }
+
+    window.addEventListener("blur", handleBlur)
+    document.addEventListener("fullscreenchange", handleFullscreenChange)
+    
+    return () => {
+      window.removeEventListener("blur", handleBlur)
+      document.removeEventListener("fullscreenchange", handleFullscreenChange)
+    }
+  }, [isStarted, isFinished, quiz])
+
+  useEffect(() => {
+    if (!isStarted || isFinished) return
     if (timeLeft <= 0) {
-      setIsFinished(true)
+      handleFinish()
       return
     }
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer)
-          setIsFinished(true)
+          handleFinish()
           return 0
         }
         return prev - 1
       })
     }, 1000)
     return () => clearInterval(timer)
-  }, [timeLeft])
+  }, [timeLeft, isStarted, isFinished])
+
+  const startExam = () => {
+    setIsStarted(true)
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(console.error)
+    }
+  }
 
   const currentSoal = soalList[currentIndex]
   const progress = soalList.length > 0 ? ((currentIndex + 1) / soalList.length) * 100 : 0
@@ -64,6 +102,9 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
 
   function handleFinish() {
     setIsFinished(true)
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(console.error)
+    }
   }
 
   function formatTime(seconds: number) {
@@ -77,6 +118,56 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <p className="text-muted-foreground">Quiz tidak ditemukan</p>
         <Button variant="outline" onClick={() => router.push("/siswa/quiz")}>Kembali</Button>
+      </div>
+    )
+  }
+
+  if (!isStarted) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6 py-8 px-4">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="flex items-center justify-center w-20 h-20 rounded-full bg-primary/10">
+            <Monitor className="h-10 w-10 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold">Konfirmasi Kesiapan Quiz</h2>
+            <p className="text-muted-foreground mt-1">{quiz.judul}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="rounded-lg border p-4 text-center">
+            <p className="text-sm text-muted-foreground">Total Soal</p>
+            <p className="text-2xl font-bold">{soalList.length}</p>
+          </div>
+          <div className="rounded-lg border p-4 text-center">
+            <p className="text-sm text-muted-foreground">Durasi Quiz</p>
+            <p className="text-2xl font-bold">{quiz.durasi} Menit</p>
+          </div>
+        </div>
+
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 text-sm space-y-2">
+          <p className="font-semibold flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4" />
+            Perhatian & Tata Tertib
+          </p>
+          <ul className="list-disc list-inside space-y-1 ml-1">
+            <li>Pastikan koneksi internet Anda stabil sebelum memulai.</li>
+            <li>Quiz akan berjalan dalam mode <strong>Layar Penuh (Fullscreen)</strong>.</li>
+            <li>Sistem akan mendeteksi jika Anda keluar dari layar penuh, membuka tab baru, atau meminimalkan browser. Tindakan tersebut akan dicatat sebagai <strong>Pelanggaran</strong>.</li>
+            <li>Waktu ujian akan otomatis dimulai ketika Anda menekan tombol di bawah.</li>
+          </ul>
+        </div>
+
+        <div className="flex gap-3 justify-center pt-4">
+          <Button variant="outline" onClick={() => router.push("/siswa/quiz")}>
+            Kembali
+          </Button>
+          <Button onClick={startExam} className="bg-primary hover:bg-primary/90 text-white">
+            <Maximize className="mr-2 h-4 w-4" />
+            Mulai Quiz Sekarang
+          </Button>
+        </div>
       </div>
     )
   }

@@ -9,7 +9,9 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
+import { Sparkles, Loader2 } from "lucide-react"
 import type { NilaiAkademik, NilaiAkademikFormData } from "../types/nilai-akademik"
 import { EMPTY_NILAI_FORM } from "../constants/nilai-akademik.constants"
 
@@ -38,6 +40,7 @@ export function NilaiAkademikFormDialog({ open, onOpenChange, data, onSave }: Pr
           praktik: data.praktik !== null ? String(data.praktik) : "",
           uts: data.uts !== null ? String(data.uts) : "",
           uas: data.uas !== null ? String(data.uas) : "",
+          catatan: data.catatan || "",
         })
       } else {
         setForm(EMPTY_NILAI_FORM)
@@ -57,12 +60,45 @@ export function NilaiAkademikFormDialog({ open, onOpenChange, data, onSave }: Pr
     }
   }
 
+  const [isGenerating, setIsGenerating] = useState(false)
+
+  const generateAICatatan = async () => {
+    setIsGenerating(true)
+    try {
+      const tugas = Number(form.tugas) || 0
+      const praktik = Number(form.praktik) || 0
+      const uts = Number(form.uts) || 0
+      const uas = Number(form.uas) || 0
+      
+      const prompt = `Nilai tugas: ${tugas}, praktik: ${praktik}, UTS: ${uts}, UAS: ${uas}. Buatkan 1-2 kalimat catatan rapor evaluasi singkat (maksimal 200 karakter) yang profesional, memotivasi, dan langsung membahas area kelebihan/kekurangan untuk siswa bernama ${data?.siswa_nama || "siswa"}. Jangan gunakan kata pembuka bertele-tele.`
+
+      const response = await fetch("/api/ai/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      })
+
+      const json = await response.json()
+
+      if (!response.ok) {
+        throw new Error(json.error || "Gagal menghubungi AI")
+      }
+
+      setForm((prev) => ({ ...prev, catatan: json.result }))
+      toast.success("Catatan evaluasi berhasil dibuat oleh AI")
+    } catch (error: any) {
+      toast.error(error.message || "Gagal memproses AI")
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
   const handleSubmit = () => {
     const newErrors: Record<string, string> = {}
     const fields: (keyof NilaiAkademikFormData)[] = ["tugas", "praktik", "uts", "uas"]
 
     for (const field of fields) {
-      if (form[field] !== "" && !validateNilai(form[field])) {
+      if (form[field] !== "" && form[field] !== undefined && !validateNilai(form[field] as string)) {
         newErrors[field] = "Nilai harus 0-100"
       }
     }
@@ -88,6 +124,7 @@ export function NilaiAkademikFormDialog({ open, onOpenChange, data, onSave }: Pr
       praktik,
       uts,
       uas,
+      catatan: form.catatan || null,
       status,
       updated_at: new Date().toISOString(),
     }
@@ -176,6 +213,31 @@ export function NilaiAkademikFormDialog({ open, onOpenChange, data, onSave }: Pr
               />
               {errors.uas && <p className="text-xs text-destructive">{errors.uas}</p>}
             </div>
+          </div>
+          
+          <div className="space-y-2 pt-2 border-t">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="catatan">Catatan Wali Kelas / Guru</Label>
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                className="h-7 text-xs bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100 dark:bg-purple-900/20 dark:border-purple-800"
+                onClick={generateAICatatan}
+                disabled={isGenerating}
+              >
+                {isGenerating ? <Loader2 className="h-3 w-3 mr-1.5 animate-spin" /> : <Sparkles className="h-3 w-3 mr-1.5" />}
+                Generate AI
+              </Button>
+            </div>
+            <Textarea
+              id="catatan"
+              placeholder="Tulis catatan evaluasi..."
+              value={form.catatan}
+              onChange={(e) => handleChange("catatan", e.target.value)}
+              rows={3}
+              className="resize-none"
+            />
           </div>
         </div>
         <DialogFooter showCloseButton>

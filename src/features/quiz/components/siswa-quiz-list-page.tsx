@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
-import { DataTable, type Column } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -51,94 +50,7 @@ export function SiswaQuizListPage() {
     }
   }
 
-  const columns: Column<Record<string, unknown>>[] = [
-    {
-      key: "judul",
-      header: "Judul",
-      render: (item) => (
-        <div>
-          <p className="font-medium">{String(item.judul)}</p>
-          <p className="text-xs text-muted-foreground line-clamp-1">{String(item.deskripsi)}</p>
-        </div>
-      ),
-    },
-    {
-      key: "mapel",
-      header: "Mata Pelajaran",
-      render: (item) => {
-        const paket = getPaketSoal(item.paket_soal_id as number)
-        return paket?.mata_pelajaran ?? "—"
-      },
-    },
-    {
-      key: "guru",
-      header: "Guru",
-      render: (item) => {
-        const paket = getPaketSoal(item.paket_soal_id as number)
-        return paket?.guru_nama ?? "—"
-      },
-    },
-    {
-      key: "soal",
-      header: "Soal",
-      render: (item) => {
-        const paket = getPaketSoal(item.paket_soal_id as number)
-        return <span>{paket?.soal_ids.length ?? 0} soal</span>
-      },
-    },
-    {
-      key: "durasi",
-      header: "Durasi",
-      render: (item) => <span>{String(item.durasi)} mnt</span>,
-    },
-    {
-      key: "deadline",
-      header: "Deadline",
-      render: (item) => {
-        const tanggal = String(item.tanggal_berakhir)
-        return (
-          <span className="text-xs">
-            {new Date(tanggal).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-          </span>
-        )
-      },
-    },
-    {
-      key: "status_waktu",
-      header: "Status",
-      render: (item) => {
-        const status = getQuizStatus(item as unknown as Quiz)
-        return <Badge className={getStatusBadge(status)}>{status}</Badge>
-      },
-    },
-    {
-      key: "aksi",
-      header: "",
-      className: "w-[100px]",
-      render: (item) => {
-        const status = getQuizStatus(item as unknown as Quiz)
-        return (
-          <div onClick={(e) => e.stopPropagation()}>
-            {status === "Berlangsung" ? (
-              <button
-                onClick={() => router.push(`/siswa/quiz/${item.id}/kerjakan`)}
-                className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-lg hover:bg-primary/90 transition-colors"
-              >
-                Kerjakan
-              </button>
-            ) : (
-              <button
-                disabled
-                className="px-3 py-1.5 bg-muted text-muted-foreground text-xs font-medium rounded-lg cursor-not-allowed"
-              >
-                {status === "Belum Dimulai" ? "Menunggu" : "Selesai"}
-              </button>
-            )}
-          </div>
-        )
-      },
-    },
-  ]
+  // Table columns removed in favor of Card layout
 
   const stats = {
     total: publishedQuizzes.length,
@@ -208,17 +120,62 @@ export function SiswaQuizListPage() {
         </Select>
       </div>
 
-      <DataTable
-        data={filteredData as unknown as Record<string, unknown>[]}
-        columns={columns}
-        emptyMessage="Tidak ada quiz tersedia"
-        onRowClick={(row) => {
-          const status = getQuizStatus(row as unknown as Quiz)
-          if (status === "Berlangsung") {
-            router.push(`/siswa/quiz/${(row as unknown as Quiz).id}/kerjakan`)
-          }
-        }}
-      />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {filteredData.map((quiz) => {
+          const paket = getPaketSoal(quiz.paket_soal_id)
+          const status = getQuizStatus(quiz)
+          return (
+            <Card key={quiz.id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-5 space-y-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-semibold text-base">{quiz.judul}</h3>
+                    <p className="text-sm text-muted-foreground">{paket?.mata_pelajaran ?? "—"}</p>
+                  </div>
+                  <Badge className={getStatusBadge(status)}>{status}</Badge>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Guru</span>
+                    <span className="font-medium">{paket?.guru_nama ?? "—"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Durasi</span>
+                    <span className="font-medium">{quiz.durasi} menit</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Soal</span>
+                    <span className="font-medium">{paket?.soal_ids.length ?? 0} soal</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Deadline</span>
+                    <span className="font-medium">
+                      {new Date(quiz.tanggal_berakhir).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  </div>
+                </div>
+                <div className="pt-2">
+                  {status === "Berlangsung" ? (
+                    <button
+                      onClick={() => router.push(`/siswa/quiz/${quiz.id}/kerjakan`)}
+                      className="w-full px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors"
+                    >
+                      Mulai Quiz
+                    </button>
+                  ) : (
+                    <button
+                      disabled
+                      className="w-full px-4 py-2 bg-muted text-muted-foreground text-sm font-medium rounded-lg cursor-not-allowed"
+                    >
+                      {status === "Belum Dimulai" ? "Menunggu" : "Selesai"}
+                    </button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </div>
     </div>
   )
 }

@@ -408,6 +408,7 @@ export const ModelName = {
   Subject: 'Subject',
   TeachingClass: 'TeachingClass',
   Material: 'Material',
+  MaterialRead: 'MaterialRead',
   Assignment: 'Assignment',
   Submission: 'Submission',
   AttendanceSession: 'AttendanceSession',
@@ -433,7 +434,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verificationToken" | "teacher" | "student" | "jurusan" | "classroom" | "subject" | "teachingClass" | "material" | "assignment" | "submission" | "attendanceSession" | "attendance" | "announcement" | "schedule" | "tahunAkademik" | "nilai" | "notifikasi" | "appSetting"
+    modelProps: "user" | "account" | "session" | "verificationToken" | "teacher" | "student" | "jurusan" | "classroom" | "subject" | "teachingClass" | "material" | "materialRead" | "assignment" | "submission" | "attendanceSession" | "attendance" | "announcement" | "schedule" | "tahunAkademik" | "nilai" | "notifikasi" | "appSetting"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1248,6 +1249,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.MaterialCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.MaterialCountAggregateOutputType> | number
+        }
+      }
+    }
+    MaterialRead: {
+      payload: Prisma.$MaterialReadPayload<ExtArgs>
+      fields: Prisma.MaterialReadFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MaterialReadFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaterialReadPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MaterialReadFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaterialReadPayload>
+        }
+        findFirst: {
+          args: Prisma.MaterialReadFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaterialReadPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MaterialReadFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaterialReadPayload>
+        }
+        findMany: {
+          args: Prisma.MaterialReadFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaterialReadPayload>[]
+        }
+        create: {
+          args: Prisma.MaterialReadCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaterialReadPayload>
+        }
+        createMany: {
+          args: Prisma.MaterialReadCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MaterialReadCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaterialReadPayload>[]
+        }
+        delete: {
+          args: Prisma.MaterialReadDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaterialReadPayload>
+        }
+        update: {
+          args: Prisma.MaterialReadUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaterialReadPayload>
+        }
+        deleteMany: {
+          args: Prisma.MaterialReadDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MaterialReadUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MaterialReadUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaterialReadPayload>[]
+        }
+        upsert: {
+          args: Prisma.MaterialReadUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MaterialReadPayload>
+        }
+        aggregate: {
+          args: Prisma.MaterialReadAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMaterialRead>
+        }
+        groupBy: {
+          args: Prisma.MaterialReadGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MaterialReadGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MaterialReadCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MaterialReadCountAggregateOutputType> | number
         }
       }
     }
@@ -2225,6 +2300,16 @@ export const MaterialScalarFieldEnum = {
 export type MaterialScalarFieldEnum = (typeof MaterialScalarFieldEnum)[keyof typeof MaterialScalarFieldEnum]
 
 
+export const MaterialReadScalarFieldEnum = {
+  id: 'id',
+  material_id: 'material_id',
+  student_id: 'student_id',
+  created_at: 'created_at'
+} as const
+
+export type MaterialReadScalarFieldEnum = (typeof MaterialReadScalarFieldEnum)[keyof typeof MaterialReadScalarFieldEnum]
+
+
 export const AssignmentScalarFieldEnum = {
   id: 'id',
   teaching_class_id: 'teaching_class_id',
@@ -2837,6 +2922,7 @@ export type GlobalOmitConfig = {
   subject?: Prisma.SubjectOmit
   teachingClass?: Prisma.TeachingClassOmit
   material?: Prisma.MaterialOmit
+  materialRead?: Prisma.MaterialReadOmit
   assignment?: Prisma.AssignmentOmit
   submission?: Prisma.SubmissionOmit
   attendanceSession?: Prisma.AttendanceSessionOmit

@@ -32,7 +32,29 @@ const floatingCards = [
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-white to-orange/5">
-      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:linear-gradient(to_bottom,white,transparent)]" />
+
+      {/* Decorative Animated Blobs */}
+      <motion.div
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.6, 0.3],
+          x: [0, 50, 0],
+          y: [0, -30, 0],
+        }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-0 left-[-10%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] mix-blend-multiply pointer-events-none"
+      />
+      <motion.div
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.2, 0.5, 0.2],
+          x: [0, -40, 0],
+          y: [0, 40, 0],
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-orange/20 rounded-full blur-[100px] mix-blend-multiply pointer-events-none"
+      />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 md:py-32 lg:py-40">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -65,14 +87,14 @@ export function HeroSection() {
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
-              <Link href="/daftar">
+              <a href="https://wa.me/6281233436196?text=Halo%20Admin%20SIAPOS,%20saya%20ingin%20mendaftar%20akun%20baru." target="_blank" rel="noopener noreferrer">
                 <Button size="lg" className="px-8 shadow-lg shadow-primary/25 w-full sm:w-auto">
-                  Mulai Belajar
+                  Hubungi Admin
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-              </Link>
+              </a>
               <Link href="/masuk">
-                <Button size="lg" variant="outline" className="px-8 w-full sm:w-auto">
+                <Button size="lg" variant="secondary" className="px-8 bg-secondary text-secondary-foreground hover:bg-secondary/80 w-full sm:w-auto">
                   Masuk ke Akun
                 </Button>
               </Link>

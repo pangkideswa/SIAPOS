@@ -8,7 +8,7 @@ import { motion } from "framer-motion"
 export function CtaSection() {
   return (
     <section className="py-20 md:py-28 bg-gradient-to-br from-primary to-primary/80 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff1a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff1a_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:linear-gradient(to_bottom,white,transparent)]" />
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
@@ -26,21 +26,20 @@ export function CtaSection() {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/daftar">
+            <a href="https://wa.me/6281233436196?text=Halo%20Admin%20SIAPOS,%20saya%20ingin%20mendaftar%20akun%20baru." target="_blank" rel="noopener noreferrer">
               <Button
                 size="lg"
                 variant="secondary"
                 className="px-8 bg-card text-primary hover:bg-card/90 shadow-lg w-full sm:w-auto"
               >
-                Daftar Gratis
+                Hubungi Admin
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-            </Link>
+            </a>
             <Link href="/masuk">
               <Button
                 size="lg"
-                variant="outline"
-                className="px-8 border-white/30 text-white hover:bg-card/10 w-full sm:w-auto"
+                className="px-8 bg-orange text-white hover:bg-orange/90 shadow-lg border-none w-full sm:w-auto"
               >
                 Masuk ke Akun
               </Button>

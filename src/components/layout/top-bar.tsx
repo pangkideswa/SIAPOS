@@ -151,10 +151,11 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
   const timeLabel = now.toLocaleTimeString("id-ID", {
     hour: "2-digit",
     minute: "2-digit",
+    second: "2-digit",
   })
 
   return (
-    <header className="h-16 border-b border-border bg-background flex items-center justify-between px-4 md:px-6 shrink-0">
+    <header className="h-16 border-b border-border bg-background/60 backdrop-blur-md flex items-center justify-between px-4 md:px-6 shrink-0 sticky top-0 z-30">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 md:hidden">
           <Button

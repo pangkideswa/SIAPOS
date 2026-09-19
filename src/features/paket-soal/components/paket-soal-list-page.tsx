@@ -10,10 +10,19 @@ import { Badge } from "@/components/ui/badge"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Plus, Pencil, Trash2, Eye, Copy, Search } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import { Plus, Pencil, Trash2, Eye, Copy, Search, Sparkles, FileText } from "lucide-react"
 import { toast } from "sonner"
 import { PaketSoalFormDialog } from "./paket-soal-form-dialog"
 import { PaketSoalDeleteDialog } from "./paket-soal-delete-dialog"
+import { ImportAIDialog } from "@/features/bank-soal/components/import-ai-dialog"
+import { AIPackageGeneratorDialog } from "./ai-package-generator-dialog"
 import {
   STATUS_PAKET_SOAL_COLORS,
   MATA_PELAJARAN_OPTIONS,
@@ -32,6 +41,8 @@ export function PaketSoalListPage() {
   const [page, setPage] = useState(1)
   const [FormDialogOpen, setFormDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [importDialogOpen, setImportDialogOpen] = useState(false)
+  const [aiPackageDialogOpen, setAiPackageDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<PaketSoal | null>(null)
   const [deletingItem, setDeletingItem] = useState<PaketSoal | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -143,10 +154,37 @@ export function PaketSoalListPage() {
         title="Paket Soal"
         description="Kelola paket soal untuk ujian dan penilaian"
         action={
-          <Button onClick={() => { setEditingItem(null); setFormDialogOpen(true) }}>
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah Paket
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button />}>
+              <Plus className="mr-2 h-4 w-4" />
+              Buat Paket Soal
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[260px]">
+              <DropdownMenuItem onClick={() => setAiPackageDialogOpen(true)} className="py-2.5 cursor-pointer">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center text-purple-600 font-medium">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Buat Paket Otomatis (AI)
+                  </div>
+                  <p className="text-[10px] text-muted-foreground ml-6">Generate soal dan rakit jadi paket</p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setImportDialogOpen(true)} className="py-2.5 cursor-pointer">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center text-blue-600 font-medium">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Import Paket (Dokumen AI)
+                  </div>
+                  <p className="text-[10px] text-muted-foreground ml-6">Ekstrak dari PDF / Word langsung ke paket</p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => { setEditingItem(null); setFormDialogOpen(true) }} className="cursor-pointer">
+                <Pencil className="mr-2 h-4 w-4 text-muted-foreground" />
+                <span>Buat Paket Kosong (Manual)</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         }
       />
 
@@ -199,6 +237,18 @@ export function PaketSoalListPage() {
         item={deletingItem}
         onConfirm={handleConfirmDelete}
         isLoading={isLoading}
+      />
+
+      <AIPackageGeneratorDialog
+        open={aiPackageDialogOpen}
+        onOpenChange={setAiPackageDialogOpen}
+        onSuccess={() => {}}
+      />
+
+      <ImportAIDialog
+        open={importDialogOpen}
+        onOpenChange={setImportDialogOpen}
+        onSuccess={() => {}}
       />
     </div>
   )

@@ -21,6 +21,7 @@ import {
   Loader2,
   Save,
   Undo2,
+  Sparkles,
 } from "lucide-react"
 import { toast } from "sonner"
 import { STATUS_PENGUMPULAN_COLORS } from "@/features/pengumpulan/constants/pengumpulan.constants"
@@ -57,6 +58,7 @@ export function JawabanDetailDialog({
   const [nilai, setNilai] = useState<string>("")
   const [feedback, setFeedback] = useState("")
   const [isSaving, setIsSaving] = useState(false)
+  const [isAIGrading, setIsAIGrading] = useState(false)
   const gradeMutation = useGradeSubmission()
 
   function handleOpen(isOpen: boolean) {
@@ -89,6 +91,52 @@ export function JawabanDetailDialog({
       toast.success(`Nilai ${submission.siswa_nama} berhasil disimpan: ${parsed}`)
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  async function handleAIGrading() {
+    setIsAIGrading(true)
+    try {
+      const prompt = `Berikan simulasi koreksi tugas untuk siswa. Anggap siswa mengerjakan dengan cukup baik.
+Format jawaban persis seperti ini (harus 2 baris):
+NILAI: [angka acak antara 75-${nilaiMaksimal}]
+ULASAN: [ulasan 2 kalimat yang memotivasi dan spesifik tentang kelebihan dan 1 area perbaikan]`
+
+      const response = await fetch("/api/ai/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      })
+
+      const json = await response.json()
+      if (!response.ok) throw new Error(json.details || json.error || "Gagal menghubungi AI")
+
+      // Parsing hasil balasan AI
+      // Contoh:
+      // NILAI: 85
+      // ULASAN: Tugas dikerjakan dengan sangat baik...
+      const text = json.result || ""
+      
+      const nilaiMatch = text.match(/NILAI:\s*(\d+)/i)
+      const ulasanMatch = text.match(/ULASAN:\s*([\s\S]+)/i)
+
+      if (nilaiMatch && nilaiMatch[1]) {
+        let n = parseInt(nilaiMatch[1], 10)
+        if (n > nilaiMaksimal) n = nilaiMaksimal
+        setNilai(String(n))
+      }
+      
+      if (ulasanMatch && ulasanMatch[1]) {
+        setFeedback(ulasanMatch[1].trim())
+      } else {
+        setFeedback(text) // fallback kalau format tidak cocok
+      }
+
+      toast.success("AI berhasil memberikan rekomendasi nilai & ulasan!")
+    } catch (e: any) {
+      toast.error(e.message || "Gagal memanggil AI.")
+    } finally {
+      setIsAIGrading(false)
     }
   }
 
@@ -192,6 +240,17 @@ export function JawabanDetailDialog({
               />
             </div>
 
+            <div className="space-y-2">
+              <Label>Ulasan Guru (Koreksi)</Label>
+              <Textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="Berikan umpan balik atau klik 'Koreksi AI'..."
+                rows={3}
+                disabled={isSaving || isAIGrading}
+              />
+            </div>
+
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Clock className="h-4 w-4" />
               {submission.waktu_pengumpulan ? (
@@ -232,9 +291,26 @@ export function JawabanDetailDialog({
                 onChange={(e) => setNilai(e.target.value)}
                 placeholder={`0-${nilaiMaksimal}`}
                 className="w-24 h-9"
-                disabled={isSaving || submission.status === "Belum Mengumpulkan"}
+                disabled={isSaving || isAIGrading || submission.status === "Belum Mengumpulkan"}
               />
               <span className="text-xs text-muted-foreground">/ {nilaiMaksimal}</span>
+              
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleAIGrading}
+                disabled={isSaving || isAIGrading || submission.status === "Belum Mengumpulkan"}
+                className="bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100 mx-1"
+                title="Koreksi dengan AI"
+              >
+                {isAIGrading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
+                )}
+                <span className="hidden sm:inline-block ml-2">Koreksi AI</span>
+              </Button>
+
               <Button
                 size="sm"
                 onClick={handleSaveNilai}

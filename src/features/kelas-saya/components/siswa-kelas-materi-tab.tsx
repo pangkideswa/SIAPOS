@@ -80,8 +80,13 @@ export function SiswaKelasMateriTab({
                 </div>
               </div>
               <div className="flex-1">
-                <h4 className="font-semibold leading-snug group-hover:text-primary transition-colors">
+                <h4 className="font-semibold leading-snug group-hover:text-primary transition-colors flex items-center gap-2">
                   {materi.judul}
+                  {materi.is_read === false && (
+                    <Badge variant="destructive" className="h-5 px-1.5 text-[10px] uppercase">
+                      Baru
+                    </Badge>
+                  )}
                 </h4>
                 <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
                   {materi.deskripsi || "Tidak ada deskripsi."}
@@ -99,9 +104,18 @@ export function SiswaKelasMateriTab({
               <Button
                 variant="outline"
                 className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                onClick={() => {
+                onClick={async () => {
                   setViewingItem(materi)
                   setDialogOpen(true)
+                  if (materi.is_read === false) {
+                    try {
+                      await fetch(`/api/materials/${materi.id}/read`, { method: "POST" })
+                      // Optimistically update local state to hide badge
+                      materi.is_read = true
+                    } catch (e) {
+                      console.error("Failed to mark as read", e)
+                    }
+                  }
                 }}
               >
                 <Eye className="mr-2 h-4 w-4" />

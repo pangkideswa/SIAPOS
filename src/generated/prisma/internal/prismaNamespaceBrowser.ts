@@ -62,6 +62,7 @@ export const ModelName = {
   Subject: 'Subject',
   TeachingClass: 'TeachingClass',
   Material: 'Material',
+  MaterialRead: 'MaterialRead',
   Assignment: 'Assignment',
   Submission: 'Submission',
   AttendanceSession: 'AttendanceSession',
@@ -283,6 +284,16 @@ export const MaterialScalarFieldEnum = {
 } as const
 
 export type MaterialScalarFieldEnum = (typeof MaterialScalarFieldEnum)[keyof typeof MaterialScalarFieldEnum]
+
+
+export const MaterialReadScalarFieldEnum = {
+  id: 'id',
+  material_id: 'material_id',
+  student_id: 'student_id',
+  created_at: 'created_at'
+} as const
+
+export type MaterialReadScalarFieldEnum = (typeof MaterialReadScalarFieldEnum)[keyof typeof MaterialReadScalarFieldEnum]
 
 
 export const AssignmentScalarFieldEnum = {

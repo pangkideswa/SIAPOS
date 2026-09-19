@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Search, Pencil } from "lucide-react"
+import { Search, Pencil, Sparkles } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -23,6 +23,7 @@ import { useNilai, useUpdateNilai } from "@/hooks/use-nilai"
 import type { NilaiUpdateData } from "@/lib/services/nilai.service"
 import { NilaiAkademikDetailDialog } from "./nilai-akademik-detail-dialog"
 import { NilaiAkademikFormDialog } from "./nilai-akademik-form-dialog"
+import { AIClassAnalyticsDialog } from "./ai-class-analytics-dialog"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { Card, CardContent } from "@/components/ui/card"
 import { ClipboardX, FileOutput } from "lucide-react"
@@ -58,6 +59,7 @@ export function NilaiAkademikGuruPage() {
   const [selectedItem, setSelectedItem] = useState<NilaiAkademik | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<NilaiAkademik | null>(null)
+  const [aiDialogOpen, setAiDialogOpen] = useState(false)
 
   const filteredData = useMemo(() => {
     let data = [...items]
@@ -155,7 +157,13 @@ export function NilaiAkademikGuruPage() {
     <div className="space-y-6">
       <PageHeader
         title="Nilai Akademik"
-        description="Input dan kelola nilai akademik kelas yang Anda ampu"
+        description="Kelola seluruh nilai siswa untuk mata pelajaran yang Anda ampu."
+        action={
+          <Button onClick={() => setAiDialogOpen(true)} className="bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-600/20 transition-all border border-purple-500">
+            <Sparkles className="mr-2 h-4 w-4" />
+            Analisis Kelas dengan AI
+          </Button>
+        }
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -271,6 +279,14 @@ export function NilaiAkademikGuruPage() {
         onOpenChange={setFormOpen}
         data={editingItem}
         onSave={handleSave}
+      />
+
+      <AIClassAnalyticsDialog
+        open={aiDialogOpen}
+        onOpenChange={setAiDialogOpen}
+        data={filteredData}
+        mapel={mapelFilter}
+        kelas={kelasFilter}
       />
     </div>
   )

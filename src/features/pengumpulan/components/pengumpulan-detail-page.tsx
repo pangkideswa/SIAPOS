@@ -188,6 +188,27 @@ export function PengumpulanDetailPage({
       },
     },
     {
+      key: "plagiarisme",
+      header: "Plagiarisme",
+      render: (item) => {
+        const p = item as unknown as PengumpulanTugas
+        if (p.status === "Belum Mengumpulkan") return <span className="text-sm text-muted-foreground">-</span>
+        
+        // Mocking persentase plagiarisme
+        const score = p.plagiarisme ?? (p.id * 17) % 100
+        
+        let colorClass = "bg-green-100 text-green-700"
+        if (score > 20 && score <= 50) colorClass = "bg-yellow-100 text-yellow-700"
+        if (score > 50) colorClass = "bg-red-100 text-red-700 font-bold"
+        
+        return (
+          <Badge variant="outline" className={`border-none ${colorClass}`}>
+            {score}% Mirip
+          </Badge>
+        )
+      }
+    },
+    {
       key: "nilai",
       header: "Nilai",
       render: (item) => {

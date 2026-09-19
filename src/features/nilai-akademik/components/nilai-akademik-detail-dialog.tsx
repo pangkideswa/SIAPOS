@@ -78,6 +78,15 @@ export function NilaiAkademikDetailDialog({ open, onOpenChange, data }: Props) {
               {data.status}
             </Badge>
           </div>
+
+          {data.catatan && (
+            <div className="border-t pt-3">
+              <p className="text-xs text-muted-foreground mb-1">Catatan Evaluasi / Rapor</p>
+              <div className="bg-muted/50 rounded-lg p-3 text-sm italic">
+                "{data.catatan}"
+              </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

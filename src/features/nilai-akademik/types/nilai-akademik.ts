@@ -12,6 +12,7 @@ export interface NilaiAkademik {
   praktik: number | null
   uts: number | null
   uas: number | null
+  catatan?: string | null
   status: StatusNilai
   tahun_ajaran: string
   semester: string
@@ -24,4 +25,5 @@ export interface NilaiAkademikFormData {
   praktik: string
   uts: string
   uas: string
+  catatan?: string
 }

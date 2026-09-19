@@ -72,6 +72,12 @@ const navItems: NavEntry[] = [
   { type: "item", label: "Tugas", href: "/guru/tugas", icon: ClipboardList, roles: ["guru"] },
   { type: "item", label: "Pengumpulan", href: "/guru/pengumpulan", icon: ClipboardCheck, roles: ["guru"] },
   { type: "item", label: "Penilaian", href: "/guru/penilaian", icon: Award, roles: ["guru"] },
+  { type: "label", label: "Evaluasi" },
+  { type: "item", label: "Bank Soal", href: "/guru/bank-soal", icon: ListChecks, roles: ["guru"] },
+  { type: "item", label: "Paket Soal", href: "/guru/paket-soal", icon: ClipboardList, roles: ["guru"] },
+  { type: "item", label: "Quiz", href: "/guru/quiz", icon: FileQuestion, roles: ["guru"] },
+  { type: "item", label: "CBT", href: "/guru/cbt", icon: Monitor, roles: ["guru"] },
+  { type: "label", label: "Lainnya" },
   { type: "item", label: "Jadwal", href: "/guru/jadwal-pelajaran", icon: Calendar, roles: ["guru"] },
   { type: "item", label: "Absensi", href: "/guru/absensi", icon: CalendarCheck, roles: ["guru"] },
   { type: "item", label: "Rekap Absensi", href: "/guru/absensi/rekap", icon: ClipboardCheck, roles: ["guru"] },
@@ -80,6 +86,8 @@ const navItems: NavEntry[] = [
   { type: "item", label: "Dashboard", href: "/siswa", icon: LayoutDashboard, roles: ["siswa"] },
   { type: "item", label: "Kelas", href: "/siswa/kelas", icon: BookOpen, roles: ["siswa"] },
   { type: "item", label: "Tugas", href: "/siswa/tugas", icon: ClipboardList, roles: ["siswa"] },
+  { type: "item", label: "Quiz", href: "/siswa/quiz", icon: FileQuestion, roles: ["siswa"] },
+  { type: "item", label: "CBT", href: "/siswa/cbt", icon: Monitor, roles: ["siswa"] },
   { type: "item", label: "Nilai", href: "/siswa/nilai-akademik", icon: FileSpreadsheet, roles: ["siswa"] },
   { type: "item", label: "Absensi", href: "/siswa/absensi", icon: CalendarCheck, roles: ["siswa"] },
   { type: "item", label: "Jadwal", href: "/siswa/jadwal-pelajaran", icon: Calendar, roles: ["siswa"] },
@@ -225,7 +233,7 @@ export function Sidebar({
     <>
       <aside
         className={cn(
-          "hidden md:flex flex-col h-screen bg-card border-r border-border transition-all duration-300 sticky top-0",
+          "hidden md:flex flex-col h-screen bg-card/80 backdrop-blur-xl border-r border-border transition-all duration-300 sticky top-0",
           collapsed ? "w-[68px]" : "w-64"
         )}
       >

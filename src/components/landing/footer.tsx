@@ -12,7 +12,14 @@ const footerLinks = [
     title: "Akun",
     links: [
       { href: "/masuk", label: "Masuk" },
-      { href: "/daftar", label: "Daftar" },
+    ],
+  },
+  {
+    title: "Kontak Kami",
+    links: [
+      { href: "https://wa.me/6281233436196", label: "WhatsApp" },
+      { href: "https://instagram.com/pangkideswa", label: "Instagram" },
+      { href: "https://tiktok.com/@pangkideswa", label: "TikTok" },
     ],
   },
 ]
@@ -60,8 +67,7 @@ export function Footer() {
 
         <div className="mt-10 pt-6 border-t border-border/60">
           <p className="text-xs text-muted-foreground text-center">
-            &copy; {new Date().getFullYear()} SIAPOS v1.0 - Pangki Deswa Rayhandi (PD-Dev). Hak
-            cipta dilindungi.
+            &copy; {new Date().getFullYear()} SIAPOS V2.0 | Hak Cipta Dilindungi | Created by PD-Dev.
           </p>
         </div>
       </div>

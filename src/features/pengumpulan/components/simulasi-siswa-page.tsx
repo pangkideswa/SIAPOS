@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { RichTextEditor } from "@/components/ui/rich-text-editor"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   FileText,
@@ -381,15 +382,14 @@ export function SimulasiSiswaPage() {
                 />
               </div>
 
-              {/* Catatan */}
+              {/* Jawaban Teks / Catatan */}
               <div className="space-y-2">
-                <Label htmlFor="catatan">Catatan (opsional)</Label>
-                <Textarea
-                  id="catatan"
-                  placeholder="Tambahkan catatan untuk guru..."
+                <Label htmlFor="catatan">Jawaban Langsung / Catatan Tambahan</Label>
+                <RichTextEditor
                   value={catatan}
-                  onChange={(e) => setCatatan(e.target.value)}
-                  rows={4}
+                  onChange={setCatatan}
+                  placeholder="Ketik jawaban Anda di sini atau berikan catatan untuk guru..."
+                  minHeight={250}
                 />
               </div>
 
