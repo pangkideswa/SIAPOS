@@ -512,8 +512,8 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
       </Dialog>
 
       {/* Violation Alert Dialog */}
-      <Dialog open={showViolationDialog} onOpenChange={setShowViolationDialog}>
-        <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+      <Dialog open={showViolationDialog}>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-destructive/10">
