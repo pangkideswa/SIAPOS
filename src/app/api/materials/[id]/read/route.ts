@@ -6,11 +6,12 @@ import { prisma } from "@/lib/prisma"
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const user = await requireApiUser()
-    const materialId = parseInt(params.id)
+    const materialId = parseInt(id)
 
     if (isNaN(materialId)) {
       return apiError(new Error("ID materi tidak valid"), 400)
