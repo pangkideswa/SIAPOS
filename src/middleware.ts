@@ -40,6 +40,9 @@ function applyRateLimit(ip: string, pathname: string): boolean {
 
 const ROLE_ROUTES: { prefix: string; roles: UserRole[] }[] = [
   { prefix: "/admin", roles: ["super_admin", "admin"] },
+  { prefix: "/guru/hasil-ujian", roles: ["guru", "super_admin", "admin"] },
+  { prefix: "/guru/quiz", roles: ["guru", "super_admin", "admin"] },
+  { prefix: "/guru/cbt", roles: ["guru", "super_admin", "admin"] },
   { prefix: "/guru", roles: ["guru"] },
   { prefix: "/siswa", roles: ["siswa"] },
   { prefix: "/wali", roles: ["wali"] },

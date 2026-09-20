@@ -315,6 +315,8 @@ export type TeacherWhereInput = {
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   classrooms?: Prisma.ClassroomListRelationFilter
   teaching_classes?: Prisma.TeachingClassListRelationFilter
+  bank_soals?: Prisma.BankSoalListRelationFilter
+  paket_soals?: Prisma.PaketSoalListRelationFilter
 }
 
 export type TeacherOrderByWithRelationInput = {
@@ -338,6 +340,8 @@ export type TeacherOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   classrooms?: Prisma.ClassroomOrderByRelationAggregateInput
   teaching_classes?: Prisma.TeachingClassOrderByRelationAggregateInput
+  bank_soals?: Prisma.BankSoalOrderByRelationAggregateInput
+  paket_soals?: Prisma.PaketSoalOrderByRelationAggregateInput
 }
 
 export type TeacherWhereUniqueInput = Prisma.AtLeast<{
@@ -364,6 +368,8 @@ export type TeacherWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   classrooms?: Prisma.ClassroomListRelationFilter
   teaching_classes?: Prisma.TeachingClassListRelationFilter
+  bank_soals?: Prisma.BankSoalListRelationFilter
+  paket_soals?: Prisma.PaketSoalListRelationFilter
 }, "id" | "user_id" | "nip" | "email">
 
 export type TeacherOrderByWithAggregationInput = {
@@ -433,6 +439,8 @@ export type TeacherCreateInput = {
   user?: Prisma.UserCreateNestedOneWithoutTeacherInput
   classrooms?: Prisma.ClassroomCreateNestedManyWithoutHomeroom_teacherInput
   teaching_classes?: Prisma.TeachingClassCreateNestedManyWithoutTeacherInput
+  bank_soals?: Prisma.BankSoalCreateNestedManyWithoutGuruInput
+  paket_soals?: Prisma.PaketSoalCreateNestedManyWithoutGuruInput
 }
 
 export type TeacherUncheckedCreateInput = {
@@ -455,6 +463,8 @@ export type TeacherUncheckedCreateInput = {
   updated_at?: Date | string
   classrooms?: Prisma.ClassroomUncheckedCreateNestedManyWithoutHomeroom_teacherInput
   teaching_classes?: Prisma.TeachingClassUncheckedCreateNestedManyWithoutTeacherInput
+  bank_soals?: Prisma.BankSoalUncheckedCreateNestedManyWithoutGuruInput
+  paket_soals?: Prisma.PaketSoalUncheckedCreateNestedManyWithoutGuruInput
 }
 
 export type TeacherUpdateInput = {
@@ -476,6 +486,8 @@ export type TeacherUpdateInput = {
   user?: Prisma.UserUpdateOneWithoutTeacherNestedInput
   classrooms?: Prisma.ClassroomUpdateManyWithoutHomeroom_teacherNestedInput
   teaching_classes?: Prisma.TeachingClassUpdateManyWithoutTeacherNestedInput
+  bank_soals?: Prisma.BankSoalUpdateManyWithoutGuruNestedInput
+  paket_soals?: Prisma.PaketSoalUpdateManyWithoutGuruNestedInput
 }
 
 export type TeacherUncheckedUpdateInput = {
@@ -498,6 +510,8 @@ export type TeacherUncheckedUpdateInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   classrooms?: Prisma.ClassroomUncheckedUpdateManyWithoutHomeroom_teacherNestedInput
   teaching_classes?: Prisma.TeachingClassUncheckedUpdateManyWithoutTeacherNestedInput
+  bank_soals?: Prisma.BankSoalUncheckedUpdateManyWithoutGuruNestedInput
+  paket_soals?: Prisma.PaketSoalUncheckedUpdateManyWithoutGuruNestedInput
 }
 
 export type TeacherCreateManyInput = {
@@ -695,6 +709,38 @@ export type TeacherUpdateOneWithoutTeaching_classesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TeacherUpdateToOneWithWhereWithoutTeaching_classesInput, Prisma.TeacherUpdateWithoutTeaching_classesInput>, Prisma.TeacherUncheckedUpdateWithoutTeaching_classesInput>
 }
 
+export type TeacherCreateNestedOneWithoutBank_soalsInput = {
+  create?: Prisma.XOR<Prisma.TeacherCreateWithoutBank_soalsInput, Prisma.TeacherUncheckedCreateWithoutBank_soalsInput>
+  connectOrCreate?: Prisma.TeacherCreateOrConnectWithoutBank_soalsInput
+  connect?: Prisma.TeacherWhereUniqueInput
+}
+
+export type TeacherUpdateOneWithoutBank_soalsNestedInput = {
+  create?: Prisma.XOR<Prisma.TeacherCreateWithoutBank_soalsInput, Prisma.TeacherUncheckedCreateWithoutBank_soalsInput>
+  connectOrCreate?: Prisma.TeacherCreateOrConnectWithoutBank_soalsInput
+  upsert?: Prisma.TeacherUpsertWithoutBank_soalsInput
+  disconnect?: Prisma.TeacherWhereInput | boolean
+  delete?: Prisma.TeacherWhereInput | boolean
+  connect?: Prisma.TeacherWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TeacherUpdateToOneWithWhereWithoutBank_soalsInput, Prisma.TeacherUpdateWithoutBank_soalsInput>, Prisma.TeacherUncheckedUpdateWithoutBank_soalsInput>
+}
+
+export type TeacherCreateNestedOneWithoutPaket_soalsInput = {
+  create?: Prisma.XOR<Prisma.TeacherCreateWithoutPaket_soalsInput, Prisma.TeacherUncheckedCreateWithoutPaket_soalsInput>
+  connectOrCreate?: Prisma.TeacherCreateOrConnectWithoutPaket_soalsInput
+  connect?: Prisma.TeacherWhereUniqueInput
+}
+
+export type TeacherUpdateOneWithoutPaket_soalsNestedInput = {
+  create?: Prisma.XOR<Prisma.TeacherCreateWithoutPaket_soalsInput, Prisma.TeacherUncheckedCreateWithoutPaket_soalsInput>
+  connectOrCreate?: Prisma.TeacherCreateOrConnectWithoutPaket_soalsInput
+  upsert?: Prisma.TeacherUpsertWithoutPaket_soalsInput
+  disconnect?: Prisma.TeacherWhereInput | boolean
+  delete?: Prisma.TeacherWhereInput | boolean
+  connect?: Prisma.TeacherWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TeacherUpdateToOneWithWhereWithoutPaket_soalsInput, Prisma.TeacherUpdateWithoutPaket_soalsInput>, Prisma.TeacherUncheckedUpdateWithoutPaket_soalsInput>
+}
+
 export type TeacherCreateWithoutUserInput = {
   foto?: string | null
   nama_lengkap: string
@@ -713,6 +759,8 @@ export type TeacherCreateWithoutUserInput = {
   updated_at?: Date | string
   classrooms?: Prisma.ClassroomCreateNestedManyWithoutHomeroom_teacherInput
   teaching_classes?: Prisma.TeachingClassCreateNestedManyWithoutTeacherInput
+  bank_soals?: Prisma.BankSoalCreateNestedManyWithoutGuruInput
+  paket_soals?: Prisma.PaketSoalCreateNestedManyWithoutGuruInput
 }
 
 export type TeacherUncheckedCreateWithoutUserInput = {
@@ -734,6 +782,8 @@ export type TeacherUncheckedCreateWithoutUserInput = {
   updated_at?: Date | string
   classrooms?: Prisma.ClassroomUncheckedCreateNestedManyWithoutHomeroom_teacherInput
   teaching_classes?: Prisma.TeachingClassUncheckedCreateNestedManyWithoutTeacherInput
+  bank_soals?: Prisma.BankSoalUncheckedCreateNestedManyWithoutGuruInput
+  paket_soals?: Prisma.PaketSoalUncheckedCreateNestedManyWithoutGuruInput
 }
 
 export type TeacherCreateOrConnectWithoutUserInput = {
@@ -770,6 +820,8 @@ export type TeacherUpdateWithoutUserInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   classrooms?: Prisma.ClassroomUpdateManyWithoutHomeroom_teacherNestedInput
   teaching_classes?: Prisma.TeachingClassUpdateManyWithoutTeacherNestedInput
+  bank_soals?: Prisma.BankSoalUpdateManyWithoutGuruNestedInput
+  paket_soals?: Prisma.PaketSoalUpdateManyWithoutGuruNestedInput
 }
 
 export type TeacherUncheckedUpdateWithoutUserInput = {
@@ -791,6 +843,8 @@ export type TeacherUncheckedUpdateWithoutUserInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   classrooms?: Prisma.ClassroomUncheckedUpdateManyWithoutHomeroom_teacherNestedInput
   teaching_classes?: Prisma.TeachingClassUncheckedUpdateManyWithoutTeacherNestedInput
+  bank_soals?: Prisma.BankSoalUncheckedUpdateManyWithoutGuruNestedInput
+  paket_soals?: Prisma.PaketSoalUncheckedUpdateManyWithoutGuruNestedInput
 }
 
 export type TeacherCreateWithoutClassroomsInput = {
@@ -811,6 +865,8 @@ export type TeacherCreateWithoutClassroomsInput = {
   updated_at?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutTeacherInput
   teaching_classes?: Prisma.TeachingClassCreateNestedManyWithoutTeacherInput
+  bank_soals?: Prisma.BankSoalCreateNestedManyWithoutGuruInput
+  paket_soals?: Prisma.PaketSoalCreateNestedManyWithoutGuruInput
 }
 
 export type TeacherUncheckedCreateWithoutClassroomsInput = {
@@ -832,6 +888,8 @@ export type TeacherUncheckedCreateWithoutClassroomsInput = {
   created_at?: Date | string
   updated_at?: Date | string
   teaching_classes?: Prisma.TeachingClassUncheckedCreateNestedManyWithoutTeacherInput
+  bank_soals?: Prisma.BankSoalUncheckedCreateNestedManyWithoutGuruInput
+  paket_soals?: Prisma.PaketSoalUncheckedCreateNestedManyWithoutGuruInput
 }
 
 export type TeacherCreateOrConnectWithoutClassroomsInput = {
@@ -868,6 +926,8 @@ export type TeacherUpdateWithoutClassroomsInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutTeacherNestedInput
   teaching_classes?: Prisma.TeachingClassUpdateManyWithoutTeacherNestedInput
+  bank_soals?: Prisma.BankSoalUpdateManyWithoutGuruNestedInput
+  paket_soals?: Prisma.PaketSoalUpdateManyWithoutGuruNestedInput
 }
 
 export type TeacherUncheckedUpdateWithoutClassroomsInput = {
@@ -889,6 +949,8 @@ export type TeacherUncheckedUpdateWithoutClassroomsInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   teaching_classes?: Prisma.TeachingClassUncheckedUpdateManyWithoutTeacherNestedInput
+  bank_soals?: Prisma.BankSoalUncheckedUpdateManyWithoutGuruNestedInput
+  paket_soals?: Prisma.PaketSoalUncheckedUpdateManyWithoutGuruNestedInput
 }
 
 export type TeacherCreateWithoutTeaching_classesInput = {
@@ -909,6 +971,8 @@ export type TeacherCreateWithoutTeaching_classesInput = {
   updated_at?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutTeacherInput
   classrooms?: Prisma.ClassroomCreateNestedManyWithoutHomeroom_teacherInput
+  bank_soals?: Prisma.BankSoalCreateNestedManyWithoutGuruInput
+  paket_soals?: Prisma.PaketSoalCreateNestedManyWithoutGuruInput
 }
 
 export type TeacherUncheckedCreateWithoutTeaching_classesInput = {
@@ -930,6 +994,8 @@ export type TeacherUncheckedCreateWithoutTeaching_classesInput = {
   created_at?: Date | string
   updated_at?: Date | string
   classrooms?: Prisma.ClassroomUncheckedCreateNestedManyWithoutHomeroom_teacherInput
+  bank_soals?: Prisma.BankSoalUncheckedCreateNestedManyWithoutGuruInput
+  paket_soals?: Prisma.PaketSoalUncheckedCreateNestedManyWithoutGuruInput
 }
 
 export type TeacherCreateOrConnectWithoutTeaching_classesInput = {
@@ -966,6 +1032,8 @@ export type TeacherUpdateWithoutTeaching_classesInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutTeacherNestedInput
   classrooms?: Prisma.ClassroomUpdateManyWithoutHomeroom_teacherNestedInput
+  bank_soals?: Prisma.BankSoalUpdateManyWithoutGuruNestedInput
+  paket_soals?: Prisma.PaketSoalUpdateManyWithoutGuruNestedInput
 }
 
 export type TeacherUncheckedUpdateWithoutTeaching_classesInput = {
@@ -987,6 +1055,220 @@ export type TeacherUncheckedUpdateWithoutTeaching_classesInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   classrooms?: Prisma.ClassroomUncheckedUpdateManyWithoutHomeroom_teacherNestedInput
+  bank_soals?: Prisma.BankSoalUncheckedUpdateManyWithoutGuruNestedInput
+  paket_soals?: Prisma.PaketSoalUncheckedUpdateManyWithoutGuruNestedInput
+}
+
+export type TeacherCreateWithoutBank_soalsInput = {
+  foto?: string | null
+  nama_lengkap: string
+  nip: string
+  nuptk?: string | null
+  jenis_kelamin?: string
+  tempat_lahir?: string | null
+  tanggal_lahir?: Date | string | null
+  no_hp?: string | null
+  email: string
+  alamat?: string | null
+  pendidikan_terakhir?: string | null
+  status_kepegawaian?: string
+  mata_pelajaran?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  created_at?: Date | string
+  updated_at?: Date | string
+  user?: Prisma.UserCreateNestedOneWithoutTeacherInput
+  classrooms?: Prisma.ClassroomCreateNestedManyWithoutHomeroom_teacherInput
+  teaching_classes?: Prisma.TeachingClassCreateNestedManyWithoutTeacherInput
+  paket_soals?: Prisma.PaketSoalCreateNestedManyWithoutGuruInput
+}
+
+export type TeacherUncheckedCreateWithoutBank_soalsInput = {
+  id?: number
+  user_id?: number | null
+  foto?: string | null
+  nama_lengkap: string
+  nip: string
+  nuptk?: string | null
+  jenis_kelamin?: string
+  tempat_lahir?: string | null
+  tanggal_lahir?: Date | string | null
+  no_hp?: string | null
+  email: string
+  alamat?: string | null
+  pendidikan_terakhir?: string | null
+  status_kepegawaian?: string
+  mata_pelajaran?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  created_at?: Date | string
+  updated_at?: Date | string
+  classrooms?: Prisma.ClassroomUncheckedCreateNestedManyWithoutHomeroom_teacherInput
+  teaching_classes?: Prisma.TeachingClassUncheckedCreateNestedManyWithoutTeacherInput
+  paket_soals?: Prisma.PaketSoalUncheckedCreateNestedManyWithoutGuruInput
+}
+
+export type TeacherCreateOrConnectWithoutBank_soalsInput = {
+  where: Prisma.TeacherWhereUniqueInput
+  create: Prisma.XOR<Prisma.TeacherCreateWithoutBank_soalsInput, Prisma.TeacherUncheckedCreateWithoutBank_soalsInput>
+}
+
+export type TeacherUpsertWithoutBank_soalsInput = {
+  update: Prisma.XOR<Prisma.TeacherUpdateWithoutBank_soalsInput, Prisma.TeacherUncheckedUpdateWithoutBank_soalsInput>
+  create: Prisma.XOR<Prisma.TeacherCreateWithoutBank_soalsInput, Prisma.TeacherUncheckedCreateWithoutBank_soalsInput>
+  where?: Prisma.TeacherWhereInput
+}
+
+export type TeacherUpdateToOneWithWhereWithoutBank_soalsInput = {
+  where?: Prisma.TeacherWhereInput
+  data: Prisma.XOR<Prisma.TeacherUpdateWithoutBank_soalsInput, Prisma.TeacherUncheckedUpdateWithoutBank_soalsInput>
+}
+
+export type TeacherUpdateWithoutBank_soalsInput = {
+  foto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama_lengkap?: Prisma.StringFieldUpdateOperationsInput | string
+  nip?: Prisma.StringFieldUpdateOperationsInput | string
+  nuptk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jenis_kelamin?: Prisma.StringFieldUpdateOperationsInput | string
+  tempat_lahir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggal_lahir?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  no_hp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pendidikan_terakhir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status_kepegawaian?: Prisma.StringFieldUpdateOperationsInput | string
+  mata_pelajaran?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneWithoutTeacherNestedInput
+  classrooms?: Prisma.ClassroomUpdateManyWithoutHomeroom_teacherNestedInput
+  teaching_classes?: Prisma.TeachingClassUpdateManyWithoutTeacherNestedInput
+  paket_soals?: Prisma.PaketSoalUpdateManyWithoutGuruNestedInput
+}
+
+export type TeacherUncheckedUpdateWithoutBank_soalsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  foto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama_lengkap?: Prisma.StringFieldUpdateOperationsInput | string
+  nip?: Prisma.StringFieldUpdateOperationsInput | string
+  nuptk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jenis_kelamin?: Prisma.StringFieldUpdateOperationsInput | string
+  tempat_lahir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggal_lahir?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  no_hp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pendidikan_terakhir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status_kepegawaian?: Prisma.StringFieldUpdateOperationsInput | string
+  mata_pelajaran?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classrooms?: Prisma.ClassroomUncheckedUpdateManyWithoutHomeroom_teacherNestedInput
+  teaching_classes?: Prisma.TeachingClassUncheckedUpdateManyWithoutTeacherNestedInput
+  paket_soals?: Prisma.PaketSoalUncheckedUpdateManyWithoutGuruNestedInput
+}
+
+export type TeacherCreateWithoutPaket_soalsInput = {
+  foto?: string | null
+  nama_lengkap: string
+  nip: string
+  nuptk?: string | null
+  jenis_kelamin?: string
+  tempat_lahir?: string | null
+  tanggal_lahir?: Date | string | null
+  no_hp?: string | null
+  email: string
+  alamat?: string | null
+  pendidikan_terakhir?: string | null
+  status_kepegawaian?: string
+  mata_pelajaran?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  created_at?: Date | string
+  updated_at?: Date | string
+  user?: Prisma.UserCreateNestedOneWithoutTeacherInput
+  classrooms?: Prisma.ClassroomCreateNestedManyWithoutHomeroom_teacherInput
+  teaching_classes?: Prisma.TeachingClassCreateNestedManyWithoutTeacherInput
+  bank_soals?: Prisma.BankSoalCreateNestedManyWithoutGuruInput
+}
+
+export type TeacherUncheckedCreateWithoutPaket_soalsInput = {
+  id?: number
+  user_id?: number | null
+  foto?: string | null
+  nama_lengkap: string
+  nip: string
+  nuptk?: string | null
+  jenis_kelamin?: string
+  tempat_lahir?: string | null
+  tanggal_lahir?: Date | string | null
+  no_hp?: string | null
+  email: string
+  alamat?: string | null
+  pendidikan_terakhir?: string | null
+  status_kepegawaian?: string
+  mata_pelajaran?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  created_at?: Date | string
+  updated_at?: Date | string
+  classrooms?: Prisma.ClassroomUncheckedCreateNestedManyWithoutHomeroom_teacherInput
+  teaching_classes?: Prisma.TeachingClassUncheckedCreateNestedManyWithoutTeacherInput
+  bank_soals?: Prisma.BankSoalUncheckedCreateNestedManyWithoutGuruInput
+}
+
+export type TeacherCreateOrConnectWithoutPaket_soalsInput = {
+  where: Prisma.TeacherWhereUniqueInput
+  create: Prisma.XOR<Prisma.TeacherCreateWithoutPaket_soalsInput, Prisma.TeacherUncheckedCreateWithoutPaket_soalsInput>
+}
+
+export type TeacherUpsertWithoutPaket_soalsInput = {
+  update: Prisma.XOR<Prisma.TeacherUpdateWithoutPaket_soalsInput, Prisma.TeacherUncheckedUpdateWithoutPaket_soalsInput>
+  create: Prisma.XOR<Prisma.TeacherCreateWithoutPaket_soalsInput, Prisma.TeacherUncheckedCreateWithoutPaket_soalsInput>
+  where?: Prisma.TeacherWhereInput
+}
+
+export type TeacherUpdateToOneWithWhereWithoutPaket_soalsInput = {
+  where?: Prisma.TeacherWhereInput
+  data: Prisma.XOR<Prisma.TeacherUpdateWithoutPaket_soalsInput, Prisma.TeacherUncheckedUpdateWithoutPaket_soalsInput>
+}
+
+export type TeacherUpdateWithoutPaket_soalsInput = {
+  foto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama_lengkap?: Prisma.StringFieldUpdateOperationsInput | string
+  nip?: Prisma.StringFieldUpdateOperationsInput | string
+  nuptk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jenis_kelamin?: Prisma.StringFieldUpdateOperationsInput | string
+  tempat_lahir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggal_lahir?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  no_hp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pendidikan_terakhir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status_kepegawaian?: Prisma.StringFieldUpdateOperationsInput | string
+  mata_pelajaran?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneWithoutTeacherNestedInput
+  classrooms?: Prisma.ClassroomUpdateManyWithoutHomeroom_teacherNestedInput
+  teaching_classes?: Prisma.TeachingClassUpdateManyWithoutTeacherNestedInput
+  bank_soals?: Prisma.BankSoalUpdateManyWithoutGuruNestedInput
+}
+
+export type TeacherUncheckedUpdateWithoutPaket_soalsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  foto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama_lengkap?: Prisma.StringFieldUpdateOperationsInput | string
+  nip?: Prisma.StringFieldUpdateOperationsInput | string
+  nuptk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jenis_kelamin?: Prisma.StringFieldUpdateOperationsInput | string
+  tempat_lahir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggal_lahir?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  no_hp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pendidikan_terakhir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status_kepegawaian?: Prisma.StringFieldUpdateOperationsInput | string
+  mata_pelajaran?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classrooms?: Prisma.ClassroomUncheckedUpdateManyWithoutHomeroom_teacherNestedInput
+  teaching_classes?: Prisma.TeachingClassUncheckedUpdateManyWithoutTeacherNestedInput
+  bank_soals?: Prisma.BankSoalUncheckedUpdateManyWithoutGuruNestedInput
 }
 
 
@@ -997,11 +1279,15 @@ export type TeacherUncheckedUpdateWithoutTeaching_classesInput = {
 export type TeacherCountOutputType = {
   classrooms: number
   teaching_classes: number
+  bank_soals: number
+  paket_soals: number
 }
 
 export type TeacherCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   classrooms?: boolean | TeacherCountOutputTypeCountClassroomsArgs
   teaching_classes?: boolean | TeacherCountOutputTypeCountTeaching_classesArgs
+  bank_soals?: boolean | TeacherCountOutputTypeCountBank_soalsArgs
+  paket_soals?: boolean | TeacherCountOutputTypeCountPaket_soalsArgs
 }
 
 /**
@@ -1028,6 +1314,20 @@ export type TeacherCountOutputTypeCountTeaching_classesArgs<ExtArgs extends runt
   where?: Prisma.TeachingClassWhereInput
 }
 
+/**
+ * TeacherCountOutputType without action
+ */
+export type TeacherCountOutputTypeCountBank_soalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BankSoalWhereInput
+}
+
+/**
+ * TeacherCountOutputType without action
+ */
+export type TeacherCountOutputTypeCountPaket_soalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaketSoalWhereInput
+}
+
 
 export type TeacherSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1050,6 +1350,8 @@ export type TeacherSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   user?: boolean | Prisma.Teacher$userArgs<ExtArgs>
   classrooms?: boolean | Prisma.Teacher$classroomsArgs<ExtArgs>
   teaching_classes?: boolean | Prisma.Teacher$teaching_classesArgs<ExtArgs>
+  bank_soals?: boolean | Prisma.Teacher$bank_soalsArgs<ExtArgs>
+  paket_soals?: boolean | Prisma.Teacher$paket_soalsArgs<ExtArgs>
   _count?: boolean | Prisma.TeacherCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["teacher"]>
 
@@ -1120,6 +1422,8 @@ export type TeacherInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   user?: boolean | Prisma.Teacher$userArgs<ExtArgs>
   classrooms?: boolean | Prisma.Teacher$classroomsArgs<ExtArgs>
   teaching_classes?: boolean | Prisma.Teacher$teaching_classesArgs<ExtArgs>
+  bank_soals?: boolean | Prisma.Teacher$bank_soalsArgs<ExtArgs>
+  paket_soals?: boolean | Prisma.Teacher$paket_soalsArgs<ExtArgs>
   _count?: boolean | Prisma.TeacherCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TeacherIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1135,6 +1439,8 @@ export type $TeacherPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     user: Prisma.$UserPayload<ExtArgs> | null
     classrooms: Prisma.$ClassroomPayload<ExtArgs>[]
     teaching_classes: Prisma.$TeachingClassPayload<ExtArgs>[]
+    bank_soals: Prisma.$BankSoalPayload<ExtArgs>[]
+    paket_soals: Prisma.$PaketSoalPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1551,6 +1857,8 @@ export interface Prisma__TeacherClient<T, Null = never, ExtArgs extends runtime.
   user<T extends Prisma.Teacher$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Teacher$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   classrooms<T extends Prisma.Teacher$classroomsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Teacher$classroomsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   teaching_classes<T extends Prisma.Teacher$teaching_classesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Teacher$teaching_classesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TeachingClassPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  bank_soals<T extends Prisma.Teacher$bank_soalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Teacher$bank_soalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BankSoalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  paket_soals<T extends Prisma.Teacher$paket_soalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Teacher$paket_soalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaketSoalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2062,6 +2370,54 @@ export type Teacher$teaching_classesArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.TeachingClassScalarFieldEnum | Prisma.TeachingClassScalarFieldEnum[]
+}
+
+/**
+ * Teacher.bank_soals
+ */
+export type Teacher$bank_soalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BankSoal
+   */
+  select?: Prisma.BankSoalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BankSoal
+   */
+  omit?: Prisma.BankSoalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BankSoalInclude<ExtArgs> | null
+  where?: Prisma.BankSoalWhereInput
+  orderBy?: Prisma.BankSoalOrderByWithRelationInput | Prisma.BankSoalOrderByWithRelationInput[]
+  cursor?: Prisma.BankSoalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BankSoalScalarFieldEnum | Prisma.BankSoalScalarFieldEnum[]
+}
+
+/**
+ * Teacher.paket_soals
+ */
+export type Teacher$paket_soalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaketSoal
+   */
+  select?: Prisma.PaketSoalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaketSoal
+   */
+  omit?: Prisma.PaketSoalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaketSoalInclude<ExtArgs> | null
+  where?: Prisma.PaketSoalWhereInput
+  orderBy?: Prisma.PaketSoalOrderByWithRelationInput | Prisma.PaketSoalOrderByWithRelationInput[]
+  cursor?: Prisma.PaketSoalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaketSoalScalarFieldEnum | Prisma.PaketSoalScalarFieldEnum[]
 }
 
 /**

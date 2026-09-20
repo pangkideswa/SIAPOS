@@ -12,9 +12,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
-import { DUMMY_PAKET_SOAL } from "@/features/paket-soal/dummy/paket-soal.data"
 import {
-  STATUS_QUIZ_OPTIONS, KELAS_OPTIONS, EMPTY_QUIZ_FORM,
+  STATUS_QUIZ_OPTIONS, EMPTY_QUIZ_FORM,
 } from "../constants/quiz.constants"
 import type { Quiz, QuizFormData } from "../types/quiz"
 
@@ -31,6 +30,41 @@ export function QuizFormDialog({
 }: QuizFormDialogProps) {
   const [form, setForm] = useState<QuizFormData>(EMPTY_QUIZ_FORM)
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const [classes, setClasses] = useState<Array<{ id: number, name: string }>>([])
+  const [packages, setPackages] = useState<Array<{ id: number, judul: string, mata_pelajaran: string }>>([])
+
+  useEffect(() => {
+    async function fetchMasterData() {
+      try {
+        const [resClasses, resPackages] = await Promise.all([
+          fetch("/api/classes"),
+          fetch("/api/exams/packages")
+        ])
+        
+        const [dataClasses, dataPackages] = await Promise.all([
+          resClasses.json(),
+          resPackages.json()
+        ])
+
+        if (dataClasses.success) {
+           const items = dataClasses.data.data ? dataClasses.data.data : dataClasses.data
+           setClasses(items)
+        }
+        if (dataPackages.success) {
+           const items = dataPackages.data.map((p: any) => ({
+             id: p.id,
+             judul: p.judul,
+             mata_pelajaran: p.mata_pelajaran
+           }))
+           setPackages(items)
+        }
+      } catch (error) {
+        console.error("Gagal memuat data master", error)
+      }
+    }
+    fetchMasterData()
+  }, [])
 
   useEffect(() => {
     if (editingItem) {
@@ -115,8 +149,8 @@ export function QuizFormDialog({
             <Select value={form.paket_soal_id ? String(form.paket_soal_id) : ""} onValueChange={(v) => v && handleChange("paket_soal_id", Number(v))}>
               <SelectTrigger><SelectValue placeholder="Pilih Paket Soal" /></SelectTrigger>
               <SelectContent>
-                {DUMMY_PAKET_SOAL.map((p) => (
-                  <SelectItem key={p.id} value={String(p.id)}>{p.nama_paket} ({p.mata_pelajaran})</SelectItem>
+                {packages.map((p) => (
+                  <SelectItem key={p.id} value={String(p.id)}>{p.judul} ({p.mata_pelajaran})</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -128,8 +162,8 @@ export function QuizFormDialog({
             <Select value={form.kelas} onValueChange={(v) => v && handleChange("kelas", v)}>
               <SelectTrigger><SelectValue placeholder="Pilih Kelas" /></SelectTrigger>
               <SelectContent>
-                {KELAS_OPTIONS.map((k) => (
-                  <SelectItem key={k} value={k}>{k}</SelectItem>
+                {classes.map((k) => (
+                  <SelectItem key={k.id} value={k.name}>{k.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

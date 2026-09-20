@@ -10,6 +10,7 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
 // ============================================================================
 // Enums
 // ============================================================================
@@ -180,6 +181,8 @@ model Teacher {
 
   classrooms       Classroom[]     @relation("HomeroomTeacher")
   teaching_classes TeachingClass[]
+  bank_soals       BankSoal[]
+  paket_soals      PaketSoal[]
 
   @@index([user_id])
   @@map("teachers")
@@ -219,6 +222,7 @@ model Student {
   nilais             Nilai[]
   attendance_records Attendance[]
   material_reads     MaterialRead[]
+  exam_participants  ExamParticipant[]
 
   @@index([classroom_id])
   @@index([tahun_akademik_id])
@@ -297,6 +301,7 @@ model TeachingClass {
   schedules           Schedule[]
   nilais              Nilai[]
   attendance_sessions AttendanceSession[]
+  exams               Exam[]
 
   @@index([classroom_id])
   @@index([subject_id])
@@ -330,7 +335,7 @@ model Material {
   created_at        DateTime       @default(now())
   updated_at        DateTime       @updatedAt
 
-  reads             MaterialRead[]
+  reads MaterialRead[]
 
   @@index([teaching_class_id])
   @@map("materials")
@@ -518,6 +523,22 @@ model TahunAkademik {
   @@map("tahun_akademik")
 }
 
+model KalenderEvent {
+  id              Int      @id @default(autoincrement())
+  nama_event      String
+  deskripsi       String?
+  kategori        String
+  tanggal_mulai   DateTime
+  tanggal_selesai DateTime
+  tahun_ajaran    String?
+  semester        String?
+  status          String
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@map("kalender_events")
+}
+
 model Nilai {
   id                Int            @id @default(autoincrement())
   student_id        Int?
@@ -559,7 +580,7 @@ model Notifikasi {
   targetRoles String[]       @default([])
   is_read     Boolean        @default(false)
   created_at  DateTime       @default(now())
-  updated_at  DateTime       @updatedAt @default(now())
+  updated_at  DateTime       @default(now()) @updatedAt
 
   @@index([user_id])
   @@map("notifikasis")
@@ -571,8 +592,181 @@ model Notifikasi {
 
 model AppSetting {
   key        String   @id
-  value      String   // Stored as JSON string to support multiple formats
+  value      String // Stored as JSON string to support multiple formats
   updated_at DateTime @updatedAt
 
   @@map("app_settings")
+}
+
+// ============================================================================
+// CBT & Evaluation
+// ============================================================================
+
+enum QuestionType {
+  PILIHAN_GANDA
+  ESAI
+}
+
+enum QuestionDifficulty {
+  MUDAH
+  SEDANG
+  SULIT
+}
+
+enum BankSoalStatus {
+  DRAFT
+  PUBLISH
+}
+
+enum ExamType {
+  QUIZ
+  CBT
+}
+
+enum ExamStatus {
+  DRAFT
+  PUBLISH
+  SELESAI
+}
+
+enum ExamParticipantStatus {
+  BELUM_MULAI
+  MENGERJAKAN
+  SELESAI
+  CURANG
+}
+
+model BankSoal {
+  id             Int                @id @default(autoincrement())
+  kode_soal      String             @unique
+  mata_pelajaran String
+  pertanyaan     String
+  tipe_soal      QuestionType       @default(PILIHAN_GANDA)
+  kesulitan      QuestionDifficulty @default(SEDANG)
+  status         BankSoalStatus     @default(DRAFT)
+  pembahasan     String?
+  lampiran       Json?
+  guru_id        Int?
+  guru           Teacher?           @relation(fields: [guru_id], references: [id])
+  created_at     DateTime           @default(now())
+  updated_at     DateTime           @updatedAt
+
+  options     QuestionOption[]
+  paket_items PaketSoalItem[]
+  answers     ExamAnswer[]
+
+  @@index([guru_id])
+  @@index([mata_pelajaran])
+  @@map("bank_soal")
+}
+
+model QuestionOption {
+  id           Int      @id @default(autoincrement())
+  bank_soal_id Int
+  bank_soal    BankSoal @relation(fields: [bank_soal_id], references: [id], onDelete: Cascade)
+  teks         String
+  is_correct   Boolean  @default(false)
+
+  @@index([bank_soal_id])
+  @@map("question_options")
+}
+
+model PaketSoal {
+  id             Int            @id @default(autoincrement())
+  kode_paket     String         @unique
+  judul          String
+  deskripsi      String?
+  mata_pelajaran String
+  guru_id        Int?
+  guru           Teacher?       @relation(fields: [guru_id], references: [id])
+  durasi_menit   Int            @default(60)
+  status         BankSoalStatus @default(DRAFT)
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+
+  items PaketSoalItem[]
+  exams Exam[]
+
+  @@index([guru_id])
+  @@map("paket_soal")
+}
+
+model PaketSoalItem {
+  id            Int       @id @default(autoincrement())
+  paket_soal_id Int
+  paket_soal    PaketSoal @relation(fields: [paket_soal_id], references: [id], onDelete: Cascade)
+  bank_soal_id  Int
+  bank_soal     BankSoal  @relation(fields: [bank_soal_id], references: [id], onDelete: Cascade)
+  bobot         Float     @default(1.0)
+  nomor_urut    Int
+
+  @@unique([paket_soal_id, bank_soal_id])
+  @@map("paket_soal_items")
+}
+
+model Exam {
+  id                Int            @id @default(autoincrement())
+  judul             String
+  tipe              ExamType       @default(QUIZ)
+  paket_soal_id     Int
+  paket_soal        PaketSoal      @relation(fields: [paket_soal_id], references: [id])
+  teaching_class_id Int?
+  teaching_class    TeachingClass? @relation(fields: [teaching_class_id], references: [id], onDelete: Cascade)
+  kelas             String?
+  deskripsi         String?
+  waktu_mulai       DateTime?
+  waktu_selesai     DateTime?
+  durasi_menit      Int?
+  kkm               Int            @default(75)
+  percobaan_maksimal Int           @default(1)
+  acak_urutan_soal  Boolean        @default(false)
+  acak_urutan_jawaban Boolean      @default(false)
+  tampilkan_nilai   Boolean        @default(false)
+  status            ExamStatus     @default(DRAFT)
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+
+  participants ExamParticipant[]
+
+  @@index([paket_soal_id])
+  @@index([teaching_class_id])
+  @@map("exams")
+}
+
+model ExamParticipant {
+  id              Int                   @id @default(autoincrement())
+  exam_id         Int
+  exam            Exam                  @relation(fields: [exam_id], references: [id], onDelete: Cascade)
+  student_id      Int
+  student         Student               @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  status          ExamParticipantStatus @default(BELUM_MULAI)
+  waktu_mulai     DateTime?
+  waktu_selesai   DateTime?
+  nilai_akhir     Float?
+  ip_address      String?
+  browser_info    String?
+  violation_count Int                   @default(0)
+  catatan_guru    String?
+  created_at      DateTime              @default(now())
+  updated_at      DateTime              @updatedAt
+
+  answers ExamAnswer[]
+
+  @@unique([exam_id, student_id])
+  @@map("exam_participants")
+}
+
+model ExamAnswer {
+  id                 Int             @id @default(autoincrement())
+  participant_id     Int
+  participant        ExamParticipant @relation(fields: [participant_id], references: [id], onDelete: Cascade)
+  bank_soal_id       Int
+  bank_soal          BankSoal        @relation(fields: [bank_soal_id], references: [id], onDelete: Cascade)
+  selected_option_id Int?
+  jawaban_esai       String?
+  is_correct         Boolean?
+  nilai              Float?
+
+  @@unique([participant_id, bank_soal_id])
+  @@map("exam_answers")
 }

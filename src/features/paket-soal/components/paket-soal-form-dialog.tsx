@@ -15,10 +15,8 @@ import { Loader2 } from "lucide-react"
 import {
   TIPE_SOAL_COLORS, KESULITAN_COLORS,
 } from "@/features/bank-soal/constants/bank-soal.constants"
-import { DUMMY_BANK_SOAL } from "@/features/bank-soal/dummy/bank-soal.data"
 import {
-  STATUS_PAKET_SOAL_OPTIONS, MATA_PELAJARAN_OPTIONS,
-  GURU_PAKET_SOAL_OPTIONS, EMPTY_PAKET_SOAL_FORM,
+  STATUS_PAKET_SOAL_OPTIONS, EMPTY_PAKET_SOAL_FORM,
 } from "../constants/paket-soal.constants"
 import type { PaketSoal, PaketSoalFormData } from "../types/paket-soal"
 import type { BankSoal } from "@/features/bank-soal/types/bank-soal"
@@ -39,6 +37,53 @@ export function PaketSoalFormDialog({
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [selectedSoalIds, setSelectedSoalIds] = useState<number[]>([])
   const [soalSearch, setSoalSearch] = useState("")
+  
+  const [teachers, setTeachers] = useState<Array<{ id: number, nama_lengkap: string }>>([])
+  const [subjects, setSubjects] = useState<Array<{ id: number, name: string }>>([])
+  const [bankSoal, setBankSoal] = useState<Array<BankSoal>>([])
+
+  useEffect(() => {
+    async function fetchMasterData() {
+      try {
+        const [resTeachers, resSubjects, resBank] = await Promise.all([
+          fetch("/api/teachers"),
+          fetch("/api/subjects"),
+          fetch("/api/exams/bank")
+        ])
+        
+        const [dataTeachers, dataSubjects, dataBank] = await Promise.all([
+          resTeachers.json(),
+          resSubjects.json(),
+          resBank.json()
+        ])
+
+        if (dataTeachers.success) {
+           const items = dataTeachers.data.data ? dataTeachers.data.data : dataTeachers.data
+           setTeachers(items)
+        }
+        if (dataSubjects.success) {
+           const items = dataSubjects.data.data ? dataSubjects.data.data : dataSubjects.data
+           setSubjects(items)
+        }
+        if (dataBank.success) {
+           const mapped = dataBank.data.map((d: any) => ({
+             id: d.id,
+             kode_soal: d.kode_soal,
+             pertanyaan: d.pertanyaan,
+             tipe_soal: d.tipe_soal === "PILIHAN_GANDA" ? "Pilihan Ganda" : "Essay",
+             kesulitan: d.kesulitan === "MUDAH" ? "Mudah" : d.kesulitan === "SEDANG" ? "Sedang" : "Sulit",
+             status: d.status === "PUBLISH" ? "Aktif" : "Draft",
+             guru_nama: d.guru?.nama_lengkap || "Sistem",
+             mata_pelajaran: d.mata_pelajaran,
+           }))
+           setBankSoal(mapped)
+        }
+      } catch (error) {
+        console.error("Gagal memuat data master", error)
+      }
+    }
+    fetchMasterData()
+  }, [])
 
   useEffect(() => {
     if (editingItem) {
@@ -46,7 +91,7 @@ export function PaketSoalFormDialog({
         nama_paket: editingItem.nama_paket,
         deskripsi: editingItem.deskripsi,
         mata_pelajaran: editingItem.mata_pelajaran,
-        guru_nama: editingItem.guru_nama,
+        guru_id: editingItem.guru_id ?? null,
         durasi: editingItem.durasi,
         nilai_maksimal: editingItem.nilai_maksimal,
         soal_ids: editingItem.soal_ids,
@@ -61,7 +106,7 @@ export function PaketSoalFormDialog({
     setSoalSearch("")
   }, [editingItem, open])
 
-  function handleChange(field: keyof PaketSoalFormData, value: string | number | number[]) {
+  function handleChange(field: keyof PaketSoalFormData, value: string | number | number[] | null) {
     setForm((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }))
   }
@@ -81,7 +126,7 @@ export function PaketSoalFormDialog({
     setForm((f) => ({ ...f, soal_ids: next }))
   }
 
-  const filteredBankSoal = DUMMY_BANK_SOAL.filter((item) => {
+  const filteredBankSoal = bankSoal.filter((item) => {
     if (!soalSearch) return true
     const q = soalSearch.toLowerCase()
     return (
@@ -98,7 +143,7 @@ export function PaketSoalFormDialog({
     const newErrors: Record<string, string> = {}
     if (!form.nama_paket.trim()) newErrors.nama_paket = "Nama paket wajib diisi"
     if (!form.mata_pelajaran) newErrors.mata_pelajaran = "Mata pelajaran wajib dipilih"
-    if (!form.guru_nama) newErrors.guru_nama = "Guru wajib dipilih"
+    if (!form.guru_id) newErrors.guru_id = "Guru wajib dipilih"
     if (form.durasi <= 0) newErrors.durasi = "Durasi harus lebih dari 0"
     if (form.nilai_maksimal <= 0) newErrors.nilai_maksimal = "Nilai maksimal harus lebih dari 0"
     if (selectedSoalIds.length === 0) newErrors.soal_ids = "Pilih minimal 1 soal"
@@ -151,8 +196,8 @@ export function PaketSoalFormDialog({
                 <Select value={form.mata_pelajaran} onValueChange={(v) => v && handleChange("mata_pelajaran", v)}>
                   <SelectTrigger><SelectValue placeholder="Pilih Mapel" /></SelectTrigger>
                   <SelectContent>
-                    {MATA_PELAJARAN_OPTIONS.map((m) => (
-                      <SelectItem key={m} value={m}>{m}</SelectItem>
+                    {subjects.map((m) => (
+                      <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -160,15 +205,15 @@ export function PaketSoalFormDialog({
               </div>
               <div className="space-y-2">
                 <Label>Guru *</Label>
-                <Select value={form.guru_nama} onValueChange={(v) => v && handleChange("guru_nama", v)}>
+                <Select value={form.guru_id ? String(form.guru_id) : ""} onValueChange={(v) => v && handleChange("guru_id", Number(v))}>
                   <SelectTrigger><SelectValue placeholder="Pilih Guru" /></SelectTrigger>
                   <SelectContent>
-                    {GURU_PAKET_SOAL_OPTIONS.map((g) => (
-                      <SelectItem key={g} value={g}>{g}</SelectItem>
+                    {teachers.map((g) => (
+                      <SelectItem key={g.id} value={String(g.id)}>{g.nama_lengkap}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.guru_nama && <p className="text-xs text-destructive">{errors.guru_nama}</p>}
+                {errors.guru_id && <p className="text-xs text-destructive">{errors.guru_id}</p>}
               </div>
             </div>
 
@@ -212,7 +257,7 @@ export function PaketSoalFormDialog({
               <div>
                 <Label className="text-base font-semibold">Pilih Soal *</Label>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {selectedSoalIds.length} soal dipilih dari {DUMMY_BANK_SOAL.length} soal tersedia
+                  {selectedSoalIds.length} soal dipilih dari {bankSoal.length} soal tersedia
                 </p>
               </div>
             </div>

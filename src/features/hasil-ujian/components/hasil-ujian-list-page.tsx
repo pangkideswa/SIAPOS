@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -33,7 +33,6 @@ import {
   STATUS_HASIL_COLORS,
   JENIS_UJIAN_COLORS,
 } from "@/features/hasil-ujian/constants/hasil-ujian.constants"
-import { DUMMY_HASIL_UJIAN } from "@/features/hasil-ujian/dummy/hasil-ujian.data"
 
 type SortKey = "siswa_nama" | "nilai" | "tanggal" | "jenis_ujian" | "status"
 type SortDir = "asc" | "desc"
@@ -51,15 +50,34 @@ export function HasilUjianListPage() {
   const [page, setPage] = useState(1)
   const [sortKey, setSortKey] = useState<SortKey>("tanggal")
   const [sortDir, setSortDir] = useState<SortDir>("desc")
+  
+  const [results, setResults] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const perPage = 10
 
-  const baseData = useMemo(() => {
-    if (isSiswa) {
-      return DUMMY_HASIL_UJIAN.filter((h) => h.siswa_nama === "Rizki Pratama")
+
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true)
+      try {
+        const res = await fetch("/api/exams/results")
+        const json = await res.json()
+        if (json.success) {
+          setResults(json.data)
+        }
+      } catch (error) {
+        console.error("Failed to fetch results", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
-    return DUMMY_HASIL_UJIAN
-  }, [isSiswa])
+    fetchData()
+  }, [])
+
+  const baseData = useMemo(() => {
+    return results
+  }, [results])
 
   const summaryData = useMemo(() => {
     const graded = baseData.filter((h) => h.nilai !== null)

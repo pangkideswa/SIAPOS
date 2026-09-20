@@ -23,7 +23,6 @@ import {
   TAHUN_AJARAN_OPTIONS,
   BULAN_OPTIONS,
 } from "../constants/kalender-akademik.constants"
-import { DUMMY_KALENDER_EVENTS } from "../dummy/kalender-akademik.data"
 import { KalenderSummaryCards } from "./kalender-summary-cards"
 import { KalenderMonthView } from "./kalender-month-view"
 import { KalenderWeekView } from "./kalender-week-view"
@@ -47,8 +46,12 @@ type EventRow = Record<string, unknown> & {
   status: string
 }
 
+import { useEffect } from "react"
+import { toast } from "sonner"
+
 export function KalenderAkademikAdminPage() {
-  const [events, setEvents] = useState<KalenderEvent[]>(DUMMY_KALENDER_EVENTS)
+  const [events, setEvents] = useState<KalenderEvent[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [kategoriFilter, setKategoriFilter] = useState("semua")
   const [semesterFilter, setSemesterFilter] = useState("semua")
@@ -62,6 +65,28 @@ export function KalenderAkademikAdminPage() {
   const [selectedEvent, setSelectedEvent] = useState<KalenderEvent | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
+
+  const fetchEvents = async () => {
+    setIsLoading(true)
+    try {
+      const res = await fetch("/api/kalender")
+      const json = await res.json()
+      if (res.ok) {
+        setEvents(json.data)
+      } else {
+        toast.error(json.message || "Gagal memuat kalender")
+      }
+    } catch (e) {
+      console.error(e)
+      toast.error("Gagal memuat kalender")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchEvents()
+  }, [])
 
   const filteredData = useMemo(() => {
     let data = [...events]
@@ -106,19 +131,58 @@ export function KalenderAkademikAdminPage() {
     setDeleteOpen(true)
   }
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deletingId !== null) {
-      setEvents((prev) => prev.filter((e) => e.id !== deletingId))
+      try {
+        const res = await fetch(`/api/kalender/${deletingId}`, { method: "DELETE" })
+        const json = await res.json()
+        if (res.ok) {
+          setEvents((prev) => prev.filter((e) => e.id !== deletingId))
+          toast.success("Event berhasil dihapus")
+        } else {
+          toast.error(json.message || "Gagal menghapus event")
+        }
+      } catch (error) {
+        console.error(error)
+        toast.error("Terjadi kesalahan saat menghapus")
+      }
       setDeleteOpen(false)
       setDeletingId(null)
     }
   }
 
-  const handleSave = (data: KalenderEvent) => {
-    if (editingEvent) {
-      setEvents((prev) => prev.map((e) => (e.id === data.id ? data : e)))
-    } else {
-      setEvents((prev) => [...prev, data])
+  const handleSave = async (data: KalenderEvent) => {
+    try {
+      if (editingEvent) {
+        const res = await fetch(`/api/kalender/${data.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
+        const json = await res.json()
+        if (res.ok) {
+          setEvents((prev) => prev.map((e) => (e.id === data.id ? json.data : e)))
+          toast.success("Event berhasil diperbarui")
+        } else {
+          toast.error(json.message || "Gagal memperbarui event")
+        }
+      } else {
+        const res = await fetch("/api/kalender", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
+        const json = await res.json()
+        if (res.ok) {
+          setEvents((prev) => [...prev, json.data])
+          toast.success("Event berhasil dibuat")
+        } else {
+          toast.error(json.message || "Gagal membuat event")
+        }
+      }
+    } catch (e) {
+      console.error(e)
+      toast.error("Terjadi kesalahan")
     }
   }
 

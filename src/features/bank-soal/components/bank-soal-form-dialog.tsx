@@ -15,7 +15,6 @@ import { Loader2 } from "lucide-react"
 
 import {
   TIPE_SOAL_OPTIONS, KESULITAN_OPTIONS, STATUS_BANK_SOAL_OPTIONS,
-  MATA_PELAJARAN_OPTIONS, KELAS_OPTIONS, GURU_BANK_SOAL_OPTIONS,
   EMPTY_BANK_SOAL_FORM, generateKodeSoal,
 } from "../constants/bank-soal.constants"
 import type { BankSoal, BankSoalFormData, PilihanGanda } from "../types/bank-soal"
@@ -33,6 +32,38 @@ export function BankSoalFormDialog({
 }: BankSoalFormDialogProps) {
   const [form, setForm] = useState<BankSoalFormData>(EMPTY_BANK_SOAL_FORM)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  
+  const [teachers, setTeachers] = useState<Array<{ id: number, nama_lengkap: string }>>([])
+  const [subjects, setSubjects] = useState<Array<{ id: number, name: string }>>([])
+
+  useEffect(() => {
+    async function fetchMasterData() {
+      try {
+        const [resTeachers, resSubjects] = await Promise.all([
+          fetch("/api/teachers"),
+          fetch("/api/subjects")
+        ])
+        
+        const [dataTeachers, dataSubjects] = await Promise.all([
+          resTeachers.json(),
+          resSubjects.json()
+        ])
+
+        if (dataTeachers.success) {
+           // check if paginated response
+           const items = dataTeachers.data.data ? dataTeachers.data.data : dataTeachers.data
+           setTeachers(items)
+        }
+        if (dataSubjects.success) {
+           const items = dataSubjects.data.data ? dataSubjects.data.data : dataSubjects.data
+           setSubjects(items)
+        }
+      } catch (error) {
+        console.error("Gagal memuat data master", error)
+      }
+    }
+    fetchMasterData()
+  }, [])
 
   useEffect(() => {
     if (editingItem) {
@@ -44,8 +75,7 @@ export function BankSoalFormDialog({
         pilihan: editingItem.pilihan,
         jawaban_benar: editingItem.jawaban_benar,
         mata_pelajaran: editingItem.mata_pelajaran,
-        guru_nama: editingItem.guru_nama,
-        kelas: editingItem.kelas,
+        guru_id: editingItem.guru_id ?? null,
         kesulitan: editingItem.kesulitan,
         status: editingItem.status,
       })
@@ -55,7 +85,7 @@ export function BankSoalFormDialog({
     setErrors({})
   }, [editingItem, open])
 
-  function handleChange(field: keyof BankSoalFormData, value: string | PilihanGanda | null) {
+  function handleChange(field: keyof BankSoalFormData, value: string | number | PilihanGanda | null) {
     setForm((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }))
   }
@@ -89,8 +119,7 @@ export function BankSoalFormDialog({
     const newErrors: Record<string, string> = {}
     if (!form.pertanyaan.trim()) newErrors.pertanyaan = "Pertanyaan wajib diisi"
     if (!form.mata_pelajaran) newErrors.mata_pelajaran = "Mata pelajaran wajib dipilih"
-    if (!form.guru_nama) newErrors.guru_nama = "Guru wajib dipilih"
-    if (!form.kelas) newErrors.kelas = "Kelas wajib dipilih"
+    if (!form.guru_id) newErrors.guru_id = "Guru wajib dipilih"
     if (form.tipe_soal === "Pilihan Ganda") {
       if (!form.jawaban_benar) newErrors.jawaban_benar = "Jawaban benar wajib dipilih"
     } else if (form.tipe_soal === "Isian Singkat") {
@@ -200,8 +229,8 @@ export function BankSoalFormDialog({
               <Select value={form.mata_pelajaran} onValueChange={(v) => v && handleChange("mata_pelajaran", v)}>
                 <SelectTrigger><SelectValue placeholder="Pilih Mapel" /></SelectTrigger>
                 <SelectContent>
-                  {MATA_PELAJARAN_OPTIONS.map((m) => (
-                    <SelectItem key={m} value={m}>{m}</SelectItem>
+                  {subjects.map((m) => (
+                    <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -209,31 +238,19 @@ export function BankSoalFormDialog({
             </div>
             <div className="space-y-2">
               <Label>Guru *</Label>
-              <Select value={form.guru_nama} onValueChange={(v) => v && handleChange("guru_nama", v)}>
+              <Select value={form.guru_id ? String(form.guru_id) : ""} onValueChange={(v) => v && handleChange("guru_id", Number(v))}>
                 <SelectTrigger><SelectValue placeholder="Pilih Guru" /></SelectTrigger>
                 <SelectContent>
-                  {GURU_BANK_SOAL_OPTIONS.map((g) => (
-                    <SelectItem key={g} value={g}>{g}</SelectItem>
+                  {teachers.map((g) => (
+                    <SelectItem key={g.id} value={String(g.id)}>{g.nama_lengkap}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {errors.guru_nama && <p className="text-xs text-destructive">{errors.guru_nama}</p>}
+              {errors.guru_id && <p className="text-xs text-destructive">{errors.guru_id}</p>}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Kelas *</Label>
-              <Select value={form.kelas} onValueChange={(v) => v && handleChange("kelas", v)}>
-                <SelectTrigger><SelectValue placeholder="Pilih Kelas" /></SelectTrigger>
-                <SelectContent>
-                  {KELAS_OPTIONS.map((k) => (
-                    <SelectItem key={k} value={k}>{k}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.kelas && <p className="text-xs text-destructive">{errors.kelas}</p>}
-            </div>
             <div className="space-y-2">
               <Label>Kesulitan</Label>
               <Select value={form.kesulitan} onValueChange={(v) => v && handleChange("kesulitan", v)}>

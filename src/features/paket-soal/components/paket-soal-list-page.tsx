@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -25,11 +25,8 @@ import { ImportAIDialog } from "@/features/bank-soal/components/import-ai-dialog
 import { AIPackageGeneratorDialog } from "./ai-package-generator-dialog"
 import {
   STATUS_PAKET_SOAL_COLORS,
-  MATA_PELAJARAN_OPTIONS,
-  GURU_PAKET_SOAL_OPTIONS,
   STATUS_PAKET_SOAL_OPTIONS,
 } from "../constants/paket-soal.constants"
-import { DUMMY_PAKET_SOAL } from "../dummy/paket-soal.data"
 import type { PaketSoal, PaketSoalFormData } from "../types/paket-soal"
 
 export function PaketSoalListPage() {
@@ -46,9 +43,36 @@ export function PaketSoalListPage() {
   const [editingItem, setEditingItem] = useState<PaketSoal | null>(null)
   const [deletingItem, setDeletingItem] = useState<PaketSoal | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [data, setData] = useState<PaketSoal[]>(DUMMY_PAKET_SOAL)
+  const [data, setData] = useState<PaketSoal[]>([])
 
   const perPage = 10
+
+  useEffect(() => {
+    fetchPaketSoal()
+  }, [])
+
+  async function fetchPaketSoal() {
+    setIsLoading(true)
+    try {
+      const res = await fetch("/api/exams/packages")
+      const json = await res.json()
+      if (json.success) {
+        const mapped = json.data.map((d: any) => ({
+          ...d,
+          nama_paket: d.judul,
+          status: d.status === "PUBLISH" ? "Aktif" : "Draft",
+          guru_nama: d.guru?.nama_lengkap || "Sistem",
+          soal_ids: new Array(d._count?.items || 0).fill(0), // mock array length for count
+          durasi: d.durasi_menit,
+        }))
+        setData(mapped)
+      }
+    } catch (error) {
+      toast.error("Gagal memuat data paket soal")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const filteredData = data.filter((item) => {
     const matchesSearch =
@@ -64,6 +88,9 @@ export function PaketSoalListPage() {
   })
 
   const paginatedData = filteredData.slice((page - 1) * perPage, page * perPage)
+
+  const mapelOptions = Array.from(new Set(data.map(d => d.mata_pelajaran))).filter(Boolean)
+  const guruOptions = Array.from(new Set(data.map(d => d.guru_nama))).filter(Boolean)
 
   const columns: Column<Record<string, unknown>>[] = [
     {
@@ -118,34 +145,55 @@ export function PaketSoalListPage() {
 
   async function handleSubmit(formData: PaketSoalFormData) {
     setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 500))
-    if (editingItem) {
-      setData((prev) => prev.map((d) => d.id === editingItem.id ? { ...d, ...formData, updated_at: new Date().toISOString() } : d))
-      toast.success("Paket soal berhasil diperbarui")
-    } else {
-      const newItem: PaketSoal = {
-        ...formData,
-        id: Math.max(...data.map((d) => d.id)) + 1,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+    try {
+      const dbPayload = {
+        judul: formData.nama_paket,
+        deskripsi: formData.deskripsi,
+        mata_pelajaran: formData.mata_pelajaran,
+        durasi_menit: formData.durasi,
+        status: formData.status === "Aktif" ? "PUBLISH" : "DRAFT",
       }
-      setData((prev) => [newItem, ...prev])
-      toast.success("Paket soal berhasil ditambahkan")
+
+      if (editingItem) {
+        const res = await fetch(`/api/exams/packages/${editingItem.id}`, {
+          method: "PUT",
+          body: JSON.stringify(dbPayload)
+        })
+        if (!res.ok) throw new Error()
+        toast.success("Paket soal berhasil diperbarui")
+      } else {
+        const res = await fetch("/api/exams/packages", {
+          method: "POST",
+          body: JSON.stringify(dbPayload)
+        })
+        if (!res.ok) throw new Error()
+        toast.success("Paket soal berhasil ditambahkan")
+      }
+      await fetchPaketSoal()
+      setFormDialogOpen(false)
+      setEditingItem(null)
+    } catch (err) {
+      toast.error("Gagal menyimpan paket soal")
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
-    setFormDialogOpen(false)
-    setEditingItem(null)
   }
 
   async function handleConfirmDelete() {
     if (!deletingItem) return
     setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 500))
-    setData((prev) => prev.filter((d) => d.id !== deletingItem.id))
-    toast.success("Paket soal berhasil dihapus")
-    setIsLoading(false)
-    setDeleteDialogOpen(false)
-    setDeletingItem(null)
+    try {
+      const res = await fetch(`/api/exams/packages/${deletingItem.id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error()
+      toast.success("Paket soal berhasil dihapus")
+      await fetchPaketSoal()
+      setDeleteDialogOpen(false)
+      setDeletingItem(null)
+    } catch (err) {
+      toast.error("Gagal menghapus paket soal")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -197,14 +245,14 @@ export function PaketSoalListPage() {
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Mapel" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mapel</SelectItem>
-            {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+            {mapelOptions.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={guruFilter === "semua" ? undefined : guruFilter} onValueChange={(v) => { if (v) { setGuruFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Guru" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Guru</SelectItem>
-            {GURU_PAKET_SOAL_OPTIONS.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+            {guruOptions.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter === "semua" ? undefined : statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(1) } }}>

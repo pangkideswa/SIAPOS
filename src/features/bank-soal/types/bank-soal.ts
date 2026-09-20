@@ -20,11 +20,11 @@ export interface BankSoal {
   jawaban_benar: string
   mata_pelajaran: string
   guru_nama: string
-  kelas: string
+  guru_id: number | null
   kesulitan: KesulitanSoal
   status: StatusBankSoal
   created_at: string
   updated_at: string
 }
 
-export type BankSoalFormData = Omit<BankSoal, "id" | "created_at" | "updated_at">
+export type BankSoalFormData = Omit<BankSoal, "id" | "created_at" | "updated_at" | "guru_nama">

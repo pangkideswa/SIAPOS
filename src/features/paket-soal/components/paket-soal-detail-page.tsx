@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,8 +10,6 @@ import { ArrowLeft, Clock, FileText } from "lucide-react"
 import {
   STATUS_PAKET_SOAL_COLORS,
 } from "../constants/paket-soal.constants"
-import { DUMMY_PAKET_SOAL } from "../dummy/paket-soal.data"
-import { DUMMY_BANK_SOAL } from "@/features/bank-soal/dummy/bank-soal.data"
 import {
   TIPE_SOAL_COLORS, KESULITAN_COLORS,
 } from "@/features/bank-soal/constants/bank-soal.constants"
@@ -21,7 +20,29 @@ interface PaketSoalDetailPageProps {
 
 export function PaketSoalDetailPage({ id }: PaketSoalDetailPageProps) {
   const router = useRouter()
-  const paket = DUMMY_PAKET_SOAL.find((p) => p.id === Number(id))
+  const [paket, setPaket] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadPaket() {
+      try {
+        const res = await fetch(`/api/exams/packages/${id}`)
+        const json = await res.json()
+        if (json.success) {
+          setPaket(json.data)
+        }
+      } catch (error) {
+        console.error("Gagal memuat paket soal")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    loadPaket()
+  }, [id])
+
+  if (isLoading) {
+    return <div className="flex h-[60vh] items-center justify-center">Memuat Detail Paket Soal...</div>
+  }
 
   if (!paket) {
     return (
@@ -35,12 +56,12 @@ export function PaketSoalDetailPage({ id }: PaketSoalDetailPageProps) {
     )
   }
 
-  const soalList = DUMMY_BANK_SOAL.filter((s) => paket.soal_ids.includes(s.id))
+  const soalList = paket.items?.map((item: any) => item.bank_soal) || []
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={paket.nama_paket}
+        title={paket.judul}
         description={`${paket.mata_pelajaran} — ${paket.guru_nama}`}
         action={
           <div className="flex gap-2">
@@ -68,7 +89,7 @@ export function PaketSoalDetailPage({ id }: PaketSoalDetailPageProps) {
               <CardTitle>Daftar Soal ({soalList.length})</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {soalList.map((soal, index) => (
+              {soalList.map((soal: any, index: number) => (
                 <div key={soal.id} className="flex items-start gap-3 p-3 rounded-lg border">
                   <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm shrink-0">
                     {index + 1}
@@ -76,8 +97,8 @@ export function PaketSoalDetailPage({ id }: PaketSoalDetailPageProps) {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm line-clamp-2">{soal.pertanyaan}</p>
                     <div className="flex gap-2 mt-2">
-                      <Badge className={TIPE_SOAL_COLORS[soal.tipe_soal]}>{soal.tipe_soal}</Badge>
-                      <Badge className={KESULITAN_COLORS[soal.kesulitan]}>{soal.kesulitan}</Badge>
+                      <Badge className={TIPE_SOAL_COLORS[soal.tipe_soal] || "bg-gray-100"}>{soal.tipe_soal}</Badge>
+                      <Badge className={KESULITAN_COLORS[soal.kesulitan] || "bg-gray-100"}>{soal.kesulitan}</Badge>
                     </div>
                   </div>
                 </div>
@@ -104,13 +125,6 @@ export function PaketSoalDetailPage({ id }: PaketSoalDetailPageProps) {
                 <p className="text-sm font-medium">{paket.guru_nama}</p>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Durasi</p>
-                  <p className="text-sm font-medium">{paket.durasi} menit</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Jumlah Soal</p>
@@ -118,12 +132,8 @@ export function PaketSoalDetailPage({ id }: PaketSoalDetailPageProps) {
                 </div>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Nilai Maksimal</p>
-                <p className="text-sm font-medium">{paket.nilai_maksimal}</p>
-              </div>
-              <div>
                 <p className="text-xs text-muted-foreground">Status</p>
-                <Badge className={STATUS_PAKET_SOAL_COLORS[paket.status]}>{paket.status}</Badge>
+                <Badge className={STATUS_PAKET_SOAL_COLORS[paket.status] || "bg-gray-100"}>{paket.status}</Badge>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Dibuat</p>

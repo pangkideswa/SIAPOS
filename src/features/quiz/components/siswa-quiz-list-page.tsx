@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { Badge } from "@/components/ui/badge"
@@ -8,34 +8,42 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Clock, FileText, AlertCircle } from "lucide-react"
+import { Clock, FileText, AlertCircle, Loader2 } from "lucide-react"
 import {
   MATA_PELAJARAN_OPTIONS,
 } from "../constants/quiz.constants"
-import { DUMMY_QUIZ } from "../dummy/quiz.data"
-import { DUMMY_PAKET_SOAL } from "@/features/paket-soal/dummy/paket-soal.data"
 import type { Quiz } from "../types/quiz"
 
 export function SiswaQuizListPage() {
   const router = useRouter()
   const [mapelFilter, setMapelFilter] = useState<string>("semua")
+  const [quizzes, setQuizzes] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const publishedQuizzes = DUMMY_QUIZ.filter((q) => q.status === "Publish")
+  useEffect(() => {
+    fetch("/api/student/exams?tipe=QUIZ")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setQuizzes(data.data)
+        }
+        setIsLoading(false)
+      })
+      .catch(err => {
+        console.error(err)
+        setIsLoading(false)
+      })
+  }, [])
 
-  const filteredData = publishedQuizzes.filter((item) => {
-    const paket = DUMMY_PAKET_SOAL.find((p) => p.id === item.paket_soal_id)
-    const matchesMapel = mapelFilter === "semua" || paket?.mata_pelajaran === mapelFilter
-    return matchesMapel
+  const filteredData = quizzes.filter((item) => {
+    const mapel = item.paket_soal?.mata_pelajaran || item.teaching_class?.mata_pelajaran
+    return mapelFilter === "semua" || mapel === mapelFilter
   })
-
-  function getPaketSoal(id: number) {
-    return DUMMY_PAKET_SOAL.find((p) => p.id === id) ?? null
-  }
 
   function getQuizStatus(quiz: Quiz) {
     const now = new Date()
-    const mulai = new Date(quiz.tanggal_mulai)
-    const berakhir = new Date(quiz.tanggal_berakhir)
+    const mulai = new Date(quiz.waktu_mulai || quiz.created_at)
+    const berakhir = new Date(quiz.waktu_selesai || quiz.created_at)
     if (now < mulai) return "Belum Dimulai"
     if (now > berakhir) return "Telah Berakhir"
     return "Berlangsung"
@@ -53,10 +61,10 @@ export function SiswaQuizListPage() {
   // Table columns removed in favor of Card layout
 
   const stats = {
-    total: publishedQuizzes.length,
-    berlangsung: publishedQuizzes.filter((q) => getQuizStatus(q) === "Berlangsung").length,
-    belumDimulai: publishedQuizzes.filter((q) => getQuizStatus(q) === "Belum Dimulai").length,
-    telahBerakhir: publishedQuizzes.filter((q) => getQuizStatus(q) === "Telah Berakhir").length,
+    total: quizzes.length,
+    berlangsung: quizzes.filter((q) => getQuizStatus(q) === "Berlangsung").length,
+    belumDimulai: quizzes.filter((q) => getQuizStatus(q) === "Belum Dimulai").length,
+    telahBerakhir: quizzes.filter((q) => getQuizStatus(q) === "Telah Berakhir").length,
   }
 
   return (
@@ -121,36 +129,44 @@ export function SiswaQuizListPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredData.map((quiz) => {
-          const paket = getPaketSoal(quiz.paket_soal_id)
+        {isLoading ? (
+          <div className="col-span-full flex justify-center py-10">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : filteredData.length === 0 ? (
+          <div className="col-span-full flex justify-center py-10 text-muted-foreground">
+            Tidak ada quiz tersedia
+          </div>
+        ) : filteredData.map((quiz) => {
           const status = getQuizStatus(quiz)
+          const mapel = quiz.paket_soal?.mata_pelajaran || quiz.teaching_class?.mata_pelajaran
           return (
             <Card key={quiz.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5 space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-semibold text-base">{quiz.judul}</h3>
-                    <p className="text-sm text-muted-foreground">{paket?.mata_pelajaran ?? "—"}</p>
+                    <p className="text-sm text-muted-foreground">{mapel ?? "—"}</p>
                   </div>
                   <Badge className={getStatusBadge(status)}>{status}</Badge>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Guru</span>
-                    <span className="font-medium">{paket?.guru_nama ?? "—"}</span>
+                    <span className="font-medium">{quiz.teaching_class?.guru_nama ?? "—"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Durasi</span>
-                    <span className="font-medium">{quiz.durasi} menit</span>
+                    <span className="font-medium">{quiz.durasi_menit} menit</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Soal</span>
-                    <span className="font-medium">{paket?.soal_ids.length ?? 0} soal</span>
+                    <span className="font-medium">{quiz.paket_soal?._count?.items ?? 0} soal</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Deadline</span>
                     <span className="font-medium">
-                      {new Date(quiz.tanggal_berakhir).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      {quiz.waktu_selesai ? new Date(quiz.waktu_selesai).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "-"}
                     </span>
                   </div>
                 </div>

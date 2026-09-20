@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -24,11 +24,9 @@ import { BankSoalDeleteDialog } from "./bank-soal-delete-dialog"
 import { AIGeneratorDialog } from "./ai-generator-dialog"
 import { ImportAIDialog } from "./import-ai-dialog"
 import {
-  TIPE_SOAL_COLORS, KESULITAN_COLORS, STATUS_BANK_SOAL_COLORS,
-  MATA_PELAJARAN_OPTIONS, GURU_BANK_SOAL_OPTIONS,
+  KESULITAN_COLORS, TIPE_SOAL_COLORS, STATUS_BANK_SOAL_COLORS,
   KESULITAN_OPTIONS, TIPE_SOAL_OPTIONS, STATUS_BANK_SOAL_OPTIONS,
 } from "../constants/bank-soal.constants"
-import { DUMMY_BANK_SOAL } from "../dummy/bank-soal.data"
 import type { BankSoal, BankSoalFormData } from "../types/bank-soal"
 
 export function BankSoalListPage() {
@@ -47,9 +45,36 @@ export function BankSoalListPage() {
   const [editingItem, setEditingItem] = useState<BankSoal | null>(null)
   const [deletingItem, setDeletingItem] = useState<BankSoal | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [data, setData] = useState<BankSoal[]>(DUMMY_BANK_SOAL)
-
+  const [data, setData] = useState<BankSoal[]>([])
+  
   const perPage = 10
+
+  useEffect(() => {
+    fetchBankSoal()
+  }, [])
+
+  async function fetchBankSoal() {
+    setIsLoading(true)
+    try {
+      const res = await fetch("/api/exams/bank")
+      const json = await res.json()
+      if (json.success) {
+        // Map database fields to frontend fields
+        const mapped = json.data.map((d: any) => ({
+          ...d,
+          tipe_soal: d.tipe_soal === "PILIHAN_GANDA" ? "Pilihan Ganda" : "Essay",
+          kesulitan: d.kesulitan === "MUDAH" ? "Mudah" : d.kesulitan === "SEDANG" ? "Sedang" : "Sulit",
+          status: d.status === "PUBLISH" ? "Aktif" : "Draft",
+          guru_nama: d.guru?.nama_lengkap || "Sistem",
+        }))
+        setData(mapped)
+      }
+    } catch (error) {
+      toast.error("Gagal memuat data bank soal")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const filteredData = data.filter((item) => {
     const matchesSearch =
@@ -67,6 +92,9 @@ export function BankSoalListPage() {
   })
 
   const paginatedData = filteredData.slice((page - 1) * perPage, page * perPage)
+  
+  const mapelOptions = Array.from(new Set(data.map(d => d.mata_pelajaran))).filter(Boolean)
+  const guruOptions = Array.from(new Set(data.map(d => d.guru_nama))).filter(Boolean)
 
   const columns: Column<Record<string, unknown>>[] = [
     {
@@ -121,34 +149,55 @@ export function BankSoalListPage() {
 
   async function handleSubmit(formData: BankSoalFormData) {
     setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 500))
-    if (editingItem) {
-      setData((prev) => prev.map((d) => d.id === editingItem.id ? { ...d, ...formData, updated_at: new Date().toISOString() } : d))
-      toast.success("Soal berhasil diperbarui")
-    } else {
-      const newItem: BankSoal = {
+    try {
+      // Map frontend fields to database fields
+      const dbPayload = {
         ...formData,
-        id: Math.max(...data.map((d) => d.id)) + 1,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        tipe_soal: formData.tipe_soal === "Pilihan Ganda" ? "PILIHAN_GANDA" : "ESAI",
+        kesulitan: formData.kesulitan === "Mudah" ? "MUDAH" : formData.kesulitan === "Sedang" ? "SEDANG" : "SULIT",
+        status: formData.status === "Aktif" ? "PUBLISH" : "DRAFT",
       }
-      setData((prev) => [newItem, ...prev])
-      toast.success("Soal berhasil ditambahkan")
+
+      if (editingItem) {
+        const res = await fetch(`/api/exams/bank/${editingItem.id}`, {
+          method: "PUT",
+          body: JSON.stringify(dbPayload)
+        })
+        if (!res.ok) throw new Error()
+        toast.success("Soal berhasil diperbarui")
+      } else {
+        const res = await fetch("/api/exams/bank", {
+          method: "POST",
+          body: JSON.stringify(dbPayload)
+        })
+        if (!res.ok) throw new Error()
+        toast.success("Soal berhasil ditambahkan")
+      }
+      await fetchBankSoal()
+      setFormDialogOpen(false)
+      setEditingItem(null)
+    } catch (err) {
+      toast.error("Gagal menyimpan soal")
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
-    setFormDialogOpen(false)
-    setEditingItem(null)
   }
 
   async function handleConfirmDelete() {
     if (!deletingItem) return
     setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 500))
-    setData((prev) => prev.filter((d) => d.id !== deletingItem.id))
-    toast.success("Soal berhasil dihapus")
-    setIsLoading(false)
-    setDeleteDialogOpen(false)
-    setDeletingItem(null)
+    try {
+      const res = await fetch(`/api/exams/bank/${deletingItem.id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error()
+      toast.success("Soal berhasil dihapus")
+      await fetchBankSoal()
+      setDeleteDialogOpen(false)
+      setDeletingItem(null)
+    } catch (err) {
+      toast.error("Gagal menghapus soal")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -207,14 +256,14 @@ export function BankSoalListPage() {
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Mapel" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mapel</SelectItem>
-            {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+            {mapelOptions.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={guruFilter === "semua" ? undefined : guruFilter} onValueChange={(v) => { if (v) { setGuruFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Guru" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Guru</SelectItem>
-            {GURU_BANK_SOAL_OPTIONS.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+            {guruOptions.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={kesulitanFilter === "semua" ? undefined : kesulitanFilter} onValueChange={(v) => { if (v) { setKesulitanFilter(v); setPage(1) } }}>

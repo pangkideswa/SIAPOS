@@ -44,7 +44,6 @@ import {
   STATUS_HASIL_COLORS,
   STATUS_HASIL_OPTIONS,
 } from "@/features/hasil-ujian/constants/hasil-ujian.constants"
-import { DUMMY_HASIL_UJIAN } from "@/features/hasil-ujian/dummy/hasil-ujian.data"
 import type { HasilUjian } from "@/features/hasil-ujian/types/hasil-ujian"
 
 function formatDateTime(dateStr: string) {
@@ -102,39 +101,64 @@ export function HasilUjianDetailPage({
   const [catatanEvaluasi, setCatatanEvaluasi] = useState<string>("")
   const [statusHasil, setStatusHasil] = useState<string>("")
   const [isSaving, setIsSaving] = useState(false)
-  const [initialized, setInitialized] = useState(false)
-
-  const hasil = DUMMY_HASIL_UJIAN.find(
-    (h) => h.id === Number(id)
-  )
+  
+  const [hasil, setHasil] = useState<HasilUjian | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (hasil && !initialized) {
-      setCatatanEvaluasi(hasil.catatan_evaluasi)
-      setStatusHasil(hasil.status)
-      setInitialized(true)
+    async function fetchDetail() {
+      setIsLoading(true)
+      try {
+        const res = await fetch(`/api/exams/results/${id}`)
+        const json = await res.json()
+        if (json.success) {
+          setHasil(json.data)
+          setCatatanEvaluasi(json.data.catatan_evaluasi || "")
+          setStatusHasil(json.data.status || "")
+        } else {
+          toast.error(json.error || "Gagal memuat hasil ujian")
+        }
+      } catch (error) {
+        console.error(error)
+        toast.error("Gagal memuat hasil ujian")
+      } finally {
+        setIsLoading(false)
+      }
     }
-  }, [hasil, initialized])
+    fetchDetail()
+  }, [id])
 
   async function handleSave() {
     if (!hasil) return
 
     setIsSaving(true)
-    await new Promise((r) => setTimeout(r, 500))
-
-    const idx = DUMMY_HASIL_UJIAN.findIndex((h) => h.id === hasil.id)
-    if (idx !== -1) {
-      DUMMY_HASIL_UJIAN[idx] = {
-        ...DUMMY_HASIL_UJIAN[idx],
-        catatan_evaluasi: catatanEvaluasi,
-        status: statusHasil as HasilUjian["status"],
-        updated_at: new Date().toISOString(),
+    try {
+      const res = await fetch(`/api/exams/results/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ catatan_evaluasi: catatanEvaluasi })
+      })
+      const json = await res.json()
+      if (json.success) {
+        toast.success("Catatan evaluasi berhasil diperbarui.")
+        router.push("/guru/hasil-ujian")
+      } else {
+        toast.error(json.error || "Gagal menyimpan")
       }
+    } catch (error) {
+      console.error(error)
+      toast.error("Gagal menyimpan catatan")
+    } finally {
+      setIsSaving(false)
     }
+  }
 
-    setIsSaving(false)
-    toast.success("Hasil ujian berhasil diperbarui.")
-    router.push("/guru/hasil-ujian")
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
   }
 
   if (!hasil) {

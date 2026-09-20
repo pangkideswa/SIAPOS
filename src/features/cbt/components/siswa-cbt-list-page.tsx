@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { Badge } from "@/components/ui/badge"
@@ -8,32 +8,40 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Clock, FileText, AlertCircle } from "lucide-react"
+import { Clock, FileText, AlertCircle, Loader2 } from "lucide-react"
 import { MATA_PELAJARAN_OPTIONS } from "../constants/cbt.constants"
-import { DUMMY_CBT } from "../dummy/cbt.data"
-import { DUMMY_PAKET_SOAL } from "@/features/paket-soal/dummy/paket-soal.data"
 import type { CBTExam } from "../types/cbt"
 
 export function SiswaCBTListPage() {
   const router = useRouter()
   const [mapelFilter, setMapelFilter] = useState<string>("semua")
+  const [exams, setExams] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const publishedExams = DUMMY_CBT.filter((c) => c.status === "Publish")
+  useEffect(() => {
+    fetch("/api/student/exams?tipe=CBT")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setExams(data.data)
+        }
+        setIsLoading(false)
+      })
+      .catch(err => {
+        console.error(err)
+        setIsLoading(false)
+      })
+  }, [])
 
-  const filteredData = publishedExams.filter((item) => {
-    const paket = DUMMY_PAKET_SOAL.find((p) => p.id === item.paket_soal_id)
-    const matchesMapel = mapelFilter === "semua" || paket?.mata_pelajaran === mapelFilter
-    return matchesMapel
+  const filteredData = exams.filter((item) => {
+    const mapel = item.paket_soal?.mata_pelajaran || item.teaching_class?.mata_pelajaran
+    return mapelFilter === "semua" || mapel === mapelFilter
   })
-
-  function getPaketSoal(id: number) {
-    return DUMMY_PAKET_SOAL.find((p) => p.id === id) ?? null
-  }
 
   function getExamStatus(exam: CBTExam) {
     const now = new Date()
-    const mulai = new Date(exam.tanggal_mulai)
-    const berakhir = new Date(exam.tanggal_berakhir)
+    const mulai = new Date(exam.waktu_mulai || exam.created_at)
+    const berakhir = new Date(exam.waktu_selesai || exam.created_at)
     if (now < mulai) return "Belum Dimulai"
     if (now > berakhir) return "Telah Berakhir"
     return "Berlangsung"
@@ -49,10 +57,10 @@ export function SiswaCBTListPage() {
   }
 
   const stats = {
-    total: publishedExams.length,
-    berlangsung: publishedExams.filter((c) => getExamStatus(c) === "Berlangsung").length,
-    belumDimulai: publishedExams.filter((c) => getExamStatus(c) === "Belum Dimulai").length,
-    telahBerakhir: publishedExams.filter((c) => getExamStatus(c) === "Telah Berakhir").length,
+    total: exams.length,
+    berlangsung: exams.filter((c) => getExamStatus(c) === "Berlangsung").length,
+    belumDimulai: exams.filter((c) => getExamStatus(c) === "Belum Dimulai").length,
+    telahBerakhir: exams.filter((c) => getExamStatus(c) === "Telah Berakhir").length,
   }
 
   return (
@@ -117,16 +125,24 @@ export function SiswaCBTListPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredData.map((exam) => {
-          const paket = getPaketSoal(exam.paket_soal_id)
+        {isLoading ? (
+          <div className="col-span-full flex justify-center py-10">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : filteredData.length === 0 ? (
+          <div className="col-span-full flex justify-center py-10 text-muted-foreground">
+            Tidak ada ujian tersedia
+          </div>
+        ) : filteredData.map((exam) => {
           const status = getExamStatus(exam)
+          const mapel = exam.paket_soal?.mata_pelajaran || exam.teaching_class?.mata_pelajaran
           return (
             <Card key={exam.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5 space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-base">{exam.nama_ujian}</h3>
-                    <p className="text-sm text-muted-foreground">{paket?.mata_pelajaran ?? "—"}</p>
+                    <h3 className="font-semibold text-base">{exam.judul}</h3>
+                    <p className="text-sm text-muted-foreground">{mapel ?? "—"}</p>
                   </div>
                   <Badge className={getStatusBadge(status)}>{status}</Badge>
                 </div>
@@ -137,16 +153,16 @@ export function SiswaCBTListPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Durasi</span>
-                    <span className="font-medium">{exam.durasi} menit</span>
+                    <span className="font-medium">{exam.durasi_menit} menit</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Soal</span>
-                    <span className="font-medium">{paket?.soal_ids.length ?? 0} soal</span>
+                    <span className="font-medium">{exam.paket_soal?._count?.items ?? 0} soal</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Deadline</span>
                     <span className="font-medium">
-                      {new Date(exam.tanggal_berakhir).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
+                      {exam.waktu_selesai ? new Date(exam.waktu_selesai).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "-"}
                     </span>
                   </div>
                 </div>

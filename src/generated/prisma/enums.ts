@@ -114,3 +114,55 @@ export const NilaiStatus = {
 } as const
 
 export type NilaiStatus = (typeof NilaiStatus)[keyof typeof NilaiStatus]
+
+
+export const QuestionType = {
+  PILIHAN_GANDA: 'PILIHAN_GANDA',
+  ESAI: 'ESAI'
+} as const
+
+export type QuestionType = (typeof QuestionType)[keyof typeof QuestionType]
+
+
+export const QuestionDifficulty = {
+  MUDAH: 'MUDAH',
+  SEDANG: 'SEDANG',
+  SULIT: 'SULIT'
+} as const
+
+export type QuestionDifficulty = (typeof QuestionDifficulty)[keyof typeof QuestionDifficulty]
+
+
+export const BankSoalStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISH: 'PUBLISH'
+} as const
+
+export type BankSoalStatus = (typeof BankSoalStatus)[keyof typeof BankSoalStatus]
+
+
+export const ExamType = {
+  QUIZ: 'QUIZ',
+  CBT: 'CBT'
+} as const
+
+export type ExamType = (typeof ExamType)[keyof typeof ExamType]
+
+
+export const ExamStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISH: 'PUBLISH',
+  SELESAI: 'SELESAI'
+} as const
+
+export type ExamStatus = (typeof ExamStatus)[keyof typeof ExamStatus]
+
+
+export const ExamParticipantStatus = {
+  BELUM_MULAI: 'BELUM_MULAI',
+  MENGERJAKAN: 'MENGERJAKAN',
+  SELESAI: 'SELESAI',
+  CURANG: 'CURANG'
+} as const
+
+export type ExamParticipantStatus = (typeof ExamParticipantStatus)[keyof typeof ExamParticipantStatus]

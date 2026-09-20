@@ -68,8 +68,7 @@ export const EMPTY_BANK_SOAL_FORM: BankSoalFormData = {
   pilihan: { A: "", B: "", C: "", D: "", E: "" },
   jawaban_benar: "A",
   mata_pelajaran: "",
-  guru_nama: "",
-  kelas: "",
+  guru_id: null,
   kesulitan: "Sedang",
   status: "Draft",
 }

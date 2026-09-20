@@ -12,10 +12,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
-import { DUMMY_PAKET_SOAL } from "@/features/paket-soal/dummy/paket-soal.data"
-import {
-  STATUS_CBT_OPTIONS, KELAS_OPTIONS, EMPTY_CBT_FORM,
-} from "../constants/cbt.constants"
+import { STATUS_CBT_OPTIONS, EMPTY_CBT_FORM } from "../constants/cbt.constants"
 import type { CBTExam, CBTExamFormData } from "../types/cbt"
 
 interface CBTFormDialogProps {
@@ -31,14 +28,29 @@ export function CBTFormDialog({
 }: CBTFormDialogProps) {
   const [form, setForm] = useState<CBTExamFormData>(EMPTY_CBT_FORM)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  
+  const [paketOptions, setPaketOptions] = useState<any[]>([])
+  const [teachingClassOptions, setTeachingClassOptions] = useState<any[]>([])
 
   useEffect(() => {
+    if (open) {
+      fetch("/api/exams/packages")
+        .then(r => r.json())
+        .then(res => setPaketOptions(res.data || []))
+        .catch(console.error)
+
+      fetch("/api/teaching-classes")
+        .then(r => r.json())
+        .then(res => setTeachingClassOptions(res.data?.data || res.data || []))
+        .catch(console.error)
+    }
+
     if (editingItem) {
       setForm({
         nama_ujian: editingItem.nama_ujian,
         deskripsi: editingItem.deskripsi,
         paket_soal_id: editingItem.paket_soal_id,
-        kelas: editingItem.kelas,
+        teaching_class_id: editingItem.teaching_class_id ?? null,
         durasi: editingItem.durasi,
         tanggal_mulai: editingItem.tanggal_mulai.slice(0, 16),
         tanggal_berakhir: editingItem.tanggal_berakhir.slice(0, 16),
@@ -56,7 +68,7 @@ export function CBTFormDialog({
     setErrors({})
   }, [editingItem, open])
 
-  function handleChange(field: keyof CBTExamFormData, value: string | number | boolean) {
+  function handleChange(field: keyof CBTExamFormData, value: string | number | boolean | null) {
     setForm((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }))
   }
@@ -65,7 +77,7 @@ export function CBTFormDialog({
     const newErrors: Record<string, string> = {}
     if (!form.nama_ujian.trim()) newErrors.nama_ujian = "Nama ujian wajib diisi"
     if (!form.paket_soal_id) newErrors.paket_soal_id = "Paket soal wajib dipilih"
-    if (!form.kelas) newErrors.kelas = "Kelas wajib dipilih"
+    if (!form.teaching_class_id) newErrors.teaching_class_id = "Kelas Mengajar wajib dipilih"
     if (!form.tanggal_mulai) newErrors.tanggal_mulai = "Tanggal mulai wajib diisi"
     if (!form.tanggal_berakhir) newErrors.tanggal_berakhir = "Tanggal berakhir wajib diisi"
     if (form.durasi <= 0) newErrors.durasi = "Durasi harus lebih dari 0"
@@ -116,8 +128,8 @@ export function CBTFormDialog({
             <Select value={form.paket_soal_id ? String(form.paket_soal_id) : ""} onValueChange={(v) => v && handleChange("paket_soal_id", Number(v))}>
               <SelectTrigger><SelectValue placeholder="Pilih Paket Soal" /></SelectTrigger>
               <SelectContent>
-                {DUMMY_PAKET_SOAL.map((p) => (
-                  <SelectItem key={p.id} value={String(p.id)}>{p.nama_paket} ({p.mata_pelajaran})</SelectItem>
+                {paketOptions.map((p) => (
+                  <SelectItem key={p.id} value={String(p.id)}>{p.judul} ({p.mata_pelajaran})</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -125,16 +137,18 @@ export function CBTFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>Kelas *</Label>
-            <Select value={form.kelas} onValueChange={(v) => v && handleChange("kelas", v)}>
+            <Label>Kelas Mengajar *</Label>
+            <Select value={form.teaching_class_id ? String(form.teaching_class_id) : ""} onValueChange={(v) => v && handleChange("teaching_class_id", Number(v))}>
               <SelectTrigger><SelectValue placeholder="Pilih Kelas" /></SelectTrigger>
               <SelectContent>
-                {KELAS_OPTIONS.map((k) => (
-                  <SelectItem key={k} value={k}>{k}</SelectItem>
+                {teachingClassOptions.map((tc) => (
+                  <SelectItem key={tc.id} value={String(tc.id)}>
+                    {tc.subject?.name} - {tc.classroom?.name} ({tc.teacher?.nama_lengkap})
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {errors.kelas && <p className="text-xs text-destructive">{errors.kelas}</p>}
+            {errors.teaching_class_id && <p className="text-xs text-destructive">{errors.teaching_class_id}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">

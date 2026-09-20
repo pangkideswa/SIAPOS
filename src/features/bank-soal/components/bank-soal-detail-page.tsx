@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,7 +10,6 @@ import { ArrowLeft, CheckCircle } from "lucide-react"
 import {
   TIPE_SOAL_COLORS, KESULITAN_COLORS, STATUS_BANK_SOAL_COLORS,
 } from "../constants/bank-soal.constants"
-import { DUMMY_BANK_SOAL } from "../dummy/bank-soal.data"
 
 interface BankSoalDetailPageProps {
   id: string
@@ -17,7 +17,29 @@ interface BankSoalDetailPageProps {
 
 export function BankSoalDetailPage({ id }: BankSoalDetailPageProps) {
   const router = useRouter()
-  const soal = DUMMY_BANK_SOAL.find((s) => s.id === Number(id))
+  const [soal, setSoal] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const res = await fetch(`/api/exams/bank/${id}`)
+        const json = await res.json()
+        if (res.ok && json.success) {
+          setSoal(json.data)
+        }
+      } catch (error) {
+        console.error("Gagal memuat detail soal")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    loadData()
+  }, [id])
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-[60vh]">Memuat Detail Soal...</div>
+  }
 
   if (!soal) {
     return (
@@ -31,11 +53,33 @@ export function BankSoalDetailPage({ id }: BankSoalDetailPageProps) {
     )
   }
 
+  // Format options into PilihanGanda object if it's multiple choice
+  let pilihan: any = {}
+  if (soal.tipe_soal === "PILIHAN_GANDA" && soal.options) {
+    const letters = ["A", "B", "C", "D", "E"]
+    soal.options.forEach((opt: any, index: number) => {
+      if (index < letters.length) {
+        pilihan[letters[index]] = opt.teks
+        if (opt.is_correct) soal.jawaban_benar = letters[index]
+      }
+    })
+  }
+
+  const tipeSoalMap: Record<string, string> = {
+    PILIHAN_GANDA: "Pilihan Ganda",
+    ESAI: "Isian Singkat", // Or "Essay"
+    "Benar / Salah": "Benar / Salah"
+  }
+
+  const tipeLabel = tipeSoalMap[soal.tipe_soal] || soal.tipe_soal
+  const kesulitanLabel = soal.kesulitan === "MUDAH" ? "Mudah" : soal.kesulitan === "SEDANG" ? "Sedang" : "Sulit"
+  const statusLabel = soal.status === "PUBLISH" ? "Aktif" : "Draft"
+
   return (
     <div className="space-y-6">
       <PageHeader
         title={soal.kode_soal}
-        description={`Soal ${soal.tipe_soal} — ${soal.mata_pelajaran}`}
+        description={`Soal ${tipeLabel} — ${soal.mata_pelajaran}`}
         action={
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => router.push("/admin/bank-soal")}>
@@ -57,15 +101,16 @@ export function BankSoalDetailPage({ id }: BankSoalDetailPageProps) {
             </CardContent>
           </Card>
 
-          {soal.tipe_soal === "Pilihan Ganda" && soal.pilihan && (
+          {soal.tipe_soal === "PILIHAN_GANDA" && Object.keys(pilihan).length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle>Pilihan Jawaban</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {(["A", "B", "C", "D", "E"] as const).map((key) => {
+                  const optionText = pilihan?.[key]
+                  if (!optionText) return null
                   const isCorrect = soal.jawaban_benar === key
-                  const optionText = soal.pilihan?.[key] ?? ""
                   return (
                     <div key={key} className={`flex items-start gap-3 p-3 rounded-lg border ${isCorrect ? "bg-green-50 border-green-200" : ""}`}>
                       <span className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold shrink-0 ${isCorrect ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"}`}>
@@ -80,7 +125,7 @@ export function BankSoalDetailPage({ id }: BankSoalDetailPageProps) {
             </Card>
           )}
 
-          {soal.tipe_soal === "Benar / Salah" && (
+          {soal.tipe_soal === "BENAR_SALAH" && (
             <Card>
               <CardHeader>
                 <CardTitle>Jawaban</CardTitle>
@@ -93,7 +138,7 @@ export function BankSoalDetailPage({ id }: BankSoalDetailPageProps) {
             </Card>
           )}
 
-          {soal.tipe_soal === "Isian Singkat" && (
+          {soal.tipe_soal === "ESAI" && (
             <Card>
               <CardHeader>
                 <CardTitle>Jawaban</CardTitle>
@@ -115,7 +160,7 @@ export function BankSoalDetailPage({ id }: BankSoalDetailPageProps) {
             <CardContent className="space-y-3">
               <div>
                 <p className="text-xs text-muted-foreground">Tipe Soal</p>
-                <Badge className={TIPE_SOAL_COLORS[soal.tipe_soal]}>{soal.tipe_soal}</Badge>
+                <Badge className={TIPE_SOAL_COLORS[tipeLabel] || "bg-muted"}>{tipeLabel}</Badge>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Mata Pelajaran</p>
@@ -123,19 +168,15 @@ export function BankSoalDetailPage({ id }: BankSoalDetailPageProps) {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Guru</p>
-                <p className="text-sm font-medium">{soal.guru_nama}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Kelas</p>
-                <p className="text-sm font-medium">{soal.kelas}</p>
+                <p className="text-sm font-medium">{soal.guru?.nama_lengkap || "Sistem"}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Kesulitan</p>
-                <Badge className={KESULITAN_COLORS[soal.kesulitan]}>{soal.kesulitan}</Badge>
+                <Badge className={KESULITAN_COLORS[kesulitanLabel] || "bg-muted"}>{kesulitanLabel}</Badge>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Status</p>
-                <Badge className={STATUS_BANK_SOAL_COLORS[soal.status]}>{soal.status}</Badge>
+                <Badge className={STATUS_BANK_SOAL_COLORS[statusLabel] || "bg-muted"}>{statusLabel}</Badge>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Dibuat</p>

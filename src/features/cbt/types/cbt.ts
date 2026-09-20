@@ -5,6 +5,7 @@ export interface CBTExam {
   nama_ujian: string
   deskripsi: string
   paket_soal_id: number
+  teaching_class_id: number | null
   kelas: string
   durasi: number
   tanggal_mulai: string
@@ -20,7 +21,7 @@ export interface CBTExam {
   updated_at: string
 }
 
-export type CBTExamFormData = Omit<CBTExam, "id" | "created_at" | "updated_at">
+export type CBTExamFormData = Omit<CBTExam, "id" | "created_at" | "updated_at" | "kelas">
 
 export interface CBTAnswer {
   soal_id: number

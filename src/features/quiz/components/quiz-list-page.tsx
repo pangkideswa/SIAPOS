@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -21,8 +21,6 @@ import {
   KELAS_OPTIONS,
   STATUS_QUIZ_OPTIONS,
 } from "../constants/quiz.constants"
-import { DUMMY_QUIZ } from "../dummy/quiz.data"
-import { DUMMY_PAKET_SOAL } from "@/features/paket-soal/dummy/paket-soal.data"
 import type { Quiz, QuizFormData } from "../types/quiz"
 
 export function QuizListPage() {
@@ -38,9 +36,39 @@ export function QuizListPage() {
   const [editingItem, setEditingItem] = useState<Quiz | null>(null)
   const [deletingItem, setDeletingItem] = useState<Quiz | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [data, setData] = useState<Quiz[]>(DUMMY_QUIZ)
+  const [data, setData] = useState<Quiz[]>([])
 
   const perPage = 10
+
+  useEffect(() => {
+    fetchQuizzes()
+  }, [])
+
+  async function fetchQuizzes() {
+    setIsLoading(true)
+    try {
+      const res = await fetch("/api/exams")
+      const json = await res.json()
+      if (json.success) {
+        // Map data to match frontend Quiz interface
+        const mapped = json.data.map((d: any) => ({
+          ...d,
+          tanggal_mulai: d.waktu_mulai ? d.waktu_mulai : "",
+          tanggal_berakhir: d.waktu_selesai ? d.waktu_selesai : "",
+          durasi: d.durasi_menit ?? 0,
+          status: d.status === "PUBLISH" ? "Publish" : d.status === "SELESAI" ? "Ditutup" : "Draft",
+          paket_soal_judul: d.paket_soal?.judul || "—",
+          mata_pelajaran: d.paket_soal?.mata_pelajaran || d.teaching_class?.mata_pelajaran || "—",
+          guru_nama: d.teaching_class?.guru_nama || "—"
+        }))
+        setData(mapped)
+      }
+    } catch (error) {
+      toast.error("Gagal memuat data quiz")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const filteredData = data.filter((item) => {
     const matchesSearch =
@@ -48,8 +76,8 @@ export function QuizListPage() {
       item.judul.toLowerCase().includes(search.toLowerCase()) ||
       item.kelas.toLowerCase().includes(search.toLowerCase()) ||
       item.deskripsi.toLowerCase().includes(search.toLowerCase())
-    const matchesMapel = mapelFilter === "semua" || getPaketSoal(item.paket_soal_id)?.mata_pelajaran === mapelFilter
-    const matchesGuru = guruFilter === "semua" || getPaketSoal(item.paket_soal_id)?.guru_nama === guruFilter
+    const matchesMapel = mapelFilter === "semua" || (item as any).mata_pelajaran === mapelFilter
+    const matchesGuru = guruFilter === "semua" || (item as any).guru_nama === guruFilter
     const matchesKelas = kelasFilter === "semua" || item.kelas === kelasFilter
     const matchesStatus = statusFilter === "semua" || item.status === statusFilter
     return matchesSearch && matchesMapel && matchesGuru && matchesKelas && matchesStatus
@@ -57,20 +85,19 @@ export function QuizListPage() {
 
   const paginatedData = filteredData.slice((page - 1) * perPage, page * perPage)
 
-  function getPaketSoal(id: number) {
-    return DUMMY_PAKET_SOAL.find((p) => p.id === id) ?? null
-  }
+  const mapelOptions = Array.from(new Set(data.map((d: any) => d.mata_pelajaran))).filter(Boolean)
+  const guruOptions = Array.from(new Set(data.map((d: any) => d.guru_nama))).filter(Boolean)
+  const kelasOptions = Array.from(new Set(data.map((d: any) => d.kelas))).filter(Boolean)
 
   const columns: Column<Record<string, unknown>>[] = [
     {
       key: "judul",
       header: "Judul Quiz",
-      render: (item) => {
-        const paket = getPaketSoal(item.paket_soal_id as number)
+      render: (item: any) => {
         return (
           <div>
             <p className="font-medium">{String(item.judul)}</p>
-            <p className="text-xs text-muted-foreground">{paket?.nama_paket ?? "—"}</p>
+            <p className="text-xs text-muted-foreground">{item.paket_soal_judul}</p>
           </div>
         )
       },
@@ -78,18 +105,12 @@ export function QuizListPage() {
     {
       key: "mata_pelajaran",
       header: "Mapel",
-      render: (item) => {
-        const paket = getPaketSoal(item.paket_soal_id as number)
-        return paket?.mata_pelajaran ?? "—"
-      },
+      render: (item: any) => item.mata_pelajaran,
     },
     {
       key: "guru",
       header: "Guru",
-      render: (item) => {
-        const paket = getPaketSoal(item.paket_soal_id as number)
-        return paket?.guru_nama ?? "—"
-      },
+      render: (item: any) => item.guru_nama,
     },
     { key: "kelas", header: "Kelas", render: (item) => String(item.kelas) },
     {
@@ -124,34 +145,55 @@ export function QuizListPage() {
 
   async function handleSubmit(formData: QuizFormData) {
     setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 500))
-    if (editingItem) {
-      setData((prev) => prev.map((d) => d.id === editingItem.id ? { ...d, ...formData, updated_at: new Date().toISOString() } : d))
-      toast.success("Quiz berhasil diperbarui")
-    } else {
-      const newItem: Quiz = {
+    try {
+      const dbPayload = {
         ...formData,
-        id: Math.max(...data.map((d) => d.id)) + 1,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        waktu_mulai: formData.tanggal_mulai ? new Date(formData.tanggal_mulai).toISOString() : undefined,
+        waktu_selesai: formData.tanggal_berakhir ? new Date(formData.tanggal_berakhir).toISOString() : undefined,
+        durasi_menit: formData.durasi,
+        status: formData.status === "Publish" ? "PUBLISH" : formData.status === "Ditutup" ? "SELESAI" : "DRAFT",
       }
-      setData((prev) => [newItem, ...prev])
-      toast.success("Quiz berhasil ditambahkan")
+
+      if (editingItem) {
+        const res = await fetch(`/api/exams/${editingItem.id}`, {
+          method: "PUT",
+          body: JSON.stringify(dbPayload)
+        })
+        if (!res.ok) throw new Error()
+        toast.success("Quiz berhasil diperbarui")
+      } else {
+        const res = await fetch("/api/exams", {
+          method: "POST",
+          body: JSON.stringify(dbPayload)
+        })
+        if (!res.ok) throw new Error()
+        toast.success("Quiz berhasil ditambahkan")
+      }
+      await fetchQuizzes()
+      setFormDialogOpen(false)
+      setEditingItem(null)
+    } catch (err) {
+      toast.error("Gagal menyimpan quiz")
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
-    setFormDialogOpen(false)
-    setEditingItem(null)
   }
 
   async function handleConfirmDelete() {
     if (!deletingItem) return
     setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 500))
-    setData((prev) => prev.filter((d) => d.id !== deletingItem.id))
-    toast.success("Quiz berhasil dihapus")
-    setIsLoading(false)
-    setDeleteDialogOpen(false)
-    setDeletingItem(null)
+    try {
+      const res = await fetch(`/api/exams/${deletingItem.id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error()
+      toast.success("Quiz berhasil dihapus")
+      await fetchQuizzes()
+      setDeleteDialogOpen(false)
+      setDeletingItem(null)
+    } catch (err) {
+      toast.error("Gagal menghapus quiz")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -176,21 +218,21 @@ export function QuizListPage() {
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Mapel" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mapel</SelectItem>
-            {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+            {mapelOptions.map((m: any) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={guruFilter === "semua" ? undefined : guruFilter} onValueChange={(v) => { if (v) { setGuruFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Guru" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Guru</SelectItem>
-            {GURU_QUIZ_OPTIONS.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+            {guruOptions.map((g: any) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={kelasFilter === "semua" ? undefined : kelasFilter} onValueChange={(v) => { if (v) { setKelasFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="Kelas" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>
-            {KELAS_OPTIONS.map((k) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
+            {kelasOptions.map((k: any) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter === "semua" ? undefined : statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(1) } }}>

@@ -70,9 +70,17 @@ export const ModelName = {
   Announcement: 'Announcement',
   Schedule: 'Schedule',
   TahunAkademik: 'TahunAkademik',
+  KalenderEvent: 'KalenderEvent',
   Nilai: 'Nilai',
   Notifikasi: 'Notifikasi',
-  AppSetting: 'AppSetting'
+  AppSetting: 'AppSetting',
+  BankSoal: 'BankSoal',
+  QuestionOption: 'QuestionOption',
+  PaketSoal: 'PaketSoal',
+  PaketSoalItem: 'PaketSoalItem',
+  Exam: 'Exam',
+  ExamParticipant: 'ExamParticipant',
+  ExamAnswer: 'ExamAnswer'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -423,6 +431,23 @@ export const TahunAkademikScalarFieldEnum = {
 export type TahunAkademikScalarFieldEnum = (typeof TahunAkademikScalarFieldEnum)[keyof typeof TahunAkademikScalarFieldEnum]
 
 
+export const KalenderEventScalarFieldEnum = {
+  id: 'id',
+  nama_event: 'nama_event',
+  deskripsi: 'deskripsi',
+  kategori: 'kategori',
+  tanggal_mulai: 'tanggal_mulai',
+  tanggal_selesai: 'tanggal_selesai',
+  tahun_ajaran: 'tahun_ajaran',
+  semester: 'semester',
+  status: 'status',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type KalenderEventScalarFieldEnum = (typeof KalenderEventScalarFieldEnum)[keyof typeof KalenderEventScalarFieldEnum]
+
+
 export const NilaiScalarFieldEnum = {
   id: 'id',
   student_id: 'student_id',
@@ -467,6 +492,117 @@ export const AppSettingScalarFieldEnum = {
 } as const
 
 export type AppSettingScalarFieldEnum = (typeof AppSettingScalarFieldEnum)[keyof typeof AppSettingScalarFieldEnum]
+
+
+export const BankSoalScalarFieldEnum = {
+  id: 'id',
+  kode_soal: 'kode_soal',
+  mata_pelajaran: 'mata_pelajaran',
+  pertanyaan: 'pertanyaan',
+  tipe_soal: 'tipe_soal',
+  kesulitan: 'kesulitan',
+  status: 'status',
+  pembahasan: 'pembahasan',
+  lampiran: 'lampiran',
+  guru_id: 'guru_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type BankSoalScalarFieldEnum = (typeof BankSoalScalarFieldEnum)[keyof typeof BankSoalScalarFieldEnum]
+
+
+export const QuestionOptionScalarFieldEnum = {
+  id: 'id',
+  bank_soal_id: 'bank_soal_id',
+  teks: 'teks',
+  is_correct: 'is_correct'
+} as const
+
+export type QuestionOptionScalarFieldEnum = (typeof QuestionOptionScalarFieldEnum)[keyof typeof QuestionOptionScalarFieldEnum]
+
+
+export const PaketSoalScalarFieldEnum = {
+  id: 'id',
+  kode_paket: 'kode_paket',
+  judul: 'judul',
+  deskripsi: 'deskripsi',
+  mata_pelajaran: 'mata_pelajaran',
+  guru_id: 'guru_id',
+  durasi_menit: 'durasi_menit',
+  status: 'status',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type PaketSoalScalarFieldEnum = (typeof PaketSoalScalarFieldEnum)[keyof typeof PaketSoalScalarFieldEnum]
+
+
+export const PaketSoalItemScalarFieldEnum = {
+  id: 'id',
+  paket_soal_id: 'paket_soal_id',
+  bank_soal_id: 'bank_soal_id',
+  bobot: 'bobot',
+  nomor_urut: 'nomor_urut'
+} as const
+
+export type PaketSoalItemScalarFieldEnum = (typeof PaketSoalItemScalarFieldEnum)[keyof typeof PaketSoalItemScalarFieldEnum]
+
+
+export const ExamScalarFieldEnum = {
+  id: 'id',
+  judul: 'judul',
+  tipe: 'tipe',
+  paket_soal_id: 'paket_soal_id',
+  teaching_class_id: 'teaching_class_id',
+  kelas: 'kelas',
+  deskripsi: 'deskripsi',
+  waktu_mulai: 'waktu_mulai',
+  waktu_selesai: 'waktu_selesai',
+  durasi_menit: 'durasi_menit',
+  kkm: 'kkm',
+  percobaan_maksimal: 'percobaan_maksimal',
+  acak_urutan_soal: 'acak_urutan_soal',
+  acak_urutan_jawaban: 'acak_urutan_jawaban',
+  tampilkan_nilai: 'tampilkan_nilai',
+  status: 'status',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type ExamScalarFieldEnum = (typeof ExamScalarFieldEnum)[keyof typeof ExamScalarFieldEnum]
+
+
+export const ExamParticipantScalarFieldEnum = {
+  id: 'id',
+  exam_id: 'exam_id',
+  student_id: 'student_id',
+  status: 'status',
+  waktu_mulai: 'waktu_mulai',
+  waktu_selesai: 'waktu_selesai',
+  nilai_akhir: 'nilai_akhir',
+  ip_address: 'ip_address',
+  browser_info: 'browser_info',
+  violation_count: 'violation_count',
+  catatan_guru: 'catatan_guru',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type ExamParticipantScalarFieldEnum = (typeof ExamParticipantScalarFieldEnum)[keyof typeof ExamParticipantScalarFieldEnum]
+
+
+export const ExamAnswerScalarFieldEnum = {
+  id: 'id',
+  participant_id: 'participant_id',
+  bank_soal_id: 'bank_soal_id',
+  selected_option_id: 'selected_option_id',
+  jawaban_esai: 'jawaban_esai',
+  is_correct: 'is_correct',
+  nilai: 'nilai'
+} as const
+
+export type ExamAnswerScalarFieldEnum = (typeof ExamAnswerScalarFieldEnum)[keyof typeof ExamAnswerScalarFieldEnum]
 
 
 export const SortOrder = {

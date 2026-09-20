@@ -235,12 +235,6 @@ export function AdminDashboardPage() {
             Sistem Integrasi Akademik dan Pembelajaran Online Sekolah.
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
-          <Bell className="h-4 w-4" />
-          <span>
-            {announcements.length} pengumuman
-          </span>
-        </div>
         <PengumumanBaruBadge role="admin" />
       </div>
 

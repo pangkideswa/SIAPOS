@@ -41,57 +41,76 @@ type NavEntry =
   | { type: "label"; label: string }
 
 const navItems: NavEntry[] = [
+  // --- ADMIN & SUPER ADMIN ---
+  { type: "label", label: "Utama" },
   { type: "item", label: "Beranda", href: "/admin", icon: LayoutDashboard, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Pengumuman", href: "/admin/pengumuman", icon: Megaphone, roles: ["super_admin", "admin"] },
+  
+  { type: "label", label: "Data Master" },
   { type: "item", label: "Pengguna", href: "/admin/users", icon: Users, roles: ["super_admin", "admin"] },
   { type: "item", label: "Jurusan", href: "/admin/jurusan", icon: Layers, roles: ["super_admin", "admin"] },
   { type: "item", label: "Guru", href: "/admin/guru", icon: GraduationCap, roles: ["super_admin", "admin"] },
   { type: "item", label: "Siswa", href: "/admin/siswa", icon: Users, roles: ["super_admin", "admin"] },
   { type: "item", label: "Kelas", href: "/admin/classes", icon: School, roles: ["super_admin", "admin"] },
   { type: "item", label: "Mata Pelajaran", href: "/admin/subjects", icon: BookMarked, roles: ["super_admin", "admin"] },
+  
+  { type: "label", label: "Akademik & KBM" },
+  { type: "item", label: "Kalender Akademik", href: "/admin/kalender-akademik", icon: CalendarDays, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Jadwal Pelajaran", href: "/admin/jadwal-pelajaran", icon: Calendar, roles: ["super_admin", "admin"] },
   { type: "item", label: "Penugasan Guru", href: "/admin/assignments", icon: UserCog, roles: ["super_admin", "admin"] },
   { type: "item", label: "Kelas Mengajar", href: "/admin/kelas-mengajar", icon: BookOpenCheck, roles: ["super_admin", "admin"] },
-  { type: "label", label: "Roadmap" },
+  { type: "item", label: "Absensi", href: "/admin/absensi", icon: CalendarCheck, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Nilai Akademik", href: "/admin/nilai-akademik", icon: FileSpreadsheet, roles: ["super_admin", "admin"] },
+  
+  { type: "label", label: "Evaluasi & Ujian" },
+  { type: "item", label: "Simulasi Tugas", href: "/admin/simulasi-tugas", icon: ClipboardCheck, roles: ["super_admin", "admin"] },
   { type: "item", label: "Bank Soal", href: "/admin/bank-soal", icon: ListChecks, roles: ["super_admin", "admin"] },
   { type: "item", label: "Paket Soal", href: "/admin/paket-soal", icon: ClipboardList, roles: ["super_admin", "admin"] },
-  { type: "item", label: "PKL", href: "/admin/pkl", icon: Award, roles: ["super_admin", "admin"] },
-  { type: "label", label: "Academic" },
-  { type: "item", label: "Jadwal Pelajaran", href: "/admin/jadwal-pelajaran", icon: Calendar, roles: ["super_admin", "admin"] },
-  { type: "item", label: "Absensi", href: "/admin/absensi", icon: CalendarCheck, roles: ["super_admin", "admin"] },
-  { type: "item", label: "Kalender Akademik", href: "/admin/kalender-akademik", icon: CalendarDays, roles: ["super_admin", "admin"] },
-  { type: "item", label: "Pengumuman", href: "/admin/pengumuman", icon: Megaphone, roles: ["super_admin", "admin"] },
-  { type: "item", label: "Nilai Akademik", href: "/admin/nilai-akademik", icon: FileSpreadsheet, roles: ["super_admin", "admin"] },
-  { type: "label", label: "Roadmap" },
   { type: "item", label: "Quiz", href: "/guru/quiz", icon: FileQuestion, roles: ["super_admin", "admin"] },
   { type: "item", label: "CBT", href: "/guru/cbt", icon: Monitor, roles: ["super_admin", "admin"] },
   { type: "item", label: "Hasil Ujian", href: "/guru/hasil-ujian", icon: ClipboardCheck, roles: ["super_admin", "admin"] },
-  { type: "item", label: "Analitik", href: "/guru/analitik", icon: BarChart3, roles: ["super_admin", "admin"] },
-  { type: "item", label: "Simulasi Tugas", href: "/admin/simulasi-tugas", icon: ClipboardCheck, roles: ["super_admin", "admin"] },
 
+  { type: "label", label: "Mendatang" },
+  { type: "item", label: "PKL", href: "/admin/pkl", icon: Award, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Analitik", href: "/guru/analitik", icon: BarChart3, roles: ["super_admin", "admin"] },
+
+  // --- GURU ---
+  { type: "label", label: "Utama" },
   { type: "item", label: "Dashboard", href: "/guru", icon: LayoutDashboard, roles: ["guru"] },
+  { type: "item", label: "Pengumuman", href: "/guru/pengumuman", icon: Megaphone, roles: ["guru"] },
+
+  { type: "label", label: "Akademik & KBM" },
   { type: "item", label: "Kelas", href: "/guru/kelas", icon: BookOpen, roles: ["guru"] },
+  { type: "item", label: "Jadwal", href: "/guru/jadwal-pelajaran", icon: Calendar, roles: ["guru"] },
+  { type: "item", label: "Absensi", href: "/guru/absensi", icon: CalendarCheck, roles: ["guru"] },
+  { type: "item", label: "Rekap Absensi", href: "/guru/absensi/rekap", icon: ClipboardCheck, roles: ["guru"] },
+
+  { type: "label", label: "Tugas & Penilaian" },
   { type: "item", label: "Tugas", href: "/guru/tugas", icon: ClipboardList, roles: ["guru"] },
   { type: "item", label: "Pengumpulan", href: "/guru/pengumpulan", icon: ClipboardCheck, roles: ["guru"] },
   { type: "item", label: "Penilaian", href: "/guru/penilaian", icon: Award, roles: ["guru"] },
-  { type: "label", label: "Evaluasi" },
+
+  { type: "label", label: "Evaluasi & Ujian" },
   { type: "item", label: "Bank Soal", href: "/guru/bank-soal", icon: ListChecks, roles: ["guru"] },
   { type: "item", label: "Paket Soal", href: "/guru/paket-soal", icon: ClipboardList, roles: ["guru"] },
   { type: "item", label: "Quiz", href: "/guru/quiz", icon: FileQuestion, roles: ["guru"] },
   { type: "item", label: "CBT", href: "/guru/cbt", icon: Monitor, roles: ["guru"] },
-  { type: "label", label: "Lainnya" },
-  { type: "item", label: "Jadwal", href: "/guru/jadwal-pelajaran", icon: Calendar, roles: ["guru"] },
-  { type: "item", label: "Absensi", href: "/guru/absensi", icon: CalendarCheck, roles: ["guru"] },
-  { type: "item", label: "Rekap Absensi", href: "/guru/absensi/rekap", icon: ClipboardCheck, roles: ["guru"] },
-  { type: "item", label: "Pengumuman", href: "/guru/pengumuman", icon: Megaphone, roles: ["guru"] },
 
+  // --- SISWA ---
+  { type: "label", label: "Utama" },
   { type: "item", label: "Dashboard", href: "/siswa", icon: LayoutDashboard, roles: ["siswa"] },
+  { type: "item", label: "Pengumuman", href: "/siswa/pengumuman", icon: Megaphone, roles: ["siswa"] },
+
+  { type: "label", label: "Akademik & KBM" },
+  { type: "item", label: "Jadwal", href: "/siswa/jadwal-pelajaran", icon: Calendar, roles: ["siswa"] },
+  { type: "item", label: "Absensi", href: "/siswa/absensi", icon: CalendarCheck, roles: ["siswa"] },
   { type: "item", label: "Kelas", href: "/siswa/kelas", icon: BookOpen, roles: ["siswa"] },
+  { type: "item", label: "Nilai", href: "/siswa/nilai-akademik", icon: FileSpreadsheet, roles: ["siswa"] },
+
+  { type: "label", label: "Tugas & Ujian" },
   { type: "item", label: "Tugas", href: "/siswa/tugas", icon: ClipboardList, roles: ["siswa"] },
   { type: "item", label: "Quiz", href: "/siswa/quiz", icon: FileQuestion, roles: ["siswa"] },
   { type: "item", label: "CBT", href: "/siswa/cbt", icon: Monitor, roles: ["siswa"] },
-  { type: "item", label: "Nilai", href: "/siswa/nilai-akademik", icon: FileSpreadsheet, roles: ["siswa"] },
-  { type: "item", label: "Absensi", href: "/siswa/absensi", icon: CalendarCheck, roles: ["siswa"] },
-  { type: "item", label: "Jadwal", href: "/siswa/jadwal-pelajaran", icon: Calendar, roles: ["siswa"] },
-  { type: "item", label: "Pengumuman", href: "/siswa/pengumuman", icon: Megaphone, roles: ["siswa"] },
 
   { type: "item", label: "Beranda", href: "/wali", icon: LayoutDashboard, roles: ["wali"] },
   { type: "item", label: "Siswa", href: "/wali/siswa", icon: Users, roles: ["wali"] },

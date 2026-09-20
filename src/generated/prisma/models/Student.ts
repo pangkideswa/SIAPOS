@@ -392,6 +392,7 @@ export type StudentWhereInput = {
   nilais?: Prisma.NilaiListRelationFilter
   attendance_records?: Prisma.AttendanceListRelationFilter
   material_reads?: Prisma.MaterialReadListRelationFilter
+  exam_participants?: Prisma.ExamParticipantListRelationFilter
 }
 
 export type StudentOrderByWithRelationInput = {
@@ -427,6 +428,7 @@ export type StudentOrderByWithRelationInput = {
   nilais?: Prisma.NilaiOrderByRelationAggregateInput
   attendance_records?: Prisma.AttendanceOrderByRelationAggregateInput
   material_reads?: Prisma.MaterialReadOrderByRelationAggregateInput
+  exam_participants?: Prisma.ExamParticipantOrderByRelationAggregateInput
 }
 
 export type StudentWhereUniqueInput = Prisma.AtLeast<{
@@ -465,6 +467,7 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   nilais?: Prisma.NilaiListRelationFilter
   attendance_records?: Prisma.AttendanceListRelationFilter
   material_reads?: Prisma.MaterialReadListRelationFilter
+  exam_participants?: Prisma.ExamParticipantListRelationFilter
 }, "id" | "user_id" | "nis" | "nisn">
 
 export type StudentOrderByWithAggregationInput = {
@@ -557,6 +560,7 @@ export type StudentCreateInput = {
   nilais?: Prisma.NilaiCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateInput = {
@@ -588,6 +592,7 @@ export type StudentUncheckedCreateInput = {
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadUncheckedCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUpdateInput = {
@@ -618,6 +623,7 @@ export type StudentUpdateInput = {
   nilais?: Prisma.NilaiUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateInput = {
@@ -649,6 +655,7 @@ export type StudentUncheckedUpdateInput = {
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUncheckedUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUncheckedUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentCreateManyInput = {
@@ -1062,6 +1069,20 @@ export type StudentUpdateOneWithoutNilaisNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StudentUpdateToOneWithWhereWithoutNilaisInput, Prisma.StudentUpdateWithoutNilaisInput>, Prisma.StudentUncheckedUpdateWithoutNilaisInput>
 }
 
+export type StudentCreateNestedOneWithoutExam_participantsInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutExam_participantsInput, Prisma.StudentUncheckedCreateWithoutExam_participantsInput>
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutExam_participantsInput
+  connect?: Prisma.StudentWhereUniqueInput
+}
+
+export type StudentUpdateOneRequiredWithoutExam_participantsNestedInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutExam_participantsInput, Prisma.StudentUncheckedCreateWithoutExam_participantsInput>
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutExam_participantsInput
+  upsert?: Prisma.StudentUpsertWithoutExam_participantsInput
+  connect?: Prisma.StudentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StudentUpdateToOneWithWhereWithoutExam_participantsInput, Prisma.StudentUpdateWithoutExam_participantsInput>, Prisma.StudentUncheckedUpdateWithoutExam_participantsInput>
+}
+
 export type StudentCreateWithoutUserInput = {
   foto?: string | null
   nis: string
@@ -1089,6 +1110,7 @@ export type StudentCreateWithoutUserInput = {
   nilais?: Prisma.NilaiCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutUserInput = {
@@ -1119,6 +1141,7 @@ export type StudentUncheckedCreateWithoutUserInput = {
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadUncheckedCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutUserInput = {
@@ -1164,6 +1187,7 @@ export type StudentUpdateWithoutUserInput = {
   nilais?: Prisma.NilaiUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutUserInput = {
@@ -1194,6 +1218,7 @@ export type StudentUncheckedUpdateWithoutUserInput = {
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUncheckedUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUncheckedUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutJurusanInput = {
@@ -1223,6 +1248,7 @@ export type StudentCreateWithoutJurusanInput = {
   nilais?: Prisma.NilaiCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutJurusanInput = {
@@ -1253,6 +1279,7 @@ export type StudentUncheckedCreateWithoutJurusanInput = {
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadUncheckedCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutJurusanInput = {
@@ -1338,6 +1365,7 @@ export type StudentCreateWithoutClassroomInput = {
   nilais?: Prisma.NilaiCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutClassroomInput = {
@@ -1368,6 +1396,7 @@ export type StudentUncheckedCreateWithoutClassroomInput = {
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadUncheckedCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutClassroomInput = {
@@ -1423,6 +1452,7 @@ export type StudentCreateWithoutMaterial_readsInput = {
   submissions?: Prisma.SubmissionCreateNestedManyWithoutStudentInput
   nilais?: Prisma.NilaiCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutMaterial_readsInput = {
@@ -1453,6 +1483,7 @@ export type StudentUncheckedCreateWithoutMaterial_readsInput = {
   submissions?: Prisma.SubmissionUncheckedCreateNestedManyWithoutStudentInput
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutMaterial_readsInput = {
@@ -1498,6 +1529,7 @@ export type StudentUpdateWithoutMaterial_readsInput = {
   submissions?: Prisma.SubmissionUpdateManyWithoutStudentNestedInput
   nilais?: Prisma.NilaiUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutMaterial_readsInput = {
@@ -1528,6 +1560,7 @@ export type StudentUncheckedUpdateWithoutMaterial_readsInput = {
   submissions?: Prisma.SubmissionUncheckedUpdateManyWithoutStudentNestedInput
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUncheckedUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutSubmissionsInput = {
@@ -1557,6 +1590,7 @@ export type StudentCreateWithoutSubmissionsInput = {
   nilais?: Prisma.NilaiCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutSubmissionsInput = {
@@ -1587,6 +1621,7 @@ export type StudentUncheckedCreateWithoutSubmissionsInput = {
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadUncheckedCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutSubmissionsInput = {
@@ -1632,6 +1667,7 @@ export type StudentUpdateWithoutSubmissionsInput = {
   nilais?: Prisma.NilaiUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutSubmissionsInput = {
@@ -1662,6 +1698,7 @@ export type StudentUncheckedUpdateWithoutSubmissionsInput = {
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUncheckedUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUncheckedUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutAttendance_recordsInput = {
@@ -1691,6 +1728,7 @@ export type StudentCreateWithoutAttendance_recordsInput = {
   submissions?: Prisma.SubmissionCreateNestedManyWithoutStudentInput
   nilais?: Prisma.NilaiCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutAttendance_recordsInput = {
@@ -1721,6 +1759,7 @@ export type StudentUncheckedCreateWithoutAttendance_recordsInput = {
   submissions?: Prisma.SubmissionUncheckedCreateNestedManyWithoutStudentInput
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadUncheckedCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutAttendance_recordsInput = {
@@ -1766,6 +1805,7 @@ export type StudentUpdateWithoutAttendance_recordsInput = {
   submissions?: Prisma.SubmissionUpdateManyWithoutStudentNestedInput
   nilais?: Prisma.NilaiUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutAttendance_recordsInput = {
@@ -1796,6 +1836,7 @@ export type StudentUncheckedUpdateWithoutAttendance_recordsInput = {
   submissions?: Prisma.SubmissionUncheckedUpdateManyWithoutStudentNestedInput
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUncheckedUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutTahun_akademikInput = {
@@ -1825,6 +1866,7 @@ export type StudentCreateWithoutTahun_akademikInput = {
   nilais?: Prisma.NilaiCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutTahun_akademikInput = {
@@ -1855,6 +1897,7 @@ export type StudentUncheckedCreateWithoutTahun_akademikInput = {
   nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadUncheckedCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutTahun_akademikInput = {
@@ -1910,6 +1953,7 @@ export type StudentCreateWithoutNilaisInput = {
   submissions?: Prisma.SubmissionCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutNilaisInput = {
@@ -1940,6 +1984,7 @@ export type StudentUncheckedCreateWithoutNilaisInput = {
   submissions?: Prisma.SubmissionUncheckedCreateNestedManyWithoutStudentInput
   attendance_records?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStudentInput
   material_reads?: Prisma.MaterialReadUncheckedCreateNestedManyWithoutStudentInput
+  exam_participants?: Prisma.ExamParticipantUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutNilaisInput = {
@@ -1985,6 +2030,7 @@ export type StudentUpdateWithoutNilaisInput = {
   submissions?: Prisma.SubmissionUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutNilaisInput = {
@@ -2013,6 +2059,145 @@ export type StudentUncheckedUpdateWithoutNilaisInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissions?: Prisma.SubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  attendance_records?: Prisma.AttendanceUncheckedUpdateManyWithoutStudentNestedInput
+  material_reads?: Prisma.MaterialReadUncheckedUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUncheckedUpdateManyWithoutStudentNestedInput
+}
+
+export type StudentCreateWithoutExam_participantsInput = {
+  foto?: string | null
+  nis: string
+  nisn: string
+  nama_lengkap: string
+  jenis_kelamin?: string
+  tempat_lahir?: string | null
+  tanggal_lahir?: Date | string | null
+  agama?: string | null
+  alamat?: string | null
+  kelas?: string | null
+  tahun_masuk?: string | null
+  tahun_ajaran?: string | null
+  status?: string
+  nama_ayah?: string | null
+  nama_ibu?: string | null
+  no_hp_ortu?: string | null
+  alamat_ortu?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  user?: Prisma.UserCreateNestedOneWithoutStudentInput
+  jurusan?: Prisma.JurusanCreateNestedOneWithoutStudentsInput
+  classroom?: Prisma.ClassroomCreateNestedOneWithoutStudentsInput
+  tahun_akademik?: Prisma.TahunAkademikCreateNestedOneWithoutStudentsInput
+  submissions?: Prisma.SubmissionCreateNestedManyWithoutStudentInput
+  nilais?: Prisma.NilaiCreateNestedManyWithoutStudentInput
+  attendance_records?: Prisma.AttendanceCreateNestedManyWithoutStudentInput
+  material_reads?: Prisma.MaterialReadCreateNestedManyWithoutStudentInput
+}
+
+export type StudentUncheckedCreateWithoutExam_participantsInput = {
+  id?: number
+  user_id?: number | null
+  foto?: string | null
+  nis: string
+  nisn: string
+  nama_lengkap: string
+  jenis_kelamin?: string
+  tempat_lahir?: string | null
+  tanggal_lahir?: Date | string | null
+  agama?: string | null
+  alamat?: string | null
+  jurusan_id?: number | null
+  kelas?: string | null
+  tahun_masuk?: string | null
+  tahun_ajaran?: string | null
+  status?: string
+  nama_ayah?: string | null
+  nama_ibu?: string | null
+  no_hp_ortu?: string | null
+  alamat_ortu?: string | null
+  classroom_id?: number | null
+  tahun_akademik_id?: number | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  submissions?: Prisma.SubmissionUncheckedCreateNestedManyWithoutStudentInput
+  nilais?: Prisma.NilaiUncheckedCreateNestedManyWithoutStudentInput
+  attendance_records?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStudentInput
+  material_reads?: Prisma.MaterialReadUncheckedCreateNestedManyWithoutStudentInput
+}
+
+export type StudentCreateOrConnectWithoutExam_participantsInput = {
+  where: Prisma.StudentWhereUniqueInput
+  create: Prisma.XOR<Prisma.StudentCreateWithoutExam_participantsInput, Prisma.StudentUncheckedCreateWithoutExam_participantsInput>
+}
+
+export type StudentUpsertWithoutExam_participantsInput = {
+  update: Prisma.XOR<Prisma.StudentUpdateWithoutExam_participantsInput, Prisma.StudentUncheckedUpdateWithoutExam_participantsInput>
+  create: Prisma.XOR<Prisma.StudentCreateWithoutExam_participantsInput, Prisma.StudentUncheckedCreateWithoutExam_participantsInput>
+  where?: Prisma.StudentWhereInput
+}
+
+export type StudentUpdateToOneWithWhereWithoutExam_participantsInput = {
+  where?: Prisma.StudentWhereInput
+  data: Prisma.XOR<Prisma.StudentUpdateWithoutExam_participantsInput, Prisma.StudentUncheckedUpdateWithoutExam_participantsInput>
+}
+
+export type StudentUpdateWithoutExam_participantsInput = {
+  foto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nis?: Prisma.StringFieldUpdateOperationsInput | string
+  nisn?: Prisma.StringFieldUpdateOperationsInput | string
+  nama_lengkap?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis_kelamin?: Prisma.StringFieldUpdateOperationsInput | string
+  tempat_lahir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggal_lahir?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_masuk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nama_ayah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama_ibu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  no_hp_ortu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  alamat_ortu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneWithoutStudentNestedInput
+  jurusan?: Prisma.JurusanUpdateOneWithoutStudentsNestedInput
+  classroom?: Prisma.ClassroomUpdateOneWithoutStudentsNestedInput
+  tahun_akademik?: Prisma.TahunAkademikUpdateOneWithoutStudentsNestedInput
+  submissions?: Prisma.SubmissionUpdateManyWithoutStudentNestedInput
+  nilais?: Prisma.NilaiUpdateManyWithoutStudentNestedInput
+  attendance_records?: Prisma.AttendanceUpdateManyWithoutStudentNestedInput
+  material_reads?: Prisma.MaterialReadUpdateManyWithoutStudentNestedInput
+}
+
+export type StudentUncheckedUpdateWithoutExam_participantsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  user_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  foto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nis?: Prisma.StringFieldUpdateOperationsInput | string
+  nisn?: Prisma.StringFieldUpdateOperationsInput | string
+  nama_lengkap?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis_kelamin?: Prisma.StringFieldUpdateOperationsInput | string
+  tempat_lahir?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggal_lahir?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  agama?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurusan_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  kelas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_masuk?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahun_ajaran?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nama_ayah?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama_ibu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  no_hp_ortu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  alamat_ortu?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tahun_akademik_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  submissions?: Prisma.SubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  nilais?: Prisma.NilaiUncheckedUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUncheckedUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUncheckedUpdateManyWithoutStudentNestedInput
 }
@@ -2070,6 +2255,7 @@ export type StudentUpdateWithoutJurusanInput = {
   nilais?: Prisma.NilaiUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutJurusanInput = {
@@ -2100,6 +2286,7 @@ export type StudentUncheckedUpdateWithoutJurusanInput = {
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUncheckedUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUncheckedUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateManyWithoutJurusanInput = {
@@ -2181,6 +2368,7 @@ export type StudentUpdateWithoutClassroomInput = {
   nilais?: Prisma.NilaiUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutClassroomInput = {
@@ -2211,6 +2399,7 @@ export type StudentUncheckedUpdateWithoutClassroomInput = {
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUncheckedUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUncheckedUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateManyWithoutClassroomInput = {
@@ -2292,6 +2481,7 @@ export type StudentUpdateWithoutTahun_akademikInput = {
   nilais?: Prisma.NilaiUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutTahun_akademikInput = {
@@ -2322,6 +2512,7 @@ export type StudentUncheckedUpdateWithoutTahun_akademikInput = {
   nilais?: Prisma.NilaiUncheckedUpdateManyWithoutStudentNestedInput
   attendance_records?: Prisma.AttendanceUncheckedUpdateManyWithoutStudentNestedInput
   material_reads?: Prisma.MaterialReadUncheckedUpdateManyWithoutStudentNestedInput
+  exam_participants?: Prisma.ExamParticipantUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateManyWithoutTahun_akademikInput = {
@@ -2360,6 +2551,7 @@ export type StudentCountOutputType = {
   nilais: number
   attendance_records: number
   material_reads: number
+  exam_participants: number
 }
 
 export type StudentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2367,6 +2559,7 @@ export type StudentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   nilais?: boolean | StudentCountOutputTypeCountNilaisArgs
   attendance_records?: boolean | StudentCountOutputTypeCountAttendance_recordsArgs
   material_reads?: boolean | StudentCountOutputTypeCountMaterial_readsArgs
+  exam_participants?: boolean | StudentCountOutputTypeCountExam_participantsArgs
 }
 
 /**
@@ -2407,6 +2600,13 @@ export type StudentCountOutputTypeCountMaterial_readsArgs<ExtArgs extends runtim
   where?: Prisma.MaterialReadWhereInput
 }
 
+/**
+ * StudentCountOutputType without action
+ */
+export type StudentCountOutputTypeCountExam_participantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ExamParticipantWhereInput
+}
+
 
 export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2441,6 +2641,7 @@ export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   nilais?: boolean | Prisma.Student$nilaisArgs<ExtArgs>
   attendance_records?: boolean | Prisma.Student$attendance_recordsArgs<ExtArgs>
   material_reads?: boolean | Prisma.Student$material_readsArgs<ExtArgs>
+  exam_participants?: boolean | Prisma.Student$exam_participantsArgs<ExtArgs>
   _count?: boolean | Prisma.StudentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["student"]>
 
@@ -2543,6 +2744,7 @@ export type StudentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   nilais?: boolean | Prisma.Student$nilaisArgs<ExtArgs>
   attendance_records?: boolean | Prisma.Student$attendance_recordsArgs<ExtArgs>
   material_reads?: boolean | Prisma.Student$material_readsArgs<ExtArgs>
+  exam_participants?: boolean | Prisma.Student$exam_participantsArgs<ExtArgs>
   _count?: boolean | Prisma.StudentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StudentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2569,6 +2771,7 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     nilais: Prisma.$NilaiPayload<ExtArgs>[]
     attendance_records: Prisma.$AttendancePayload<ExtArgs>[]
     material_reads: Prisma.$MaterialReadPayload<ExtArgs>[]
+    exam_participants: Prisma.$ExamParticipantPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2997,6 +3200,7 @@ export interface Prisma__StudentClient<T, Null = never, ExtArgs extends runtime.
   nilais<T extends Prisma.Student$nilaisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$nilaisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NilaiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   attendance_records<T extends Prisma.Student$attendance_recordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$attendance_recordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   material_reads<T extends Prisma.Student$material_readsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$material_readsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MaterialReadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  exam_participants<T extends Prisma.Student$exam_participantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$exam_participantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExamParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3620,6 +3824,30 @@ export type Student$material_readsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.MaterialReadScalarFieldEnum | Prisma.MaterialReadScalarFieldEnum[]
+}
+
+/**
+ * Student.exam_participants
+ */
+export type Student$exam_participantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ExamParticipant
+   */
+  select?: Prisma.ExamParticipantSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ExamParticipant
+   */
+  omit?: Prisma.ExamParticipantOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExamParticipantInclude<ExtArgs> | null
+  where?: Prisma.ExamParticipantWhereInput
+  orderBy?: Prisma.ExamParticipantOrderByWithRelationInput | Prisma.ExamParticipantOrderByWithRelationInput[]
+  cursor?: Prisma.ExamParticipantWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ExamParticipantScalarFieldEnum | Prisma.ExamParticipantScalarFieldEnum[]
 }
 
 /**

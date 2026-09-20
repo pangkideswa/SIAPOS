@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select"
 import { Sparkles, Loader2, Bot } from "lucide-react"
 import { toast } from "sonner"
-import { MATA_PELAJARAN_OPTIONS } from "@/features/bank-soal/constants/bank-soal.constants"
+
 
 const aiPackageSchema = z.object({
   nama_paket: z.string().min(3, "Nama paket minimal 3 karakter"),
@@ -38,6 +38,19 @@ interface AIPackageGeneratorDialogProps {
 
 export function AIPackageGeneratorDialog({ open, onOpenChange, onSuccess }: AIPackageGeneratorDialogProps) {
   const [isGenerating, setIsGenerating] = useState(false)
+  const [subjects, setSubjects] = useState<{id: number, name: string}[]>([])
+
+  useEffect(() => {
+    fetch("/api/subjects")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const items = data.data.data ? data.data.data : data.data
+          setSubjects(items)
+        }
+      })
+      .catch(console.error)
+  }, [])
 
   const {
     register,
@@ -116,9 +129,11 @@ export function AIPackageGeneratorDialog({ open, onOpenChange, onSuccess }: AIPa
                   <SelectValue placeholder="Pilih mapel..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {MATA_PELAJARAN_OPTIONS.map((m) => (
-                    <SelectItem key={m} value={m}>{m}</SelectItem>
-                  ))}
+                  {subjects.length > 0 ? subjects.map((m) => (
+                    <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
+                  )) : (
+                    <SelectItem value="loading" disabled>Memuat mapel...</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
               {errors.mata_pelajaran && <p className="text-xs text-destructive">{errors.mata_pelajaran.message}</p>}

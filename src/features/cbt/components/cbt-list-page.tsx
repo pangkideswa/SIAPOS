@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -20,8 +20,6 @@ import {
   MATA_PELAJARAN_OPTIONS,
   KELAS_OPTIONS,
 } from "../constants/cbt.constants"
-import { DUMMY_CBT } from "../dummy/cbt.data"
-import { DUMMY_PAKET_SOAL } from "@/features/paket-soal/dummy/paket-soal.data"
 import type { CBTExam, CBTExamFormData } from "../types/cbt"
 
 export function CBTListPage() {
@@ -36,9 +34,40 @@ export function CBTListPage() {
   const [editingItem, setEditingItem] = useState<CBTExam | null>(null)
   const [deletingItem, setDeletingItem] = useState<CBTExam | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [data, setData] = useState<CBTExam[]>(DUMMY_CBT)
+  const [data, setData] = useState<CBTExam[]>([])
 
   const perPage = 10
+
+  useEffect(() => {
+    fetchCbts()
+  }, [])
+
+  async function fetchCbts() {
+    setIsLoading(true)
+    try {
+      const res = await fetch("/api/exams")
+      const json = await res.json()
+      if (json.success) {
+        // Map data to match frontend CBT interface
+        const mapped = json.data.map((d: any) => ({
+          ...d,
+          nama_ujian: d.judul,
+          tanggal_mulai: d.waktu_mulai ? d.waktu_mulai : "",
+          tanggal_berakhir: d.waktu_selesai ? d.waktu_selesai : "",
+          durasi: d.durasi_menit ?? 0,
+          status: d.status === "PUBLISH" ? "Publish" : d.status === "SELESAI" ? "Ditutup" : "Draft",
+          paket_soal_judul: d.paket_soal?.judul || "—",
+          mata_pelajaran: d.paket_soal?.mata_pelajaran || d.teaching_class?.mata_pelajaran || "—",
+          guru_nama: d.teaching_class?.guru_nama || "—"
+        }))
+        setData(mapped)
+      }
+    } catch (error) {
+      toast.error("Gagal memuat data CBT")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const filteredData = data.filter((item) => {
     const matchesSearch =
@@ -46,7 +75,7 @@ export function CBTListPage() {
       item.nama_ujian.toLowerCase().includes(search.toLowerCase()) ||
       item.kelas.toLowerCase().includes(search.toLowerCase()) ||
       item.deskripsi.toLowerCase().includes(search.toLowerCase())
-    const matchesMapel = mapelFilter === "semua" || getPaketSoal(item.paket_soal_id)?.mata_pelajaran === mapelFilter
+    const matchesMapel = mapelFilter === "semua" || (item as any).mata_pelajaran === mapelFilter
     const matchesKelas = kelasFilter === "semua" || item.kelas === kelasFilter
     const matchesStatus = statusFilter === "semua" || item.status === statusFilter
     return matchesSearch && matchesMapel && matchesKelas && matchesStatus
@@ -54,20 +83,18 @@ export function CBTListPage() {
 
   const paginatedData = filteredData.slice((page - 1) * perPage, page * perPage)
 
-  function getPaketSoal(id: number) {
-    return DUMMY_PAKET_SOAL.find((p) => p.id === id) ?? null
-  }
+  const mapelOptions = Array.from(new Set(data.map((d: any) => d.mata_pelajaran))).filter(Boolean)
+  const kelasOptions = Array.from(new Set(data.map((d: any) => d.kelas))).filter(Boolean)
 
   const columns: Column<Record<string, unknown>>[] = [
     {
       key: "nama_ujian",
       header: "Nama Ujian",
-      render: (item) => {
-        const paket = getPaketSoal(item.paket_soal_id as number)
+      render: (item: any) => {
         return (
           <div>
             <p className="font-medium">{String(item.nama_ujian)}</p>
-            <p className="text-xs text-muted-foreground">{paket?.nama_paket ?? "—"}</p>
+            <p className="text-xs text-muted-foreground">{item.paket_soal_judul}</p>
           </div>
         )
       },
@@ -75,18 +102,12 @@ export function CBTListPage() {
     {
       key: "mapel",
       header: "Mapel",
-      render: (item) => {
-        const paket = getPaketSoal(item.paket_soal_id as number)
-        return paket?.mata_pelajaran ?? "—"
-      },
+      render: (item: any) => item.mata_pelajaran,
     },
     {
       key: "guru",
       header: "Guru",
-      render: (item) => {
-        const paket = getPaketSoal(item.paket_soal_id as number)
-        return paket?.guru_nama ?? "—"
-      },
+      render: (item: any) => item.guru_nama,
     },
     { key: "kelas", header: "Kelas", render: (item) => String(item.kelas) },
     {
@@ -132,34 +153,59 @@ export function CBTListPage() {
 
   async function handleSubmit(formData: CBTExamFormData) {
     setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 500))
-    if (editingItem) {
-      setData((prev) => prev.map((d) => d.id === editingItem.id ? { ...d, ...formData, updated_at: new Date().toISOString() } : d))
-      toast.success("CBT berhasil diperbarui")
-    } else {
-      const newItem: CBTExam = {
-        ...formData,
-        id: Math.max(...data.map((d) => d.id)) + 1,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+    try {
+      const dbPayload = {
+        judul: formData.nama_ujian,
+        tipe: "CBT",
+        deskripsi: formData.deskripsi,
+        paket_soal_id: formData.paket_soal_id,
+        kelas: formData.kelas,
+        waktu_mulai: formData.tanggal_mulai ? new Date(formData.tanggal_mulai).toISOString() : undefined,
+        waktu_selesai: formData.tanggal_berakhir ? new Date(formData.tanggal_berakhir).toISOString() : undefined,
+        durasi_menit: formData.durasi,
+        status: formData.status === "Publish" ? "PUBLISH" : formData.status === "Selesai" ? "SELESAI" : "DRAFT",
       }
-      setData((prev) => [newItem, ...prev])
-      toast.success("CBT berhasil ditambahkan")
+
+      if (editingItem) {
+        const res = await fetch(`/api/exams/${editingItem.id}`, {
+          method: "PUT",
+          body: JSON.stringify(dbPayload)
+        })
+        if (!res.ok) throw new Error()
+        toast.success("CBT berhasil diperbarui")
+      } else {
+        const res = await fetch("/api/exams", {
+          method: "POST",
+          body: JSON.stringify(dbPayload)
+        })
+        if (!res.ok) throw new Error()
+        toast.success("CBT berhasil ditambahkan")
+      }
+      await fetchCbts()
+      setFormDialogOpen(false)
+      setEditingItem(null)
+    } catch (err) {
+      toast.error("Gagal menyimpan CBT")
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
-    setFormDialogOpen(false)
-    setEditingItem(null)
   }
 
   async function handleConfirmDelete() {
     if (!deletingItem) return
     setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 500))
-    setData((prev) => prev.filter((d) => d.id !== deletingItem.id))
-    toast.success("CBT berhasil dihapus")
-    setIsLoading(false)
-    setDeleteDialogOpen(false)
-    setDeletingItem(null)
+    try {
+      const res = await fetch(`/api/exams/${deletingItem.id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error()
+      toast.success("CBT berhasil dihapus")
+      await fetchCbts()
+      setDeleteDialogOpen(false)
+      setDeletingItem(null)
+    } catch (err) {
+      toast.error("Gagal menghapus CBT")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -184,14 +230,14 @@ export function CBTListPage() {
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Mapel" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mapel</SelectItem>
-            {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+            {mapelOptions.map((m: any) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={kelasFilter === "semua" ? undefined : kelasFilter} onValueChange={(v) => { if (v) { setKelasFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="Kelas" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>
-            {KELAS_OPTIONS.map((k) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
+            {kelasOptions.map((k: any) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter === "semua" ? undefined : statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(1) } }}>

@@ -6,6 +6,7 @@ export interface PaketSoal {
   deskripsi: string
   mata_pelajaran: string
   guru_nama: string
+  guru_id: number | null
   durasi: number
   nilai_maksimal: number
   soal_ids: number[]
@@ -14,4 +15,4 @@ export interface PaketSoal {
   updated_at: string
 }
 
-export type PaketSoalFormData = Omit<PaketSoal, "id" | "created_at" | "updated_at">
+export type PaketSoalFormData = Omit<PaketSoal, "id" | "created_at" | "updated_at" | "guru_nama">

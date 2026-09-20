@@ -3,7 +3,7 @@ import { PrismaClient } from "@/generated/prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg"
 
 const globalForPrisma = globalThis as unknown as {
-  prisma?: PrismaClient
+  prisma_v2?: PrismaClient
 }
 
 import { Pool } from "pg"
@@ -16,8 +16,8 @@ function createPrismaClient(): PrismaClient {
 }
 
 export const prisma: PrismaClient =
-  globalForPrisma.prisma ?? createPrismaClient()
+  globalForPrisma.prisma_v2 ?? createPrismaClient()
 
 if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma
+  globalForPrisma.prisma_v2 = prisma
 }

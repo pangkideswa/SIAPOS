@@ -148,6 +148,12 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
     day: "numeric",
     month: "long",
   })
+  const shortDateLabel = now.toLocaleDateString("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  })
   const timeLabel = now.toLocaleTimeString("id-ID", {
     hour: "2-digit",
     minute: "2-digit",
@@ -170,7 +176,15 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
           <div className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0 overflow-hidden">
             <img src="/favicon.png" alt="Logo SIAPOS" className="w-full h-full object-contain" />
           </div>
-          <span className="font-bold text-lg tracking-tight line-clamp-1">{settings.pengaturan_sistem?.nama_aplikasi || "SIAPOS"}</span>
+          
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground px-2 py-1 rounded-lg bg-muted whitespace-nowrap ml-1 overflow-hidden max-w-[180px] sm:max-w-none">
+            <Clock className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+            <span className="truncate">
+              <span className="hidden sm:inline">{dateLabel}, </span>
+              <span className="sm:hidden">{shortDateLabel}, </span>
+              {timeLabel}
+            </span>
+          </div>
         </div>
         <div className="hidden md:block">
           <h1 className="text-lg font-semibold text-foreground">{pageTitle}</h1>
@@ -178,8 +192,8 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
       </div>
 
       <div className="flex items-center gap-2">
-        <div className="hidden xl:flex items-center gap-2 text-xs text-muted-foreground px-2.5 py-1.5 rounded-lg bg-muted whitespace-nowrap">
-          <Clock className="h-4 w-4" />
+        <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground px-2.5 py-1.5 rounded-lg bg-muted whitespace-nowrap">
+          <Clock className="h-4 w-4 shrink-0" />
           <span>
             {dateLabel}, {timeLabel}
           </span>

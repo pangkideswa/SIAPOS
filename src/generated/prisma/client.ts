@@ -137,6 +137,11 @@ export type Schedule = Prisma.ScheduleModel
  */
 export type TahunAkademik = Prisma.TahunAkademikModel
 /**
+ * Model KalenderEvent
+ * 
+ */
+export type KalenderEvent = Prisma.KalenderEventModel
+/**
  * Model Nilai
  * 
  */
@@ -151,3 +156,38 @@ export type Notifikasi = Prisma.NotifikasiModel
  * 
  */
 export type AppSetting = Prisma.AppSettingModel
+/**
+ * Model BankSoal
+ * 
+ */
+export type BankSoal = Prisma.BankSoalModel
+/**
+ * Model QuestionOption
+ * 
+ */
+export type QuestionOption = Prisma.QuestionOptionModel
+/**
+ * Model PaketSoal
+ * 
+ */
+export type PaketSoal = Prisma.PaketSoalModel
+/**
+ * Model PaketSoalItem
+ * 
+ */
+export type PaketSoalItem = Prisma.PaketSoalItemModel
+/**
+ * Model Exam
+ * 
+ */
+export type Exam = Prisma.ExamModel
+/**
+ * Model ExamParticipant
+ * 
+ */
+export type ExamParticipant = Prisma.ExamParticipantModel
+/**
+ * Model ExamAnswer
+ * 
+ */
+export type ExamAnswer = Prisma.ExamAnswerModel

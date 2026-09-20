@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Search } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
 import { Input } from "@/components/ui/input"
@@ -17,7 +17,6 @@ import {
   KATEGORI_OPTIONS,
   BULAN_OPTIONS,
 } from "../constants/kalender-akademik.constants"
-import { DUMMY_KALENDER_EVENTS } from "../dummy/kalender-akademik.data"
 import { KalenderSummaryCards } from "./kalender-summary-cards"
 import { KalenderMonthView } from "./kalender-month-view"
 import { KalenderWeekView } from "./kalender-week-view"
@@ -25,13 +24,35 @@ import { KalenderAgendaView } from "./kalender-agenda-view"
 import { KalenderEventDetailDialog } from "./kalender-event-detail-dialog"
 
 export function KalenderAkademikSiswaPage() {
-  const [events] = useState<KalenderEvent[]>(DUMMY_KALENDER_EVENTS)
+  const [events, setEvents] = useState<KalenderEvent[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [kategoriFilter, setKategoriFilter] = useState("semua")
+  const [semesterFilter, setSemesterFilter] = useState("semua")
+  const [tahunAjaranFilter, setTahunAjaranFilter] = useState("semua")
   const [bulanFilter, setBulanFilter] = useState("semua")
+  const [page, setPage] = useState(1)
   const [viewMode, setViewMode] = useState("month")
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<KalenderEvent | null>(null)
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setIsLoading(true)
+      try {
+        const res = await fetch("/api/kalender")
+        const json = await res.json()
+        if (res.ok) {
+          setEvents(json.data)
+        }
+      } catch (e) {
+        console.error("Failed to fetch events", e)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchEvents()
+  }, [])
 
   const filteredData = useMemo(() => {
     let data = [...events]

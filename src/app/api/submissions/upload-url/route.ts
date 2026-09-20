@@ -23,7 +23,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB limit for students
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireApiUser("siswa")
+    const user = await requireApiUser("super_admin", "admin", "guru", "siswa")
     const body = await request.json()
     
     const { assignment_id, student_id, filename, contentType, size } = body

@@ -10,11 +10,8 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
 import { ArrowLeft, ArrowRight, Clock, Flag, CheckCircle2, Bookmark, BookmarkCheck, AlertTriangle, Menu, Maximize, ShieldAlert, Monitor, X } from "lucide-react"
-import { DUMMY_CBT } from "../dummy/cbt.data"
-import { DUMMY_PAKET_SOAL } from "@/features/paket-soal/dummy/paket-soal.data"
-import { DUMMY_BANK_SOAL } from "@/features/bank-soal/dummy/bank-soal.data"
+import { toast } from "sonner"
 import type { CBTAnswer } from "../types/cbt"
-import type { BankSoal } from "@/features/bank-soal/types/bank-soal"
 
 interface CBTExamPageProps {
   id: string
@@ -22,30 +19,66 @@ interface CBTExamPageProps {
 
 export function CBTExamPage({ id }: CBTExamPageProps) {
   const router = useRouter()
-  const cbt = DUMMY_CBT.find((c) => c.id === Number(id))
-  const paket = cbt ? DUMMY_PAKET_SOAL.find((p) => p.id === cbt.paket_soal_id) : null
-
-  const soalList: BankSoal[] = useMemo(() => {
-    if (!paket) return []
-    let base = DUMMY_BANK_SOAL.filter((s) => paket.soal_ids.includes(s.id))
-    if (cbt?.acak_soal) {
-      base = [...base].sort(() => Math.random() - 0.5)
-    }
-    return base
-  }, [paket, cbt?.acak_soal])
-
+  
+  const [exam, setExam] = useState<any>(null)
+  const [participant, setParticipant] = useState<any>(null)
+  const [soalList, setSoalList] = useState<any[]>([])
+  
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<CBTAnswer[]>([])
-  const [timeLeft, setTimeLeft] = useState(cbt ? cbt.durasi * 60 : 0)
+  const [timeLeft, setTimeLeft] = useState(0)
   const [isStarted, setIsStarted] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isFinished, setIsFinished] = useState(false)
   const [showFinishDialog, setShowFinishDialog] = useState(false)
   const [violationCount, setViolationCount] = useState(0)
   const [showViolationDialog, setShowViolationDialog] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (!isStarted || isFinished || !cbt) return
+    async function loadExam() {
+      try {
+        const res = await fetch(`/api/exams/${id}/start`, { method: 'POST' })
+        const json = await res.json()
+        if (json.success) {
+          setExam(json.data.exam)
+          setParticipant(json.data.participant)
+          
+          let items = json.data.exam.paket_soal?.items?.map((i: any) => i.bank_soal) || []
+          if (json.data.exam.acak_urutan_soal) {
+             items = [...items].sort(() => Math.random() - 0.5)
+          }
+          setSoalList(items)
+          setTimeLeft((json.data.exam.durasi_menit || 60) * 60)
+          
+          // Load previous answers
+          if (json.data.participant.answers) {
+             const prevAnswers = json.data.participant.answers.map((a: any) => ({
+                soal_id: a.bank_soal_id,
+                jawaban: a.selected_option_id ? String(a.selected_option_id) : (a.jawaban_esai || ""),
+                ditandai: false
+             }))
+             setAnswers(prevAnswers)
+          }
+
+          if (json.data.participant.status === "SELESAI") {
+             setIsFinished(true)
+             setIsStarted(true)
+          }
+        } else {
+          toast.error(json.error || "Gagal memuat ujian")
+        }
+      } catch (error) {
+        toast.error("Terjadi kesalahan jaringan")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    loadExam()
+  }, [id])
+
+  useEffect(() => {
+    if (!isStarted || isFinished || !exam) return
 
     const handleBlur = () => {
       setViolationCount((prev) => prev + 1)
@@ -66,28 +99,25 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
       window.removeEventListener("blur", handleBlur)
       document.removeEventListener("fullscreenchange", handleFullscreenChange)
     }
-  }, [isStarted, isFinished, cbt])
+  }, [isStarted, isFinished, exam])
 
   useEffect(() => {
     if (!isStarted || isFinished) return
     if (timeLeft <= 0) {
-      if (cbt?.auto_submit) {
-        handleFinish()
-      }
+      handleFinish()
       return
     }
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer)
-          if (cbt?.auto_submit) handleFinish()
+          handleFinish()
           return 0
         }
         return prev - 1
       })
     }, 1000)
     return () => clearInterval(timer)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft, isStarted, isFinished])
   
   const startExam = () => {
@@ -100,11 +130,13 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
   const currentSoal = soalList[currentIndex]
   const progress = soalList.length > 0 ? ((currentIndex + 1) / soalList.length) * 100 : 0
 
-  const answeredCount = answers.length
+  const answeredCount = answers.filter(a => a.jawaban !== "").length
   const bookmarkedIds = answers.filter((a) => a.ditandai).map((a) => a.soal_id)
 
-  const handleAnswer = useCallback((jawaban: string) => {
-    if (!currentSoal) return
+  const handleAnswer = useCallback(async (jawaban: string) => {
+    if (!currentSoal || !participant) return
+    
+    // Optimistic update
     setAnswers((prev) => {
       const existing = prev.find((a) => a.soal_id === currentSoal.id)
       if (existing) {
@@ -112,7 +144,26 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
       }
       return [...prev, { soal_id: currentSoal.id, jawaban, ditandai: false }]
     })
-  }, [currentSoal])
+
+    // Auto save to backend
+    try {
+      const payload = {
+         participant_id: participant.id,
+         action: "save",
+         answers: [{
+            bank_soal_id: currentSoal.id,
+            selected_option_id: currentSoal.tipe_soal === "PILIHAN_GANDA" ? Number(jawaban) : null,
+            jawaban_esai: currentSoal.tipe_soal === "ESAI" ? jawaban : null
+         }]
+      }
+      await fetch("/api/exams/submit", {
+         method: "POST",
+         body: JSON.stringify(payload)
+      })
+    } catch (e) {
+      console.error("Gagal auto-save", e)
+    }
+  }, [currentSoal, participant])
 
   function handleBookmark() {
     if (!currentSoal) return
@@ -125,11 +176,30 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
     })
   }
 
-  function handleFinish() {
+  async function handleFinish() {
     setShowFinishDialog(false)
-    setIsFinished(true)
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(console.error)
+    }
+    setIsFinished(true)
+    setIsLoading(true)
+    try {
+      const payload = {
+         participant_id: participant.id,
+         action: "submit"
+      }
+      const res = await fetch("/api/exams/submit", {
+         method: "POST",
+         body: JSON.stringify(payload)
+      })
+      const json = await res.json()
+      if (json.success) {
+         setParticipant(json.data)
+      }
+    } catch (e) {
+      toast.error("Gagal mengirim jawaban akhir")
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -143,14 +213,18 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
     const answer = answers.find((a) => a.soal_id === soalId)
     if (!answer) return "belum"
     if (answer.ditandai) return "ditandai"
-    if (answer.jawaban) return "dijawab"
+    if (answer.jawaban && answer.jawaban !== "") return "dijawab"
     return "belum"
   }
 
-  if (!cbt || !paket || soalList.length === 0) {
+  if (isLoading) {
+    return <div className="flex h-[60vh] items-center justify-center">Memuat Ujian...</div>
+  }
+
+  if (!exam || soalList.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <p className="text-muted-foreground">Ujian CBT tidak ditemukan</p>
+        <p className="text-muted-foreground">Ujian CBT tidak ditemukan atau soal kosong.</p>
         <Button variant="outline" onClick={() => router.push("/siswa/cbt")}>Kembali</Button>
       </div>
     )
@@ -165,7 +239,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
           </div>
           <div>
             <h2 className="text-2xl font-bold">Konfirmasi Kesiapan Ujian</h2>
-            <p className="text-muted-foreground mt-1">{cbt.nama_ujian}</p>
+            <p className="text-muted-foreground mt-1">{exam.judul}</p>
           </div>
         </div>
 
@@ -176,7 +250,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
           </div>
           <div className="rounded-lg border p-4 text-center">
             <p className="text-sm text-muted-foreground">Durasi Ujian</p>
-            <p className="text-2xl font-bold">{cbt.durasi} Menit</p>
+            <p className="text-2xl font-bold">{exam.durasi_menit || 60} Menit</p>
           </div>
         </div>
 
@@ -207,16 +281,8 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
   }
 
   if (isFinished) {
-    const totalBenar = answers.filter((a) => {
-      const soal = soalList.find((s) => s.id === a.soal_id)
-      return soal?.jawaban_benar === a.jawaban
-    }).length
-    const totalSalah = answers.filter((a) => {
-      const soal = soalList.find((s) => s.id === a.soal_id)
-      return soal && a.jawaban && soal.jawaban_benar !== a.jawaban
-    }).length
-    const nilai = Math.round((totalBenar / soalList.length) * 100)
-    const lulus = nilai >= cbt.nilai_minimum_lulus
+    const nilai = participant?.nilai_akhir ?? 0
+    const lulus = nilai >= (exam.kkm ?? 75)
 
     return (
       <div className="max-w-2xl mx-auto space-y-6 py-8">
@@ -231,34 +297,23 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
             </div>
           )}
           <div className="text-center">
-            <h2 className="text-2xl font-bold">{lulus ? "Selamat! Anda Lulus" : "Belum Tercapai"}</h2>
-            <p className="text-muted-foreground mt-1">{cbt.nama_ujian}</p>
+            <h2 className="text-2xl font-bold">{lulus ? "Selamat! Anda Lulus" : "Belum Lulus (Di bawah KKM)"}</h2>
+            <p className="text-muted-foreground mt-1">{exam.judul}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+        <div className="grid grid-cols-1 gap-4 max-w-sm mx-auto">
           <div className="rounded-lg border p-4 text-center">
-            <p className="text-sm text-muted-foreground">Nilai</p>
-            <p className="text-3xl font-bold text-primary">{nilai}</p>
-          </div>
-          <div className="rounded-lg border p-4 text-center">
-            <p className="text-sm text-muted-foreground">Waktu</p>
-            <p className="text-3xl font-bold">{formatTime((cbt.durasi * 60) - timeLeft)}</p>
-          </div>
-          <div className="rounded-lg border p-4 text-center">
-            <p className="text-sm text-muted-foreground">Benar</p>
-            <p className="text-3xl font-bold text-green-600">{totalBenar}</p>
-          </div>
-          <div className="rounded-lg border p-4 text-center">
-            <p className="text-sm text-muted-foreground">Salah</p>
-            <p className="text-3xl font-bold text-red-600">{totalSalah}</p>
+            <p className="text-sm text-muted-foreground">Nilai Akhir</p>
+            <p className="text-4xl font-bold text-primary">{Math.round(nilai)}</p>
+            <p className="text-xs text-muted-foreground mt-2">KKM: {exam.kkm ?? 75}</p>
           </div>
         </div>
 
         <div className="flex gap-3 justify-center pt-4">
           <Button variant="outline" onClick={() => router.push("/siswa/cbt")}>Kembali ke Daftar Ujian</Button>
-          {cbt.tampilkan_nilai && (
-            <Button onClick={() => router.push(`/siswa/cbt/${cbt.id}/hasil`)}>Lihat Hasil</Button>
+          {exam.tampilkan_nilai && (
+            <Button onClick={() => router.push(`/siswa/cbt/${exam.id}/hasil`)}>Lihat Analitik Hasil</Button>
           )}
         </div>
       </div>
@@ -332,7 +387,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
                 <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setIsMobileMenuOpen(true)}>
                   <Menu className="h-4 w-4" />
                 </Button>
-                <h2 className="font-semibold text-sm line-clamp-1">{cbt.nama_ujian}</h2>
+                <h2 className="font-semibold text-sm line-clamp-1">{exam.judul}</h2>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
@@ -353,7 +408,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
             {currentSoal && (
               <div className="max-w-3xl mx-auto space-y-6">
                 <div className="flex items-start justify-between">
-                  <Badge className="bg-primary/10 text-primary">{currentSoal.tipe_soal}</Badge>
+                  <Badge className="bg-primary/10 text-primary">{currentSoal.tipe_soal === "PILIHAN_GANDA" ? "Pilihan Ganda" : "Esai"}</Badge>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -371,16 +426,15 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
 
                 <div className="text-base leading-relaxed whitespace-pre-wrap">{currentSoal.pertanyaan}</div>
 
-                {currentSoal.tipe_soal === "Pilihan Ganda" && currentSoal.pilihan && (
+                {currentSoal.tipe_soal === "PILIHAN_GANDA" && currentSoal.options && (
                   <div className="space-y-3">
-                    {(["A", "B", "C", "D", "E"] as const).map((key) => {
-                      const optionText = currentSoal.pilihan?.[key]
-                      if (!optionText) return null
-                      const isSelected = answers.find((a) => a.soal_id === currentSoal.id)?.jawaban === key
+                    {currentSoal.options.map((opt: any, i: number) => {
+                      const letter = String.fromCharCode(65 + i)
+                      const isSelected = answers.find((a) => a.soal_id === currentSoal.id)?.jawaban === String(opt.id)
                       return (
                         <button
-                          key={key}
-                          onClick={() => handleAnswer(key)}
+                          key={opt.id}
+                          onClick={() => handleAnswer(String(opt.id))}
                           className={`w-full flex items-start gap-3 p-4 rounded-lg border-2 text-left transition-all ${
                             isSelected
                               ? "border-primary bg-primary/5"
@@ -390,51 +444,22 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
                           <span className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm shrink-0 ${
                             isSelected ? "bg-primary text-white" : "bg-muted text-muted-foreground"
                           }`}>
-                            {key}
+                            {letter}
                           </span>
-                          <span className="text-sm flex-1 pt-1">{optionText}</span>
+                          <span className="text-sm flex-1 pt-1">{opt.teks}</span>
                         </button>
                       )
                     })}
                   </div>
                 )}
 
-                {currentSoal.tipe_soal === "Benar / Salah" && (
-                  <div className="space-y-3">
-                    {["Benar", "Salah"].map((option) => {
-                      const isSelected = answers.find((a) => a.soal_id === currentSoal.id)?.jawaban === option
-                      return (
-                        <button
-                          key={option}
-                          onClick={() => handleAnswer(option)}
-                          className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 text-left transition-all ${
-                            isSelected
-                              ? option === "Benar" ? "border-green-500 bg-green-50" : "border-red-500 bg-red-50"
-                              : "border-border hover:border-primary/30 hover:bg-muted/30"
-                          }`}
-                        >
-                          <span className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm shrink-0 ${
-                            isSelected
-                              ? option === "Benar" ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                              : "bg-muted text-muted-foreground"
-                          }`}>
-                            {option === "Benar" ? "✓" : "✗"}
-                          </span>
-                          <span className="text-sm font-medium">{option}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
-
-                {currentSoal.tipe_soal === "Isian Singkat" && (
+                {currentSoal.tipe_soal === "ESAI" && (
                   <div>
-                    <input
-                      type="text"
+                    <textarea
                       value={answers.find((a) => a.soal_id === currentSoal.id)?.jawaban ?? ""}
                       onChange={(e) => handleAnswer(e.target.value)}
                       placeholder="Ketik jawaban Anda..."
-                      className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none transition-colors text-sm"
+                      className="w-full px-4 py-3 rounded-lg border-2 border-border focus:border-primary outline-none transition-colors text-sm min-h-[150px]"
                     />
                   </div>
                 )}
