@@ -159,7 +159,7 @@ export function CBTListPage() {
         tipe: "CBT",
         deskripsi: formData.deskripsi,
         paket_soal_id: formData.paket_soal_id,
-        kelas: formData.kelas,
+        teaching_class_id: formData.teaching_class_id,
         waktu_mulai: formData.tanggal_mulai ? new Date(formData.tanggal_mulai).toISOString() : undefined,
         waktu_selesai: formData.tanggal_berakhir ? new Date(formData.tanggal_berakhir).toISOString() : undefined,
         durasi_menit: formData.durasi,

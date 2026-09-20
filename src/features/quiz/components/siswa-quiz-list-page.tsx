@@ -12,7 +12,6 @@ import { Clock, FileText, AlertCircle, Loader2 } from "lucide-react"
 import {
   MATA_PELAJARAN_OPTIONS,
 } from "../constants/quiz.constants"
-import type { Quiz } from "../types/quiz"
 
 export function SiswaQuizListPage() {
   const router = useRouter()
@@ -40,7 +39,7 @@ export function SiswaQuizListPage() {
     return mapelFilter === "semua" || mapel === mapelFilter
   })
 
-  function getQuizStatus(quiz: Quiz) {
+  function getQuizStatus(quiz: any) {
     const now = new Date()
     const mulai = new Date(quiz.waktu_mulai || quiz.created_at)
     const berakhir = new Date(quiz.waktu_selesai || quiz.created_at)

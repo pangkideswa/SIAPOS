@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/select"
 import { Clock, FileText, AlertCircle, Loader2 } from "lucide-react"
 import { MATA_PELAJARAN_OPTIONS } from "../constants/cbt.constants"
-import type { CBTExam } from "../types/cbt"
 
 export function SiswaCBTListPage() {
   const router = useRouter()
@@ -38,7 +37,7 @@ export function SiswaCBTListPage() {
     return mapelFilter === "semua" || mapel === mapelFilter
   })
 
-  function getExamStatus(exam: CBTExam) {
+  function getExamStatus(exam: any) {
     const now = new Date()
     const mulai = new Date(exam.waktu_mulai || exam.created_at)
     const berakhir = new Date(exam.waktu_selesai || exam.created_at)
