@@ -350,7 +350,11 @@ export function TugasListPage() {
       </div>
 
       <DataTable
-        columns={columns}
+
+        page={page}
+        perPage={perPage}
+        total={filteredData.length}
+        onPageChange={setPage}        columns={columns}
         data={paginatedData as unknown as Record<string, unknown>[]}
         loading={isTableLoading}
         emptyMessage={

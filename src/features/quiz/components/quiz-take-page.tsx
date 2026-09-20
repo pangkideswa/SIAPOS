@@ -40,20 +40,21 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
       try {
         const res = await fetch(`/api/exams/${id}/start`, { method: 'POST' })
         const json = await res.json()
-        if (json.success) {
-          setQuiz(json.data.exam)
-          setParticipant(json.data.participant)
+        if (json.data || json.success) {
+          const payload = json.data || json;
+          setQuiz(payload.exam)
+          setParticipant(payload.participant)
           
-          let items = json.data.exam.paket_soal?.items?.map((i: any) => i.bank_soal) || []
-          if (json.data.exam.acak_urutan_soal) {
+          let items = payload.exam?.paket_soal?.items?.map((i: any) => i.bank_soal) || []
+          if (payload.exam?.acak_urutan_soal) {
              items = [...items].sort(() => Math.random() - 0.5)
           }
           setSoalList(items)
-          setTimeLeft((json.data.exam.durasi_menit || 60) * 60)
+          setTimeLeft((payload.exam?.durasi_menit || 60) * 60)
           
           // Load previous answers
-          if (json.data.participant.answers) {
-             const prevAnswers = json.data.participant.answers.map((a: any) => ({
+          if (payload.participant?.answers) {
+             const prevAnswers = payload.participant.answers.map((a: any) => ({
                 soal_id: a.bank_soal_id,
                 jawaban: a.selected_option_id ? String(a.selected_option_id) : (a.jawaban_esai || ""),
                 ditandai: false
@@ -61,7 +62,7 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
              setAnswers(prevAnswers)
           }
 
-          if (json.data.participant.status === "SELESAI") {
+          if (payload.participant?.status === "SELESAI") {
              setIsFinished(true)
              setIsStarted(true)
           }

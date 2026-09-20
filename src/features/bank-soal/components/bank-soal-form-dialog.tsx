@@ -49,12 +49,12 @@ export function BankSoalFormDialog({
           resSubjects.json()
         ])
 
-        if (dataTeachers.success) {
+        if (dataTeachers.data) {
            // check if paginated response
            const items = dataTeachers.data.data ? dataTeachers.data.data : dataTeachers.data
            setTeachers(items)
         }
-        if (dataSubjects.success) {
+        if (dataSubjects.data) {
            const items = dataSubjects.data.data ? dataSubjects.data.data : dataSubjects.data
            setSubjects(items)
         }

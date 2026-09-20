@@ -149,10 +149,8 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
     month: "long",
   })
   const shortDateLabel = now.toLocaleDateString("id-ID", {
-    weekday: "long",
     day: "numeric",
     month: "short",
-    year: "numeric",
   })
   const timeLabel = now.toLocaleTimeString("id-ID", {
     hour: "2-digit",

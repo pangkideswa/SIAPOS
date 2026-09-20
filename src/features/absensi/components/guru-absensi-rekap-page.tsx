@@ -275,15 +275,18 @@ export function GuruAbsensiRekapPage() {
       </div>
 
       <DataTable
-        columns={columns}
+
+        page={page}
+        perPage={perPage}
+        total={filteredData.length}
+        onPageChange={setPage}        columns={columns}
         data={paginatedData as RekapRow[]}
         loading={isLoading}
         emptyMessage={
           isError
             ? "Gagal memuat data rekap absensi"
             : "Tidak ada data rekap absensi"
-        }
-      />
+        }/>
 
       {isError && (
         <div className="rounded-lg border border-destructive/40 bg-destructive/5 py-4 px-4 text-center text-sm text-destructive">

@@ -27,8 +27,13 @@ export async function GET(request: NextRequest) {
       teachingClassIds = classes.map(c => c.id)
     }
 
+    const tipe = request.nextUrl.searchParams.get("tipe")
     const items = await examService.getAll()
-    const filteredItems = isAdmin(user) ? items : items.filter(i => !i.teaching_class_id || teachingClassIds.includes(i.teaching_class_id))
+    let filteredItems = isAdmin(user) ? items : items.filter(i => !i.teaching_class_id || teachingClassIds.includes(i.teaching_class_id))
+    
+    if (tipe) {
+      filteredItems = filteredItems.filter(i => i.tipe === tipe)
+    }
     
     return ok(filteredItems)
   } catch (error) {
@@ -41,12 +46,21 @@ export async function POST(request: NextRequest) {
     const user = await requireApiUser("super_admin", "admin", "guru")
     const body = await request.json()
     
+    let kelas = body.kelas
+    if (!kelas && body.teaching_class_id) {
+      const tc = await import("@/lib/prisma").then(m => m.prisma.teachingClass.findUnique({
+        where: { id: body.teaching_class_id },
+        select: { kelas: true }
+      }))
+      if (tc?.kelas) kelas = tc.kelas
+    }
+    
     const createdItem = await examService.create({
       judul: body.judul,
       tipe: body.tipe,
       paket_soal_id: body.paket_soal_id,
       teaching_class_id: body.teaching_class_id,
-      kelas: body.kelas,
+      kelas: kelas,
       deskripsi: body.deskripsi,
       waktu_mulai: body.waktu_mulai ? new Date(body.waktu_mulai) : undefined,
       waktu_selesai: body.waktu_selesai ? new Date(body.waktu_selesai) : undefined,

@@ -47,12 +47,12 @@ export function QuizFormDialog({
           resPackages.json()
         ])
 
-        if (dataClasses.success) {
+        if (dataClasses.data) {
            const items = dataClasses.data.data ? dataClasses.data.data : dataClasses.data
            setClasses(items)
         }
-        if (dataPackages.success) {
-           const items = dataPackages.data.map((p: any) => ({
+        if (dataPackages.data) {
+           const items = (dataPackages.data.data ? dataPackages.data.data : dataPackages.data).map((p: any) => ({
              id: p.id,
              judul: p.judul,
              mata_pelajaran: p.mata_pelajaran

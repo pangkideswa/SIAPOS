@@ -2,6 +2,7 @@ export type StatusPaketSoal = "Draft" | "Aktif" | "Arsip"
 
 export interface PaketSoal {
   id: number
+  kode_paket: string
   nama_paket: string
   deskripsi: string
   mata_pelajaran: string
@@ -15,4 +16,4 @@ export interface PaketSoal {
   updated_at: string
 }
 
-export type PaketSoalFormData = Omit<PaketSoal, "id" | "created_at" | "updated_at" | "guru_nama">
+export type PaketSoalFormData = Omit<PaketSoal, "id" | "kode_paket" | "created_at" | "updated_at" | "guru_nama">

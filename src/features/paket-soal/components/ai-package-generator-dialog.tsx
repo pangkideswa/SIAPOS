@@ -39,17 +39,34 @@ interface AIPackageGeneratorDialogProps {
 export function AIPackageGeneratorDialog({ open, onOpenChange, onSuccess }: AIPackageGeneratorDialogProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [subjects, setSubjects] = useState<{id: number, name: string}[]>([])
+  const [classes, setClasses] = useState<{id: number, name: string}[]>([])
 
   useEffect(() => {
-    fetch("/api/subjects")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          const items = data.data.data ? data.data.data : data.data
+    async function fetchMasterData() {
+      try {
+        const [resSubjects, resClasses] = await Promise.all([
+          fetch("/api/subjects"),
+          fetch("/api/classes")
+        ])
+        
+        const [dataSubjects, dataClasses] = await Promise.all([
+          resSubjects.json(),
+          resClasses.json()
+        ])
+
+        if (dataSubjects.data) {
+          const items = dataSubjects.data.data ? dataSubjects.data.data : dataSubjects.data
           setSubjects(items)
         }
-      })
-      .catch(console.error)
+        if (dataClasses.data) {
+          const items = dataClasses.data.data ? dataClasses.data.data : dataClasses.data
+          setClasses(items)
+        }
+      } catch (error) {
+        console.error("Gagal memuat data master", error)
+      }
+    }
+    fetchMasterData()
   }, [])
 
   const {
@@ -77,16 +94,23 @@ export function AIPackageGeneratorDialog({ open, onOpenChange, onSuccess }: AIPa
   const onSubmit = async (data: AIPackageValues) => {
     setIsGenerating(true)
     try {
-      // TODO: Call backend API to generate questions with AI,
-      // save them to bank_soal, and then create a paket_soal linking to them.
-      await new Promise(resolve => setTimeout(resolve, 3500))
+      const response = await fetch("/api/exams/packages/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+      const result = await response.json()
       
-      toast.success(`Paket soal "${data.nama_paket}" berhasil dibuat dengan ${data.jumlah_soal} soal!`)
+      if (!response.ok) {
+        throw new Error(result.message || "Gagal membuat paket soal otomatis")
+      }
+      
+      toast.success(result.message || `Paket soal "${data.nama_paket}" berhasil dibuat dengan ${data.jumlah_soal} soal!`)
       onSuccess()
       reset()
       onOpenChange(false)
-    } catch (error) {
-      toast.error("Gagal membuat paket soal otomatis. Silakan coba lagi.")
+    } catch (error: any) {
+      toast.error(error.message || "Gagal membuat paket soal otomatis. Silakan coba lagi.")
     } finally {
       setIsGenerating(false)
     }
@@ -141,12 +165,18 @@ export function AIPackageGeneratorDialog({ open, onOpenChange, onSuccess }: AIPa
 
             <div className="space-y-2">
               <Label htmlFor="tingkat">Kelas / Tingkat <span className="text-destructive">*</span></Label>
-              <Input
-                id="tingkat"
-                placeholder="Cth: Kelas X SMK"
-                className={errors.tingkat ? "border-destructive" : ""}
-                {...register("tingkat")}
-              />
+              <Select value={formValues.tingkat} onValueChange={(v) => setValue("tingkat", v || "")}>
+                <SelectTrigger className={errors.tingkat ? "border-destructive" : ""}>
+                  <SelectValue placeholder="Pilih kelas..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {classes.length > 0 ? classes.map((c) => (
+                    <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+                  )) : (
+                    <SelectItem value="loading" disabled>Memuat kelas...</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
               {errors.tingkat && <p className="text-xs text-destructive">{errors.tingkat.message}</p>}
             </div>
           </div>

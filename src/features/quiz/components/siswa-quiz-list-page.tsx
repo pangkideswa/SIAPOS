@@ -9,13 +9,16 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
 import { Clock, FileText, AlertCircle, Loader2 } from "lucide-react"
-import {
-  MATA_PELAJARAN_OPTIONS,
-} from "../constants/quiz.constants"
+import { toast } from "sonner"
+import { PaginationControls } from "@/components/ui/pagination-controls"
+import type { CBTExam } from "@/features/cbt/types/cbt"
+
 
 export function SiswaQuizListPage() {
   const router = useRouter()
   const [mapelFilter, setMapelFilter] = useState<string>("semua")
+  const [page, setPage] = useState(1)
+  const perPage = 9
   const [quizzes, setQuizzes] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -23,8 +26,9 @@ export function SiswaQuizListPage() {
     fetch("/api/student/exams?tipe=QUIZ")
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
-          setQuizzes(data.data)
+        if (data.data || data.success) {
+          const sourceData = Array.isArray(data.data) ? data.data : (data.data?.data || [])
+          setQuizzes(sourceData)
         }
         setIsLoading(false)
       })
@@ -122,7 +126,9 @@ export function SiswaQuizListPage() {
           <SelectTrigger className="w-full sm:w-[180px]"><SelectValue placeholder="Mata Pelajaran" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mata Pelajaran</SelectItem>
-            {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+            {Array.from(new Set(quizzes.map(d => d.paket_soal?.mata_pelajaran || d.teaching_class?.mata_pelajaran))).filter(Boolean).map((m) => (
+              <SelectItem key={m as string} value={m as string}>{m as string}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -136,7 +142,7 @@ export function SiswaQuizListPage() {
           <div className="col-span-full flex justify-center py-10 text-muted-foreground">
             Tidak ada quiz tersedia
           </div>
-        ) : filteredData.map((quiz) => {
+        ) : filteredData.slice((page - 1) * perPage, page * perPage).map((quiz) => {
           const status = getQuizStatus(quiz)
           const mapel = quiz.paket_soal?.mata_pelajaran || quiz.teaching_class?.mata_pelajaran
           return (
@@ -191,6 +197,14 @@ export function SiswaQuizListPage() {
           )
         })}
       </div>
+
+      <PaginationControls
+        page={page}
+        total={filteredData.length}
+        perPage={perPage}
+        onPageChange={setPage}
+        itemName="quiz"
+      />
     </div>
   )
 }

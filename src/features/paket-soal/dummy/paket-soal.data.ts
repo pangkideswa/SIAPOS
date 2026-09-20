@@ -3,6 +3,7 @@ import type { PaketSoal } from "../types/paket-soal"
 export const DUMMY_PAKET_SOAL: PaketSoal[] = [
   {
     id: 1,
+    kode_paket: "PKG-001",
     nama_paket: "UTS Matematika Semester Ganjil",
     deskripsi: "Paket soal Ulangan Tengah Semester untuk mata pelajaran Matematika kelas X RPL.",
     mata_pelajaran: "Matematika",
@@ -17,6 +18,7 @@ export const DUMMY_PAKET_SOAL: PaketSoal[] = [
   },
   {
     id: 2,
+    kode_paket: "PKG-002",
     nama_paket: "Quiz Bahasa Indonesia - Sinonim & Antonim",
     deskripsi: "Paket quiz singkat untuk menguasai kosakata sinonim dan antonim.",
     mata_pelajaran: "Bahasa Indonesia",
@@ -31,6 +33,7 @@ export const DUMMY_PAKET_SOAL: PaketSoal[] = [
   },
   {
     id: 3,
+    kode_paket: "PKG-003",
     nama_paket: "Try Out Fisika - Mekanika",
     deskripsi: "Simulasi try out untuk persiapan ujian nasional mata pelajaran Fisika.",
     mata_pelajaran: "Fisika",
@@ -45,6 +48,7 @@ export const DUMMY_PAKET_SOAL: PaketSoal[] = [
   },
   {
     id: 4,
+    kode_paket: "PKG-004",
     nama_paket: "PTS Kimia Semester Ganjil",
     deskripsi: "Paket soal Penilaian Tengah Semester untuk mata pelajaran Kimia.",
     mata_pelajaran: "Kimia",
@@ -59,6 +63,7 @@ export const DUMMY_PAKET_SOAL: PaketSoal[] = [
   },
   {
     id: 5,
+    kode_paket: "PKG-005",
     nama_paket: "Ulangan Harian Biologi - Sel",
     deskripsi: "Ulangan harian tentang struktur dan fungsi sel.",
     mata_pelajaran: "Biologi",

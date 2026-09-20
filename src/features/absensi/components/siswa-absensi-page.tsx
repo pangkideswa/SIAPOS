@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
@@ -46,6 +46,8 @@ export function SiswaAbsensiPage() {
   const { user } = useAuth()
   const siswaName = user?.name ?? ""
   const { data: siswaData } = useStudents()
+  const [page, setPage] = useState(1)
+  const perPage = 10
 
   const siswa = (siswaData ?? []).find(
     (s) =>
@@ -217,8 +219,12 @@ export function SiswaAbsensiPage() {
       <div>
         <h2 className="text-lg font-semibold mb-4">Riwayat Absensi</h2>
         <DataTable<AbsensiRow>
+          page={page}
+          perPage={perPage}
+          total={tableData.length}
+          onPageChange={setPage}
           columns={columns}
-          data={tableData}
+          data={tableData.slice((page - 1) * perPage, page * perPage)}
           loading={isLoading}
           emptyMessage={
             isError

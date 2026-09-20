@@ -54,6 +54,12 @@ export async function GET(
 
     if (!exam) return apiError(new Error("Exam tidak ditemukan"), 404)
 
+    // Check visibility logic (only students are blocked; assume admins/teachers hit a different route or we'd check roles here if they shared)
+    // Wait, this route uses requireApiUser("siswa") on line 12, so ONLY siswa can hit it!
+    if (!exam.tampilkan_nilai) {
+      return apiError(new Error("Hasil ujian belum dipublikasikan oleh Guru"), 403)
+    }
+
     return ok({ participant, exam }, "Hasil ujian berhasil dimuat")
   } catch (error) {
     return apiError(error)

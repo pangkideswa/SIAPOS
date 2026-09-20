@@ -9,11 +9,15 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
 import { Clock, FileText, AlertCircle, Loader2 } from "lucide-react"
-import { MATA_PELAJARAN_OPTIONS } from "../constants/cbt.constants"
+import { toast } from "sonner"
+import { PaginationControls } from "@/components/ui/pagination-controls"
+import type { CBTExam } from "@/features/cbt/types/cbt"
 
 export function SiswaCBTListPage() {
   const router = useRouter()
   const [mapelFilter, setMapelFilter] = useState<string>("semua")
+  const [page, setPage] = useState(1)
+  const perPage = 9
   const [exams, setExams] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -21,8 +25,9 @@ export function SiswaCBTListPage() {
     fetch("/api/student/exams?tipe=CBT")
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
-          setExams(data.data)
+        if (data.data || data.success) {
+          const sourceData = Array.isArray(data.data) ? data.data : (data.data?.data || [])
+          setExams(sourceData)
         }
         setIsLoading(false)
       })
@@ -118,7 +123,9 @@ export function SiswaCBTListPage() {
           <SelectTrigger className="w-full sm:w-[180px]"><SelectValue placeholder="Mata Pelajaran" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mata Pelajaran</SelectItem>
-            {MATA_PELAJARAN_OPTIONS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+            {Array.from(new Set(exams.map(d => d.paket_soal?.mata_pelajaran || d.teaching_class?.mata_pelajaran))).filter(Boolean).map((m) => (
+              <SelectItem key={m as string} value={m as string}>{m as string}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -130,55 +137,59 @@ export function SiswaCBTListPage() {
           </div>
         ) : filteredData.length === 0 ? (
           <div className="col-span-full flex justify-center py-10 text-muted-foreground">
-            Tidak ada ujian tersedia
+            Tidak ada CBT tersedia
           </div>
-        ) : filteredData.map((exam) => {
-          const status = getExamStatus(exam)
-          const mapel = exam.paket_soal?.mata_pelajaran || exam.teaching_class?.mata_pelajaran
+        ) : filteredData.slice((page - 1) * perPage, page * perPage).map((cbt) => {
+          const status = getExamStatus(cbt)
+          const mapel = cbt.paket_soal?.mata_pelajaran || cbt.teaching_class?.mata_pelajaran
           return (
-            <Card key={exam.id} className="hover:shadow-md transition-shadow">
+            <Card key={cbt.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5 space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-base">{exam.judul}</h3>
+                    <h3 className="font-semibold text-base">{cbt.judul}</h3>
                     <p className="text-sm text-muted-foreground">{mapel ?? "—"}</p>
                   </div>
                   <Badge className={getStatusBadge(status)}>{status}</Badge>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Kelas</span>
-                    <span className="font-medium">{exam.kelas}</span>
+                    <span className="text-muted-foreground">Guru</span>
+                    <span className="font-medium">{cbt.teaching_class?.guru_nama ?? "—"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Durasi</span>
-                    <span className="font-medium">{exam.durasi_menit} menit</span>
+                    <span className="font-medium">{cbt.durasi_menit} menit</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Soal</span>
-                    <span className="font-medium">{exam.paket_soal?._count?.items ?? 0} soal</span>
+                    <span className="font-medium">{cbt.paket_soal?._count?.items ?? 0} soal</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Deadline</span>
-                    <span className="font-medium">
-                      {exam.waktu_selesai ? new Date(exam.waktu_selesai).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "-"}
+                    <span className="text-muted-foreground">Jadwal</span>
+                    <span className="font-medium text-right">
+                      {cbt.waktu_mulai ? new Date(cbt.waktu_mulai).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "-"}
+                      <br/>
+                      s/d
+                      <br/>
+                      {cbt.waktu_selesai ? new Date(cbt.waktu_selesai).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "-"}
                     </span>
                   </div>
                 </div>
                 <div className="pt-2">
                   {status === "Berlangsung" ? (
                     <button
-                      onClick={() => router.push(`/siswa/cbt/${exam.id}/ujian`)}
+                      onClick={() => router.push(`/siswa/cbt/${cbt.id}/ujian`)}
                       className="w-full px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors"
                     >
-                      Mulai Ujian
+                      Mulai CBT
                     </button>
                   ) : (
                     <button
                       disabled
                       className="w-full px-4 py-2 bg-muted text-muted-foreground text-sm font-medium rounded-lg cursor-not-allowed"
                     >
-                      {status === "Belum Dimulai" ? "Menunggu" : "Selesai"}
+                      {status === "Belum Dimulai" ? "Menunggu Waktu" : "Selesai"}
                     </button>
                   )}
                 </div>
@@ -187,6 +198,14 @@ export function SiswaCBTListPage() {
           )
         })}
       </div>
+
+      <PaginationControls
+        page={page}
+        total={filteredData.length}
+        perPage={perPage}
+        onPageChange={setPage}
+        itemName="CBT"
+      />
     </div>
   )
 }

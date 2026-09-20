@@ -36,7 +36,7 @@ export function CBTFormDialog({
     if (open) {
       fetch("/api/exams/packages")
         .then(r => r.json())
-        .then(res => setPaketOptions(res.data || []))
+        .then(res => setPaketOptions(res.data?.data || res.data || []))
         .catch(console.error)
 
       fetch("/api/teaching-classes")
@@ -143,7 +143,7 @@ export function CBTFormDialog({
               <SelectContent>
                 {teachingClassOptions.map((tc) => (
                   <SelectItem key={tc.id} value={String(tc.id)}>
-                    {tc.subject?.name} - {tc.classroom?.name} ({tc.teacher?.nama_lengkap})
+                    {tc.mata_pelajaran} - {tc.kelas} ({tc.guru_nama})
                   </SelectItem>
                 ))}
               </SelectContent>

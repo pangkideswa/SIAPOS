@@ -218,10 +218,22 @@ export const examService = {
       maxPossibleScore += item.bobot
       
       const answer = participant.answers.find(a => a.bank_soal_id === item.bank_soal_id)
-      if (answer && item.bank_soal.tipe_soal === "PILIHAN_GANDA" && answer.selected_option_id) {
-        const correctOption = item.bank_soal.options.find(o => o.is_correct)
-        const isCorrect = correctOption && correctOption.id === answer.selected_option_id
-        
+      if (answer) {
+        let isCorrect = false;
+
+        if (item.bank_soal.tipe_soal === "PILIHAN_GANDA" && answer.selected_option_id) {
+          const correctOption = item.bank_soal.options.find(o => o.is_correct)
+          isCorrect = !!correctOption && correctOption.id === answer.selected_option_id
+        } else if (item.bank_soal.tipe_soal === "ESAI" && answer.jawaban_esai) {
+          const correctOption = item.bank_soal.options.find(o => o.is_correct)
+          if (correctOption) {
+            // Strict text match ignoring case and whitespace for "Isian Singkat"
+            const studentAns = answer.jawaban_esai.toLowerCase().trim()
+            const correctAns = correctOption.teks.toLowerCase().trim()
+            isCorrect = studentAns === correctAns
+          }
+        }
+
         // Update correct status in answer
         await prisma.examAnswer.update({
           where: { id: answer.id },

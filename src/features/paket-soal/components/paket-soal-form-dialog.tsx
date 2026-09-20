@@ -57,15 +57,15 @@ export function PaketSoalFormDialog({
           resBank.json()
         ])
 
-        if (dataTeachers.success) {
+        if (dataTeachers.data) {
            const items = dataTeachers.data.data ? dataTeachers.data.data : dataTeachers.data
            setTeachers(items)
         }
-        if (dataSubjects.success) {
+        if (dataSubjects.data) {
            const items = dataSubjects.data.data ? dataSubjects.data.data : dataSubjects.data
            setSubjects(items)
         }
-        if (dataBank.success) {
+        if (dataBank.data) {
            const mapped = dataBank.data.map((d: any) => ({
              id: d.id,
              kode_soal: d.kode_soal,

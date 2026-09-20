@@ -45,11 +45,12 @@ export function CBTListPage() {
   async function fetchCbts() {
     setIsLoading(true)
     try {
-      const res = await fetch("/api/exams")
+      const res = await fetch("/api/exams?tipe=CBT")
       const json = await res.json()
-      if (json.success) {
+      if (json.data || json.success) {
         // Map data to match frontend CBT interface
-        const mapped = json.data.map((d: any) => ({
+        const sourceData = Array.isArray(json.data) ? json.data : (json.data?.data || [])
+        const mapped = sourceData.map((d: any) => ({
           ...d,
           nama_ujian: d.judul,
           tanggal_mulai: d.waktu_mulai ? d.waktu_mulai : "",
@@ -250,6 +251,10 @@ export function CBTListPage() {
       </div>
 
       <DataTable
+        page={page}
+        perPage={perPage}
+        total={filteredData.length}
+        onPageChange={setPage}
         data={paginatedData as unknown as Record<string, unknown>[]}
         columns={columns}
         emptyMessage="Tidak ada ujian CBT ditemukan"

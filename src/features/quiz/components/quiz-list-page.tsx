@@ -47,11 +47,12 @@ export function QuizListPage() {
   async function fetchQuizzes() {
     setIsLoading(true)
     try {
-      const res = await fetch("/api/exams")
+      const res = await fetch("/api/exams?tipe=QUIZ")
       const json = await res.json()
-      if (json.success) {
+      if (json.data || json.success) {
         // Map data to match frontend Quiz interface
-        const mapped = json.data.map((d: any) => ({
+        const sourceData = Array.isArray(json.data) ? json.data : (json.data?.data || [])
+        const mapped = sourceData.map((d: any) => ({
           ...d,
           tanggal_mulai: d.waktu_mulai ? d.waktu_mulai : "",
           tanggal_berakhir: d.waktu_selesai ? d.waktu_selesai : "",
@@ -245,6 +246,10 @@ export function QuizListPage() {
       </div>
 
       <DataTable
+        page={page}
+        perPage={perPage}
+        total={filteredData.length}
+        onPageChange={setPage}
         data={paginatedData as unknown as Record<string, unknown>[]}
         columns={columns}
         emptyMessage="Tidak ada quiz ditemukan"

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,6 +45,7 @@ export function BankSoalListPage() {
   const [importDialogOpen, setImportDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<BankSoal | null>(null)
   const [deletingItem, setDeletingItem] = useState<BankSoal | null>(null)
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [data, setData] = useState<BankSoal[]>([])
   
@@ -58,9 +60,10 @@ export function BankSoalListPage() {
     try {
       const res = await fetch("/api/exams/bank")
       const json = await res.json()
-      if (json.success) {
+      if (json.data || json.success) {
         // Map database fields to frontend fields
-        const mapped = json.data.map((d: any) => ({
+        const sourceData = Array.isArray(json.data) ? json.data : (json.data?.data || [])
+        const mapped = sourceData.map((d: any) => ({
           ...d,
           tipe_soal: d.tipe_soal === "PILIHAN_GANDA" ? "Pilihan Ganda" : "Essay",
           kesulitan: d.kesulitan === "MUDAH" ? "Mudah" : d.kesulitan === "SEDANG" ? "Sedang" : "Sulit",
@@ -97,6 +100,37 @@ export function BankSoalListPage() {
   const guruOptions = Array.from(new Set(data.map(d => d.guru_nama))).filter(Boolean)
 
   const columns: Column<Record<string, unknown>>[] = [
+    {
+      key: "select",
+      header: (
+        <Checkbox
+          checked={paginatedData.length > 0 && selectedIds.length === paginatedData.length}
+          onCheckedChange={(checked) => {
+            if (checked) {
+              setSelectedIds(paginatedData.map((d) => Number(d.id)))
+            } else {
+              setSelectedIds([])
+            }
+          }}
+          aria-label="Select all"
+        />
+      ),
+      className: "w-[40px]",
+      render: (item) => (
+        <Checkbox
+          checked={selectedIds.includes(Number(item.id))}
+          onCheckedChange={(checked) => {
+            if (checked) {
+              setSelectedIds([...selectedIds, Number(item.id)])
+            } else {
+              setSelectedIds(selectedIds.filter((id) => id !== Number(item.id)))
+            }
+          }}
+          aria-label="Select row"
+          onClick={(e) => e.stopPropagation()}
+        />
+      ),
+    },
     {
       key: "kode_soal",
       header: "Kode",
@@ -183,25 +217,53 @@ export function BankSoalListPage() {
     }
   }
 
-  async function handleConfirmDelete() {
+  async function handleDeleteConfirm() {
     if (!deletingItem) return
     setIsLoading(true)
     try {
       const res = await fetch(`/api/exams/bank/${deletingItem.id}`, { method: "DELETE" })
-      if (!res.ok) throw new Error()
-      toast.success("Soal berhasil dihapus")
-      await fetchBankSoal()
+      if (res.ok) {
+        toast.success("Soal berhasil dihapus")
+        fetchBankSoal()
+      } else {
+        toast.error("Gagal menghapus soal")
+      }
+    } catch (error) {
+      toast.error("Terjadi kesalahan")
+    } finally {
+      setIsLoading(false)
       setDeleteDialogOpen(false)
       setDeletingItem(null)
-    } catch (err) {
-      toast.error("Gagal menghapus soal")
+    }
+  }
+
+  async function handleBulkDelete() {
+    if (!confirm(`Anda yakin ingin menghapus ${selectedIds.length} soal terpilih?`)) return
+    
+    setIsLoading(true)
+    try {
+      const res = await fetch("/api/exams/bank/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: selectedIds })
+      })
+      const result = await res.json()
+      if (res.ok) {
+        toast.success(result.message || `${selectedIds.length} soal berhasil dihapus`)
+        setSelectedIds([])
+        fetchBankSoal()
+      } else {
+        toast.error(result.message || "Gagal menghapus soal")
+      }
+    } catch (error) {
+      toast.error("Terjadi kesalahan jaringan")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20">
       <PageHeader
         title="Bank Soal"
         description="Kelola soal-soal untuk ujian dan penilaian"
@@ -283,11 +345,17 @@ export function BankSoalListPage() {
       </div>
 
       <DataTable
+        page={page}
+        perPage={perPage}
+        total={filteredData.length}
+        onPageChange={setPage}
         data={paginatedData as unknown as Record<string, unknown>[]}
         columns={columns}
         emptyMessage="Tidak ada soal ditemukan"
         onRowClick={(row) => router.push(`/admin/bank-soal/${(row as unknown as BankSoal).id}`)}
       />
+
+
 
       <BankSoalFormDialog
         open={FormDialogOpen}
@@ -301,7 +369,7 @@ export function BankSoalListPage() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         item={deletingItem}
-        onConfirm={handleConfirmDelete}
+        onConfirm={handleDeleteConfirm}
         isLoading={isLoading}
       />
 
@@ -314,8 +382,22 @@ export function BankSoalListPage() {
       <ImportAIDialog
         open={importDialogOpen}
         onOpenChange={setImportDialogOpen}
-        onSuccess={() => {}}
+        onSuccess={fetchBankSoal}
       />
+      
+      {/* Floating Bulk Action Bar */}
+      {selectedIds.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-card border shadow-lg rounded-full px-6 py-3 flex items-center gap-4 animate-in slide-in-from-bottom-10 fade-in">
+          <span className="text-sm font-medium">{selectedIds.length} soal terpilih</span>
+          <Button variant="destructive" size="sm" className="rounded-full" onClick={handleBulkDelete}>
+            <Trash2 className="h-4 w-4 mr-2" />
+            Hapus Terpilih
+          </Button>
+          <Button variant="ghost" size="sm" className="rounded-full h-8 w-8 p-0" onClick={() => setSelectedIds([])}>
+            X
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

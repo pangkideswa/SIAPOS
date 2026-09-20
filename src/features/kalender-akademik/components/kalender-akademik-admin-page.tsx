@@ -347,6 +347,10 @@ export function KalenderAkademikAdminPage() {
       </div>
 
       <DataTable<EventRow>
+        page={page}
+        perPage={PER_PAGE}
+        total={filteredData.length}
+        onPageChange={setPage}
         columns={columns}
         data={paginatedData as unknown as EventRow[]}
         emptyMessage="Tidak ada data kalender akademik"

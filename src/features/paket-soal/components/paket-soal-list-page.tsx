@@ -56,9 +56,11 @@ export function PaketSoalListPage() {
     try {
       const res = await fetch("/api/exams/packages")
       const json = await res.json()
-      if (json.success) {
-        const mapped = json.data.map((d: any) => ({
+      if (json.data || json.success) {
+        const sourceData = Array.isArray(json.data) ? json.data : (json.data?.data || [])
+        const mapped = sourceData.map((d: any) => ({
           ...d,
+          kode_paket: d.kode_paket,
           nama_paket: d.judul,
           status: d.status === "PUBLISH" ? "Aktif" : "Draft",
           guru_nama: d.guru?.nama_lengkap || "Sistem",
@@ -147,11 +149,18 @@ export function PaketSoalListPage() {
     setIsLoading(true)
     try {
       const dbPayload = {
+        kode_paket: editingItem?.kode_paket || `PKG-${Date.now()}`,
         judul: formData.nama_paket,
         deskripsi: formData.deskripsi,
         mata_pelajaran: formData.mata_pelajaran,
         durasi_menit: formData.durasi,
+        guru_id: formData.guru_id,
         status: formData.status === "Aktif" ? "PUBLISH" : "DRAFT",
+        items: formData.soal_ids.map((id, index) => ({
+          bank_soal_id: id,
+          bobot: 1, // Default weight
+          nomor_urut: index + 1
+        }))
       }
 
       if (editingItem) {
@@ -265,6 +274,10 @@ export function PaketSoalListPage() {
       </div>
 
       <DataTable
+        page={page}
+        perPage={perPage}
+        total={filteredData.length}
+        onPageChange={setPage}
         data={paginatedData as unknown as Record<string, unknown>[]}
         columns={columns}
         emptyMessage="Tidak ada paket soal ditemukan"

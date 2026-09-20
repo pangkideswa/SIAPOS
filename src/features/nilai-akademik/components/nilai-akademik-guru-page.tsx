@@ -237,6 +237,10 @@ export function NilaiAkademikGuruPage() {
       </div>
 
       <DataTable<Row>
+        page={page}
+        perPage={PER_PAGE}
+        total={filteredData.length}
+        onPageChange={setPage}
         columns={columns}
         data={paginatedData as unknown as Row[]}
         emptyMessage="Tidak ada data nilai ditemukan"

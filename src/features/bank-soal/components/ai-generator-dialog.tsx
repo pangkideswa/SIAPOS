@@ -38,17 +38,34 @@ interface AIGeneratorDialogProps {
 export function AIGeneratorDialog({ open, onOpenChange, onSuccess }: AIGeneratorDialogProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [subjects, setSubjects] = useState<{id: number, name: string}[]>([])
+  const [classes, setClasses] = useState<{id: number, name: string}[]>([])
 
   useEffect(() => {
-    fetch("/api/subjects")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          const items = data.data.data ? data.data.data : data.data
+    async function fetchMasterData() {
+      try {
+        const [resSubjects, resClasses] = await Promise.all([
+          fetch("/api/subjects"),
+          fetch("/api/classes")
+        ])
+        
+        const [dataSubjects, dataClasses] = await Promise.all([
+          resSubjects.json(),
+          resClasses.json()
+        ])
+
+        if (dataSubjects.data) {
+          const items = dataSubjects.data.data ? dataSubjects.data.data : dataSubjects.data
           setSubjects(items)
         }
-      })
-      .catch(console.error)
+        if (dataClasses.data) {
+          const items = dataClasses.data.data ? dataClasses.data.data : dataClasses.data
+          setClasses(items)
+        }
+      } catch (error) {
+        console.error("Gagal memuat data master", error)
+      }
+    }
+    fetchMasterData()
   }, [])
 
   const {
@@ -75,16 +92,23 @@ export function AIGeneratorDialog({ open, onOpenChange, onSuccess }: AIGenerator
   const onSubmit = async (data: AIGenerateValues) => {
     setIsGenerating(true)
     try {
-      // TODO: Connect to backend API for Gemini / OpenAI
-      // Simulasi loading AI
-      await new Promise(resolve => setTimeout(resolve, 3000))
+      const response = await fetch("/api/exams/bank/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+      const result = await response.json()
       
-      toast.success(`${data.jumlah_soal} Soal ${data.mata_pelajaran} berhasil di-generate!`)
+      if (!response.ok) {
+        throw new Error(result.message || "Gagal generate soal")
+      }
+      
+      toast.success(result.message || `${data.jumlah_soal} Soal ${data.mata_pelajaran} berhasil di-generate!`)
       onSuccess()
       reset()
       onOpenChange(false)
-    } catch (error) {
-      toast.error("Gagal men-generate soal. Silakan coba lagi.")
+    } catch (error: any) {
+      toast.error(error.message || "Gagal men-generate soal. Silakan coba lagi.")
     } finally {
       setIsGenerating(false)
     }
@@ -128,12 +152,18 @@ export function AIGeneratorDialog({ open, onOpenChange, onSuccess }: AIGenerator
 
             <div className="space-y-2">
               <Label htmlFor="tingkat">Kelas / Tingkat <span className="text-destructive">*</span></Label>
-              <Input
-                id="tingkat"
-                placeholder="Cth: Kelas X SMK"
-                className={errors.tingkat ? "border-destructive" : ""}
-                {...register("tingkat")}
-              />
+              <Select value={formValues.tingkat} onValueChange={(v) => setValue("tingkat", v || "")}>
+                <SelectTrigger className={errors.tingkat ? "border-destructive" : ""}>
+                  <SelectValue placeholder="Pilih kelas..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {classes.length > 0 ? classes.map((c) => (
+                    <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+                  )) : (
+                    <SelectItem value="loading" disabled>Memuat kelas...</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
               {errors.tingkat && <p className="text-xs text-destructive">{errors.tingkat.message}</p>}
             </div>
           </div>

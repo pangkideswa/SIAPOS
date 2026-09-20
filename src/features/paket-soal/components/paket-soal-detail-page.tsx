@@ -28,7 +28,7 @@ export function PaketSoalDetailPage({ id }: PaketSoalDetailPageProps) {
       try {
         const res = await fetch(`/api/exams/packages/${id}`)
         const json = await res.json()
-        if (json.success) {
+        if (json.data || json.success) {
           setPaket(json.data)
         }
       } catch (error) {

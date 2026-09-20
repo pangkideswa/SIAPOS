@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireApiUser("super_admin", "admin", "siswa")
+    const user = await requireApiUser("super_admin", "admin", "guru", "siswa")
     const body = parseWithSchema(submissionCreateSchema, await request.json())
     
     const sessionStudentId = await getStudentId(user)

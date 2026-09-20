@@ -25,7 +25,7 @@ export function BankSoalDetailPage({ id }: BankSoalDetailPageProps) {
       try {
         const res = await fetch(`/api/exams/bank/${id}`)
         const json = await res.json()
-        if (res.ok && json.success) {
+        if (res.ok && (json.data || json.success)) {
           setSoal(json.data)
         }
       } catch (error) {

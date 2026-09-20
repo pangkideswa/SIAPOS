@@ -514,7 +514,11 @@ export function HasilUjianListPage() {
 
       {/* DataTable */}
       <DataTable
-        columns={columns}
+
+        page={page}
+        perPage={perPage}
+        total={filteredData.length}
+        onPageChange={setPage}        columns={columns}
         data={paginatedData as unknown as Record<string, unknown>[]}
         loading={false}
         emptyMessage="Tidak ada hasil ujian ditemukan"

@@ -91,6 +91,7 @@ const navItems: NavEntry[] = [
   { type: "item", label: "Penilaian", href: "/guru/penilaian", icon: Award, roles: ["guru"] },
 
   { type: "label", label: "Evaluasi & Ujian" },
+  { type: "item", label: "Simulasi Tugas", href: "/guru/simulasi-tugas", icon: ClipboardCheck, roles: ["guru"] },
   { type: "item", label: "Bank Soal", href: "/guru/bank-soal", icon: ListChecks, roles: ["guru"] },
   { type: "item", label: "Paket Soal", href: "/guru/paket-soal", icon: ClipboardList, roles: ["guru"] },
   { type: "item", label: "Quiz", href: "/guru/quiz", icon: FileQuestion, roles: ["guru"] },

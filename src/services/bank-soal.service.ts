@@ -100,4 +100,12 @@ export const bankSoalService = {
       where: { id },
     })
   },
+
+  async bulkDelete(ids: number[]) {
+    return await prisma.bankSoal.deleteMany({
+      where: {
+        id: { in: ids }
+      }
+    })
+  },
 }
