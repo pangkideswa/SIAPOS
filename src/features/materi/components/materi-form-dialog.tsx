@@ -343,6 +343,7 @@ export function MateriFormDialog({
       onOpenChange={(next) => {
         if (!isLoading && !isUploading) onOpenChange(next)
       }}
+      disablePointerDismissal={true}
     >
       <ResponsiveDialogContent className="sm:max-w-2xl">
         <ResponsiveDialogHeader>
