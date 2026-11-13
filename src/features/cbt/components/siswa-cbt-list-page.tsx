@@ -50,10 +50,10 @@ export function SiswaCBTListPage() {
       if (participant.status === "MENGERJAKAN") return "Sedang Dikerjakan"
     }
     const now = new Date()
-    const mulai = new Date(cbt.waktu_mulai || cbt.created_at)
-    const berakhir = new Date(cbt.waktu_selesai || cbt.created_at)
-    if (now < mulai) return "Belum Dimulai"
-    if (now > berakhir) return "Telah Berakhir"
+    const mulai = cbt.waktu_mulai ? new Date(cbt.waktu_mulai) : null
+    const berakhir = cbt.waktu_selesai ? new Date(cbt.waktu_selesai) : null
+    if (mulai && now < mulai) return "Belum Dimulai"
+    if (berakhir && now > berakhir) return "Telah Berakhir"
     return "Tersedia"
   }
 
@@ -211,7 +211,7 @@ export function SiswaCBTListPage() {
                     >
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
                       {cbt.tampilkan_nilai
-                        ? `Lihat Hasil (Nilai: ${Math.round(participant.nilai_akhir || 0)})`
+                        ? `Lihat Hasil (Nilai: ${Math.round(participant?.nilai_akhir || 0)})`
                         : "Lihat Status Selesai (Hasil Dirahasiakan)"}
                     </button>
                   ) : status === "Sedang Dikerjakan" ? (
@@ -224,11 +224,11 @@ export function SiswaCBTListPage() {
                     </button>
                   ) : status === "Pelanggaran" ? (
                     <button
-                      disabled
-                      className="w-full px-4 py-2.5 bg-destructive/15 text-destructive text-xs sm:text-sm font-semibold rounded-lg cursor-not-allowed flex items-center justify-center gap-1.5"
+                      onClick={() => router.push(`/siswa/cbt/${cbt.id}/ujian`)}
+                      className="w-full px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-xs"
                     >
                       <ShieldAlert className="h-4 w-4" />
-                      Ujian Dibekukan (Pelanggaran)
+                      Ujian Terkunci (Cek Buka Kunci)
                     </button>
                   ) : status === "Tersedia" ? (
                     <button

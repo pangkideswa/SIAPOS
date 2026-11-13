@@ -72,6 +72,34 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
   const [inputToken, setInputToken] = useState("")
   const [isStarting, setIsStarting] = useState(false)
   const [isFullscreenActive, setIsFullscreenActive] = useState(true)
+  const [isCheckingUnlock, setIsCheckingUnlock] = useState(false)
+
+  async function checkUnlockStatus() {
+    setIsCheckingUnlock(true)
+    try {
+      const res = await fetch(`/api/exams/${id}/start`, { method: "POST" })
+      const json = await res.json()
+      if (json.data || json.success) {
+        const payload = json.data || json
+        if (payload.participant?.status === "MENGERJAKAN") {
+          setIsCurang(false)
+          setIsFinished(false)
+          setParticipant(payload.participant)
+          setViolationCount(payload.participant.violation_count || 0)
+          toast.success("Ujian telah dibuka kembali oleh pengawas! Memasuki ujian...")
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {})
+          }
+          return
+        }
+      }
+      toast.info("Status ujian masih dibekukan. Silakan hubungi pengawas di ruangan.")
+    } catch (e) {
+      toast.error("Gagal memeriksa status kunci ujian")
+    } finally {
+      setIsCheckingUnlock(false)
+    }
+  }
 
   // Track fullscreen state for student
   useEffect(() => {
@@ -120,7 +148,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
           if (loadedParticipant?.status === "CURANG") {
             setIsCurang(true)
             setIsStarted(true)
-            setIsFinished(true)
+            setIsFinished(false)
             setIsLoading(false)
             return
           }
@@ -137,7 +165,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
           }
 
           // Initialized remaining time from server
-          const remainingSecs = payload.remaining_seconds ?? 0
+          const remainingSecs = payload.remaining_seconds ?? (loadedExam.durasi_menit || 60) * 60
           setTimeLeft(remainingSecs)
           targetEndTimeRef.current = Date.now() + remainingSecs * 1000
 
@@ -188,8 +216,8 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
 
           setAnswers(Object.values(initialAnswersMap))
 
-          // If time is already up, trigger finish
-          if (remainingSecs <= 0) {
+          // If time is already up for an exam that is currently in progress, auto-finish
+          if (loadedParticipant?.status === "MENGERJAKAN" && remainingSecs <= 0) {
             handleFinish()
           }
         } else {
@@ -308,7 +336,9 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
       if (json.data || json.success) {
         const payload = json.data || json
         setParticipant(payload.participant)
-        const remainingSecs = payload.remaining_seconds ?? 0
+        const remainingSecs = (payload.remaining_seconds && payload.remaining_seconds > 0)
+          ? payload.remaining_seconds
+          : (exam.durasi_menit || 60) * 60
         setTimeLeft(remainingSecs)
         targetEndTimeRef.current = Date.now() + remainingSecs * 1000
 
@@ -492,35 +522,6 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
     )
   }
 
-  const [isCheckingUnlock, setIsCheckingUnlock] = useState(false)
-
-  async function checkUnlockStatus() {
-    setIsCheckingUnlock(true)
-    try {
-      const res = await fetch(`/api/exams/${id}/start`, { method: "POST" })
-      const json = await res.json()
-      if (json.data || json.success) {
-        const payload = json.data || json
-        if (payload.participant?.status === "MENGERJAKAN") {
-          setIsCurang(false)
-          setIsFinished(false)
-          setParticipant(payload.participant)
-          setViolationCount(payload.participant.violation_count || 0)
-          toast.success("Ujian telah dibuka kembali oleh pengawas! Memasuki ujian...")
-          if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(() => {})
-          }
-          return
-        }
-      }
-      toast.info("Status ujian masih dibekukan. Silakan hubungi pengawas di ruangan.")
-    } catch (e) {
-      toast.error("Gagal memeriksa status kunci ujian")
-    } finally {
-      setIsCheckingUnlock(false)
-    }
-  }
-
   if (isCurang) {
     return (
       <div className="max-w-xl mx-auto space-y-6 py-12 px-4 text-center">
@@ -601,7 +602,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
             <li>
               Dilarang berpindah tab, meminimalkan jendela browser, atau membuka aplikasi lain. Tindakan ini dicatat sebagai <strong>Pelanggaran Anti-Curang</strong>.
             </li>
-            <li>Maksimal toleransi pelanggaran adalah <strong>5 kali</strong>. Melebihi itu, lembar ujian otomatis terkunci.</li>
+            <li>Maksimal toleransi pelanggaran adalah <strong>3 kali</strong>. Melebihi itu, lembar ujian otomatis terkunci.</li>
             <li>Waktu ujian akan terus berjalan secara otomatis dan tidak dapat dihentikan sementara.</li>
           </ul>
         </div>
@@ -1067,11 +1068,11 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
 
           <div className="rounded-lg border p-4 bg-muted/40 space-y-3">
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Setiap kali Anda meninggalkan halaman ujian, sistem mencatatnya sebagai pelanggaran. Ujian akan otomatis dihentikan dan dibekukan jika mencapai 5 kali pelanggaran.
+              Setiap kali Anda meninggalkan halaman ujian, sistem mencatatnya sebagai pelanggaran. Ujian akan otomatis dihentikan dan dibekukan jika mencapai 3 kali pelanggaran.
             </p>
             <div className="flex justify-between items-center bg-destructive/10 border border-destructive/20 p-3 rounded-lg">
               <span className="text-xs font-semibold text-destructive">Total Pelanggaran Anda:</span>
-              <span className="text-lg font-extrabold text-destructive">{violationCount} / 5</span>
+              <span className="text-lg font-extrabold text-destructive">{violationCount} / 3</span>
             </div>
           </div>
 

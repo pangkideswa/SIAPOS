@@ -41,24 +41,10 @@ export async function POST(
     const exam = await examService.getById(examId)
     if (!exam) return apiError(new Error("Ujian tidak ditemukan"), 404)
 
-    // 2. Validate Exam Status & Schedule Window
+    // 2. Validate Exam Status
     if (exam.status !== "PUBLISH") {
       return apiError(new Error("Ujian ini belum dipublikasikan oleh Guru"), 403)
     }
-
-    const now = new Date()
-    if (exam.waktu_mulai && now < new Date(exam.waktu_mulai)) {
-      return apiError(new Error("Waktu pelaksanaan ujian belum dimulai"), 403)
-    }
-
-    if (exam.waktu_selesai && now > new Date(exam.waktu_selesai)) {
-      return apiError(new Error("Waktu pelaksanaan ujian telah berakhir"), 403)
-    }
-
-    // Parse request body for token or start signal if present
-    const body = await request.json().catch(() => ({}))
-    const providedToken = body?.token ? String(body.token).trim().toUpperCase() : null
-    const isExplicitStart = !!body?.start
 
     // 3. Check or Enroll Participant
     let participant = (await examService.getParticipant(examId, student.id)) as any
@@ -66,9 +52,21 @@ export async function POST(
       participant = (await examService.enrollStudent(examId, student.id)) as any
     }
 
-    if (participant.status === "CURANG") {
-      return apiError(new Error("Akses ujian diblokir karena terindikasi pelanggaran (Anti-Curang). Hubungi pengawas/guru."), 403)
+    const now = new Date()
+    // If student hasn't started yet, enforce start and end schedule window
+    if (participant.status === "BELUM_MULAI") {
+      if (exam.waktu_mulai && now < new Date(exam.waktu_mulai)) {
+        return apiError(new Error("Waktu pelaksanaan ujian belum dimulai"), 403)
+      }
+      if (exam.waktu_selesai && now > new Date(exam.waktu_selesai)) {
+        return apiError(new Error("Waktu pelaksanaan ujian telah berakhir"), 403)
+      }
     }
+
+    // Parse request body for token or start signal if present
+    const body = await request.json().catch(() => ({}))
+    const providedToken = body?.token ? String(body.token).trim().toUpperCase() : null
+    const isExplicitStart = !!body?.start
 
     // Token Validation: required if exam has token, participant is BELUM_MULAI, and student clicked start
     if (exam.token && exam.token.trim() !== "") {
@@ -82,7 +80,7 @@ export async function POST(
       }
     }
 
-    // Start exam timestamp when student explicitly starts or if already in progress
+    // Start exam timestamp when student explicitly starts
     if (participant.status === "BELUM_MULAI" && isExplicitStart) {
       participant = (await examService.startExam(participant.id)) as any
     }
@@ -93,18 +91,22 @@ export async function POST(
     // 4. Calculate accurate remaining time (Server-side truth)
     const durationMinutes = exam.durasi_menit || 60
     const durationSeconds = durationMinutes * 60
-    const startTime = new Date(participant.waktu_mulai || Date.now()).getTime()
-    const elapsedSeconds = Math.max(0, Math.floor((Date.now() - startTime) / 1000))
-    let remainingSeconds = Math.max(0, durationSeconds - elapsedSeconds)
+    let remainingSeconds = durationSeconds
 
-    if (exam.waktu_selesai) {
-      const scheduleRemaining = Math.max(0, Math.floor((new Date(exam.waktu_selesai).getTime() - Date.now()) / 1000))
-      remainingSeconds = Math.min(remainingSeconds, scheduleRemaining)
-    }
+    if (participant.status === "MENGERJAKAN" && participant.waktu_mulai) {
+      const startTime = new Date(participant.waktu_mulai).getTime()
+      const elapsedSeconds = Math.max(0, Math.floor((Date.now() - startTime) / 1000))
+      remainingSeconds = Math.max(0, durationSeconds - elapsedSeconds)
 
-    // If time has completely expired and participant has not submitted yet, auto-submit
-    if (remainingSeconds <= 0 && participant.status === "MENGERJAKAN") {
-      participant = await examService.submitExam(participant.id)
+      if (exam.waktu_selesai) {
+        const scheduleRemaining = Math.max(0, Math.floor((new Date(exam.waktu_selesai).getTime() - Date.now()) / 1000))
+        remainingSeconds = Math.min(remainingSeconds, scheduleRemaining)
+      }
+
+      // If time has completely expired and participant has not submitted yet, auto-submit
+      if (remainingSeconds <= 0) {
+        participant = await examService.submitExam(participant.id)
+      }
     }
 
     // 5. Sanitize questions & options (NEVER leak is_correct or pembahasan)

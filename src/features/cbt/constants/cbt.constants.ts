@@ -50,5 +50,5 @@ export const EMPTY_CBT_FORM: CBTExamFormData = {
   tampilkan_nilai: true,
   izinkan_kembali: true,
   auto_submit: true,
-  status: "Draft",
+  status: "Publish",
 }

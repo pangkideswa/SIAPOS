@@ -64,10 +64,22 @@ export const examService = {
   },
 
   async getForStudent(kelas: string, tipe?: ExamType, studentId?: number) {
+    const cleanKelas = (kelas || "").trim()
     return await prisma.exam.findMany({
       where: {
         status: "PUBLISH",
-        kelas: kelas,
+        ...(cleanKelas
+          ? {
+              OR: [
+                { kelas: { equals: kelas, mode: "insensitive" } },
+                { kelas: { equals: cleanKelas, mode: "insensitive" } },
+                { kelas: { contains: cleanKelas, mode: "insensitive" } },
+                { teaching_class: { kelas: { contains: cleanKelas, mode: "insensitive" } } },
+                { kelas: null },
+                { kelas: "" },
+              ],
+            }
+          : {}),
         ...(tipe ? { tipe } : {}),
       },
       include: {

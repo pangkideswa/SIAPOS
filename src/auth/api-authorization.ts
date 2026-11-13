@@ -83,7 +83,13 @@ export async function getStudentId(user: ApiUser): Promise<number | null> {
 export async function getStudentProfile(user: ApiUser) {
   if (user.role !== "siswa") return null
   return prisma.student.findFirst({
-    where: { user_id: user.id },
+    where: {
+      OR: [
+        { user_id: user.id },
+        ...(user.name ? [{ nama_lengkap: { equals: user.name, mode: "insensitive" as const } }] : []),
+        ...(user.email ? [{ user: { email: { equals: user.email, mode: "insensitive" as const } } }] : []),
+      ],
+    },
     select: { id: true, kelas: true, classroom_id: true },
   })
 }

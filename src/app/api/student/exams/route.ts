@@ -12,15 +12,23 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const tipe = searchParams.get("tipe") as ExamType | null
 
-    const student = await prisma.student.findUnique({
-      where: { user_id: user.id }
+    const student = await prisma.student.findFirst({
+      where: {
+        OR: [
+          { user_id: user.id },
+          ...(user.name ? [{ nama_lengkap: { equals: user.name, mode: "insensitive" as const } }] : []),
+          ...(user.email ? [{ user: { email: { equals: user.email, mode: "insensitive" as const } } }] : []),
+        ],
+      },
+      include: { classroom: true },
     })
 
-    if (!student || !student.kelas) {
-      return ok([]) // Return empty if student has no class
+    if (!student) {
+      return ok([]) // Return empty if student not found
     }
 
-    const items = await examService.getForStudent(student.kelas, tipe ?? undefined, student.id)
+    const studentClass = student.kelas || student.classroom?.name || ""
+    const items = await examService.getForStudent(studentClass, tipe ?? undefined, student.id)
     
     const mappedItems = items.map((item: any) => {
       const participant = item.participants?.[0] || null

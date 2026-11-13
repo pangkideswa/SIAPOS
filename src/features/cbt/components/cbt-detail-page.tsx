@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -41,6 +41,7 @@ import {
   KeyRound,
   Copy,
   FileCheck,
+  FileText,
   Check,
   X,
   Award,
@@ -81,6 +82,56 @@ export function CBTDetailPage({ id }: CBTDetailPageProps) {
   const [essayGrades, setEssayGrades] = useState<Record<number, number>>({})
   const [catatanGuru, setCatatanGuru] = useState("")
   const [isSavingGrade, setIsSavingGrade] = useState(false)
+
+  // Real-time dynamic grading statistics & score recalculation
+  const gradingSummary = useMemo(() => {
+    if (!gradingData?.questions) return null
+    let totalScore = 0
+    let maxPossible = 0
+    let correctCount = 0
+    let wrongCount = 0
+    let essayCount = 0
+    let pgCount = 0
+    let gradedEssayCount = 0
+
+    gradingData.questions.forEach((q: any) => {
+      maxPossible += q.bobot || 0
+      if (q.tipe_soal === "ESAI") {
+        essayCount++
+        const score = q.answer?.id ? essayGrades[q.answer.id] ?? q.answer.nilai ?? 0 : 0
+        totalScore += score
+        if (q.answer?.id && essayGrades[q.answer.id] !== undefined) {
+          gradedEssayCount++
+        }
+      } else {
+        pgCount++
+        if (q.answer?.is_correct) {
+          correctCount++
+          totalScore += q.bobot || 0
+        } else {
+          wrongCount++
+        }
+      }
+    })
+
+    const finalPct = maxPossible > 0 ? Math.round((totalScore / maxPossible) * 100) : 0
+    const kkm = gradingData.exam?.kkm ?? 75
+    const isLulus = finalPct >= kkm
+
+    return {
+      totalScore,
+      maxPossible,
+      finalPct,
+      kkm,
+      isLulus,
+      correctCount,
+      wrongCount,
+      essayCount,
+      pgCount,
+      gradedEssayCount,
+      totalQuestions: gradingData.questions.length,
+    }
+  }, [gradingData, essayGrades])
 
   const loadData = useCallback(async (quiet = false) => {
     if (!quiet) setIsRefreshing(true)
@@ -520,9 +571,9 @@ export function CBTDetailPage({ id }: CBTDetailPageProps) {
         const count = item.violation_count || 0
         if (count === 0) return <span className="text-xs text-muted-foreground">0</span>
         return (
-          <Badge className="bg-destructive/15 text-destructive font-bold text-xs">
+          <Badge className={`${count >= 3 ? "bg-red-500 text-white" : "bg-destructive/15 text-destructive"} font-bold text-xs`}>
             <ShieldAlert className="mr-1 h-3 w-3" />
-            {count}x
+            {count}/3
           </Badge>
         )
       },
@@ -1039,20 +1090,44 @@ export function CBTDetailPage({ id }: CBTDetailPageProps) {
 
       {/* Modal Koreksi Manual Esai & Review Lembar Jawaban Siswa */}
       <Dialog open={isGradingOpen} onOpenChange={setIsGradingOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0">
-          <DialogHeader className="p-6 pb-4 border-b">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <DialogTitle className="text-lg font-bold flex items-center gap-2">
-                  <FileCheck className="h-5 w-5 text-primary" />
-                  Lembar Jawaban: {gradingData?.participant?.nama_lengkap || "Siswa"}
-                </DialogTitle>
-                <DialogDescription className="text-xs mt-1">
-                  NISN: {gradingData?.participant?.nisn || "—"} | Kelas: {gradingData?.participant?.kelas || "—"} | Status:{" "}
-                  <span className="font-semibold">{gradingData?.participant?.status}</span>
-                </DialogDescription>
+        <DialogContent className="w-[96vw] max-w-5xl sm:max-w-5xl lg:max-w-6xl max-h-[92vh] flex flex-col p-0 overflow-hidden shadow-2xl rounded-2xl border bg-background">
+          <DialogHeader className="p-5 sm:p-6 pb-4 border-b bg-muted/20">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <FileCheck className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-lg sm:text-xl font-bold tracking-tight">
+                      Lembar Jawaban: {gradingData?.participant?.nama_lengkap || "Siswa"}
+                    </DialogTitle>
+                    <DialogDescription className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5">
+                      <span>NISN: <strong>{gradingData?.participant?.nisn || "—"}</strong></span>
+                      <span>•</span>
+                      <span>Kelas: <strong>{gradingData?.participant?.kelas || "—"}</strong></span>
+                      <span>•</span>
+                      <span>Status: <Badge variant="outline" className="text-[10px] uppercase font-bold py-0">{gradingData?.participant?.status || "—"}</Badge></span>
+                      <span>•</span>
+                      <span>
+                        Pelanggaran:{" "}
+                        <Badge
+                          className={`text-[10px] font-bold py-0 ${
+                            (gradingData?.participant?.violation_count || 0) >= 3
+                              ? "bg-rose-500 text-white"
+                              : "bg-destructive/15 text-destructive"
+                          }`}
+                        >
+                          {gradingData?.participant?.violation_count || 0}/3
+                        </Badge>
+                      </span>
+                    </DialogDescription>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
+
+              {/* Top Right: Score Overview & AI Button */}
+              <div className="flex items-center gap-3 self-end sm:self-center shrink-0">
                 {gradingData?.questions?.some((q: any) => q.tipe_soal === "ESAI") && (
                   <Button
                     type="button"
@@ -1060,7 +1135,7 @@ export function CBTDetailPage({ id }: CBTDetailPageProps) {
                     size="sm"
                     onClick={handleAiGrade}
                     disabled={isAiGrading || isGradingLoading}
-                    className="h-8 text-xs gap-1.5 border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:border-purple-800 dark:text-purple-300 font-semibold"
+                    className="h-9 text-xs gap-1.5 border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:border-purple-800 dark:text-purple-300 font-semibold shadow-xs"
                   >
                     {isAiGrading ? (
                       <>
@@ -1070,46 +1145,95 @@ export function CBTDetailPage({ id }: CBTDetailPageProps) {
                     ) : (
                       <>
                         <Sparkles className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
-                        <span>Koreksi Esai dengan AI</span>
+                        <span>Bantu Koreksi Esai AI</span>
                       </>
                     )}
                   </Button>
                 )}
-                {gradingData?.participant?.nilai_akhir !== null && (
-                  <div className="text-right">
-                    <span className="text-xs text-muted-foreground block">Nilai Akhir</span>
-                    <span className="text-2xl font-black text-primary">
-                      {Math.round(gradingData?.participant?.nilai_akhir)}
-                    </span>
+
+                {gradingSummary && (
+                  <div className="flex items-center gap-3 bg-card border rounded-xl p-2.5 px-4 shadow-xs">
+                    <div className="text-right">
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block">Nilai Akhir</span>
+                      <div className="flex items-baseline gap-1 justify-end">
+                        <span className="text-2xl sm:text-3xl font-black text-primary leading-none">
+                          {gradingSummary.finalPct}
+                        </span>
+                        <span className="text-xs text-muted-foreground font-semibold">/ 100</span>
+                      </div>
+                    </div>
+                    <Badge
+                      className={`text-xs px-2 py-0.5 font-bold ${
+                        gradingSummary.isLulus
+                          ? "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300"
+                          : "bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/50 dark:text-rose-300"
+                      }`}
+                    >
+                      {gradingSummary.isLulus ? "LULUS" : `REMEDIAL (KKM ${gradingSummary.kkm})`}
+                    </Badge>
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Quick Summary Pill Bar */}
+            {gradingSummary && (
+              <div className="flex flex-wrap items-center gap-2 pt-2 text-xs">
+                <span className="text-muted-foreground font-medium">Ringkasan:</span>
+                <span className="bg-muted px-2.5 py-0.5 rounded-full text-foreground font-semibold">
+                  {gradingSummary.totalQuestions} Butir Soal
+                </span>
+                <span className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 px-2.5 py-0.5 rounded-full font-semibold">
+                  ✓ {gradingSummary.correctCount} PG Benar
+                </span>
+                <span className="bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300 px-2.5 py-0.5 rounded-full font-semibold">
+                  ✗ {gradingSummary.wrongCount} PG Salah
+                </span>
+                {gradingSummary.essayCount > 0 && (
+                  <span className="bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300 px-2.5 py-0.5 rounded-full font-semibold">
+                    ✎ {gradingSummary.essayCount} Soal Esai
+                  </span>
+                )}
+              </div>
+            )}
           </DialogHeader>
 
           {/* Question & Answer List */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 bg-muted/10">
             {isGradingLoading ? (
-              <div className="flex flex-col items-center justify-center py-12 gap-3 text-muted-foreground">
-                <RefreshCw className="h-6 w-6 animate-spin text-primary" />
-                <p className="text-xs">Memuat lembar jawaban siswa...</p>
+              <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
+                <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm font-medium">Memuat lembar jawaban siswa...</p>
               </div>
             ) : gradingData?.questions?.length === 0 ? (
-              <div className="text-center py-10 text-muted-foreground text-sm">
-                Belum ada lembar jawaban yang diisi.
+              <div className="text-center py-16 text-muted-foreground text-sm border rounded-xl bg-card">
+                Belum ada lembar jawaban yang diisi untuk peserta ini.
               </div>
             ) : (
               gradingData?.questions?.map((q: any) => {
                 const isEssay = q.tipe_soal === "ESAI"
                 const ans = q.answer
                 const currentScore = ans?.id ? essayGrades[ans.id] ?? ans.nilai ?? 0 : 0
+                const isCorrect = ans?.is_correct
 
                 return (
-                  <div key={q.bank_soal_id} className="rounded-xl border p-5 bg-card space-y-3 shadow-xs">
-                    <div className="flex items-start justify-between gap-2 border-b pb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-primary">Soal No. {q.number}</span>
-                        <Badge variant="outline" className="text-xs">
+                  <div
+                    key={q.bank_soal_id}
+                    className={`rounded-xl border bg-card p-5 space-y-4 shadow-xs transition-all ${
+                      isEssay
+                        ? "border-primary/20"
+                        : isCorrect
+                        ? "border-emerald-200 dark:border-emerald-900/50"
+                        : "border-rose-200 dark:border-rose-900/50"
+                    }`}
+                  >
+                    {/* Header bar of question card */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="w-7 h-7 rounded-lg bg-primary/10 text-primary font-bold text-xs flex items-center justify-center shrink-0">
+                          #{q.number}
+                        </span>
+                        <Badge variant="outline" className="text-xs font-semibold">
                           {isEssay ? "Esai / Uraian" : "Pilihan Ganda"}
                         </Badge>
                         <Badge variant="secondary" className="text-xs font-mono">
@@ -1117,34 +1241,11 @@ export function CBTDetailPage({ id }: CBTDetailPageProps) {
                         </Badge>
                       </div>
 
-                      {/* Score Indicator */}
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-semibold text-muted-foreground">Skor:</span>
-                        <span className="text-sm font-bold text-foreground">
-                          {currentScore} / {q.bobot}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Question text */}
-                    <p className="text-sm font-medium leading-relaxed whitespace-pre-wrap">{q.pertanyaan}</p>
-
-                    {/* Answer Area */}
-                    {isEssay ? (
-                      <div className="space-y-3 pt-1">
-                        <div className="p-3.5 rounded-lg border bg-muted/30 space-y-1">
-                          <span className="text-xs font-semibold text-muted-foreground block uppercase">
-                            Jawaban Siswa:
-                          </span>
-                          <p className="text-sm font-normal text-foreground whitespace-pre-wrap">
-                            {ans?.jawaban_esai || <span className="text-muted-foreground italic">Tidak dijawab</span>}
-                          </p>
-                        </div>
-
-                        {/* Grading Controls for Essay */}
-                        <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg border bg-primary/5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-primary">Beri Nilai Esai:</span>
+                      {/* Right: Score status or grading controls */}
+                      {isEssay ? (
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-xs font-bold text-primary">Skor Esai:</span>
+                          <div className="flex items-center gap-1.5">
                             <Input
                               type="number"
                               min={0}
@@ -1156,88 +1257,210 @@ export function CBTDetailPage({ id }: CBTDetailPageProps) {
                                   setEssayGrades((prev) => ({ ...prev, [ans.id]: val }))
                                 }
                               }}
-                              className="w-20 h-8 text-center font-bold text-sm bg-background"
+                              className="w-16 h-8 text-center font-bold text-sm bg-background"
                             />
-                            <span className="text-xs text-muted-foreground">/ {q.bobot}</span>
+                            <span className="text-xs text-muted-foreground font-semibold">/ {q.bobot}</span>
                           </div>
 
                           {/* Quick Score Buttons */}
                           {ans?.id && (
-                            <div className="flex gap-1.5">
+                            <div className="flex gap-1">
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                className="h-7 text-xs px-2"
-                                onClick={() => setEssayGrades((prev) => ({ ...prev, [ans.id]: q.bobot }))}
+                                className="h-8 text-xs px-2"
+                                onClick={() => setEssayGrades((prev) => ({ ...prev, [ans.id]: 0 }))}
                               >
-                                Penuh ({q.bobot})
+                                0
                               </Button>
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                className="h-7 text-xs px-2"
+                                className="h-8 text-xs px-2"
                                 onClick={() =>
                                   setEssayGrades((prev) => ({ ...prev, [ans.id]: Math.round(q.bobot / 2) }))
                                 }
                               >
-                                Setengah ({Math.round(q.bobot / 2)})
+                                50%
                               </Button>
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                className="h-7 text-xs px-2"
-                                onClick={() => setEssayGrades((prev) => ({ ...prev, [ans.id]: 0 }))}
+                                className="h-8 text-xs px-2 font-semibold text-emerald-700 border-emerald-300 bg-emerald-50 hover:bg-emerald-100"
+                                onClick={() => setEssayGrades((prev) => ({ ...prev, [ans.id]: q.bobot }))}
                               >
-                                Nol (0)
+                                Penuh ({q.bobot})
                               </Button>
                             </div>
                           )}
                         </div>
+                      ) : (
+                        <div>
+                          {isCorrect ? (
+                            <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 font-bold text-xs gap-1">
+                              <Check className="h-3.5 w-3.5 text-emerald-600" />
+                              Benar (+{q.bobot} Poin)
+                            </Badge>
+                          ) : ans?.selected_option_id ? (
+                            <Badge className="bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/50 dark:text-rose-300 font-bold text-xs gap-1">
+                              <X className="h-3.5 w-3.5 text-rose-600" />
+                              Salah (0 Poin)
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-muted-foreground text-xs">
+                              — Tidak Dijawab (0 Poin)
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                    </div>
 
-                        {/* AI Feedback Analysis Badge */}
-                        {ans?.id && aiFeedbacks[ans.id] && (
-                          <div className="flex items-start gap-2.5 p-3 rounded-lg bg-purple-50/70 border border-purple-200 dark:bg-purple-950/30 dark:border-purple-800/50 text-xs text-purple-900 dark:text-purple-200">
-                            <Sparkles className="h-4 w-4 shrink-0 text-purple-600 dark:text-purple-400 mt-0.5" />
-                            <div className="space-y-0.5">
-                              <span className="font-bold text-[11px] text-purple-800 dark:text-purple-300">
-                                Rekomendasi & Analisis Koreksi AI:
+                    {/* Question text */}
+                    <div className="text-sm font-medium leading-relaxed whitespace-pre-wrap text-foreground">
+                      {q.pertanyaan}
+                    </div>
+
+                    {/* Multiple Choice Options List with Visual Precision */}
+                    {!isEssay && (
+                      <div className="space-y-2 pt-1">
+                        {q.options && q.options.length > 0 ? (
+                          <div className="grid gap-2">
+                            {q.options.map((opt: any, optIdx: number) => {
+                              const optionLetter = String.fromCharCode(65 + optIdx)
+                              const isSelected = ans?.selected_option_id === opt.id
+                              const isCorrectKey = opt.is_correct || opt.id === q.correct_option?.id
+
+                              let itemStyle = "border-border/60 bg-muted/20 text-muted-foreground"
+                              let badgeContent = null
+
+                              if (isSelected && isCorrectKey) {
+                                itemStyle =
+                                  "border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-100 ring-1 ring-emerald-500/40"
+                                badgeContent = (
+                                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 rounded-full">
+                                    <Check className="h-3 w-3" /> Pilihan Siswa (Benar)
+                                  </span>
+                                )
+                              } else if (isSelected && !isCorrectKey) {
+                                itemStyle =
+                                  "border-rose-400 bg-rose-50/70 dark:bg-rose-950/30 text-rose-900 dark:text-rose-100 ring-1 ring-rose-400/40"
+                                badgeContent = (
+                                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-900/60 px-2 py-0.5 rounded-full">
+                                    <X className="h-3 w-3" /> Pilihan Siswa (Salah)
+                                  </span>
+                                )
+                              } else if (!isSelected && isCorrectKey) {
+                                itemStyle =
+                                  "border-emerald-400/80 bg-emerald-50/40 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-200 border-dashed"
+                                badgeContent = (
+                                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100/70 dark:bg-emerald-900/40 px-2 py-0.5 rounded-full">
+                                    <Check className="h-3 w-3" /> Kunci Jawaban
+                                  </span>
+                                )
+                              }
+
+                              return (
+                                <div
+                                  key={opt.id}
+                                  className={`flex items-start justify-between gap-3 p-3 rounded-lg border text-sm transition-colors ${itemStyle}`}
+                                >
+                                  <div className="flex items-start gap-3">
+                                    <span
+                                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
+                                        isSelected && isCorrectKey
+                                          ? "bg-emerald-600 text-white"
+                                          : isSelected && !isCorrectKey
+                                          ? "bg-rose-600 text-white"
+                                          : isCorrectKey
+                                          ? "bg-emerald-200 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100"
+                                          : "bg-muted text-muted-foreground"
+                                      }`}
+                                    >
+                                      {optionLetter}
+                                    </span>
+                                    <span className="leading-relaxed">{opt.teks}</span>
+                                  </div>
+                                  {badgeContent && <div className="shrink-0">{badgeContent}</div>}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        ) : (
+                          /* Fallback side-by-side if options array is not loaded */
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div className="p-3.5 rounded-lg border bg-muted/30 space-y-1">
+                              <span className="text-[10px] text-muted-foreground block font-bold uppercase tracking-wider">
+                                Jawaban Siswa:
                               </span>
-                              <p className="leading-relaxed">{aiFeedbacks[ans.id]}</p>
+                              <span
+                                className={`text-sm font-semibold flex items-center gap-1.5 ${
+                                  isCorrect ? "text-emerald-600" : "text-destructive"
+                                }`}
+                              >
+                                {isCorrect ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
+                                {ans?.selected_option_teks || <span className="italic font-normal">Tidak dijawab</span>}
+                              </span>
+                            </div>
+
+                            <div className="p-3.5 rounded-lg border bg-emerald-500/10 border-emerald-500/30 text-emerald-950 dark:text-emerald-200 space-y-1">
+                              <span className="text-[10px] text-emerald-800 dark:text-emerald-400 block font-bold uppercase tracking-wider">
+                                Kunci Jawaban:
+                              </span>
+                              <span className="text-sm font-bold flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300">
+                                <Check className="h-4 w-4" />
+                                {q.correct_option?.teks || "—"}
+                              </span>
                             </div>
                           </div>
                         )}
                       </div>
-                    ) : (
-                      /* Multiple Choice Review */
-                      <div className="space-y-2 pt-1 text-xs">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <div className="p-2.5 rounded-lg border bg-muted/30">
-                            <span className="text-[10px] text-muted-foreground block font-bold uppercase">
-                              Jawaban Siswa:
-                            </span>
-                            <span
-                              className={`font-semibold flex items-center gap-1.5 mt-0.5 ${
-                                ans?.is_correct ? "text-green-600 font-bold" : "text-destructive font-bold"
-                              }`}
-                            >
-                              {ans?.is_correct ? <Check className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
-                              {ans?.selected_option_teks || <span className="italic font-normal">Tidak dijawab</span>}
-                            </span>
-                          </div>
+                    )}
 
-                          <div className="p-2.5 rounded-lg border bg-emerald-500/10 border-emerald-500/30 text-emerald-950 dark:text-emerald-200">
-                            <span className="text-[10px] text-emerald-800 dark:text-emerald-400 block font-bold uppercase">
-                              Kunci Jawaban:
-                            </span>
-                            <span className="font-bold flex items-center gap-1.5 mt-0.5 text-emerald-700 dark:text-emerald-300">
-                              <Check className="h-3.5 w-3.5" />
-                              {q.correct_option?.teks || "—"}
-                            </span>
-                          </div>
+                    {/* Essay Answer Details */}
+                    {isEssay && (
+                      <div className="space-y-3 pt-1">
+                        <div className="p-4 rounded-xl border bg-muted/20 border-border/80 space-y-1.5">
+                          <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                            <FileText className="h-3.5 w-3.5 text-primary" />
+                            Jawaban Siswa:
+                          </span>
+                          <p className="text-sm font-normal text-foreground leading-relaxed whitespace-pre-wrap pl-5 border-l-2 border-primary/40">
+                            {ans?.jawaban_esai || <span className="text-muted-foreground italic">Siswa tidak mengisi jawaban pada butir ini.</span>}
+                          </p>
                         </div>
+
+                        {q.pembahasan && (
+                          <div className="p-3.5 rounded-lg border border-emerald-200 bg-emerald-50/50 dark:bg-emerald-950/20 text-xs text-emerald-900 dark:text-emerald-200 space-y-1">
+                            <span className="font-bold text-emerald-800 dark:text-emerald-300 block uppercase tracking-wider text-[11px]">
+                              Rubrik / Kunci Jawaban Guru:
+                            </span>
+                            <p className="leading-relaxed whitespace-pre-wrap">{q.pembahasan}</p>
+                          </div>
+                        )}
+
+                        {/* AI Feedback Analysis Badge */}
+                        {ans?.id && aiFeedbacks[ans.id] && (
+                          <div className="flex items-start gap-2.5 p-3.5 rounded-lg bg-purple-50 border border-purple-200 dark:bg-purple-950/30 dark:border-purple-800/50 text-xs text-purple-900 dark:text-purple-200 shadow-xs">
+                            <Sparkles className="h-4 w-4 shrink-0 text-purple-600 dark:text-purple-400 mt-0.5" />
+                            <div className="space-y-1">
+                              <span className="font-bold text-[11px] text-purple-800 dark:text-purple-300 block">
+                                Rekomendasi & Analisis Koreksi AI:
+                              </span>
+                              <p className="leading-relaxed whitespace-pre-wrap">{aiFeedbacks[ans.id]}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Pembahasan Soal jika ada */}
+                    {!isEssay && q.pembahasan && (
+                      <div className="p-3 rounded-lg bg-muted/40 border text-xs text-muted-foreground space-y-1">
+                        <span className="font-bold text-foreground text-[11px] block">Pembahasan Soal:</span>
+                        <p className="leading-relaxed whitespace-pre-wrap">{q.pembahasan}</p>
                       </div>
                     )}
                   </div>
@@ -1247,30 +1470,38 @@ export function CBTDetailPage({ id }: CBTDetailPageProps) {
 
             {/* Teacher Notes Area */}
             {gradingData && (
-              <div className="space-y-2 pt-2 border-t">
-                <label className="text-xs font-bold text-foreground">Catatan / Evaluasi Guru untuk Siswa:</label>
+              <div className="space-y-2 pt-3 border-t bg-card p-4 rounded-xl border">
+                <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <Award className="h-3.5 w-3.5 text-primary" />
+                  Catatan / Evaluasi Guru untuk Siswa:
+                </label>
                 <textarea
                   value={catatanGuru}
                   onChange={(e) => setCatatanGuru(e.target.value)}
-                  placeholder="Tambahkan catatan atau masukan untuk siswa ini (opsional)..."
-                  className="w-full p-3 rounded-lg border text-xs min-h-[70px] outline-none focus:border-primary"
+                  placeholder="Berikan masukan, motivasi, atau catatan evaluasi untuk siswa ini (opsional)..."
+                  className="w-full p-3 rounded-lg border text-xs min-h-[75px] outline-none focus:border-primary bg-background"
                 />
               </div>
             )}
           </div>
 
-          <DialogFooter className="p-4 border-t bg-muted/20 gap-2">
-            <Button variant="outline" onClick={() => setIsGradingOpen(false)} disabled={isSavingGrade}>
-              Tutup
-            </Button>
-            <Button
-              onClick={handleSaveGrades}
-              disabled={isSavingGrade || isGradingLoading}
-              className="bg-primary text-white font-semibold"
-            >
-              <Award className="mr-1.5 h-4 w-4" />
-              {isSavingGrade ? "Menyimpan..." : "Simpan Penilaian & Nilai Akhir"}
-            </Button>
+          <DialogFooter className="p-4 sm:px-6 border-t bg-muted/20 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="text-xs text-muted-foreground flex items-center gap-2">
+              <span>Perubahan nilai akan otomatis memperbarui nilai akhir rapor siswa.</span>
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <Button variant="outline" onClick={() => setIsGradingOpen(false)} disabled={isSavingGrade}>
+                Tutup
+              </Button>
+              <Button
+                onClick={handleSaveGrades}
+                disabled={isSavingGrade || isGradingLoading}
+                className="bg-primary text-white font-semibold gap-1.5"
+              >
+                <Award className="h-4 w-4" />
+                {isSavingGrade ? "Menyimpan..." : "Simpan Penilaian & Nilai Akhir"}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

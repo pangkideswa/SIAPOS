@@ -119,6 +119,33 @@ Dokumen ini mencatat seluruh perbaikan, peningkatan logika, dan penyesuaian fung
     - **Status DRAFT / Draft:** Kuning Amber (`bg-amber-100 text-amber-800 border-amber-300`)
   - Pada [`paket-soal-detail-page.tsx`](file:///d:/SIAPOS/src/features/paket-soal/components/paket-soal-detail-page.tsx), badge kini menampilkan teks yang diformat ramah (*Mudah*, *Sedang*, *Sulit*, dan *Aktif / Terbit*) dengan warna latar dan teks yang kontras tinggi.
 
+### 13. Perbaikan Akses Masuk Siswa ke CBT (Student Entry & Session Lifecycle)
+- **Masalah Awal:** Siswa tidak dapat masuk ke lembar ujian CBT atau langsung terlempar keluar dengan status selesai / jadwal berakhir.
+- **Penyebab & Solusi:**
+  1. **Pencocokan Kelas Fleksibel:** Kelas siswa di database memiliki variasi spasi (`"Kelas XII "`), sementara perbandingan di API sebelumnya menggunakan pencocokan kaku. Diperbaiki di [`src/services/exam.service.ts`](file:///d:/SIAPOS/src/services/exam.service.ts) dengan dukungan `cleanKelas`, `mode: "insensitive"`, dan relasi rombel `teaching_class`.
+  2. **Pencegahan Auto-Finish Prematur:** Di [`src/features/cbt/components/cbt-exam-page.tsx`](file:///d:/SIAPOS/src/features/cbt/components/cbt-exam-page.tsx), `handleFinish()` sebelumnya terpanggil otomatis saat memuat halaman jika `remaining_seconds <= 0`. Sekarang hanya aktif jika status siswa memang sedang `MENGERJAKAN`. Bagi siswa `BELUM_MULAI`, sisa waktu selalu diawali dengan durasi penuh ujian.
+  3. **Penanganan Status CURANG:** Di [`src/app/api/exams/[id]/start/route.ts`](file:///d:/SIAPOS/src/app/api/exams/[id]/start/route.ts), menghilangkan respons 403 fatal agar halaman ujian tetap memuat data dan merender layar penangguhan anti-curang beserta tombol **"Cek Status Buka Kunci"**.
+  4. **Tombol Interaktif Siswa:** Di [`src/features/cbt/components/siswa-cbt-list-page.tsx`](file:///d:/SIAPOS/src/features/cbt/components/siswa-cbt-list-page.tsx), tombol kartu ujian berstatus "Pelanggaran" diubah menjadi tombol aktif **"Ujian Terkunci (Cek Buka Kunci)"** agar siswa dapat langsung mengakses halaman status.
+  5. **Status Ketersediaan Ujian:** Memperbaiki logika tanggal selesai agar ujian dengan batas fleksibel tidak otomatis dikunci sebagai "Telah Berakhir".
+
+### 14. Redesain Elegan Lembar Jawaban & Koreksi Guru (Modal Grading Workspace)
+- **Masalah Awal:** Modal koreksi lembar jawaban peserta di monitoring guru tampil sangat sempit (terbatas pada lebar bawaan `sm:max-w-sm` 384px), teks dan indikator skor berantakan, serta perbandingan jawaban pilihan ganda terlihat terhimpit.
+- **Penyempurnaan:**
+  - **Ukuran Workspace Luas & Responsif:** Modal diperluas menjadi `sm:max-w-5xl lg:max-w-6xl` di [`src/features/cbt/components/cbt-detail-page.tsx`](file:///d:/SIAPOS/src/features/cbt/components/cbt-detail-page.tsx) dengan bayangan halus, border presisi, dan tata letak profesional seperti modul lainnya.
+  - **Header Informasi Terstruktur:** Dilengkapi identitas siswa (NISN, Rombel, Status Ujian, Status Pelanggaran `x/3`), kartu Nilai Akhir real-time, badge kelulusan KKM, serta ringkasan cepat butir soal (Total, Benar, Salah, Esai).
+  - **Verifikasi Pilihan Ganda (A, B, C, D):** Menampilkan seluruh butir pilihan jawaban dengan penanda visual berkelas:
+    - Opsi pilihan siswa yang benar: highlight hijau emerald dengan lencana `✓ Pilihan Siswa (Benar)`.
+    - Opsi pilihan siswa yang salah: highlight merah rose dengan lencana `✗ Pilihan Siswa (Salah)`.
+    - Opsi kunci jawaban yang sebenarnya: highlight hijau putus-putus dengan lencana `✓ Kunci Jawaban`.
+  - **Kalkulasi Nilai Real-Time (`useMemo`):** Saat guru mengubah skor butir esai (atau menggunakan tombol cepat 0, 50%, Penuh), Nilai Akhir di header otomatis dikalkulasi ulang secara langsung.
+
+### 15. Standardisasi Batas Toleransi Pelanggaran Anti-Curang (Maksimal 3 Kali)
+- **Penyesuaian:** Mengubah batas toleransi anti-curang dari 5 kali menjadi **maksimal 3 kali (3x)** secara konsisten di seluruh modul:
+  - Backend API [`src/app/api/exams/submit/route.ts`](file:///d:/SIAPOS/src/app/api/exams/submit/route.ts): `MAX_VIOLATIONS = 3`. Pada pelanggaran ke-3, ujian otomatis terkunci dengan status `CURANG`.
+  - UI Tata Tertib Siswa [`src/features/cbt/components/cbt-exam-page.tsx`](file:///d:/SIAPOS/src/features/cbt/components/cbt-exam-page.tsx): Diperbarui menjadi *"Maksimal toleransi pelanggaran adalah 3 kali"*.
+  - Modal Peringatan Anti-Curang: Diperbarui menjadi `Total Pelanggaran Anda: {count} / 3`.
+  - Tabel Monitoring Guru: Kolom pelanggaran menampilkan indikator `{count}/3` dengan sorotan merah jika mencapai 3x.
+
 ---
 
 ## Verifikasi & Pengujian Sistem

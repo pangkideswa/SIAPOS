@@ -54,8 +54,8 @@ export async function POST(request: NextRequest) {
         }
       })
 
-      // Maximum 5 violations tolerance for anti-cheat
-      const MAX_VIOLATIONS = 5
+      // Maximum 3 violations tolerance for anti-cheat
+      const MAX_VIOLATIONS = 3
       if (updated.violation_count >= MAX_VIOLATIONS) {
         // Submit exam answers first to evaluate whatever was answered
         await examService.submitExam(participant_id)

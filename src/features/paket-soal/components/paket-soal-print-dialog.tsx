@@ -110,14 +110,47 @@ export function PaketSoalPrintDialog({
           >
             {/* KOP Penilaian Ujian */}
             {includeHeader && (
-              <div className="border-b-2 border-black dark:border-foreground pb-4 mb-6 text-center">
-                <p className="text-xs uppercase tracking-widest font-bold">
-                  Sistem Informasi Administrasi & Pembelajaran Online Sekolah (SIAPOS)
-                </p>
-                <h1 className="text-xl font-black uppercase tracking-tight mt-1">
-                  Naskah Penilaian / Ujian Berbasis Komputer (CBT)
-                </h1>
-                <div className="grid grid-cols-2 text-left text-xs mt-4 pt-3 border-t border-slate-300 dark:border-border gap-y-1 gap-x-4">
+              <div className="pb-4 mb-6">
+                {/* Header with Logo SIAPOS & Formal Institution Info */}
+                <div className="flex items-center justify-between gap-4">
+                  {/* Left Logo */}
+                  <div className="shrink-0 flex items-center justify-center">
+                    <img
+                      src="/favicon.png"
+                      alt="Logo SIAPOS"
+                      className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-sm print:drop-shadow-none print:w-20 print:h-20"
+                    />
+                  </div>
+
+                  {/* Center Text */}
+                  <div className="flex-1 text-center space-y-0.5">
+                    <p className="text-[11px] sm:text-xs uppercase tracking-wider font-bold text-muted-foreground">
+                      SISTEM INFORMASI ADMINISTRASI & PEMBELAJARAN ONLINE SEKOLAH
+                    </p>
+                    <h2 className="text-sm sm:text-base font-extrabold tracking-wide text-foreground">
+                      SIAPOS EDUCATION OPERATING SYSTEM
+                    </h2>
+                    <h1 className="text-base sm:text-xl font-black uppercase tracking-tight text-foreground pt-0.5">
+                      Naskah Penilaian / Ujian Berbasis Komputer (CBT)
+                    </h1>
+                    <p className="text-[11px] text-muted-foreground italic">
+                      Platform Asesmen & Arsip Bank Soal Kurikulum Terpadu
+                    </p>
+                  </div>
+
+                  {/* Right Spacer for balanced centering */}
+                  <div
+                    className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 hidden sm:flex items-center justify-center opacity-0 pointer-events-none print:flex print:w-20 print:h-20"
+                    aria-hidden="true"
+                  >
+                    <div className="w-16 h-16 sm:w-20 sm:h-20" />
+                  </div>
+                </div>
+
+                {/* Formal Double Border Divider (KOP Resmi Standar Sekolah) */}
+                <div className="border-b-[3px] border-double border-slate-900 dark:border-foreground/80 mt-3 mb-4 print:border-black" />
+
+                <div className="grid grid-cols-2 text-left text-xs gap-y-1.5 gap-x-6 p-3 bg-slate-50/80 dark:bg-muted/20 rounded-md border border-slate-200 dark:border-border print:bg-transparent print:border-slate-300">
                   <div>
                     <span className="font-semibold text-muted-foreground">Mata Pelajaran:</span>{" "}
                     <strong className="text-foreground">{paket.mata_pelajaran}</strong>
@@ -136,7 +169,7 @@ export function PaketSoalPrintDialog({
                   </div>
                 </div>
 
-                <div className="mt-3 p-2 bg-slate-50 dark:bg-muted/30 rounded border border-slate-200 dark:border-border text-left text-[11px] text-muted-foreground space-y-0.5">
+                <div className="mt-3 p-2.5 bg-slate-50 dark:bg-muted/30 rounded border border-slate-200 dark:border-border text-left text-[11px] text-muted-foreground space-y-0.5 print:bg-transparent print:border-slate-300">
                   <p className="font-bold text-foreground">PETUNJUK UMUM:</p>
                   <ol className="list-decimal list-inside space-y-0.5 pl-1">
                     <li>Berdoalah sebelum mulai mengerjakan soal.</li>
