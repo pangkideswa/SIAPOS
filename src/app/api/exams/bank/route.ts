@@ -4,19 +4,22 @@ import { bankSoalService } from "@/services/bank-soal.service"
 import { ok, created, apiError } from "@/lib/api-utils"
 import { isAdmin, requireApiUser } from "@/auth/api-authorization"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const user = await requireApiUser("super_admin", "admin", "guru")
+    const scope = request.nextUrl.searchParams.get("scope")
     
-    let actualGuruId: number | undefined = undefined
-    if (user.role === "guru") {
+    if (user.role === "guru" && scope !== "all") {
       const teacher = await import("@/lib/prisma").then(m => m.prisma.teacher.findUnique({
-        where: { user_id: user.id }
+        where: { user_id: user.id },
+        select: { id: true }
       }))
-      actualGuruId = teacher?.id
+      if (!teacher) return ok([])
+      const items = await bankSoalService.getAll(teacher.id)
+      return ok(items)
     }
 
-    const items = await bankSoalService.getAll(isAdmin(user) ? undefined : actualGuruId)
+    const items = await bankSoalService.getAll()
     return ok(items)
   } catch (error) {
     return apiError(error)

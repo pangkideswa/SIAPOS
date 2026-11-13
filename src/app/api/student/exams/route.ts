@@ -20,9 +20,18 @@ export async function GET(request: NextRequest) {
       return ok([]) // Return empty if student has no class
     }
 
-    const items = await examService.getForStudent(student.kelas, tipe ?? undefined)
+    const items = await examService.getForStudent(student.kelas, tipe ?? undefined, student.id)
     
-    return ok(items)
+    const mappedItems = items.map((item: any) => {
+      const participant = item.participants?.[0] || null
+      const { participants, ...rest } = item
+      return {
+        ...rest,
+        participant,
+      }
+    })
+
+    return ok(mappedItems)
   } catch (error) {
     return apiError(error)
   }

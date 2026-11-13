@@ -722,6 +722,7 @@ model Exam {
   acak_urutan_soal  Boolean        @default(false)
   acak_urutan_jawaban Boolean      @default(false)
   tampilkan_nilai   Boolean        @default(false)
+  token             String?
   status            ExamStatus     @default(DRAFT)
   created_at        DateTime       @default(now())
   updated_at        DateTime       @updatedAt

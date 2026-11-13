@@ -93,11 +93,11 @@ function mapPrismaError(error: unknown): { message: string; status: number } {
 // ============================================================================
 
 export function ok<T>(data: T, message?: string) {
-  return NextResponse.json({ data, message })
+  return NextResponse.json({ success: true, data, message })
 }
 
 export function created<T>(data: T, message?: string) {
-  return NextResponse.json({ data, message }, { status: 201 })
+  return NextResponse.json({ success: true, data, message }, { status: 201 })
 }
 
 export function apiError(error: unknown, status = 500) {

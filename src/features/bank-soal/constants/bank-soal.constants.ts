@@ -12,15 +12,23 @@ export const TIPE_SOAL_COLORS: Record<string, string> = {
 }
 
 export const KESULITAN_COLORS: Record<string, string> = {
-  Mudah: "bg-green-100 text-green-800",
-  Sedang: "bg-yellow-100 text-yellow-800",
-  Sulit: "bg-red-100 text-red-800",
+  Mudah: "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300",
+  MUDAH: "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300",
+  Sedang: "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300",
+  SEDANG: "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300",
+  Sulit: "bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300",
+  SULIT: "bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/60 dark:text-rose-300",
 }
 
 export const STATUS_BANK_SOAL_COLORS: Record<string, string> = {
-  Draft: "bg-yellow-100 text-yellow-800",
-  Aktif: "bg-green-100 text-green-800",
-  Arsip: "bg-muted text-foreground",
+  Draft: "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300",
+  DRAFT: "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300",
+  Aktif: "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300",
+  AKTIF: "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300",
+  Publish: "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300",
+  PUBLISH: "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300",
+  Arsip: "bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-200",
+  ARSIP: "bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-200",
 }
 
 export const MATA_PELAJARAN_OPTIONS = [

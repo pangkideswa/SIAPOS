@@ -60,6 +60,7 @@ export type ExamMinAggregateOutputType = {
   acak_urutan_soal: boolean | null
   acak_urutan_jawaban: boolean | null
   tampilkan_nilai: boolean | null
+  token: string | null
   status: $Enums.ExamStatus | null
   created_at: Date | null
   updated_at: Date | null
@@ -81,6 +82,7 @@ export type ExamMaxAggregateOutputType = {
   acak_urutan_soal: boolean | null
   acak_urutan_jawaban: boolean | null
   tampilkan_nilai: boolean | null
+  token: string | null
   status: $Enums.ExamStatus | null
   created_at: Date | null
   updated_at: Date | null
@@ -102,6 +104,7 @@ export type ExamCountAggregateOutputType = {
   acak_urutan_soal: number
   acak_urutan_jawaban: number
   tampilkan_nilai: number
+  token: number
   status: number
   created_at: number
   updated_at: number
@@ -143,6 +146,7 @@ export type ExamMinAggregateInputType = {
   acak_urutan_soal?: true
   acak_urutan_jawaban?: true
   tampilkan_nilai?: true
+  token?: true
   status?: true
   created_at?: true
   updated_at?: true
@@ -164,6 +168,7 @@ export type ExamMaxAggregateInputType = {
   acak_urutan_soal?: true
   acak_urutan_jawaban?: true
   tampilkan_nilai?: true
+  token?: true
   status?: true
   created_at?: true
   updated_at?: true
@@ -185,6 +190,7 @@ export type ExamCountAggregateInputType = {
   acak_urutan_soal?: true
   acak_urutan_jawaban?: true
   tampilkan_nilai?: true
+  token?: true
   status?: true
   created_at?: true
   updated_at?: true
@@ -293,6 +299,7 @@ export type ExamGroupByOutputType = {
   acak_urutan_soal: boolean
   acak_urutan_jawaban: boolean
   tampilkan_nilai: boolean
+  token: string | null
   status: $Enums.ExamStatus
   created_at: Date
   updated_at: Date
@@ -337,6 +344,7 @@ export type ExamWhereInput = {
   acak_urutan_soal?: Prisma.BoolFilter<"Exam"> | boolean
   acak_urutan_jawaban?: Prisma.BoolFilter<"Exam"> | boolean
   tampilkan_nilai?: Prisma.BoolFilter<"Exam"> | boolean
+  token?: Prisma.StringNullableFilter<"Exam"> | string | null
   status?: Prisma.EnumExamStatusFilter<"Exam"> | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFilter<"Exam"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Exam"> | Date | string
@@ -361,6 +369,7 @@ export type ExamOrderByWithRelationInput = {
   acak_urutan_soal?: Prisma.SortOrder
   acak_urutan_jawaban?: Prisma.SortOrder
   tampilkan_nilai?: Prisma.SortOrder
+  token?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -388,6 +397,7 @@ export type ExamWhereUniqueInput = Prisma.AtLeast<{
   acak_urutan_soal?: Prisma.BoolFilter<"Exam"> | boolean
   acak_urutan_jawaban?: Prisma.BoolFilter<"Exam"> | boolean
   tampilkan_nilai?: Prisma.BoolFilter<"Exam"> | boolean
+  token?: Prisma.StringNullableFilter<"Exam"> | string | null
   status?: Prisma.EnumExamStatusFilter<"Exam"> | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFilter<"Exam"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Exam"> | Date | string
@@ -412,6 +422,7 @@ export type ExamOrderByWithAggregationInput = {
   acak_urutan_soal?: Prisma.SortOrder
   acak_urutan_jawaban?: Prisma.SortOrder
   tampilkan_nilai?: Prisma.SortOrder
+  token?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -441,6 +452,7 @@ export type ExamScalarWhereWithAggregatesInput = {
   acak_urutan_soal?: Prisma.BoolWithAggregatesFilter<"Exam"> | boolean
   acak_urutan_jawaban?: Prisma.BoolWithAggregatesFilter<"Exam"> | boolean
   tampilkan_nilai?: Prisma.BoolWithAggregatesFilter<"Exam"> | boolean
+  token?: Prisma.StringNullableWithAggregatesFilter<"Exam"> | string | null
   status?: Prisma.EnumExamStatusWithAggregatesFilter<"Exam"> | $Enums.ExamStatus
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Exam"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"Exam"> | Date | string
@@ -459,6 +471,7 @@ export type ExamCreateInput = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: string | null
   status?: $Enums.ExamStatus
   created_at?: Date | string
   updated_at?: Date | string
@@ -483,6 +496,7 @@ export type ExamUncheckedCreateInput = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: string | null
   status?: $Enums.ExamStatus
   created_at?: Date | string
   updated_at?: Date | string
@@ -502,6 +516,7 @@ export type ExamUpdateInput = {
   acak_urutan_soal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acak_urutan_jawaban?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tampilkan_nilai?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumExamStatusFieldUpdateOperationsInput | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -526,6 +541,7 @@ export type ExamUncheckedUpdateInput = {
   acak_urutan_soal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acak_urutan_jawaban?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tampilkan_nilai?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumExamStatusFieldUpdateOperationsInput | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -548,6 +564,7 @@ export type ExamCreateManyInput = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: string | null
   status?: $Enums.ExamStatus
   created_at?: Date | string
   updated_at?: Date | string
@@ -566,6 +583,7 @@ export type ExamUpdateManyMutationInput = {
   acak_urutan_soal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acak_urutan_jawaban?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tampilkan_nilai?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumExamStatusFieldUpdateOperationsInput | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -587,6 +605,7 @@ export type ExamUncheckedUpdateManyInput = {
   acak_urutan_soal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acak_urutan_jawaban?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tampilkan_nilai?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumExamStatusFieldUpdateOperationsInput | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -618,6 +637,7 @@ export type ExamCountOrderByAggregateInput = {
   acak_urutan_soal?: Prisma.SortOrder
   acak_urutan_jawaban?: Prisma.SortOrder
   tampilkan_nilai?: Prisma.SortOrder
+  token?: Prisma.SortOrder
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -648,6 +668,7 @@ export type ExamMaxOrderByAggregateInput = {
   acak_urutan_soal?: Prisma.SortOrder
   acak_urutan_jawaban?: Prisma.SortOrder
   tampilkan_nilai?: Prisma.SortOrder
+  token?: Prisma.SortOrder
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -669,6 +690,7 @@ export type ExamMinOrderByAggregateInput = {
   acak_urutan_soal?: Prisma.SortOrder
   acak_urutan_jawaban?: Prisma.SortOrder
   tampilkan_nilai?: Prisma.SortOrder
+  token?: Prisma.SortOrder
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -807,6 +829,7 @@ export type ExamCreateWithoutTeaching_classInput = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: string | null
   status?: $Enums.ExamStatus
   created_at?: Date | string
   updated_at?: Date | string
@@ -829,6 +852,7 @@ export type ExamUncheckedCreateWithoutTeaching_classInput = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: string | null
   status?: $Enums.ExamStatus
   created_at?: Date | string
   updated_at?: Date | string
@@ -880,6 +904,7 @@ export type ExamScalarWhereInput = {
   acak_urutan_soal?: Prisma.BoolFilter<"Exam"> | boolean
   acak_urutan_jawaban?: Prisma.BoolFilter<"Exam"> | boolean
   tampilkan_nilai?: Prisma.BoolFilter<"Exam"> | boolean
+  token?: Prisma.StringNullableFilter<"Exam"> | string | null
   status?: Prisma.EnumExamStatusFilter<"Exam"> | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFilter<"Exam"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"Exam"> | Date | string
@@ -898,6 +923,7 @@ export type ExamCreateWithoutPaket_soalInput = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: string | null
   status?: $Enums.ExamStatus
   created_at?: Date | string
   updated_at?: Date | string
@@ -920,6 +946,7 @@ export type ExamUncheckedCreateWithoutPaket_soalInput = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: string | null
   status?: $Enums.ExamStatus
   created_at?: Date | string
   updated_at?: Date | string
@@ -965,6 +992,7 @@ export type ExamCreateWithoutParticipantsInput = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: string | null
   status?: $Enums.ExamStatus
   created_at?: Date | string
   updated_at?: Date | string
@@ -988,6 +1016,7 @@ export type ExamUncheckedCreateWithoutParticipantsInput = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: string | null
   status?: $Enums.ExamStatus
   created_at?: Date | string
   updated_at?: Date | string
@@ -1022,6 +1051,7 @@ export type ExamUpdateWithoutParticipantsInput = {
   acak_urutan_soal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acak_urutan_jawaban?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tampilkan_nilai?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumExamStatusFieldUpdateOperationsInput | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1045,6 +1075,7 @@ export type ExamUncheckedUpdateWithoutParticipantsInput = {
   acak_urutan_soal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acak_urutan_jawaban?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tampilkan_nilai?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumExamStatusFieldUpdateOperationsInput | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1065,6 +1096,7 @@ export type ExamCreateManyTeaching_classInput = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: string | null
   status?: $Enums.ExamStatus
   created_at?: Date | string
   updated_at?: Date | string
@@ -1083,6 +1115,7 @@ export type ExamUpdateWithoutTeaching_classInput = {
   acak_urutan_soal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acak_urutan_jawaban?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tampilkan_nilai?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumExamStatusFieldUpdateOperationsInput | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1105,6 +1138,7 @@ export type ExamUncheckedUpdateWithoutTeaching_classInput = {
   acak_urutan_soal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acak_urutan_jawaban?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tampilkan_nilai?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumExamStatusFieldUpdateOperationsInput | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1126,6 +1160,7 @@ export type ExamUncheckedUpdateManyWithoutTeaching_classInput = {
   acak_urutan_soal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acak_urutan_jawaban?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tampilkan_nilai?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumExamStatusFieldUpdateOperationsInput | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1146,6 +1181,7 @@ export type ExamCreateManyPaket_soalInput = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: string | null
   status?: $Enums.ExamStatus
   created_at?: Date | string
   updated_at?: Date | string
@@ -1164,6 +1200,7 @@ export type ExamUpdateWithoutPaket_soalInput = {
   acak_urutan_soal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acak_urutan_jawaban?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tampilkan_nilai?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumExamStatusFieldUpdateOperationsInput | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1186,6 +1223,7 @@ export type ExamUncheckedUpdateWithoutPaket_soalInput = {
   acak_urutan_soal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acak_urutan_jawaban?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tampilkan_nilai?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumExamStatusFieldUpdateOperationsInput | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1207,6 +1245,7 @@ export type ExamUncheckedUpdateManyWithoutPaket_soalInput = {
   acak_urutan_soal?: Prisma.BoolFieldUpdateOperationsInput | boolean
   acak_urutan_jawaban?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tampilkan_nilai?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumExamStatusFieldUpdateOperationsInput | $Enums.ExamStatus
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1259,6 +1298,7 @@ export type ExamSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: boolean
   status?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -1284,6 +1324,7 @@ export type ExamSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: boolean
   status?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -1307,6 +1348,7 @@ export type ExamSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: boolean
   status?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -1330,12 +1372,13 @@ export type ExamSelectScalar = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: boolean
   status?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
 
-export type ExamOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "judul" | "tipe" | "paket_soal_id" | "teaching_class_id" | "kelas" | "deskripsi" | "waktu_mulai" | "waktu_selesai" | "durasi_menit" | "kkm" | "percobaan_maksimal" | "acak_urutan_soal" | "acak_urutan_jawaban" | "tampilkan_nilai" | "status" | "created_at" | "updated_at", ExtArgs["result"]["exam"]>
+export type ExamOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "judul" | "tipe" | "paket_soal_id" | "teaching_class_id" | "kelas" | "deskripsi" | "waktu_mulai" | "waktu_selesai" | "durasi_menit" | "kkm" | "percobaan_maksimal" | "acak_urutan_soal" | "acak_urutan_jawaban" | "tampilkan_nilai" | "token" | "status" | "created_at" | "updated_at", ExtArgs["result"]["exam"]>
 export type ExamInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   paket_soal?: boolean | Prisma.PaketSoalDefaultArgs<ExtArgs>
   teaching_class?: boolean | Prisma.Exam$teaching_classArgs<ExtArgs>
@@ -1374,6 +1417,7 @@ export type $ExamPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     acak_urutan_soal: boolean
     acak_urutan_jawaban: boolean
     tampilkan_nilai: boolean
+    token: string | null
     status: $Enums.ExamStatus
     created_at: Date
     updated_at: Date
@@ -1818,6 +1862,7 @@ export interface ExamFieldRefs {
   readonly acak_urutan_soal: Prisma.FieldRef<"Exam", 'Boolean'>
   readonly acak_urutan_jawaban: Prisma.FieldRef<"Exam", 'Boolean'>
   readonly tampilkan_nilai: Prisma.FieldRef<"Exam", 'Boolean'>
+  readonly token: Prisma.FieldRef<"Exam", 'String'>
   readonly status: Prisma.FieldRef<"Exam", 'ExamStatus'>
   readonly created_at: Prisma.FieldRef<"Exam", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"Exam", 'DateTime'>

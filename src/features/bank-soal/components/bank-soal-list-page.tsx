@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { Button } from "@/components/ui/button"
@@ -32,6 +32,8 @@ import type { BankSoal, BankSoalFormData } from "../types/bank-soal"
 
 export function BankSoalListPage() {
   const router = useRouter()
+  const pathname = usePathname()
+  const basePath = pathname?.startsWith("/guru") ? "/guru" : "/admin"
   const [search, setSearch] = useState("")
   const [tipeFilter, setTipeFilter] = useState<string>("semua")
   const [mapelFilter, setMapelFilter] = useState<string>("semua")
@@ -164,7 +166,7 @@ export function BankSoalListPage() {
       className: "w-[120px]",
       render: (item) => (
         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" aria-label="Lihat" onClick={() => router.push(`/admin/bank-soal/${item.id}`)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" aria-label="Lihat" onClick={() => router.push(`${basePath}/bank-soal/${item.id}`)}>
             <Eye className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as BankSoal); setFormDialogOpen(true) }}>
@@ -352,7 +354,7 @@ export function BankSoalListPage() {
         data={paginatedData as unknown as Record<string, unknown>[]}
         columns={columns}
         emptyMessage="Tidak ada soal ditemukan"
-        onRowClick={(row) => router.push(`/admin/bank-soal/${(row as unknown as BankSoal).id}`)}
+        onRowClick={(row) => router.push(`${basePath}/bank-soal/${(row as unknown as BankSoal).id}`)}
       />
 
 

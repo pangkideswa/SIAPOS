@@ -35,7 +35,11 @@ export async function POST(request: NextRequest) {
     const qType = typeMapping[tipe_soal] || "PILIHAN_GANDA"
     const isPilihanGanda = qType === "PILIHAN_GANDA"
     
-    const ai = new GoogleGenAI()
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) {
+      return apiError(new Error("GEMINI_API_KEY belum dikonfigurasi di server"), 500)
+    }
+    const ai = new GoogleGenAI({ apiKey })
     
     const prompt = `Anda adalah seorang ahli pembuat soal ujian untuk siswa sekolah tingkat ${tingkat}. 
 Mata Pelajaran: ${mata_pelajaran}
@@ -79,7 +83,7 @@ Tingkat kesulitan (kesulitan) dapat bervariasi antara: MUDAH, SEDANG, atau SULIT
     while (retries > 0) {
         try {
             response = await ai.models.generateContent({
-                model: 'gemini-3.8-flash',
+                model: 'gemini-flash-lite-latest',
                 contents: prompt,
                 config: {
                     responseMimeType: 'application/json',
@@ -115,15 +119,24 @@ Tingkat kesulitan (kesulitan) dapat bervariasi antara: MUDAH, SEDANG, atau SULIT
       
       let options = undefined;
       if (isPilihanGanda && Array.isArray(q.pilihan_ganda)) {
-          options = q.pilihan_ganda.map((opt: any) => ({
-              teks: opt.teks || "Opsi kosong",
-              is_correct: !!opt.is_correct
-          }))
-      } else if (!isPilihanGanda && q.jawaban_benar_esai) {
-          options = [{
-              teks: q.jawaban_benar_esai,
-              is_correct: true
-          }]
+        let hasCorrect = false
+        options = q.pilihan_ganda.map((opt: any) => {
+          const isCorrect = opt.is_correct === true || opt.is_correct === "true" || opt.is_correct === 1
+          if (isCorrect) hasCorrect = true
+          return {
+            teks: opt.teks || "Opsi kosong",
+            is_correct: isCorrect,
+          }
+        })
+        if (!hasCorrect && options.length > 0) {
+          options[0].is_correct = true
+        }
+      } else if (!isPilihanGanda) {
+        const correctText = q.jawaban_benar_esai || q.kunci_jawaban || q.pembahasan || "Kunci Jawaban"
+        options = [{
+          teks: correctText,
+          is_correct: true,
+        }]
       }
       
       const createdItem = await bankSoalService.create({

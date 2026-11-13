@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
     // Memanggil API Gemini
     const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: "gemini-flash-lite-latest",
       contents: prompt,
       config: {
         systemInstruction: systemInstruction || "Kamu adalah asisten pintar dan ramah yang membantu tugas pendidikan di aplikasi SIAPOS.",

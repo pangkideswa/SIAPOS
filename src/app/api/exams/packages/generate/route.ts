@@ -6,6 +6,7 @@ import { ok, created, apiError } from "@/lib/api-utils"
 import { requireApiUser } from "@/auth/api-authorization"
 import { prisma } from "@/lib/prisma"
 import { GoogleGenAI, Type } from "@google/genai"
+import { distributeProportionalWeights } from "@/lib/cbt-scoring"
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,7 +39,11 @@ export async function POST(request: NextRequest) {
     const qType = typeMapping[tipe_soal] || "PILIHAN_GANDA"
     const isPilihanGanda = qType === "PILIHAN_GANDA"
     
-    const ai = new GoogleGenAI()
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) {
+      return apiError(new Error("GEMINI_API_KEY belum dikonfigurasi di server"), 500)
+    }
+    const ai = new GoogleGenAI({ apiKey })
     
     const prompt = `Anda adalah seorang ahli pembuat soal ujian untuk siswa sekolah tingkat ${tingkat}. 
 Mata Pelajaran: ${mata_pelajaran}
@@ -48,7 +53,7 @@ Tipe Soal: ${tipe_soal}
 Jumlah Soal: ${jumlah_soal}
 
 Buatkan paket soal ujian berkualitas tinggi dan mendidik sesuai topik. Hindari pertanyaan yang terlalu umum.
-${tipe_soal === "Benar / Salah" ? `Setiap soal WAJIB memiliki tepat 2 opsi pilihan yaitu "Benar" dan "Salah", dan pastikan hanya satu opsi yang memiliki 'is_correct' bernilai true.` : tipe_soal === "Pilihan Ganda" ? `Setiap soal WAJIB memiliki tepat 4 opsi pilihan (A, B, C, D), dan pastikan hanya satu opsi yang memiliki 'is_correct' bernilai true.` : ""}
+${tipe_soal === "Benar / Salah" ? `Setiap soal WAJIB memiliki tepat 2 opsi pilihan yaitu "Benar" dan "Salah", dan pastikan hanya satu opsi yang memiliki 'is_correct' bernilai true.` : tipe_soal === "Pilihan Ganda" ? `Setiap soal WAJIB memiliki tepat 4 opsi pilihan (A, B, C, D), dan pastikan hanya satu opsi yang memiliki 'is_correct' bernilai true.` : `Setiap soal WAJIB menyertakan 'jawaban_benar_esai' berupa kata kunci utama atau rubrik singkat jawaban yang benar.`}
 Tingkat kesulitan (kesulitan) dapat bervariasi antara: MUDAH, SEDANG, atau SULIT.`
 
     const responseSchema = {
@@ -70,7 +75,9 @@ Tingkat kesulitan (kesulitan) dapat bervariasi antara: MUDAH, SEDANG, atau SULIT
                             },
                         }
                     }
-                } : {})
+                } : {
+                    jawaban_benar_esai: { type: Type.STRING }
+                })
             }
         }
     }
@@ -80,7 +87,7 @@ Tingkat kesulitan (kesulitan) dapat bervariasi antara: MUDAH, SEDANG, atau SULIT
     while (retries > 0) {
         try {
             response = await ai.models.generateContent({
-                model: 'gemini-3.8-flash',
+                model: 'gemini-flash-lite-latest',
                 contents: prompt,
                 config: {
                     responseMimeType: 'application/json',
@@ -114,10 +121,27 @@ Tingkat kesulitan (kesulitan) dapat bervariasi antara: MUDAH, SEDANG, atau SULIT
       const q = generatedQuestions[i]
       const kode = `AI-${mata_pelajaran.substring(0,3).toUpperCase()}-${Date.now().toString().slice(-4)}-${i+1}`
       
-      const options = isPilihanGanda && Array.isArray(q.pilihan_ganda) ? q.pilihan_ganda.map((opt: any) => ({
-          teks: opt.teks || "Opsi kosong",
-          is_correct: !!opt.is_correct
-      })) : undefined
+      let options = undefined
+      if (isPilihanGanda && Array.isArray(q.pilihan_ganda)) {
+        let hasCorrect = false
+        options = q.pilihan_ganda.map((opt: any) => {
+          const isCorrect = opt.is_correct === true || opt.is_correct === "true" || opt.is_correct === 1
+          if (isCorrect) hasCorrect = true
+          return {
+            teks: opt.teks || "Opsi kosong",
+            is_correct: isCorrect,
+          }
+        })
+        if (!hasCorrect && options.length > 0) {
+          options[0].is_correct = true
+        }
+      } else if (!isPilihanGanda) {
+        const correctText = q.jawaban_benar_esai || q.kunci_jawaban || q.pembahasan || "Kunci Jawaban"
+        options = [{
+          teks: correctText,
+          is_correct: true,
+        }]
+      }
       
       const createdItem = await bankSoalService.create({
         kode_soal: kode,
@@ -134,11 +158,12 @@ Tingkat kesulitan (kesulitan) dapat bervariasi antara: MUDAH, SEDANG, atau SULIT
     }
 
     const kodePaket = `PKT-AI-${Date.now().toString().slice(-6)}`
-    const paketItems = generatedIds.map((id, index) => ({
+    const rawItems = generatedIds.map((id, index) => ({
       bank_soal_id: id,
-      bobot: isPilihanGanda ? 10 : 20,
+      tipe_soal: qType,
       nomor_urut: index + 1
     }))
+    const paketItems = distributeProportionalWeights(rawItems, 100)
 
     const createdPackage = await paketSoalService.create({
       kode_paket: kodePaket,

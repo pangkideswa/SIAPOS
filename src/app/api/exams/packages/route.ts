@@ -7,16 +7,18 @@ import { isAdmin, requireApiUser } from "@/auth/api-authorization"
 export async function GET() {
   try {
     const user = await requireApiUser("super_admin", "admin", "guru")
-    let actualGuruId: number | undefined = undefined
     
     if (user.role === "guru") {
       const teacher = await import("@/lib/prisma").then(m => m.prisma.teacher.findUnique({
-        where: { user_id: user.id }
+        where: { user_id: user.id },
+        select: { id: true }
       }))
-      actualGuruId = teacher?.id
+      if (!teacher) return ok([])
+      const items = await paketSoalService.getAll(teacher.id)
+      return ok(items)
     }
 
-    const items = await paketSoalService.getAll(isAdmin(user) ? undefined : actualGuruId)
+    const items = await paketSoalService.getAll()
     return ok(items)
   } catch (error) {
     return apiError(error)

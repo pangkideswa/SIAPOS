@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react"
+import { Plus, Pencil, Trash2, Eye, Search, KeyRound, Copy, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 import { CBTFormDialog } from "./cbt-form-dialog"
 import { CBTDeleteDialog } from "./cbt-delete-dialog"
@@ -56,10 +56,14 @@ export function CBTListPage() {
           tanggal_mulai: d.waktu_mulai ? d.waktu_mulai : "",
           tanggal_berakhir: d.waktu_selesai ? d.waktu_selesai : "",
           durasi: d.durasi_menit ?? 0,
-          status: d.status === "PUBLISH" ? "Publish" : d.status === "SELESAI" ? "Ditutup" : "Draft",
+          nilai_minimum_lulus: d.kkm ?? 75,
+          acak_soal: d.acak_urutan_soal ?? false,
+          acak_jawaban: d.acak_urutan_jawaban ?? false,
+          tampilkan_nilai: d.tampilkan_nilai ?? false,
+          status: d.status === "PUBLISH" ? "Publish" : d.status === "SELESAI" ? "Selesai" : "Draft",
           paket_soal_judul: d.paket_soal?.judul || "—",
           mata_pelajaran: d.paket_soal?.mata_pelajaran || d.teaching_class?.mata_pelajaran || "—",
-          guru_nama: d.teaching_class?.guru_nama || "—"
+          guru_nama: d.teaching_class?.guru_nama || d.teaching_class?.teacher?.nama_lengkap || d.paket_soal?.guru?.nama_lengkap || "—"
         }))
         setData(mapped)
       }
@@ -68,6 +72,35 @@ export function CBTListPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const [isTokenActionId, setIsTokenActionId] = useState<number | null>(null)
+
+  async function handleToggleToken(examId: number, action: "generate" | "remove") {
+    setIsTokenActionId(examId)
+    try {
+      const res = await fetch(`/api/exams/${examId}/token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      })
+      const json = await res.json()
+      if (json.success || json.data) {
+        toast.success(json.message || "Token ujian berhasil diperbarui")
+        await fetchCbts()
+      } else {
+        toast.error(json.error || json.message || "Gagal memperbarui token")
+      }
+    } catch (e) {
+      toast.error("Gagal memperbarui token ujian")
+    } finally {
+      setIsTokenActionId(null)
+    }
+  }
+
+  function handleCopyToken(token: string) {
+    navigator.clipboard.writeText(token)
+    toast.success(`Token ${token} berhasil disalin ke clipboard!`)
   }
 
   const filteredData = data.filter((item) => {
@@ -95,7 +128,24 @@ export function CBTListPage() {
         return (
           <div>
             <p className="font-medium">{String(item.nama_ujian)}</p>
-            <p className="text-xs text-muted-foreground">{item.paket_soal_judul}</p>
+            {item.paket_soal_id ? (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  router.push(`/guru/paket-soal/${item.paket_soal_id}`)
+                }}
+                className="text-xs text-primary hover:underline inline-flex items-center gap-1.5 text-left mt-0.5"
+                title="Klik untuk melihat paket soal & mengatur bobot butir soal"
+              >
+                <span>{item.paket_soal_judul}</span>
+                <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-semibold">
+                  Atur Bobot
+                </span>
+              </button>
+            ) : (
+              <p className="text-xs text-muted-foreground">{item.paket_soal_judul}</p>
+            )}
           </div>
         )
       },
@@ -133,18 +183,95 @@ export function CBTListPage() {
       render: (item) => <Badge className={STATUS_CBT_COLORS[String(item.status)]}>{String(item.status)}</Badge>,
     },
     {
+      key: "token",
+      header: "Token Ujian",
+      render: (item: any) => {
+        const isActionLoading = isTokenActionId === item.id
+        if (item.token) {
+          return (
+            <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+              <Badge variant="outline" className="font-mono text-xs font-black tracking-widest bg-primary/10 text-primary border-primary/30 px-2 py-0.5">
+                <KeyRound className="mr-1 h-3 w-3" />
+                {item.token}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                title="Salin Token"
+                onClick={() => handleCopyToken(item.token)}
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground hover:text-primary"
+                title="Ganti Token Baru"
+                onClick={() => handleToggleToken(item.id, "generate")}
+                disabled={isActionLoading}
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${isActionLoading ? "animate-spin text-primary" : ""}`} />
+              </Button>
+            </div>
+          )
+        }
+        return (
+          <div onClick={(e) => e.stopPropagation()}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-[11px] px-2 font-semibold text-primary border-primary/30 hover:bg-primary/10"
+              onClick={() => handleToggleToken(item.id, "generate")}
+              disabled={isActionLoading}
+            >
+              <KeyRound className="mr-1 h-3 w-3" />
+              {isActionLoading ? "Merilis..." : "Rilis Token"}
+            </Button>
+          </div>
+        )
+      },
+    },
+    {
       key: "actions",
-      header: "",
-      className: "w-[100px]",
+      header: "Aksi",
+      className: "w-[160px]",
       render: (item) => (
-        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" aria-label="Lihat" onClick={() => router.push(`/guru/cbt/${item.id}`)}>
-            <Eye className="h-4 w-4" />
+        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs font-bold gap-1 text-primary border-primary/30 hover:bg-primary/10"
+            title="Buka Proctoring & Pengawasan CBT"
+            onClick={() => router.push(`/guru/cbt/${item.id}`)}
+          >
+            <Eye className="h-3.5 w-3.5" />
+            <span>Monitor</span>
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as CBTExam); setFormDialogOpen(true) }}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            title="Edit"
+            aria-label="Edit"
+            onClick={() => {
+              setEditingItem(item as unknown as CBTExam)
+              setFormDialogOpen(true)
+            }}
+          >
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" title="Hapus" aria-label="Hapus" onClick={() => { setDeletingItem(item as unknown as CBTExam); setDeleteDialogOpen(true) }}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+            title="Hapus"
+            aria-label="Hapus"
+            onClick={() => {
+              setDeletingItem(item as unknown as CBTExam)
+              setDeleteDialogOpen(true)
+            }}
+          >
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -164,6 +291,10 @@ export function CBTListPage() {
         waktu_mulai: formData.tanggal_mulai ? new Date(formData.tanggal_mulai).toISOString() : undefined,
         waktu_selesai: formData.tanggal_berakhir ? new Date(formData.tanggal_berakhir).toISOString() : undefined,
         durasi_menit: formData.durasi,
+        kkm: formData.nilai_minimum_lulus,
+        acak_urutan_soal: formData.acak_soal,
+        acak_urutan_jawaban: formData.acak_jawaban,
+        tampilkan_nilai: formData.tampilkan_nilai,
         status: formData.status === "Publish" ? "PUBLISH" : formData.status === "Selesai" ? "SELESAI" : "DRAFT",
       }
 

@@ -125,12 +125,28 @@ export function CBTFormDialog({
 
           <div className="space-y-2">
             <Label>Paket Soal *</Label>
-            <Select value={form.paket_soal_id ? String(form.paket_soal_id) : ""} onValueChange={(v) => v && handleChange("paket_soal_id", Number(v))}>
+            <Select
+              value={form.paket_soal_id ? String(form.paket_soal_id) : ""}
+              onValueChange={(v) => {
+                if (!v) return
+                const pId = Number(v)
+                handleChange("paket_soal_id", pId)
+                const selectedPaket = paketOptions.find((p) => p.id === pId)
+                if (selectedPaket?.durasi_menit && (!form.durasi || form.durasi === 60)) {
+                  handleChange("durasi", selectedPaket.durasi_menit)
+                }
+              }}
+            >
               <SelectTrigger><SelectValue placeholder="Pilih Paket Soal" /></SelectTrigger>
               <SelectContent>
-                {paketOptions.map((p) => (
-                  <SelectItem key={p.id} value={String(p.id)}>{p.judul} ({p.mata_pelajaran})</SelectItem>
-                ))}
+                {paketOptions.map((p) => {
+                  const guruPembuat = p.guru?.nama_lengkap || p.guru_nama || "Sistem"
+                  return (
+                    <SelectItem key={p.id} value={String(p.id)}>
+                      {p.judul} ({p.mata_pelajaran} • Guru: {guruPembuat})
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
             {errors.paket_soal_id && <p className="text-xs text-destructive">{errors.paket_soal_id}</p>}

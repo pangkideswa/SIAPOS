@@ -565,6 +565,7 @@ export const ExamScalarFieldEnum = {
   acak_urutan_soal: 'acak_urutan_soal',
   acak_urutan_jawaban: 'acak_urutan_jawaban',
   tampilkan_nilai: 'tampilkan_nilai',
+  token: 'token',
   status: 'status',
   created_at: 'created_at',
   updated_at: 'updated_at'

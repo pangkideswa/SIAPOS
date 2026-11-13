@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -17,6 +17,8 @@ interface BankSoalDetailPageProps {
 
 export function BankSoalDetailPage({ id }: BankSoalDetailPageProps) {
   const router = useRouter()
+  const pathname = usePathname()
+  const basePath = pathname?.startsWith("/guru") ? "/guru" : "/admin"
   const [soal, setSoal] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -45,7 +47,7 @@ export function BankSoalDetailPage({ id }: BankSoalDetailPageProps) {
     return (
       <div className="space-y-6">
         <PageHeader title="Detail Soal" description="Soal tidak ditemukan" />
-        <Button variant="outline" onClick={() => router.push("/admin/bank-soal")}>
+        <Button variant="outline" onClick={() => router.push(`${basePath}/bank-soal`)}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Kembali ke Bank Soal
         </Button>
@@ -82,7 +84,7 @@ export function BankSoalDetailPage({ id }: BankSoalDetailPageProps) {
         description={`Soal ${tipeLabel} — ${soal.mata_pelajaran}`}
         action={
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => router.push("/admin/bank-soal")}>
+            <Button variant="outline" size="sm" onClick={() => router.push(`${basePath}/bank-soal`)}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali
             </Button>

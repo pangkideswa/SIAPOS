@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { PageHeader } from "@/components/ui/page-header"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { Button } from "@/components/ui/button"
@@ -31,6 +31,8 @@ import type { PaketSoal, PaketSoalFormData } from "../types/paket-soal"
 
 export function PaketSoalListPage() {
   const router = useRouter()
+  const pathname = usePathname()
+  const basePath = pathname?.startsWith("/guru") ? "/guru" : "/admin"
   const [search, setSearch] = useState("")
   const [mapelFilter, setMapelFilter] = useState<string>("semua")
   const [guruFilter, setGuruFilter] = useState<string>("semua")
@@ -128,10 +130,37 @@ export function PaketSoalListPage() {
       className: "w-[120px]",
       render: (item) => (
         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" aria-label="Lihat" onClick={() => router.push(`/admin/paket-soal/${item.id}`)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" aria-label="Lihat" onClick={() => router.push(`${basePath}/paket-soal/${item.id}`)}>
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as PaketSoal); setFormDialogOpen(true) }}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            title="Edit"
+            aria-label="Edit"
+            onClick={async () => {
+              try {
+                const res = await fetch(`/api/exams/packages/${item.id}`)
+                const json = await res.json()
+                const detail = json.data || json
+                const weightsMap: Record<number, number> = {}
+                detail.items?.forEach((it: any) => {
+                  weightsMap[it.bank_soal_id] = it.bobot
+                })
+                setEditingItem({
+                  ...item,
+                  ...detail,
+                  soal_ids: detail.items?.map((it: any) => it.bank_soal_id) || [],
+                  custom_weights: weightsMap,
+                  items: detail.items || [],
+                } as unknown as PaketSoal)
+              } catch (e) {
+                setEditingItem(item as unknown as PaketSoal)
+              }
+              setFormDialogOpen(true)
+            }}
+          >
             <Pencil className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" title="Duplikat" aria-label="Duplikat" onClick={() => toast.success(`Paket soal ${String(item.nama_paket)} berhasil diduplikat`)}>
@@ -158,7 +187,7 @@ export function PaketSoalListPage() {
         status: formData.status === "Aktif" ? "PUBLISH" : "DRAFT",
         items: formData.soal_ids.map((id, index) => ({
           bank_soal_id: id,
-          bobot: 1, // Default weight
+          bobot: Number(formData.custom_weights?.[id]) || 1,
           nomor_urut: index + 1
         }))
       }
@@ -281,7 +310,7 @@ export function PaketSoalListPage() {
         data={paginatedData as unknown as Record<string, unknown>[]}
         columns={columns}
         emptyMessage="Tidak ada paket soal ditemukan"
-        onRowClick={(row) => router.push(`/admin/paket-soal/${(row as unknown as PaketSoal).id}`)}
+        onRowClick={(row) => router.push(`${basePath}/paket-soal/${(row as unknown as PaketSoal).id}`)}
       />
 
       <PaketSoalFormDialog

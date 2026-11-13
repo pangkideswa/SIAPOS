@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import type { BankSoalStatus } from "@/generated/prisma/enums"
+import { distributeProportionalWeights } from "@/lib/cbt-scoring"
 
 export type PaketSoalCreateInput = {
   kode_paket: string
@@ -40,7 +41,11 @@ export const paketSoalService = {
       include: {
         items: {
           include: {
-            bank_soal: true
+            bank_soal: {
+              include: {
+                options: true,
+              },
+            },
           },
           orderBy: { nomor_urut: "asc" }
         },
@@ -52,6 +57,25 @@ export const paketSoalService = {
   },
 
   async create(data: PaketSoalCreateInput) {
+    let itemsToCreate = data.items
+    if (itemsToCreate && itemsToCreate.length > 0) {
+      const allDefault = itemsToCreate.every(i => i.bobot === 1 || i.bobot === 0)
+      if (allDefault && itemsToCreate.length !== 100) {
+        const bankIds = itemsToCreate.map(i => i.bank_soal_id)
+        const bankRecords = await prisma.bankSoal.findMany({
+          where: { id: { in: bankIds } },
+          select: { id: true, tipe_soal: true }
+        })
+        const mapType = new Map(bankRecords.map(b => [b.id, b.tipe_soal]))
+        const withTypes = itemsToCreate.map(i => ({
+          bank_soal_id: i.bank_soal_id,
+          tipe_soal: mapType.get(i.bank_soal_id) || "PILIHAN_GANDA",
+          nomor_urut: i.nomor_urut
+        }))
+        itemsToCreate = distributeProportionalWeights(withTypes, 100)
+      }
+    }
+
     return await prisma.paketSoal.create({
       data: {
         kode_paket: data.kode_paket,
@@ -61,8 +85,8 @@ export const paketSoalService = {
         durasi_menit: data.durasi_menit,
         status: data.status ?? "DRAFT",
         guru_id: data.guru_id,
-        items: data.items ? {
-          create: data.items,
+        items: itemsToCreate ? {
+          create: itemsToCreate,
         } : undefined,
       },
       include: {

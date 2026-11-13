@@ -11,9 +11,13 @@ export interface PaketSoal {
   durasi: number
   nilai_maksimal: number
   soal_ids: number[]
+  custom_weights?: Record<number, number>
+  items?: any[]
   status: StatusPaketSoal
   created_at: string
   updated_at: string
 }
 
-export type PaketSoalFormData = Omit<PaketSoal, "id" | "kode_paket" | "created_at" | "updated_at" | "guru_nama">
+export type PaketSoalFormData = Omit<PaketSoal, "id" | "kode_paket" | "created_at" | "updated_at" | "guru_nama"> & {
+  custom_weights?: Record<number, number>
+}

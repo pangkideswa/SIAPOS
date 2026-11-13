@@ -16,10 +16,20 @@ export type ExamCreateInput = {
   acak_urutan_soal?: boolean
   acak_urutan_jawaban?: boolean
   tampilkan_nilai?: boolean
+  token?: string | null
   status?: ExamStatus
 }
 
 export type ExamUpdateInput = Partial<ExamCreateInput>
+
+function generateExamToken(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+  let token = ""
+  for (let i = 0; i < 6; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return token
+}
 
 export const examService = {
   async getAll(teachingClassId?: number) {
@@ -27,10 +37,23 @@ export const examService = {
       where: teachingClassId ? { teaching_class_id: teachingClassId } : undefined,
       include: {
         paket_soal: {
-          select: { judul: true, mata_pelajaran: true }
+          select: {
+            judul: true,
+            mata_pelajaran: true,
+            guru: {
+              select: { nama_lengkap: true }
+            }
+          }
         },
         teaching_class: {
-          select: { kelas: true, mata_pelajaran: true }
+          select: {
+            kelas: true,
+            mata_pelajaran: true,
+            guru_nama: true,
+            teacher: {
+              select: { nama_lengkap: true }
+            }
+          }
         },
         _count: {
           select: { participants: true }
@@ -40,7 +63,7 @@ export const examService = {
     })
   },
 
-  async getForStudent(kelas: string, tipe?: ExamType) {
+  async getForStudent(kelas: string, tipe?: ExamType, studentId?: number) {
     return await prisma.exam.findMany({
       where: {
         status: "PUBLISH",
@@ -49,11 +72,37 @@ export const examService = {
       },
       include: {
         paket_soal: {
-          select: { judul: true, mata_pelajaran: true }
+          select: {
+            judul: true,
+            mata_pelajaran: true,
+            guru: {
+              select: { nama_lengkap: true }
+            },
+            _count: { select: { items: true } }
+          }
         },
         teaching_class: {
-          select: { guru_nama: true, mata_pelajaran: true }
+          select: {
+            guru_nama: true,
+            mata_pelajaran: true,
+            teacher: {
+              select: { nama_lengkap: true }
+            }
+          }
         },
+        ...(studentId ? {
+          participants: {
+            where: { student_id: studentId },
+            select: {
+              id: true,
+              status: true,
+              nilai_akhir: true,
+              waktu_mulai: true,
+              waktu_selesai: true,
+              violation_count: true
+            }
+          }
+        } : {})
       },
       orderBy: { created_at: "desc" },
     })
@@ -65,17 +114,32 @@ export const examService = {
       include: {
         paket_soal: {
           include: {
+            guru: {
+              select: { nama_lengkap: true }
+            },
             items: {
               include: { bank_soal: { include: { options: true } } },
               orderBy: { nomor_urut: "asc" }
             }
           }
         },
+        teaching_class: {
+          select: {
+            guru_nama: true,
+            mata_pelajaran: true,
+            teacher: {
+              select: { nama_lengkap: true }
+            }
+          }
+        }
       },
     })
   },
 
   async create(data: ExamCreateInput) {
+    const isCbt = (data.tipe ?? "QUIZ") === "CBT"
+    const token = data.token || (isCbt ? generateExamToken() : null)
+
     return await prisma.exam.create({
       data: {
         judul: data.judul,
@@ -92,6 +156,7 @@ export const examService = {
         acak_urutan_soal: data.acak_urutan_soal ?? false,
         acak_urutan_jawaban: data.acak_urutan_jawaban ?? false,
         tampilkan_nilai: data.tampilkan_nilai ?? false,
+        token: token,
         status: data.status ?? "DRAFT",
       },
     })
@@ -115,6 +180,7 @@ export const examService = {
         acak_urutan_soal: data.acak_urutan_soal,
         acak_urutan_jawaban: data.acak_urutan_jawaban,
         tampilkan_nilai: data.tampilkan_nilai,
+        token: data.token,
         status: data.status,
       },
     })
@@ -219,44 +285,59 @@ export const examService = {
       
       const answer = participant.answers.find(a => a.bank_soal_id === item.bank_soal_id)
       if (answer) {
-        let isCorrect = false;
+        let isCorrect: boolean | null = false
+        let itemScore: number | null = 0
 
         if (item.bank_soal.tipe_soal === "PILIHAN_GANDA" && answer.selected_option_id) {
           const correctOption = item.bank_soal.options.find(o => o.is_correct)
           isCorrect = !!correctOption && correctOption.id === answer.selected_option_id
+          itemScore = isCorrect ? item.bobot : 0
         } else if (item.bank_soal.tipe_soal === "ESAI" && answer.jawaban_esai) {
           const correctOption = item.bank_soal.options.find(o => o.is_correct)
-          if (correctOption) {
-            // Strict text match ignoring case and whitespace for "Isian Singkat"
-            const studentAns = answer.jawaban_esai.toLowerCase().trim()
+          const studentAns = answer.jawaban_esai.toLowerCase().trim()
+          
+          if (correctOption && correctOption.teks) {
             const correctAns = correctOption.teks.toLowerCase().trim()
-            isCorrect = studentAns === correctAns
+            // Check exact match or keyword inclusion
+            if (studentAns === correctAns || (correctAns.length >= 3 && (studentAns.includes(correctAns) || correctAns.includes(studentAns)))) {
+              isCorrect = true
+              itemScore = item.bobot
+            } else {
+              // Not automatically matched: leave as pending teacher/AI review
+              isCorrect = null
+              itemScore = null
+            }
+          } else {
+            // No rubric option present yet: leave as pending review
+            isCorrect = null
+            itemScore = null
           }
         }
 
-        // Update correct status in answer
+        // Update answer in DB
         await prisma.examAnswer.update({
           where: { id: answer.id },
           data: { 
             is_correct: isCorrect,
-            nilai: isCorrect ? item.bobot : 0
+            nilai: itemScore
           }
         });
 
-        if (isCorrect) {
-          totalScore += item.bobot;
+        if (itemScore && itemScore > 0) {
+          totalScore += itemScore;
         }
       }
     }
 
     const finalScore = maxPossibleScore > 0 ? (totalScore / maxPossibleScore) * 100 : 0;
+    const roundedScore = Math.round(finalScore * 100) / 100;
 
     return await prisma.examParticipant.update({
       where: { id: participantId },
       data: {
         status: "SELESAI",
         waktu_selesai: new Date(),
-        nilai_akhir: finalScore
+        nilai_akhir: roundedScore
       }
     });
   }

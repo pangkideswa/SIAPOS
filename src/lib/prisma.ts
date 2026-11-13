@@ -9,7 +9,7 @@ const globalForPrisma = globalThis as unknown as {
 import { Pool } from "pg"
 
 function createPrismaClient(): PrismaClient {
-  const connectionString = process.env.SUPABASE_DATABASE_URL ?? process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/siapos";
+  const connectionString = process.env.SUPABASE_DIRECT_URL ?? process.env.DATABASE_URL ?? process.env.SUPABASE_DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/siapos";
   const pool = new Pool({ connectionString })
   const adapter = new PrismaPg(pool)
   return new PrismaClient({ adapter })
