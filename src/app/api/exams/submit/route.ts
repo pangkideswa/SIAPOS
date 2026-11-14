@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     if (!student) return apiError(new Error("Profil siswa tidak ditemukan"), 404)
 
     const body = await request.json()
-    const { participant_id, action, answers } = body
+    const { participant_id, action, answers, instant, reason } = body
 
     if (!participant_id) {
       return apiError(new Error("Parameter participant_id wajib diisi"), 400)
@@ -47,6 +47,9 @@ export async function POST(request: NextRequest) {
 
     // Handle Violation action
     if (action === "violation") {
+      const isInstant = instant === true
+      const violationReason = reason || "Terdeteksi pelanggaran kecurangan"
+
       const updated = await prisma.examParticipant.update({
         where: { id: participant_id },
         data: {
@@ -54,19 +57,21 @@ export async function POST(request: NextRequest) {
         }
       })
 
-      // Maximum 3 violations tolerance for anti-cheat
+      // Maximum 3 violations tolerance for anti-cheat, or instant lock for critical violations (split screen)
       const MAX_VIOLATIONS = 3
-      if (updated.violation_count >= MAX_VIOLATIONS) {
+      if (isInstant || updated.violation_count >= MAX_VIOLATIONS) {
         // Submit exam answers first to evaluate whatever was answered
         await examService.submitExam(participant_id)
         const locked = await prisma.examParticipant.update({
           where: { id: participant_id },
           data: {
             status: "CURANG",
-            catatan_guru: `Dihentikan otomatis oleh sistem CBT karena melanggar aturan anti-curang sebanyak ${updated.violation_count} kali.`
+            catatan_guru: isInstant
+              ? `Dihentikan otomatis oleh sistem karena: ${violationReason}.`
+              : `Dihentikan otomatis oleh sistem karena melanggar aturan anti-curang sebanyak ${updated.violation_count} kali.`
           }
         })
-        return ok(locked, "Ujian dihentikan karena telah melampaui batas toleransi pelanggaran anti-curang.")
+        return ok(locked, isInstant ? violationReason : "Ujian dihentikan karena telah melampaui batas toleransi pelanggaran anti-curang.")
       }
 
       return ok(updated, `Pelanggaran anti-curang dicatat (${updated.violation_count}/${MAX_VIOLATIONS})`)

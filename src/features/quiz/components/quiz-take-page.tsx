@@ -1,17 +1,40 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { ArrowLeft, ArrowRight, Clock, CheckCircle2, Monitor, Maximize, ShieldAlert, AlertTriangle, Bookmark, BookmarkCheck, Flag, Menu, X, Sparkles, BookOpenCheck } from "lucide-react"
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+  ArrowLeft,
+  ArrowRight,
+  Clock,
+  CheckCircle2,
+  Monitor,
+  Maximize,
+  ShieldAlert,
+  AlertTriangle,
+  Bookmark,
+  BookmarkCheck,
+  Flag,
+  Menu,
+  X,
+  Sparkles,
+  BookOpenCheck,
+  RefreshCw,
+} from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import type { QuizAnswer } from "../types/quiz"
+import { detectSplitScreen } from "@/lib/anti-cheat"
 
 interface QuizTakePageProps {
   id: string
@@ -30,10 +53,93 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
   const [isStarted, setIsStarted] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isFinished, setIsFinished] = useState(false)
+  const [isCurang, setIsCurang] = useState(false)
   const [showFinishDialog, setShowFinishDialog] = useState(false)
   const [violationCount, setViolationCount] = useState(0)
   const [showViolationDialog, setShowViolationDialog] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isSplitScreen, setIsSplitScreen] = useState(false)
+  const [isFullscreenActive, setIsFullscreenActive] = useState(true)
+  const [isCheckingUnlock, setIsCheckingUnlock] = useState(false)
+
+  async function checkUnlockStatus() {
+    setIsCheckingUnlock(true)
+    try {
+      const res = await fetch(`/api/exams/${id}/start`, { method: "POST" })
+      const json = await res.json()
+      if (json.data || json.success) {
+        const payload = json.data || json
+        if (payload.participant?.status === "MENGERJAKAN") {
+          setIsCurang(false)
+          setIsFinished(false)
+          setParticipant(payload.participant)
+          setViolationCount(payload.participant.violation_count || 0)
+          toast.success("Kuis telah dibuka kembali oleh guru! Memasuki kuis...")
+          if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(() => {})
+          }
+          return
+        }
+      }
+      toast.info("Status kuis masih dibekukan. Silakan hubungi guru pengajar.")
+    } catch (e) {
+      toast.error("Gagal memeriksa status kunci kuis")
+    } finally {
+      setIsCheckingUnlock(false)
+    }
+  }
+
+  // Monitor Split Screen state before start
+  useEffect(() => {
+    if (isStarted || isFinished || isCurang) return
+
+    const checkSplit = () => {
+      const res = detectSplitScreen()
+      setIsSplitScreen(res.isSplit)
+    }
+
+    checkSplit()
+    window.addEventListener("resize", checkSplit)
+    window.addEventListener("orientationchange", checkSplit)
+    window.addEventListener("focus", checkSplit)
+    window.addEventListener("blur", checkSplit)
+
+    const interval = setInterval(checkSplit, 1000)
+
+    return () => {
+      window.removeEventListener("resize", checkSplit)
+      window.removeEventListener("orientationchange", checkSplit)
+      window.removeEventListener("focus", checkSplit)
+      window.removeEventListener("blur", checkSplit)
+      clearInterval(interval)
+    }
+  }, [isStarted, isFinished, isCurang])
+
+  // Track fullscreen state for student
+  useEffect(() => {
+    if (!isStarted || isFinished || isCurang) return
+    const checkFs = () => {
+      setIsFullscreenActive(!!document.fullscreenElement)
+    }
+    checkFs()
+    document.addEventListener("fullscreenchange", checkFs)
+    window.addEventListener("focus", checkFs)
+    return () => {
+      document.removeEventListener("fullscreenchange", checkFs)
+      window.removeEventListener("focus", checkFs)
+    }
+  }, [isStarted, isFinished, isCurang])
+
+  const handleReEnterFullscreen = () => {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen()
+        .then(() => {
+          setIsFullscreenActive(true)
+          setShowViolationDialog(false)
+        })
+        .catch(() => {})
+    }
+  }
 
   useEffect(() => {
     async function loadQuiz() {
@@ -45,7 +151,16 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
           const loadedExam = payload.exam
           setQuiz(loadedExam)
           setParticipant(payload.participant)
+          setViolationCount(payload.participant?.violation_count || 0)
           
+          if (payload.participant?.status === "CURANG") {
+            setIsCurang(true)
+            setIsStarted(true)
+            setIsFinished(false)
+            setIsLoading(false)
+            return
+          }
+
           let items: any[] = []
           if (Array.isArray(loadedExam?.soal_items) && loadedExam.soal_items.length > 0) {
             items = loadedExam.soal_items
@@ -85,29 +200,108 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
     loadQuiz()
   }, [id])
 
+  // Anti-Cheat: Fullscreen, Blur, Split-Screen, and Tab Switch Detection
   useEffect(() => {
-    if (!isStarted || isFinished || !quiz) return
+    if (!isStarted || isFinished || isCurang || !participant) return
 
-    const handleBlur = () => {
-      setViolationCount((prev) => prev + 1)
-      setShowViolationDialog(true)
-    }
-    
-    const handleFullscreenChange = () => {
-      if (!document.fullscreenElement) {
-        setViolationCount((prev) => prev + 1)
+    const triggerViolation = async (reason: string, instant = false) => {
+      try {
+        const res = await fetch("/api/exams/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            participant_id: participant.id,
+            action: "violation",
+            instant,
+            reason,
+          }),
+        })
+        const json = await res.json()
+        if (json.success && json.data) {
+          const vCount = json.data.violation_count || violationCount + 1
+          setViolationCount(vCount)
+          if (json.data.status === "CURANG" || instant) {
+            setIsCurang(true)
+            setIsFinished(true)
+            setShowViolationDialog(false)
+            toast.error(instant ? `Kuis dihentikan! ${reason}` : "Kuis Anda telah dihentikan karena terindikasi kecurangan.")
+            return
+          }
+        }
+      } catch (e) {
+        console.error("Gagal mencatat pelanggaran", e)
+      }
+      if (!instant) {
         setShowViolationDialog(true)
       }
     }
 
+    const checkSplitInExam = () => {
+      const splitCheck = detectSplitScreen()
+      if (splitCheck.isSplit) {
+        triggerViolation("Terdeteksi menggunakan fitur Split Screen (layar terbelah / multi-window) saat kuis berlangsung", true)
+      }
+    }
+
+    const handleBlur = () => {
+      const splitCheck = detectSplitScreen()
+      if (splitCheck.isSplit) {
+        triggerViolation("Terdeteksi menggunakan fitur Split Screen (layar terbelah / multi-window) saat kuis berlangsung", true)
+      } else {
+        triggerViolation("Berpindah tab atau membuka aplikasi lain")
+      }
+    }
+
+    const handleFullscreenChange = () => {
+      const isFs = !!document.fullscreenElement
+      setIsFullscreenActive(isFs)
+      if (!isFs) {
+        const splitCheck = detectSplitScreen()
+        if (splitCheck.isSplit) {
+          triggerViolation("Terdeteksi menggunakan fitur Split Screen (layar terbelah / multi-window) saat kuis berlangsung", true)
+        } else {
+          triggerViolation("Keluar dari mode layar penuh (fullscreen)")
+        }
+      }
+    }
+
+    const handleResize = () => {
+      checkSplitInExam()
+    }
+
+    // Prevent copy, cut, context menu, and devtools shortcuts
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault()
+    const handleCopy = (e: ClipboardEvent) => e.preventDefault()
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && (e.key === "c" || e.key === "C" || e.key === "u" || e.key === "U" || e.key === "i" || e.key === "I"))
+      ) {
+        e.preventDefault()
+      }
+    }
+
     window.addEventListener("blur", handleBlur)
+    window.addEventListener("resize", handleResize)
+    window.addEventListener("orientationchange", handleResize)
     document.addEventListener("fullscreenchange", handleFullscreenChange)
-    
+    window.addEventListener("contextmenu", handleContextMenu)
+    window.addEventListener("copy", handleCopy)
+    window.addEventListener("keydown", handleKeyDown)
+
+    const splitInterval = setInterval(checkSplitInExam, 1500)
+
     return () => {
       window.removeEventListener("blur", handleBlur)
+      window.removeEventListener("resize", handleResize)
+      window.removeEventListener("orientationchange", handleResize)
       document.removeEventListener("fullscreenchange", handleFullscreenChange)
+      window.removeEventListener("contextmenu", handleContextMenu)
+      window.removeEventListener("copy", handleCopy)
+      window.removeEventListener("keydown", handleKeyDown)
+      clearInterval(splitInterval)
     }
-  }, [isStarted, isFinished, quiz])
+  }, [isStarted, isFinished, isCurang, participant, violationCount])
 
   useEffect(() => {
     if (!isStarted || isFinished) return
@@ -129,6 +323,13 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
   }, [timeLeft, isStarted, isFinished])
 
   const startExam = async () => {
+    const splitCheck = detectSplitScreen()
+    if (splitCheck.isSplit) {
+      setIsSplitScreen(true)
+      toast.error("Tidak dapat memulai kuis: Mode Layar Terbelah (Split Screen) terdeteksi. Silakan gunakan satu layar penuh.")
+      return
+    }
+
     try {
       await fetch(`/api/exams/${id}/start`, {
         method: "POST",
@@ -249,6 +450,38 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
     )
   }
 
+  if (isCurang) {
+    return (
+      <div className="max-w-xl mx-auto space-y-6 py-12 px-4 text-center">
+        <div className="flex items-center justify-center w-20 h-20 rounded-full bg-destructive/10 mx-auto">
+          <ShieldAlert className="h-10 w-10 text-destructive" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-destructive">Akses Kuis Ditangguhkan</h2>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            {participant?.catatan_guru || "Sistem mendeteksi indikasi kecurangan (penggunaan Split Screen / multi-window / berpindah tab atau keluar mode layar penuh). Lembar kuis Anda telah otomatis dibekukan demi menjaga integritas penilaian."}
+          </p>
+        </div>
+        <div className="p-4 rounded-xl border bg-muted/30 text-xs text-muted-foreground">
+          Silakan melapor langsung kepada guru pengajar untuk membuka kunci kuis Anda.
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button
+            onClick={checkUnlockStatus}
+            disabled={isCheckingUnlock}
+            className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${isCheckingUnlock ? "animate-spin" : ""}`} />
+            {isCheckingUnlock ? "Memeriksa Status..." : "Cek Status Buka Kunci"}
+          </Button>
+          <Button onClick={() => router.push("/siswa/quiz")} variant="outline" className="w-full sm:w-auto">
+            Kembali ke Daftar Quiz
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   if (!quiz || soalList.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
@@ -295,18 +528,39 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
           <ul className="list-disc list-inside space-y-1.5 text-xs text-muted-foreground leading-relaxed">
             <li>Kuis difungsikan untuk evaluasi harian dan mengukur daya serap materi pembelajaran.</li>
             <li>Kerjakan secara mandiri dan cermat tanpa membuka catatan atau bantuan luar.</li>
-            <li>Kuis berjalan dalam mode fokus penuh demi menjamin keaslian pemahaman Anda.</li>
+            <li>Kuis berjalan dalam mode <strong>Layar Penuh (Fullscreen)</strong>.</li>
+            <li>Dilarang berpindah tab, meminimalkan browser, atau membuka aplikasi lain.</li>
+            <li>
+              Dilarang keras menggunakan fitur <strong>Split Screen (layar terbelah / multi-window)</strong> atau floating window. Tindakan ini akan <strong>langsung menyebabkan status CURANG</strong> dan kuis dihentikan seketika.
+            </li>
             <li>Waktu akan langsung berjalan otomatis begitu Anda menekan tombol di bawah.</li>
           </ul>
         </div>
+
+        {isSplitScreen && (
+          <div className="rounded-2xl border-2 border-destructive bg-destructive/10 p-4 text-center space-y-2 animate-in fade-in">
+            <div className="flex items-center justify-center gap-2 text-destructive font-bold text-sm sm:text-base">
+              <AlertTriangle className="h-5 w-5 shrink-0" />
+              <span>Mode Split Screen / Layar Terbelah Terdeteksi!</span>
+            </div>
+            <p className="text-xs sm:text-sm text-destructive/90 leading-relaxed">
+              Sistem mendeteksi layar perangkat Anda sedang terbagi atau tidak dalam ukuran penuh. Untuk mencegah indikasi kecurangan, 
+              Anda <strong>wajib menutup aplikasi lain</strong> dan memperluas browser ke <strong>satu layar penuh</strong> sebelum dapat memulai kuis.
+            </p>
+          </div>
+        )}
 
         <div className="flex flex-wrap sm:flex-nowrap gap-3 justify-center pt-2">
           <Button variant="outline" className="w-full sm:w-auto h-11 px-5 rounded-2xl" onClick={() => router.push("/siswa/quiz")}>
             Kembali
           </Button>
-          <Button onClick={startExam} className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold h-11 px-6 rounded-2xl shadow-md shadow-purple-600/25">
+          <Button
+            onClick={startExam}
+            disabled={isSplitScreen}
+            className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold h-11 px-6 rounded-2xl shadow-md shadow-purple-600/25"
+          >
             <Sparkles className="mr-2 h-4 w-4" />
-            Mulai Kuis Sekarang
+            {isSplitScreen ? "Tutup Split Screen Untuk Memulai" : "Mulai Kuis Sekarang"}
           </Button>
         </div>
       </div>
@@ -576,7 +830,7 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
       </Dialog>
 
       {/* Violation Alert Dialog */}
-      <Dialog open={showViolationDialog}>
+      <Dialog open={showViolationDialog} onOpenChange={setShowViolationDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <div className="flex items-center gap-3">
@@ -586,25 +840,59 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
               <div>
                 <DialogTitle className="text-destructive">Peringatan Anti-Curang!</DialogTitle>
                 <DialogDescription>
-                  Sistem mendeteksi Anda berpindah tab atau meminimalkan browser.
+                  Sistem mendeteksi Anda berpindah tab atau keluar dari mode layar penuh.
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
           <div className="rounded-lg border p-4 bg-muted/50 space-y-2">
-            <p className="text-sm">Tindakan ini tercatat sebagai pelanggaran ujian.</p>
+            <p className="text-sm">Tindakan ini tercatat sebagai pelanggaran kuis.</p>
             <div className="flex justify-between items-center bg-destructive/10 p-3 rounded-md">
               <span className="text-sm font-medium text-destructive">Total Pelanggaran Anda:</span>
-              <span className="text-xl font-bold text-destructive">{violationCount}</span>
+              <span className="text-xl font-bold text-destructive">{violationCount} / 3</span>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Maksimal 3 kali toleransi pelanggaran sebelum lembar kuis otomatis dibekukan sebagai tindakan curang.
+            </p>
           </div>
           <DialogFooter>
-            <Button onClick={() => setShowViolationDialog(false)} className="bg-destructive hover:bg-destructive/90">
-              Saya Mengerti & Kembali ke Quiz
+            <Button
+              onClick={() => {
+                setShowViolationDialog(false)
+                handleReEnterFullscreen()
+              }}
+              className="bg-destructive hover:bg-destructive/90 text-white w-full font-bold"
+            >
+              Saya Mengerti & Kembali ke Layar Penuh
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Persistent Fullscreen Barrier Overlay */}
+      {isStarted && !isFinished && !isCurang && !isFullscreenActive && (
+        <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center select-none animate-in fade-in">
+          <div className="max-w-md w-full bg-card border-2 border-purple-500/40 p-8 rounded-2xl shadow-2xl space-y-6">
+            <div className="w-16 h-16 rounded-full bg-purple-500/10 text-purple-600 flex items-center justify-center mx-auto">
+              <Monitor className="h-8 w-8" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-foreground">Mode Layar Penuh Diperlukan</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Sesi kuis harian Anda sedang berlangsung. Untuk menjaga ketertiban dan integritas kuis, Anda wajib berada dalam mode layar penuh (fullscreen).
+              </p>
+            </div>
+            <Button
+              size="lg"
+              onClick={handleReEnterFullscreen}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold text-base py-6 rounded-xl shadow-lg shadow-purple-600/25"
+            >
+              <Maximize className="mr-2 h-5 w-5" />
+              Kembali ke Layar Penuh
+            </Button>
+          </div>
+        </div>
+      )}
     </>
   )
 }

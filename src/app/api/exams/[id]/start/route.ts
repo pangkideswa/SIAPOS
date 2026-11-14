@@ -138,19 +138,21 @@ export async function POST(
 
     // 5. Sanitize questions & options (NEVER leak is_correct or pembahasan)
     let rawItems: QuestionItem[] =
-      (exam.paket_soal?.items || []).map((item) => ({
-        id: item.bank_soal.id,
-        nomor_urut: item.nomor_urut,
-        bobot: item.bobot,
-        pertanyaan: item.bank_soal.pertanyaan,
-        tipe_soal: item.bank_soal.tipe_soal,
-        lampiran: item.bank_soal.lampiran,
-        options: (item.bank_soal.options || []).map((opt) => ({
-          id: opt.id,
-          teks: opt.teks,
-          // CRITICAL: is_correct is strictly omitted!
-        })),
-      }))
+      participant.status === "CURANG"
+        ? []
+        : (exam.paket_soal?.items || []).map((item) => ({
+            id: item.bank_soal.id,
+            nomor_urut: item.nomor_urut,
+            bobot: item.bobot,
+            pertanyaan: item.bank_soal.pertanyaan,
+            tipe_soal: item.bank_soal.tipe_soal,
+            lampiran: item.bank_soal.lampiran,
+            options: (item.bank_soal.options || []).map((opt) => ({
+              id: opt.id,
+              teks: opt.teks,
+              // CRITICAL: is_correct is strictly omitted!
+            })),
+          }))
 
     // 6. Deterministic Shuffle per participant
     if (exam.acak_urutan_soal) {

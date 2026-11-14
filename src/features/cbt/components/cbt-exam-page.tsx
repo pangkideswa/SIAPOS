@@ -36,6 +36,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import type { CBTAnswer } from "../types/cbt"
+import { detectSplitScreen } from "@/lib/anti-cheat"
 
 interface CBTExamPageProps {
   id: string
@@ -73,6 +74,33 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
   const [isStarting, setIsStarting] = useState(false)
   const [isFullscreenActive, setIsFullscreenActive] = useState(true)
   const [isCheckingUnlock, setIsCheckingUnlock] = useState(false)
+  const [isSplitScreen, setIsSplitScreen] = useState(false)
+
+  // Monitor Split Screen state before start
+  useEffect(() => {
+    if (isStarted || isFinished || isCurang) return
+
+    const checkSplit = () => {
+      const res = detectSplitScreen()
+      setIsSplitScreen(res.isSplit)
+    }
+
+    checkSplit()
+    window.addEventListener("resize", checkSplit)
+    window.addEventListener("orientationchange", checkSplit)
+    window.addEventListener("focus", checkSplit)
+    window.addEventListener("blur", checkSplit)
+
+    const interval = setInterval(checkSplit, 1000)
+
+    return () => {
+      window.removeEventListener("resize", checkSplit)
+      window.removeEventListener("orientationchange", checkSplit)
+      window.removeEventListener("focus", checkSplit)
+      window.removeEventListener("blur", checkSplit)
+      clearInterval(interval)
+    }
+  }, [isStarted, isFinished, isCurang])
 
   async function checkUnlockStatus() {
     setIsCheckingUnlock(true)
@@ -250,11 +278,11 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
     return () => clearInterval(timer)
   }, [isStarted, isFinished, isCurang])
 
-  // Anti-Cheat: Fullscreen, Blur, and Tab Switch Detection
+  // Anti-Cheat: Fullscreen, Blur, Split-Screen, and Tab Switch Detection
   useEffect(() => {
     if (!isStarted || isFinished || isCurang || !participant) return
 
-    const triggerViolation = async (reason: string) => {
+    const triggerViolation = async (reason: string, instant = false) => {
       try {
         const res = await fetch("/api/exams/submit", {
           method: "POST",
@@ -262,34 +290,59 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
           body: JSON.stringify({
             participant_id: participant.id,
             action: "violation",
+            instant,
+            reason,
           }),
         })
         const json = await res.json()
         if (json.success && json.data) {
           const vCount = json.data.violation_count || violationCount + 1
           setViolationCount(vCount)
-          if (json.data.status === "CURANG") {
+          if (json.data.status === "CURANG" || instant) {
             setIsCurang(true)
             setIsFinished(true)
             setShowViolationDialog(false)
-            toast.error("Ujian Anda telah dihentikan karena terindikasi kecurangan.")
+            toast.error(instant ? `Ujian dihentikan! ${reason}` : "Ujian Anda telah dihentikan karena terindikasi kecurangan.")
             return
           }
         }
       } catch (e) {
         console.error("Gagal mencatat pelanggaran", e)
       }
-      setShowViolationDialog(true)
+      if (!instant) {
+        setShowViolationDialog(true)
+      }
+    }
+
+    const checkSplitInExam = () => {
+      const splitCheck = detectSplitScreen()
+      if (splitCheck.isSplit) {
+        triggerViolation("Terdeteksi menggunakan fitur Split Screen (layar terbelah / multi-window) saat ujian berlangsung", true)
+      }
     }
 
     const handleBlur = () => {
-      triggerViolation("Berpindah tab atau membuka aplikasi lain")
+      const splitCheck = detectSplitScreen()
+      if (splitCheck.isSplit) {
+        triggerViolation("Terdeteksi menggunakan fitur Split Screen (layar terbelah / multi-window) saat ujian berlangsung", true)
+      } else {
+        triggerViolation("Berpindah tab atau membuka aplikasi lain")
+      }
     }
 
     const handleFullscreenChange = () => {
       if (!document.fullscreenElement) {
-        triggerViolation("Keluar dari mode layar penuh (fullscreen)")
+        const splitCheck = detectSplitScreen()
+        if (splitCheck.isSplit) {
+          triggerViolation("Terdeteksi menggunakan fitur Split Screen (layar terbelah / multi-window) saat ujian berlangsung", true)
+        } else {
+          triggerViolation("Keluar dari mode layar penuh (fullscreen)")
+        }
       }
+    }
+
+    const handleResize = () => {
+      checkSplitInExam()
     }
 
     // Prevent copy, cut, context menu, and devtools shortcuts
@@ -305,21 +358,36 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
     }
 
     window.addEventListener("blur", handleBlur)
+    window.addEventListener("resize", handleResize)
+    window.addEventListener("orientationchange", handleResize)
     document.addEventListener("fullscreenchange", handleFullscreenChange)
     window.addEventListener("contextmenu", handleContextMenu)
     window.addEventListener("copy", handleCopy)
     window.addEventListener("keydown", handleKeyDown)
 
+    // Periodic split-screen verification
+    const splitInterval = setInterval(checkSplitInExam, 1500)
+
     return () => {
       window.removeEventListener("blur", handleBlur)
+      window.removeEventListener("resize", handleResize)
+      window.removeEventListener("orientationchange", handleResize)
       document.removeEventListener("fullscreenchange", handleFullscreenChange)
       window.removeEventListener("contextmenu", handleContextMenu)
       window.removeEventListener("copy", handleCopy)
       window.removeEventListener("keydown", handleKeyDown)
+      clearInterval(splitInterval)
     }
   }, [isStarted, isFinished, isCurang, participant, violationCount])
 
   const startExam = async () => {
+    const splitCheck = detectSplitScreen()
+    if (splitCheck.isSplit) {
+      setIsSplitScreen(true)
+      toast.error("Tidak dapat memulai ujian: Mode Layar Terbelah (Split Screen) terdeteksi. Silakan gunakan satu layar penuh.")
+      return
+    }
+
     if (exam.has_token && (!inputToken || inputToken.trim().length === 0)) {
       toast.error("Silakan masukkan Token Ujian dari pengawas ruangan.")
       return
@@ -531,8 +599,7 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
         <div className="space-y-2">
           <h2 className="text-2xl font-bold text-destructive">Akses Ujian Ditangguhkan</h2>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Sistem CBT mendeteksi aktivitas mencurigakan (berpindah tab / keluar fullscreen melebihi batas toleransi anti-curang).
-            Lembar ujian Anda telah otomatis dibekukan demi menjaga integritas ujian.
+            {participant?.catatan_guru || "Sistem mendeteksi indikasi kecurangan (penggunaan Split Screen / multi-window / berpindah tab atau keluar mode layar penuh). Lembar ujian Anda telah otomatis dibekukan demi menjaga integritas ujian."}
           </p>
         </div>
         <div className="p-4 rounded-lg border bg-muted/30 text-xs text-muted-foreground">
@@ -602,10 +669,26 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
             <li>
               Dilarang berpindah tab, meminimalkan jendela browser, atau membuka aplikasi lain. Tindakan ini dicatat sebagai <strong>Pelanggaran Anti-Curang</strong>.
             </li>
-            <li>Maksimal toleransi pelanggaran adalah <strong>3 kali</strong>. Melebihi itu, lembar ujian otomatis terkunci.</li>
+            <li>
+              Dilarang keras menggunakan fitur <strong>Split Screen (layar terbelah / multi-window)</strong> atau floating window. Tindakan ini akan <strong>langsung menyebabkan status CURANG</strong> dan ujian dihentikan seketika.
+            </li>
+            <li>Maksimal toleransi pelanggaran umum adalah <strong>3 kali</strong>. Melebihi itu, lembar ujian otomatis terkunci.</li>
             <li>Waktu ujian akan terus berjalan secara otomatis dan tidak dapat dihentikan sementara.</li>
           </ul>
         </div>
+
+        {isSplitScreen && (
+          <div className="rounded-xl border-2 border-destructive bg-destructive/10 p-4 text-center space-y-2 animate-in fade-in">
+            <div className="flex items-center justify-center gap-2 text-destructive font-bold text-sm sm:text-base">
+              <AlertTriangle className="h-5 w-5 shrink-0" />
+              <span>Mode Split Screen / Layar Terbelah Terdeteksi!</span>
+            </div>
+            <p className="text-xs sm:text-sm text-destructive/90 leading-relaxed">
+              Sistem mendeteksi layar perangkat Anda sedang terbagi atau tidak dalam ukuran penuh. Untuk mencegah indikasi kecurangan, 
+              Anda <strong>wajib menutup aplikasi lain</strong> dan memperluas browser ke <strong>satu layar penuh</strong> sebelum dapat memulai ujian.
+            </p>
+          </div>
+        )}
 
         {exam.has_token && (
           <div className="rounded-xl border p-4 bg-primary/5 space-y-2 text-center">
@@ -635,11 +718,11 @@ export function CBTExamPage({ id }: CBTExamPageProps) {
           </Button>
           <Button
             onClick={startExam}
-            disabled={isStarting}
+            disabled={isStarting || isSplitScreen}
             className="bg-primary hover:bg-primary/90 text-white font-semibold px-6"
           >
             <Maximize className="mr-2 h-4 w-4" />
-            {isStarting ? "Memverifikasi..." : "Mulai Ujian Sekarang"}
+            {isSplitScreen ? "Tutup Split Screen Untuk Memulai" : isStarting ? "Memverifikasi..." : "Mulai Ujian Sekarang"}
           </Button>
         </div>
       </div>
