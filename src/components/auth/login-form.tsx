@@ -11,9 +11,23 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  ArrowLeft,
+  MessageCircle,
+  Mail,
+} from "lucide-react"
 import { motion } from "framer-motion"
-import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogBody, ResponsiveDialogFooter } from "@/components/ui/responsive-dialog"
+import {
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+  ResponsiveDialogBody,
+  ResponsiveDialogFooter,
+} from "@/components/ui/responsive-dialog"
 import { signIn } from "next-auth/react"
 import { useSearchParams } from "next/navigation"
 
@@ -89,53 +103,93 @@ export function LoginForm() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="w-full max-w-md"
+      className="w-full max-w-md mx-auto"
     >
-      <div className="mb-8 text-center lg:text-left">
-        <div className="flex flex-col items-center gap-2 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden">
+      {/* Mobile Back Link (Visible only on smaller screens where showcase is hidden) */}
+      <div className="lg:hidden mb-6 flex items-center justify-between">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border/80 text-xs font-semibold text-foreground hover:bg-muted active:scale-95 transition-all shadow-sm"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          <span>Kembali ke Beranda</span>
+        </Link>
+        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+          SIAPOS v2.0
+        </span>
+      </div>
+
+      {/* Brand & Greeting Header */}
+      <div className="mb-6 text-center">
+        <div className="flex flex-col items-center">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-card border border-primary/20 shadow-md shadow-primary/10 overflow-hidden p-2 mb-3"
+          >
             <img src="/favicon.png" alt="Logo SIAPOS" className="w-full h-full object-contain" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight">Selamat Datang di {settings.pengaturan_sistem?.nama_aplikasi || "SIAPOS"}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Masukkan email atau NIP/NISN dan kata sandi Anda
+          </motion.div>
+
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
+            Selamat Datang di <span className="text-primary">{settings.pengaturan_sistem?.nama_aplikasi || "SIAPOS"}</span>
+          </h1>
+
+          <p className="mt-2 text-xs sm:text-sm text-muted-foreground font-medium max-w-md mx-auto leading-relaxed">
+            <span className="inline-block">Sistem Integrasi Akademik</span>{" "}
+            <span className="inline-block">dan Pembelajaran Online Sekolah</span>
           </p>
+        </div>
+
+        {/* Role Login Guide Pills */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5 text-[11px]">
+          <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
+            👨‍🏫 <strong>Guru:</strong> NIP / Email
+          </span>
+          <span className="px-2.5 py-1 rounded-full bg-orange/10 text-orange border border-orange/20 font-medium">
+            🎓 <strong>Siswa:</strong> NISN
+          </span>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 shadow-sm">
+      {/* Main Login Card */}
+      <div className="rounded-3xl border border-border/80 bg-card/90 dark:bg-card/95 p-6 sm:p-8 shadow-xl shadow-primary/5 backdrop-blur-xl">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {serverError && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
-              className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm"
+              className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs sm:text-sm font-medium"
             >
               {serverError}
             </motion.div>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="identifier">Email / NIP / NISN</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="identifier" className="text-xs font-bold text-foreground">
+              Email / NIP / NISN
+            </Label>
             <Input
               id="identifier"
               type="text"
               placeholder="Masukkan email, NIP, atau NISN"
               autoComplete="username"
               disabled={isSubmitting}
+              className="h-11 rounded-xl bg-background/50 border-border/80 text-sm focus-visible:ring-primary/30"
               {...register("identifier")}
             />
             {errors.identifier && (
-              <p className="text-xs text-destructive">{errors.identifier.message}</p>
+              <p className="text-xs text-destructive font-medium">{errors.identifier.message}</p>
             )}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Kata Sandi</Label>
+              <Label htmlFor="password" className="text-xs font-bold text-foreground">
+                Kata Sandi
+              </Label>
               <Link
                 href="/lupa-password"
-                className="text-xs text-primary hover:underline font-medium"
+                className="text-xs text-primary hover:underline font-semibold"
               >
                 Lupa sandi?
               </Link>
@@ -147,13 +201,15 @@ export function LoginForm() {
                 placeholder="Masukkan kata sandi"
                 autoComplete="current-password"
                 disabled={isSubmitting}
+                className="h-11 rounded-xl bg-background/50 border-border/80 pr-10 text-sm focus-visible:ring-primary/30"
                 {...register("password")}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                 tabIndex={-1}
+                aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />
@@ -163,16 +219,18 @@ export function LoginForm() {
               </button>
             </div>
             {errors.password && (
-              <p className="text-xs text-destructive">{errors.password.message}</p>
+              <p className="text-xs text-destructive font-medium">{errors.password.message}</p>
             )}
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center pt-1">
             <Checkbox
               checked={rememberMe}
               onCheckedChange={(checked) => setValue("rememberMe", checked)}
               label={
-                <span className="text-sm text-muted-foreground">Ingat saya</span>
+                <span className="text-xs sm:text-sm text-muted-foreground select-none">
+                  Ingat saya di perangkat ini
+                </span>
               }
               disabled={isSubmitting}
             />
@@ -180,26 +238,26 @@ export function LoginForm() {
 
           <Button
             type="submit"
-            className="w-full h-11 text-sm font-semibold"
+            className="w-full h-11 text-sm font-bold bg-primary hover:bg-primary/90 active:bg-blue-700 active:scale-[0.98] transition-all rounded-xl shadow-md shadow-primary/20"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Memproses...
+                Memproses Masuk...
               </>
             ) : (
-              "Masuk"
+              "Masuk ke Akun"
             )}
           </Button>
         </form>
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border" />
+            <span className="w-full border-t border-border/80" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="bg-card px-3 text-muted-foreground">
+            <span className="bg-card px-3 text-muted-foreground font-medium">
               Atau masuk dengan
             </span>
           </div>
@@ -209,7 +267,7 @@ export function LoginForm() {
           type="button"
           variant="outline"
           onClick={handleGoogleLogin}
-          className="w-full h-11 text-sm font-semibold gap-3"
+          className="w-full h-11 text-sm font-semibold gap-3 rounded-xl border-border/80 hover:bg-muted/60 active:scale-[0.98] transition-all"
           disabled={googleErrorLoading}
         >
           {googleErrorLoading ? (
@@ -243,16 +301,31 @@ export function LoginForm() {
         </Button>
       </div>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        Belum punya akun?{" "}
-        <a 
-          href="mailto:pangkiajaa@gmail.com?subject=Permohonan%20Pembuatan%20Akun%20SIAPOS"
-          className="text-primary font-semibold hover:underline"
-        >
-          Hubungi admin
-        </a>
-      </p>
+      {/* Support & Contact Admin Links */}
+      <div className="mt-6 text-center text-xs text-muted-foreground space-y-1.5">
+        <p>Belum memiliki akun terdaftar?</p>
+        <div className="flex items-center justify-center gap-3 font-semibold">
+          <a
+            href="https://wa.me/6281233436196?text=Halo%20Admin%20SIAPOS,%20saya%20ingin%20membuat%20atau%20mendaftarkan%20akun."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-700 hover:underline"
+          >
+            <MessageCircle className="h-3.5 w-3.5" />
+            <span>WhatsApp Admin</span>
+          </a>
+          <span className="text-border">•</span>
+          <a
+            href="mailto:pangkiajaa@gmail.com?subject=Permohonan%20Pembuatan%20Akun%20SIAPOS"
+            className="inline-flex items-center gap-1 text-primary hover:text-primary/90 hover:underline"
+          >
+            <Mail className="h-3.5 w-3.5" />
+            <span>Email Admin</span>
+          </a>
+        </div>
+      </div>
 
+      {/* Google Error Dialog */}
       <ResponsiveDialog open={googleError} onOpenChange={setGoogleError}>
         <ResponsiveDialogContent showCloseButton>
           <ResponsiveDialogHeader>

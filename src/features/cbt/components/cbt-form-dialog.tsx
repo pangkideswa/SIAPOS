@@ -14,6 +14,7 @@ import {
 import { Loader2 } from "lucide-react"
 import { STATUS_CBT_OPTIONS, EMPTY_CBT_FORM } from "../constants/cbt.constants"
 import type { CBTExam, CBTExamFormData } from "../types/cbt"
+import { DateTimePickerWIB } from "@/components/ui/date-time-picker-wib"
 
 interface CBTFormDialogProps {
   open: boolean
@@ -167,22 +168,21 @@ export function CBTFormDialog({
             {errors.teaching_class_id && <p className="text-xs text-destructive">{errors.teaching_class_id}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Tanggal Mulai *</Label>
-              <Input
-                type="datetime-local"
+              <Label>Tanggal & Jam Mulai (WIB) *</Label>
+              <DateTimePickerWIB
                 value={form.tanggal_mulai}
-                onChange={(e) => handleChange("tanggal_mulai", e.target.value)}
+                onChange={(val) => handleChange("tanggal_mulai", val)}
               />
               {errors.tanggal_mulai && <p className="text-xs text-destructive">{errors.tanggal_mulai}</p>}
             </div>
+
             <div className="space-y-2">
-              <Label>Tanggal Berakhir *</Label>
-              <Input
-                type="datetime-local"
+              <Label>Tanggal & Jam Berakhir (WIB) *</Label>
+              <DateTimePickerWIB
                 value={form.tanggal_berakhir}
-                onChange={(e) => handleChange("tanggal_berakhir", e.target.value)}
+                onChange={(val) => handleChange("tanggal_berakhir", val)}
               />
               {errors.tanggal_berakhir && <p className="text-xs text-destructive">{errors.tanggal_berakhir}</p>}
             </div>

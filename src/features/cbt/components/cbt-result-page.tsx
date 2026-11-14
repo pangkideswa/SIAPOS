@@ -17,6 +17,7 @@ import {
   HelpCircle,
   Sparkles,
 } from "lucide-react"
+import { formatDateTimeWIB } from "@/lib/date-utils"
 
 interface CBTResultPageProps {
   id: string
@@ -423,13 +424,13 @@ export function CBTResultPage({ id }: CBTResultPageProps) {
               <div>
                 <span className="text-muted-foreground block">Waktu Mulai Pengerjaan</span>
                 <span className="font-medium">
-                  {new Date(participant.waktu_mulai || participant.created_at).toLocaleString("id-ID")}
+                  {formatDateTimeWIB(participant.waktu_mulai || participant.created_at)}
                 </span>
               </div>
               <div>
                 <span className="text-muted-foreground block">Waktu Submit</span>
                 <span className="font-medium">
-                  {new Date(participant.waktu_selesai || participant.updated_at).toLocaleString("id-ID")}
+                  {formatDateTimeWIB(participant.waktu_selesai || participant.updated_at)}
                 </span>
               </div>
             </CardContent>

@@ -8,16 +8,44 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Clock, FileText, AlertCircle, Loader2, CheckCircle2, ShieldAlert } from "lucide-react"
+import { Clock, FileText, Loader2, CheckCircle2, AlertCircle, ShieldAlert } from "lucide-react"
 import { toast } from "sonner"
 import { PaginationControls } from "@/components/ui/pagination-controls"
+import { formatDateTimeWIB } from "@/lib/date-utils"
+
+interface StudentExamItem {
+  id: number
+  judul: string
+  deskripsi?: string
+  durasi_menit: number
+  waktu_mulai?: string | null
+  waktu_selesai?: string | null
+  tampilkan_nilai?: boolean
+  token?: string | null
+  paket_soal?: {
+    judul?: string
+    mata_pelajaran?: string
+    guru?: { nama_lengkap?: string }
+    _count?: { items: number }
+  } | null
+  teaching_class?: {
+    mata_pelajaran?: string
+    guru_nama?: string
+    teacher?: { nama_lengkap?: string }
+  } | null
+  participant?: {
+    id: number
+    status: string
+    nilai_akhir?: number | null
+  } | null
+}
 
 export function SiswaCBTListPage() {
   const router = useRouter()
   const [mapelFilter, setMapelFilter] = useState<string>("semua")
   const [page, setPage] = useState(1)
   const perPage = 9
-  const [exams, setExams] = useState<any[]>([])
+  const [exams, setExams] = useState<StudentExamItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -30,8 +58,7 @@ export function SiswaCBTListPage() {
         }
         setIsLoading(false)
       })
-      .catch(err => {
-        console.error(err)
+      .catch(() => {
         toast.error("Gagal memuat daftar ujian CBT")
         setIsLoading(false)
       })
@@ -42,7 +69,7 @@ export function SiswaCBTListPage() {
     return mapelFilter === "semua" || mapel === mapelFilter
   })
 
-  function getExamStudentStatus(cbt: any) {
+  function getExamStudentStatus(cbt: StudentExamItem) {
     const participant = cbt.participant
     if (participant) {
       if (participant.status === "SELESAI") return "Selesai"
@@ -192,12 +219,7 @@ export function SiswaCBTListPage() {
                     <span className="text-muted-foreground">Batas Waktu</span>
                     <span className="font-medium text-right">
                       {cbt.waktu_selesai
-                        ? new Date(cbt.waktu_selesai).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "short",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })
+                        ? formatDateTimeWIB(cbt.waktu_selesai)
                         : "Fleksibel"}
                     </span>
                   </div>

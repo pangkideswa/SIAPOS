@@ -45,15 +45,10 @@ import {
   STATUS_HASIL_OPTIONS,
 } from "@/features/hasil-ujian/constants/hasil-ujian.constants"
 import type { HasilUjian } from "@/features/hasil-ujian/types/hasil-ujian"
+import { formatDateTimeWIB } from "@/lib/date-utils"
 
 function formatDateTime(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+  return formatDateTimeWIB(dateStr)
 }
 
 function InfoRow({

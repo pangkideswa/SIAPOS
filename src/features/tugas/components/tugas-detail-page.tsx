@@ -29,6 +29,7 @@ import {
 } from "@/hooks/use-assignments"
 import type { TugasFormData, TugasLampiran } from "@/features/tugas/types/tugas"
 import { toast } from "sonner"
+import { formatDateTimeWIB } from "@/lib/date-utils"
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -39,13 +40,7 @@ function formatDate(dateStr: string) {
 }
 
 function formatDateTime(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+  return formatDateTimeWIB(dateStr, { monthFormat: "long" })
 }
 
 function InfoRow({

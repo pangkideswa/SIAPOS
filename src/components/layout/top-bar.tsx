@@ -21,7 +21,8 @@ import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import React, { Component, type ReactNode } from "react"
 import type { UserRole } from "@/types/auth"
-import { getInitials } from "@/lib/utils"
+import { getInitials, cn } from "@/lib/utils"
+import { to24HourTime } from "@/lib/date-utils"
 
 class AvatarErrorBoundary extends Component<{children: ReactNode}, {error: unknown}> {
   constructor(props: {children: ReactNode}) {
@@ -41,14 +42,27 @@ class AvatarErrorBoundary extends Component<{children: ReactNode}, {error: unkno
 }
 
 function getRoleLabel(role: UserRole): string {
-  const labels: Record<UserRole, string> = {
+  const labels: Record<string, string> = {
     super_admin: "Super Admin",
     admin: "Admin",
     guru: "Guru",
     siswa: "Siswa",
-    wali: "Wali Kelas",
   }
   return labels[role] ?? role
+}
+
+function getRoleBadgeStyle(role: UserRole) {
+  switch (role) {
+    case "super_admin":
+    case "admin":
+      return "bg-primary/10 text-primary border-primary/20"
+    case "guru":
+      return "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20"
+    case "siswa":
+      return "bg-orange/10 text-orange border-orange/20"
+    default:
+      return "bg-muted text-muted-foreground border-border"
+  }
 }
 
 function getPageTitle(pathname: string): string {
@@ -75,7 +89,7 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith("/admin/nilai-akademik")) return "Nilai Akademik"
   if (pathname.match(/^\/admin\/pengumuman\/\d+$/)) return "Detail Pengumuman"
   if (pathname.startsWith("/admin/pengumuman")) return "Pengumuman"
-  if (pathname.startsWith("/admin")) return "Beranda"
+  if (pathname.startsWith("/admin")) return "Dashboard Admin"
   if (pathname.match(/^\/guru\/kelas\/\d+$/)) return "Detail Kelas"
   if (pathname.startsWith("/guru/kelas")) return "Kelas Saya"
   if (pathname.match(/^\/guru\/materi\/\d+$/)) return "Detail Materi"
@@ -98,7 +112,7 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith("/guru/nilai-akademik")) return "Nilai Akademik"
   if (pathname.match(/^\/guru\/pengumuman\/\d+$/)) return "Detail Pengumuman"
   if (pathname.startsWith("/guru/pengumuman")) return "Pengumuman"
-  if (pathname.startsWith("/guru")) return "Dashboard"
+  if (pathname.startsWith("/guru")) return "Dashboard Guru"
   if (pathname.match(/^\/siswa\/kelas\/\d+$/)) return "Detail Kelas"
   if (pathname.startsWith("/siswa/kelas")) return "Kelas Saya"
   if (pathname.startsWith("/siswa/pelajaran")) return "Kelas Saya"
@@ -120,10 +134,7 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith("/siswa/pengumuman")) return "Pengumuman"
   if (pathname.startsWith("/siswa/profil")) return "Profil"
   if (pathname.startsWith("/siswa/pengaturan")) return "Pengaturan"
-  if (pathname.startsWith("/siswa")) return "Dashboard"
-  if (pathname.startsWith("/wali/siswa")) return "Siswa"
-  if (pathname.startsWith("/wali/laporan")) return "Laporan"
-  if (pathname.startsWith("/wali")) return "Beranda"
+  if (pathname.startsWith("/siswa")) return "Dashboard Siswa"
   if (pathname === "/forbidden") return "Akses Ditolak"
   return "Beranda"
 }
@@ -152,57 +163,73 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
     day: "numeric",
     month: "short",
   })
-  const timeLabel = now.toLocaleTimeString("id-ID", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  })
+  const timeLabel = to24HourTime(now, true)
+
+  const userRole = (user?.role ?? "admin") as UserRole
 
   return (
-    <header className="h-16 border-b border-border bg-background/60 backdrop-blur-md flex items-center justify-between px-4 md:px-6 shrink-0 sticky top-0 z-30">
+    <header className="h-16 border-b border-border/80 bg-background/70 backdrop-blur-xl flex items-center justify-between px-4 md:px-6 shrink-0 sticky top-0 z-30">
+      {/* Left: Mobile Toggle & Page Title */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 md:hidden">
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={onMenuClick}
-            aria-label="Buka menu"
-            className="-ml-1"
+            aria-label="Buka menu navigasi"
+            className="-ml-1 rounded-xl hover:bg-muted active:scale-95 transition-all"
           >
             <Menu className="h-5 w-5 text-muted-foreground" />
           </Button>
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0 overflow-hidden">
+          
+          <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-card border border-primary/20 shadow-sm p-1 overflow-hidden">
             <img src="/favicon.png" alt="Logo SIAPOS" className="w-full h-full object-contain" />
           </div>
           
-          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground px-2 py-1 rounded-lg bg-muted whitespace-nowrap ml-1 overflow-hidden max-w-[180px] sm:max-w-none">
-            <Clock className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-            <span className="truncate">
+          {/* Mobile Clock */}
+          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground px-2.5 py-1 rounded-full bg-card border border-border/80 shadow-sm whitespace-nowrap ml-1 overflow-hidden max-w-[170px] sm:max-w-none">
+            <span className="relative flex h-1.5 w-1.5 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+            </span>
+            <span className="truncate font-semibold">
               <span className="hidden sm:inline">{dateLabel}, </span>
               <span className="sm:hidden">{shortDateLabel}, </span>
-              {timeLabel}
+              {timeLabel} WIB
             </span>
           </div>
         </div>
-        <div className="hidden md:block">
-          <h1 className="text-lg font-semibold text-foreground">{pageTitle}</h1>
+
+        {/* Desktop Breadcrumb/Title */}
+        <div className="hidden md:flex items-center gap-2">
+          <h1 className="text-base sm:text-lg font-black tracking-tight text-foreground">
+            {pageTitle}
+          </h1>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground px-2.5 py-1.5 rounded-lg bg-muted whitespace-nowrap">
-          <Clock className="h-4 w-4 shrink-0" />
+      {/* Right Controls: Desktop Clock, Search, Theme, Notifications, Role Badge, Avatar */}
+      <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Live School Clock with Pulse Indicator */}
+        <div className="hidden md:flex items-center gap-2 text-xs font-semibold text-muted-foreground px-3 py-1.5 rounded-full bg-card/80 border border-border/80 shadow-sm backdrop-blur-md">
+          <span className="relative flex h-2 w-2 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          </span>
+          <Clock className="h-3.5 w-3.5 text-primary shrink-0" />
           <span>
-            {dateLabel}, {timeLabel}
+            {dateLabel}, {timeLabel} WIB
           </span>
         </div>
-        <div className="hidden sm:flex items-center gap-2">
+
+        {/* Quick Search */}
+        <div className="hidden sm:flex items-center">
           {searchOpen ? (
             <div className="flex items-center">
               <Input
                 type="text"
-                placeholder="Cari..."
-                className="w-48 lg:w-64 h-8"
+                placeholder="Cari menu / data..."
+                className="w-48 lg:w-60 h-9 rounded-xl bg-card border-border/80 text-xs focus-visible:ring-primary/30"
                 autoFocus
                 onBlur={() => setSearchOpen(false)}
               />
@@ -212,8 +239,10 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
               variant="ghost"
               size="icon-sm"
               onClick={() => setSearchOpen(true)}
+              className="rounded-xl hover:bg-muted/80 active:scale-95 transition-all text-muted-foreground hover:text-foreground"
+              aria-label="Cari"
             >
-              <Search className="h-4 w-4 text-muted-foreground" />
+              <Search className="h-4 w-4" />
             </Button>
           )}
         </div>
@@ -221,51 +250,66 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
         <ThemeToggle />
         <NotificationBell />
 
-        <span className="hidden lg:block text-xs text-muted-foreground px-2 py-1 rounded-lg bg-muted">
-          {getRoleLabel(user?.role ?? "admin" as UserRole)}
+        {/* Role Pill Badge */}
+        <span className={cn(
+          "hidden lg:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border shadow-xs select-none",
+          getRoleBadgeStyle(userRole)
+        )}>
+          {getRoleLabel(userRole)}
         </span>
 
+        {/* User Profile Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <button className="focus:outline-none rounded-full">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
+              <button className="focus:outline-none rounded-full transition-transform active:scale-95">
+                <Avatar className="h-8 w-8 ring-2 ring-primary/20 hover:ring-primary/40 transition-all cursor-pointer shadow-xs">
+                  <AvatarFallback className="bg-primary/10 text-primary font-black text-xs">
                     {user?.name ? getInitials(user.name) : "?"}
                   </AvatarFallback>
                 </Avatar>
               </button>
             }
           />
-          <DropdownMenuContent align="end" className="w-52">
+          <DropdownMenuContent align="end" className="w-56 p-1.5 rounded-2xl border-border/80 shadow-xl backdrop-blur-xl">
             <AvatarErrorBoundary>
               <DropdownMenuGroup>
-                <DropdownMenuLabel>
-                  <p className="font-medium text-sm">{user?.name}</p>
-                  <p className="text-xs text-muted-foreground font-normal">
+                <DropdownMenuLabel className="p-2.5">
+                  <p className="font-bold text-sm text-foreground truncate">{user?.name}</p>
+                  <p className="text-xs text-muted-foreground font-medium truncate mt-0.5">
                     {user?.email}
                   </p>
-                  <span className="inline-block mt-1 text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                    {getRoleLabel(user?.role ?? "admin" as UserRole)}
+                  <span className={cn(
+                    "inline-block mt-2 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border",
+                    getRoleBadgeStyle(userRole)
+                  )}>
+                    {getRoleLabel(userRole)}
                   </span>
                 </DropdownMenuLabel>
               </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => router.push(`/${user?.role === "guru" ? "guru" : user?.role === "siswa" ? "siswa" : user?.role === "wali" ? "wali" : "admin"}/profil`)}>
-                <User className="mr-2 h-4 w-4" />
+              <DropdownMenuSeparator className="my-1 border-border/60" />
+              <DropdownMenuItem
+                onClick={() => router.push(`/${user?.role === "guru" ? "guru" : user?.role === "siswa" ? "siswa" : "admin"}/profil`)}
+                className="rounded-xl py-2 cursor-pointer font-medium text-xs text-foreground/80 hover:text-foreground"
+              >
+                <User className="mr-2 h-4 w-4 text-primary" />
                 Profil Saya
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push(`/${user?.role === "guru" ? "guru" : user?.role === "siswa" ? "siswa" : user?.role === "wali" ? "wali" : "admin"}/pengaturan`)}>
-                <Settings className="mr-2 h-4 w-4" />
+              <DropdownMenuItem
+                onClick={() => router.push(`/${user?.role === "guru" ? "guru" : user?.role === "siswa" ? "siswa" : "admin"}/pengaturan`)}
+                className="rounded-xl py-2 cursor-pointer font-medium text-xs text-foreground/80 hover:text-foreground"
+              >
+                <Settings className="mr-2 h-4 w-4 text-muted-foreground" />
                 Pengaturan
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="my-1 border-border/60" />
               <DropdownMenuItem
                 onClick={() => logout()}
                 variant="destructive"
+                className="rounded-xl py-2 cursor-pointer font-semibold text-xs text-destructive hover:bg-destructive/10"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                Keluar
+                Keluar dari Akun
               </DropdownMenuItem>
             </AvatarErrorBoundary>
           </DropdownMenuContent>

@@ -28,10 +28,9 @@ import {
   FileSpreadsheet,
   X,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn, getInitials } from "@/lib/utils"
 import { useAuth } from "@/contexts/auth-context"
 import { useSettings } from "@/contexts/settings-context"
-import { Separator } from "@/components/ui/separator"
 import { useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import type { UserRole } from "@/types/auth"
@@ -43,7 +42,7 @@ type NavEntry =
 const navItems: NavEntry[] = [
   // --- ADMIN & SUPER ADMIN ---
   { type: "label", label: "Utama" },
-  { type: "item", label: "Beranda", href: "/admin", icon: LayoutDashboard, roles: ["super_admin", "admin"] },
+  { type: "item", label: "Dashboard", href: "/admin", icon: LayoutDashboard, roles: ["super_admin", "admin"] },
   { type: "item", label: "Pengumuman", href: "/admin/pengumuman", icon: Megaphone, roles: ["super_admin", "admin"] },
   
   { type: "label", label: "Data Master" },
@@ -112,19 +111,13 @@ const navItems: NavEntry[] = [
   { type: "item", label: "Tugas", href: "/siswa/tugas", icon: ClipboardList, roles: ["siswa"] },
   { type: "item", label: "Quiz", href: "/siswa/quiz", icon: FileQuestion, roles: ["siswa"] },
   { type: "item", label: "CBT", href: "/siswa/cbt", icon: Monitor, roles: ["siswa"] },
-
-  { type: "item", label: "Beranda", href: "/wali", icon: LayoutDashboard, roles: ["wali"] },
-  { type: "item", label: "Siswa", href: "/wali/siswa", icon: Users, roles: ["wali"] },
-  { type: "item", label: "Laporan", href: "/wali/laporan", icon: BookOpen, roles: ["wali"] },
-  { type: "item", label: "PKL", href: "/wali/pkl", icon: Award, roles: ["wali"] },
 ]
 
-const roleLabels: Record<UserRole, string> = {
+const roleLabels: Record<string, string> = {
   super_admin: "Super Admin",
-  admin: "Admin",
-  guru: "Guru",
+  admin: "Admin Sekolah",
+  guru: "Guru Pengajar",
   siswa: "Siswa",
-  wali: "Wali Kelas",
 }
 
 function SidebarContent({
@@ -141,7 +134,7 @@ function SidebarContent({
   const pathname = usePathname()
 
   const userRole = user?.role ?? "admin"
-  const roleLabel = roleLabels[userRole] ?? "Admin"
+  const roleLabel = roleLabels[userRole] ?? "Pengguna"
 
   const filteredNav = navItems.reduce<NavEntry[]>((items, entry, index) => {
     if (entry.type === "label") {
@@ -173,60 +166,103 @@ function SidebarContent({
 
   return (
     <>
-      <div className="flex items-center gap-2.5 px-4 h-16 border-b border-border shrink-0">
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0 overflow-hidden">
-          <img src="/favicon.png" alt="Logo SIAPOS" className="w-full h-full object-contain" />
-        </div>
-        {!collapsed && (
-          <div className="flex flex-col">
-            <span className="font-bold text-base tracking-tight leading-tight line-clamp-1">
-              {settings.pengaturan_sistem?.nama_aplikasi || "SIAPOS"}
-            </span>
-            <span className="text-[10px] text-muted-foreground font-medium leading-tight">
-              {roleLabel}
-            </span>
+      {/* Brand Header */}
+      <div className="flex items-center gap-3 px-4 h-16 border-b border-border/80 shrink-0">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-card border border-primary/20 shadow-md shadow-primary/10 overflow-hidden p-1 shrink-0 transition-transform group-hover:scale-105 active:scale-95">
+            <img src="/favicon.png" alt="Logo SIAPOS" className="w-full h-full object-contain" />
           </div>
-        )}
+          {!collapsed && (
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-black text-base tracking-tight leading-none text-foreground truncate">
+                  {settings.pengaturan_sistem?.nama_aplikasi || "SIAPOS"}
+                </span>
+                <span className="inline-flex items-center gap-1 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 shrink-0">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                  </span>
+                  v2.0
+                </span>
+              </div>
+              <span className="text-[10px] text-muted-foreground font-medium mt-0.5 truncate">
+                {roleLabel}
+              </span>
+            </div>
+          )}
+        </Link>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      {/* Navigation Links */}
+      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1 scrollbar-thin">
         {filteredNav.map((entry) => {
           if (entry.type === "label") {
             if (collapsed) return null
             return (
-              <div key={entry.label} className="px-3 pt-4 pb-1">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+              <div key={entry.label} className="px-3 pt-3.5 pb-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground/70">
                   {entry.label}
                 </span>
               </div>
             )
           }
+
           const isActive =
             pathname === entry.href || pathname.startsWith(entry.href + "/")
+          
           return (
             <Link
               key={entry.href}
               href={entry.href}
               onClick={handleNavigate}
+              title={collapsed ? entry.label : undefined}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 select-none active:scale-[0.98]",
                 isActive
-                  ? "bg-primary/10 text-primary shadow-sm shadow-primary/5"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-primary text-white shadow-md shadow-primary/25 font-bold"
+                  : "text-muted-foreground hover:bg-muted/80 hover:text-foreground active:bg-primary/10 active:text-primary"
               )}
             >
-              <entry.icon className="h-5 w-5 shrink-0" />
-              {!collapsed && <span>{entry.label}</span>}
+              <entry.icon
+                className={cn(
+                  "h-4 w-4 sm:h-5 sm:w-5 shrink-0 transition-transform group-hover:scale-110",
+                  isActive ? "text-white" : "text-muted-foreground group-hover:text-foreground"
+                )}
+              />
+              {!collapsed && <span className="truncate">{entry.label}</span>}
+              {isActive && !collapsed && (
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+              )}
             </Link>
           )
         })}
       </nav>
 
+      {/* Sidebar Bottom Profile Card */}
+      {!collapsed && user && (
+        <div className="p-3 border-t border-border/80 shrink-0">
+          <div className="flex items-center gap-2.5 p-2 rounded-2xl bg-card border border-border/80 shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-black text-xs shrink-0 border border-primary/20">
+              {user.name ? getInitials(user.name) : "?"}
+            </div>
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="text-xs font-bold text-foreground truncate leading-tight">
+                {user.name}
+              </span>
+              <span className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
+                {roleLabel}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
+      {/* Collapse Toggle Button */}
       {onToggleCollapse && (
         <button
           onClick={onToggleCollapse}
-          className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border shadow-sm flex items-center justify-center hover:bg-muted transition-colors z-10"
+          className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border shadow-md flex items-center justify-center hover:bg-muted active:scale-95 transition-all z-20"
           aria-label={collapsed ? "Perluas menu" : "Ciutkan menu"}
         >
           {collapsed ? (
@@ -251,9 +287,10 @@ export function Sidebar({
 
   return (
     <>
+      {/* Desktop Sticky Sidebar */}
       <aside
         className={cn(
-          "hidden md:flex flex-col h-screen bg-card/80 backdrop-blur-xl border-r border-border transition-all duration-300 sticky top-0",
+          "hidden md:flex flex-col h-screen bg-card/85 dark:bg-card/90 backdrop-blur-xl border-r border-border/80 transition-all duration-300 sticky top-0 z-30",
           collapsed ? "w-[68px]" : "w-64"
         )}
       >
@@ -263,6 +300,7 @@ export function Sidebar({
         />
       </aside>
 
+      {/* Mobile Drawer Sidebar */}
       <AnimatePresence>
         {open && (
           <div className="md:hidden fixed inset-0 z-50">
@@ -272,22 +310,22 @@ export function Sidebar({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => onOpenChange(false)}
-              className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+              className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
               aria-hidden="true"
             />
             <motion.aside
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
-              transition={{ type: "tween", duration: 0.25, ease: "easeOut" }}
-              className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-card shadow-xl flex flex-col"
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-card border-r border-border/80 shadow-2xl flex flex-col"
             >
               <button
                 onClick={() => onOpenChange(false)}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-xl bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Tutup menu"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
               <SidebarContent
                 collapsed={false}

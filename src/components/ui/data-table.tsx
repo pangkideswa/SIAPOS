@@ -31,7 +31,7 @@ interface DataTableProps<T> {
   onPageChange?: (page: number) => void
 }
 
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T extends object = Record<string, unknown>>({
   columns,
   data,
   loading = false,
@@ -54,7 +54,6 @@ export function DataTable<T extends Record<string, unknown>>({
   }
 
   const hasPagination = page !== undefined && perPage !== undefined && total !== undefined && onPageChange;
-  const totalPages = total && perPage ? Math.ceil(total / perPage) : 1;
 
   return (
     <div className="space-y-4">
@@ -82,7 +81,7 @@ export function DataTable<T extends Record<string, unknown>>({
             ) : (
               data.map((item, i) => (
                 <TableRow
-                  key={String(item.id ?? i)}
+                  key={String((item as Record<string, unknown>).id ?? i)}
                   className={onRowClick ? "cursor-pointer hover:bg-muted/30" : ""}
                   onClick={() => onRowClick?.(item)}
                 >
@@ -90,7 +89,7 @@ export function DataTable<T extends Record<string, unknown>>({
                     <TableCell key={col.key} className={col.className}>
                       {col.render
                         ? col.render(item, i)
-                        : String(item[col.key] ?? "-")}
+                        : String((item as Record<string, unknown>)[col.key] ?? "-")}
                     </TableCell>
                   ))}
                 </TableRow>

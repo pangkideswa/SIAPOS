@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
-import type { ExamType, ExamStatus, ExamParticipantStatus } from "@/generated/prisma/enums"
+import type { ExamType, ExamStatus } from "@/generated/prisma/enums"
+import type { Prisma } from "@/generated/prisma/client"
 
 export type ExamCreateInput = {
   judul: string
@@ -65,22 +66,48 @@ export const examService = {
 
   async getForStudent(kelas: string, tipe?: ExamType, studentId?: number) {
     const cleanKelas = (kelas || "").trim()
+
+    // Determine grade token (e.g. "XII RPL 1" -> "XII", "X TKJ 2" -> "X")
+    const gradeMatches: string[] = []
+    if (/\b(xii|12)\b/i.test(cleanKelas)) gradeMatches.push("XII", "12", "Kelas XII", "Kelas 12")
+    if (/\b(xi|11)\b/i.test(cleanKelas)) gradeMatches.push("XI", "11", "Kelas XI", "Kelas 11")
+    if (/\b(x|10)\b/i.test(cleanKelas)) gradeMatches.push("X", "10", "Kelas X", "Kelas 10")
+
+    const orClassConditions: Prisma.ExamWhereInput[] = [
+      { kelas: null },
+      { kelas: "" },
+      { kelas: { in: ["Semua Kelas", "Semua", "semua kelas", "semua", "ALL", "all", "UMUM", "Umum"] } },
+      { teaching_class_id: null },
+    ]
+
+    if (cleanKelas) {
+      orClassConditions.push(
+        { kelas: { equals: cleanKelas, mode: "insensitive" } },
+        { kelas: { contains: cleanKelas, mode: "insensitive" } },
+        { teaching_class: { kelas: { contains: cleanKelas, mode: "insensitive" } } },
+        { teaching_class: { kelas: { equals: cleanKelas, mode: "insensitive" } } }
+      )
+      for (const gm of gradeMatches) {
+        orClassConditions.push(
+          { kelas: { contains: gm, mode: "insensitive" } },
+          { teaching_class: { kelas: { contains: gm, mode: "insensitive" } } }
+        )
+      }
+    }
+
     return await prisma.exam.findMany({
       where: {
-        status: "PUBLISH",
-        ...(cleanKelas
-          ? {
-              OR: [
-                { kelas: { equals: kelas, mode: "insensitive" } },
-                { kelas: { equals: cleanKelas, mode: "insensitive" } },
-                { kelas: { contains: cleanKelas, mode: "insensitive" } },
-                { teaching_class: { kelas: { contains: cleanKelas, mode: "insensitive" } } },
-                { kelas: null },
-                { kelas: "" },
-              ],
-            }
-          : {}),
-        ...(tipe ? { tipe } : {}),
+        AND: [
+          {
+            OR: [
+              { status: "PUBLISH" as const },
+              { status: "SELESAI" as const },
+              ...(tipe === "QUIZ" ? [{ status: "DRAFT" as const }] : []),
+            ],
+          },
+          ...(orClassConditions.length > 0 ? [{ OR: orClassConditions }] : []),
+          ...(tipe ? [{ tipe }] : []),
+        ],
       },
       include: {
         paket_soal: {

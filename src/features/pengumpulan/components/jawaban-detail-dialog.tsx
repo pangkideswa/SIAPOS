@@ -28,6 +28,8 @@ import { STATUS_PENGUMPULAN_COLORS } from "@/features/pengumpulan/constants/peng
 import { useGradeSubmission } from "@/hooks/use-submissions"
 import type { PengumpulanTugas } from "@/features/pengumpulan/types/pengumpulan"
 
+import { formatDateTimeWIB } from "@/lib/date-utils"
+
 interface JawabanDetailDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -38,13 +40,7 @@ interface JawabanDetailDialogProps {
 }
 
 function formatDateTime(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+  return formatDateTimeWIB(dateStr, { monthFormat: "long" })
 }
 
 export function JawabanDetailDialog({

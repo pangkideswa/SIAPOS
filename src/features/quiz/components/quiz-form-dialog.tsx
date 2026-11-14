@@ -16,6 +16,7 @@ import {
   STATUS_QUIZ_OPTIONS, EMPTY_QUIZ_FORM,
 } from "../constants/quiz.constants"
 import type { Quiz, QuizFormData } from "../types/quiz"
+import { DateTimePickerWIB } from "@/components/ui/date-time-picker-wib"
 
 interface QuizFormDialogProps {
   open: boolean
@@ -32,27 +33,34 @@ export function QuizFormDialog({
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const [classes, setClasses] = useState<Array<{ id: number, name: string }>>([])
+  const [teachingClasses, setTeachingClasses] = useState<Array<{ id: number, mata_pelajaran: string, kelas: string, guru_nama: string }>>([])
   const [packages, setPackages] = useState<Array<{ id: number, judul: string, mata_pelajaran: string }>>([])
 
   useEffect(() => {
     async function fetchMasterData() {
       try {
-        const [resClasses, resPackages] = await Promise.all([
+        const [resClasses, resPackages, resTeachingClasses] = await Promise.all([
           fetch("/api/classes"),
-          fetch("/api/exams/packages")
+          fetch("/api/exams/packages"),
+          fetch("/api/teaching-classes"),
         ])
         
-        const [dataClasses, dataPackages] = await Promise.all([
+        const [dataClasses, dataPackages, dataTeachingClasses] = await Promise.all([
           resClasses.json(),
-          resPackages.json()
+          resPackages.json(),
+          resTeachingClasses.json(),
         ])
 
         if (dataClasses.data) {
            const items = dataClasses.data.data ? dataClasses.data.data : dataClasses.data
            setClasses(items)
         }
+        if (dataTeachingClasses.data) {
+           const items = dataTeachingClasses.data.data ? dataTeachingClasses.data.data : dataTeachingClasses.data
+           setTeachingClasses(items)
+        }
         if (dataPackages.data) {
-           const items = (dataPackages.data.data ? dataPackages.data.data : dataPackages.data).map((p: any) => ({
+           const items = (dataPackages.data.data ? dataPackages.data.data : dataPackages.data).map((p: { id: number; judul: string; mata_pelajaran: string }) => ({
              id: p.id,
              judul: p.judul,
              mata_pelajaran: p.mata_pelajaran
@@ -72,6 +80,7 @@ export function QuizFormDialog({
         judul: editingItem.judul,
         deskripsi: editingItem.deskripsi,
         paket_soal_id: editingItem.paket_soal_id,
+        teaching_class_id: editingItem.teaching_class_id ?? null,
         kelas: editingItem.kelas,
         tanggal_mulai: editingItem.tanggal_mulai.slice(0, 16),
         tanggal_berakhir: editingItem.tanggal_berakhir.slice(0, 16),
@@ -97,7 +106,7 @@ export function QuizFormDialog({
     const newErrors: Record<string, string> = {}
     if (!form.judul.trim()) newErrors.judul = "Judul quiz wajib diisi"
     if (!form.paket_soal_id) newErrors.paket_soal_id = "Paket soal wajib dipilih"
-    if (!form.kelas) newErrors.kelas = "Kelas wajib dipilih"
+    if (!form.teaching_class_id && !form.kelas) newErrors.teaching_class_id = "Kelas Mengajar wajib dipilih"
     if (!form.tanggal_mulai) newErrors.tanggal_mulai = "Tanggal mulai wajib diisi"
     if (!form.tanggal_berakhir) newErrors.tanggal_berakhir = "Tanggal berakhir wajib diisi"
     if (form.durasi <= 0) newErrors.durasi = "Durasi harus lebih dari 0"
@@ -158,34 +167,56 @@ export function QuizFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>Kelas *</Label>
-            <Select value={form.kelas} onValueChange={(v) => v && handleChange("kelas", v)}>
-              <SelectTrigger><SelectValue placeholder="Pilih Kelas" /></SelectTrigger>
+            <Label>Kelas Mengajar *</Label>
+            <Select
+              value={form.teaching_class_id ? String(form.teaching_class_id) : ""}
+              onValueChange={(v) => {
+                if (!v) return
+                const tcId = Number(v)
+                const tc = teachingClasses.find((t) => t.id === tcId)
+                setForm((prev) => ({
+                  ...prev,
+                  teaching_class_id: tcId,
+                  kelas: tc ? tc.kelas : prev.kelas,
+                }))
+                if (errors.teaching_class_id) {
+                  setErrors((prev) => ({ ...prev, teaching_class_id: "" }))
+                }
+              }}
+            >
+              <SelectTrigger><SelectValue placeholder="Pilih Kelas Mengajar" /></SelectTrigger>
               <SelectContent>
-                {classes.map((k) => (
-                  <SelectItem key={k.id} value={k.name}>{k.name}</SelectItem>
-                ))}
+                {teachingClasses.length > 0 ? (
+                  teachingClasses.map((tc) => (
+                    <SelectItem key={tc.id} value={String(tc.id)}>
+                      {tc.mata_pelajaran} - {tc.kelas} ({tc.guru_nama})
+                    </SelectItem>
+                  ))
+                ) : (
+                  classes.map((k) => (
+                    <SelectItem key={k.id} value={String(k.id)}>{k.name}</SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
-            {errors.kelas && <p className="text-xs text-destructive">{errors.kelas}</p>}
+            {errors.teaching_class_id && <p className="text-xs text-destructive">{errors.teaching_class_id}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Tanggal Mulai *</Label>
-              <Input
-                type="datetime-local"
+              <Label>Tanggal & Jam Mulai (WIB) *</Label>
+              <DateTimePickerWIB
                 value={form.tanggal_mulai}
-                onChange={(e) => handleChange("tanggal_mulai", e.target.value)}
+                onChange={(val) => handleChange("tanggal_mulai", val)}
               />
               {errors.tanggal_mulai && <p className="text-xs text-destructive">{errors.tanggal_mulai}</p>}
             </div>
+
             <div className="space-y-2">
-              <Label>Tanggal Berakhir *</Label>
-              <Input
-                type="datetime-local"
+              <Label>Tanggal & Jam Berakhir (WIB) *</Label>
+              <DateTimePickerWIB
                 value={form.tanggal_berakhir}
-                onChange={(e) => handleChange("tanggal_berakhir", e.target.value)}
+                onChange={(val) => handleChange("tanggal_berakhir", val)}
               />
               {errors.tanggal_berakhir && <p className="text-xs text-destructive">{errors.tanggal_berakhir}</p>}
             </div>

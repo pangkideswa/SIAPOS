@@ -2,8 +2,8 @@
 
 import { Suspense } from "react"
 import { AuthProvider } from "@/contexts/auth-context"
-import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
+import { AuthVisualShowcase } from "@/components/auth/auth-visual-showcase"
 
 function AuthSkeleton() {
   return (
@@ -31,34 +31,24 @@ export default function AuthLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary to-primary/80 relative overflow-hidden items-center justify-center p-12">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-        <div className="relative text-center">
-          <Link href="/" className="inline-flex items-center gap-3 mb-8">
-            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-card/20 shadow-lg backdrop-blur-sm overflow-hidden p-1">
-              <img src="/favicon.png" alt="Logo SIAPOS" className="w-full h-full object-contain" />
-            </div>
-            <span className="font-bold text-3xl tracking-tight text-white">
-              SIAPOS
-            </span>
-          </Link>
-          <h2 className="text-2xl font-bold text-white mb-3">
-            Belajar Lebih Mudah,
-          </h2>
-          <p className="text-lg text-white/80">
-            Berkembang Lebih Cepat
-          </p>
-          <p className="mt-4 text-sm text-white/60 max-w-xs mx-auto">
-            Platform pembelajaran digital untuk sekolah.
-          </p>
-        </div>
+    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-background">
+      {/* 1. Left Dynamic Visual Showcase (Desktop/Tablet) */}
+      <div className="hidden lg:flex lg:w-1/2 relative min-h-screen">
+        <AuthVisualShowcase />
       </div>
 
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-primary/5 via-white to-orange/5 px-4 py-8 lg:py-0">
-        <AuthProvider>
-          <Suspense fallback={<AuthSkeleton />}>{children}</Suspense>
-        </AuthProvider>
+      {/* 2. Right Column: Form Container with Dynamic Ambient Glow & Dot Matrix */}
+      <div className="flex-1 flex items-center justify-center relative p-4 sm:p-8 lg:p-12 overflow-hidden min-h-screen">
+        {/* Subtle Ambient Aurora Glow on the Right Side */}
+        <div className="absolute -top-28 -right-28 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-28 -left-28 w-80 h-80 bg-orange/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(#00000008_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
+
+        <div className="relative z-10 w-full max-w-md py-6">
+          <AuthProvider>
+            <Suspense fallback={<AuthSkeleton />}>{children}</Suspense>
+          </AuthProvider>
+        </div>
       </div>
     </div>
   )

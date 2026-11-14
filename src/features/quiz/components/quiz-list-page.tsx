@@ -12,16 +12,45 @@ import {
 } from "@/components/ui/select"
 import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react"
 import { toast } from "sonner"
+import { formatDateTimeWIB } from "@/lib/date-utils"
 import { QuizFormDialog } from "./quiz-form-dialog"
 import { QuizDeleteDialog } from "./quiz-delete-dialog"
 import {
   STATUS_QUIZ_COLORS,
-  MATA_PELAJARAN_OPTIONS,
-  GURU_QUIZ_OPTIONS,
-  KELAS_OPTIONS,
   STATUS_QUIZ_OPTIONS,
 } from "../constants/quiz.constants"
 import type { Quiz, QuizFormData } from "../types/quiz"
+
+interface QuizApiResponseItem {
+  id: number
+  judul: string
+  deskripsi?: string
+  tipe?: string
+  paket_soal_id?: number
+  teaching_class_id?: number | null
+  waktu_mulai?: string | null
+  waktu_selesai?: string | null
+  durasi_menit?: number
+  percobaan_maksimal?: number
+  acak_urutan_soal?: boolean
+  acak_urutan_jawaban?: boolean
+  tampilkan_nilai?: boolean
+  status?: string
+  created_at?: string
+  updated_at?: string
+  kelas?: string | null
+  paket_soal?: {
+    judul?: string
+    mata_pelajaran?: string
+    guru?: { nama_lengkap?: string }
+  } | null
+  teaching_class?: {
+    kelas?: string
+    mata_pelajaran?: string
+    guru_nama?: string
+    teacher?: { nama_lengkap?: string }
+  } | null
+}
 
 export function QuizListPage() {
   const router = useRouter()
@@ -52,19 +81,30 @@ export function QuizListPage() {
       if (json.data || json.success) {
         // Map data to match frontend Quiz interface
         const sourceData = Array.isArray(json.data) ? json.data : (json.data?.data || [])
-        const mapped = sourceData.map((d: any) => ({
-          ...d,
+        const mapped: Quiz[] = (sourceData as QuizApiResponseItem[]).map((d) => ({
+          id: d.id,
+          judul: d.judul,
+          deskripsi: d.deskripsi || "",
+          paket_soal_id: d.paket_soal_id || 0,
+          teaching_class_id: d.teaching_class_id || null,
           tanggal_mulai: d.waktu_mulai ? d.waktu_mulai : "",
           tanggal_berakhir: d.waktu_selesai ? d.waktu_selesai : "",
           durasi: d.durasi_menit ?? 0,
-          status: d.status === "PUBLISH" ? "Publish" : d.status === "SELESAI" ? "Ditutup" : "Draft",
+          percobaan_maksimal: d.percobaan_maksimal ?? 1,
+          acak_urutan_soal: d.acak_urutan_soal ?? false,
+          acak_urutan_jawaban: d.acak_urutan_jawaban ?? false,
+          tampilkan_nilai: d.tampilkan_nilai ?? true,
+          status: (d.status === "PUBLISH" ? "Publish" : d.status === "SELESAI" ? "Ditutup" : "Draft"),
           paket_soal_judul: d.paket_soal?.judul || "—",
           mata_pelajaran: d.paket_soal?.mata_pelajaran || d.teaching_class?.mata_pelajaran || "—",
-          guru_nama: d.teaching_class?.guru_nama || "—"
+          guru_nama: d.teaching_class?.guru_nama || d.teaching_class?.teacher?.nama_lengkap || d.paket_soal?.guru?.nama_lengkap || "—",
+          kelas: d.kelas || d.teaching_class?.kelas || "Semua Kelas",
+          created_at: d.created_at || "",
+          updated_at: d.updated_at || "",
         }))
         setData(mapped)
       }
-    } catch (error) {
+    } catch {
       toast.error("Gagal memuat data quiz")
     } finally {
       setIsLoading(false)
@@ -77,8 +117,8 @@ export function QuizListPage() {
       item.judul.toLowerCase().includes(search.toLowerCase()) ||
       item.kelas.toLowerCase().includes(search.toLowerCase()) ||
       item.deskripsi.toLowerCase().includes(search.toLowerCase())
-    const matchesMapel = mapelFilter === "semua" || (item as any).mata_pelajaran === mapelFilter
-    const matchesGuru = guruFilter === "semua" || (item as any).guru_nama === guruFilter
+    const matchesMapel = mapelFilter === "semua" || item.mata_pelajaran === mapelFilter
+    const matchesGuru = guruFilter === "semua" || item.guru_nama === guruFilter
     const matchesKelas = kelasFilter === "semua" || item.kelas === kelasFilter
     const matchesStatus = statusFilter === "semua" || item.status === statusFilter
     return matchesSearch && matchesMapel && matchesGuru && matchesKelas && matchesStatus
@@ -86,18 +126,18 @@ export function QuizListPage() {
 
   const paginatedData = filteredData.slice((page - 1) * perPage, page * perPage)
 
-  const mapelOptions = Array.from(new Set(data.map((d: any) => d.mata_pelajaran))).filter(Boolean)
-  const guruOptions = Array.from(new Set(data.map((d: any) => d.guru_nama))).filter(Boolean)
-  const kelasOptions = Array.from(new Set(data.map((d: any) => d.kelas))).filter(Boolean)
+  const mapelOptions = Array.from(new Set(data.map((d) => d.mata_pelajaran))).filter((m): m is string => Boolean(m))
+  const guruOptions = Array.from(new Set(data.map((d) => d.guru_nama))).filter((g): g is string => Boolean(g))
+  const kelasOptions = Array.from(new Set(data.map((d) => d.kelas))).filter((k): k is string => Boolean(k))
 
-  const columns: Column<Record<string, unknown>>[] = [
+  const columns: Column<Quiz>[] = [
     {
       key: "judul",
       header: "Judul Quiz",
-      render: (item: any) => {
+      render: (item) => {
         return (
           <div>
-            <p className="font-medium">{String(item.judul)}</p>
+            <p className="font-medium">{item.judul}</p>
             <p className="text-xs text-muted-foreground">{item.paket_soal_judul}</p>
           </div>
         )
@@ -106,23 +146,34 @@ export function QuizListPage() {
     {
       key: "mata_pelajaran",
       header: "Mapel",
-      render: (item: any) => item.mata_pelajaran,
+      render: (item) => item.mata_pelajaran,
     },
     {
       key: "guru",
       header: "Guru",
-      render: (item: any) => item.guru_nama,
+      render: (item) => item.guru_nama,
     },
-    { key: "kelas", header: "Kelas", render: (item) => String(item.kelas) },
+    { key: "kelas", header: "Kelas", render: (item) => item.kelas },
     {
       key: "durasi",
       header: "Durasi",
-      render: (item) => <span>{String(item.durasi)} mnt</span>,
+      render: (item) => <span>{item.durasi} mnt</span>,
+    },
+    {
+      key: "jadwal",
+      header: "Jadwal (WIB)",
+      render: (item) => (
+        <span className="text-xs text-muted-foreground whitespace-nowrap">
+          {item.tanggal_mulai ? formatDateTimeWIB(item.tanggal_mulai, { includeYear: false }) : "—"}
+          {" s.d "}
+          {item.tanggal_berakhir ? formatDateTimeWIB(item.tanggal_berakhir, { includeYear: false }) : "—"}
+        </span>
+      ),
     },
     {
       key: "status",
       header: "Status",
-      render: (item) => <Badge className={STATUS_QUIZ_COLORS[String(item.status)]}>{String(item.status)}</Badge>,
+      render: (item) => <Badge className={STATUS_QUIZ_COLORS[item.status]}>{item.status}</Badge>,
     },
     {
       key: "actions",
@@ -133,10 +184,10 @@ export function QuizListPage() {
           <Button variant="ghost" size="icon" className="h-8 w-8" title="Lihat" aria-label="Lihat" onClick={() => router.push(`/guru/quiz/${item.id}`)}>
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item as unknown as Quiz); setFormDialogOpen(true) }}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" aria-label="Edit" onClick={() => { setEditingItem(item); setFormDialogOpen(true) }}>
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" title="Hapus" aria-label="Hapus" onClick={() => { setDeletingItem(item as unknown as Quiz); setDeleteDialogOpen(true) }}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" title="Hapus" aria-label="Hapus" onClick={() => { setDeletingItem(item); setDeleteDialogOpen(true) }}>
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -149,6 +200,7 @@ export function QuizListPage() {
     try {
       const dbPayload = {
         ...formData,
+        tipe: "QUIZ",
         waktu_mulai: formData.tanggal_mulai ? new Date(formData.tanggal_mulai).toISOString() : undefined,
         waktu_selesai: formData.tanggal_berakhir ? new Date(formData.tanggal_berakhir).toISOString() : undefined,
         durasi_menit: formData.durasi,
@@ -173,7 +225,7 @@ export function QuizListPage() {
       await fetchQuizzes()
       setFormDialogOpen(false)
       setEditingItem(null)
-    } catch (err) {
+    } catch {
       toast.error("Gagal menyimpan quiz")
     } finally {
       setIsLoading(false)
@@ -190,7 +242,7 @@ export function QuizListPage() {
       await fetchQuizzes()
       setDeleteDialogOpen(false)
       setDeletingItem(null)
-    } catch (err) {
+    } catch {
       toast.error("Gagal menghapus quiz")
     } finally {
       setIsLoading(false)
@@ -200,8 +252,8 @@ export function QuizListPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Quiz"
-        description="Kelola quiz untuk siswa"
+        title="Quiz & Ujian Harian"
+        description="Kelola kuis harian, asesmen formatif, dan tes kemampuan mandiri siswa"
         action={
           <Button onClick={() => { setEditingItem(null); setFormDialogOpen(true) }}>
             <Plus className="mr-2 h-4 w-4" />
@@ -219,21 +271,21 @@ export function QuizListPage() {
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Mapel" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mapel</SelectItem>
-            {mapelOptions.map((m: any) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+            {mapelOptions.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={guruFilter === "semua" ? undefined : guruFilter} onValueChange={(v) => { if (v) { setGuruFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Guru" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Guru</SelectItem>
-            {guruOptions.map((g: any) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+            {guruOptions.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={kelasFilter === "semua" ? undefined : kelasFilter} onValueChange={(v) => { if (v) { setKelasFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="Kelas" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>
-            {kelasOptions.map((k: any) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
+            {kelasOptions.map((k) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter === "semua" ? undefined : statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(1) } }}>
@@ -245,15 +297,15 @@ export function QuizListPage() {
         </Select>
       </div>
 
-      <DataTable
+      <DataTable<Quiz>
         page={page}
         perPage={perPage}
         total={filteredData.length}
         onPageChange={setPage}
-        data={paginatedData as unknown as Record<string, unknown>[]}
+        data={paginatedData}
         columns={columns}
         emptyMessage="Tidak ada quiz ditemukan"
-        onRowClick={(row) => router.push(`/guru/quiz/${(row as unknown as Quiz).id}`)}
+        onRowClick={(row) => router.push(`/guru/quiz/${row.id}`)}
       />
 
       <QuizFormDialog

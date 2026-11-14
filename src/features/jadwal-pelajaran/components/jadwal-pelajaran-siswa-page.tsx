@@ -127,8 +127,8 @@ export function JadwalPelajaranSiswaPage() {
                             : ""
                         }
                       >
-                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
-                          {jadwal.jam_mulai} - {jadwal.jam_selesai}
+                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap font-medium">
+                          {jadwal.jam_mulai} - {jadwal.jam_selesai} WIB
                         </td>
                         <td className="px-4 py-3 font-medium">
                           {jadwal.mata_pelajaran}

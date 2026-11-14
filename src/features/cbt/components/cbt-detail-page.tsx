@@ -50,6 +50,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react"
 import { toast } from "sonner"
+import { formatDateTimeWIB } from "@/lib/date-utils"
 
 interface CBTDetailPageProps {
   id: string
@@ -993,9 +994,9 @@ export function CBTDetailPage({ id }: CBTDetailPageProps) {
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="text-muted-foreground">Jadwal Pelaksanaan</p>
-                  <p className="font-semibold">
-                    {exam.waktu_mulai ? new Date(exam.waktu_mulai).toLocaleDateString("id-ID") : "—"} s/d{" "}
-                    {exam.waktu_selesai ? new Date(exam.waktu_selesai).toLocaleDateString("id-ID") : "—"}
+                  <p className="font-semibold text-xs sm:text-sm">
+                    {exam.waktu_mulai ? formatDateTimeWIB(exam.waktu_mulai) : "—"} s/d{" "}
+                    {exam.waktu_selesai ? formatDateTimeWIB(exam.waktu_selesai) : "—"}
                   </p>
                 </div>
               </div>

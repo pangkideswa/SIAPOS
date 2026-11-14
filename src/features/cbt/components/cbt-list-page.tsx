@@ -12,15 +12,48 @@ import {
 } from "@/components/ui/select"
 import { Plus, Pencil, Trash2, Eye, Search, KeyRound, Copy, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
+import { formatDateTimeWIB } from "@/lib/date-utils"
 import { CBTFormDialog } from "./cbt-form-dialog"
 import { CBTDeleteDialog } from "./cbt-delete-dialog"
 import {
   STATUS_CBT_COLORS,
   STATUS_CBT_OPTIONS,
-  MATA_PELAJARAN_OPTIONS,
-  KELAS_OPTIONS,
 } from "../constants/cbt.constants"
 import type { CBTExam, CBTExamFormData } from "../types/cbt"
+
+interface ExamApiResponseItem {
+  id: number
+  judul: string
+  deskripsi?: string
+  tipe?: string
+  paket_soal_id?: number
+  teaching_class_id?: number | null
+  waktu_mulai?: string | null
+  waktu_selesai?: string | null
+  durasi_menit?: number
+  kkm?: number
+  acak_urutan_soal?: boolean
+  acak_urutan_jawaban?: boolean
+  tampilkan_nilai?: boolean
+  izinkan_kembali?: boolean
+  auto_submit?: boolean
+  status?: string
+  token?: string | null
+  created_at?: string
+  updated_at?: string
+  kelas?: string | null
+  paket_soal?: {
+    judul?: string
+    mata_pelajaran?: string
+    guru?: { nama_lengkap?: string }
+  } | null
+  teaching_class?: {
+    kelas?: string
+    mata_pelajaran?: string
+    guru_nama?: string
+    teacher?: { nama_lengkap?: string }
+  } | null
+}
 
 export function CBTListPage() {
   const router = useRouter()
@@ -50,9 +83,12 @@ export function CBTListPage() {
       if (json.data || json.success) {
         // Map data to match frontend CBT interface
         const sourceData = Array.isArray(json.data) ? json.data : (json.data?.data || [])
-        const mapped = sourceData.map((d: any) => ({
-          ...d,
+        const mapped: CBTExam[] = (sourceData as ExamApiResponseItem[]).map((d) => ({
+          id: d.id,
           nama_ujian: d.judul,
+          deskripsi: d.deskripsi || "",
+          paket_soal_id: d.paket_soal_id || 0,
+          teaching_class_id: d.teaching_class_id || null,
           tanggal_mulai: d.waktu_mulai ? d.waktu_mulai : "",
           tanggal_berakhir: d.waktu_selesai ? d.waktu_selesai : "",
           durasi: d.durasi_menit ?? 0,
@@ -60,14 +96,20 @@ export function CBTListPage() {
           acak_soal: d.acak_urutan_soal ?? false,
           acak_jawaban: d.acak_urutan_jawaban ?? false,
           tampilkan_nilai: d.tampilkan_nilai ?? false,
-          status: d.status === "PUBLISH" ? "Publish" : d.status === "SELESAI" ? "Selesai" : "Draft",
+          izinkan_kembali: d.izinkan_kembali ?? true,
+          auto_submit: d.auto_submit ?? true,
+          status: (d.status === "PUBLISH" ? "Publish" : d.status === "SELESAI" ? "Selesai" : "Draft"),
           paket_soal_judul: d.paket_soal?.judul || "—",
           mata_pelajaran: d.paket_soal?.mata_pelajaran || d.teaching_class?.mata_pelajaran || "—",
-          guru_nama: d.teaching_class?.guru_nama || d.teaching_class?.teacher?.nama_lengkap || d.paket_soal?.guru?.nama_lengkap || "—"
+          guru_nama: d.teaching_class?.guru_nama || d.teaching_class?.teacher?.nama_lengkap || d.paket_soal?.guru?.nama_lengkap || "—",
+          kelas: d.kelas || d.teaching_class?.kelas || "Semua Kelas",
+          token: d.token || null,
+          created_at: d.created_at || "",
+          updated_at: d.updated_at || "",
         }))
         setData(mapped)
       }
-    } catch (error) {
+    } catch {
       toast.error("Gagal memuat data CBT")
     } finally {
       setIsLoading(false)
@@ -91,7 +133,7 @@ export function CBTListPage() {
       } else {
         toast.error(json.error || json.message || "Gagal memperbarui token")
       }
-    } catch (e) {
+    } catch {
       toast.error("Gagal memperbarui token ujian")
     } finally {
       setIsTokenActionId(null)
@@ -109,7 +151,7 @@ export function CBTListPage() {
       item.nama_ujian.toLowerCase().includes(search.toLowerCase()) ||
       item.kelas.toLowerCase().includes(search.toLowerCase()) ||
       item.deskripsi.toLowerCase().includes(search.toLowerCase())
-    const matchesMapel = mapelFilter === "semua" || (item as any).mata_pelajaran === mapelFilter
+    const matchesMapel = mapelFilter === "semua" || item.mata_pelajaran === mapelFilter
     const matchesKelas = kelasFilter === "semua" || item.kelas === kelasFilter
     const matchesStatus = statusFilter === "semua" || item.status === statusFilter
     return matchesSearch && matchesMapel && matchesKelas && matchesStatus
@@ -117,17 +159,17 @@ export function CBTListPage() {
 
   const paginatedData = filteredData.slice((page - 1) * perPage, page * perPage)
 
-  const mapelOptions = Array.from(new Set(data.map((d: any) => d.mata_pelajaran))).filter(Boolean)
-  const kelasOptions = Array.from(new Set(data.map((d: any) => d.kelas))).filter(Boolean)
+  const mapelOptions = Array.from(new Set(data.map((d) => d.mata_pelajaran))).filter((m): m is string => Boolean(m))
+  const kelasOptions = Array.from(new Set(data.map((d) => d.kelas))).filter((k): k is string => Boolean(k))
 
-  const columns: Column<Record<string, unknown>>[] = [
+  const columns: Column<CBTExam>[] = [
     {
       key: "nama_ujian",
       header: "Nama Ujian",
-      render: (item: any) => {
+      render: (item) => {
         return (
           <div>
-            <p className="font-medium">{String(item.nama_ujian)}</p>
+            <p className="font-medium">{item.nama_ujian}</p>
             {item.paket_soal_id ? (
               <button
                 type="button"
@@ -153,39 +195,46 @@ export function CBTListPage() {
     {
       key: "mapel",
       header: "Mapel",
-      render: (item: any) => item.mata_pelajaran,
+      render: (item) => item.mata_pelajaran,
     },
     {
       key: "guru",
       header: "Guru",
-      render: (item: any) => item.guru_nama,
+      render: (item) => item.guru_nama,
     },
-    { key: "kelas", header: "Kelas", render: (item) => String(item.kelas) },
+    { key: "kelas", header: "Kelas", render: (item) => item.kelas },
     {
       key: "durasi",
       header: "Durasi",
-      render: (item) => <span>{String(item.durasi)} mnt</span>,
+      render: (item) => <span>{item.durasi} mnt</span>,
     },
     {
       key: "jadwal",
-      header: "Jadwal",
-      render: (item) => (
-        <span className="text-xs">
-          {new Date(String(item.tanggal_mulai)).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
-          {" — "}
-          {new Date(String(item.tanggal_berakhir)).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
-        </span>
-      ),
+      header: "Jadwal (WIB)",
+      render: (item) => {
+        if (!item.tanggal_mulai) return <span className="text-xs text-muted-foreground">—</span>
+        return (
+          <span className="text-xs leading-tight block">
+            <span>{formatDateTimeWIB(item.tanggal_mulai, { includeYear: false })}</span>
+            {item.tanggal_berakhir && (
+              <>
+                <span className="text-muted-foreground mx-1">s.d</span>
+                <span>{formatDateTimeWIB(item.tanggal_berakhir, { includeYear: false })}</span>
+              </>
+            )}
+          </span>
+        )
+      },
     },
     {
       key: "status",
       header: "Status",
-      render: (item) => <Badge className={STATUS_CBT_COLORS[String(item.status)]}>{String(item.status)}</Badge>,
+      render: (item) => <Badge className={STATUS_CBT_COLORS[item.status]}>{item.status}</Badge>,
     },
     {
       key: "token",
       header: "Token Ujian",
-      render: (item: any) => {
+      render: (item) => {
         const isActionLoading = isTokenActionId === item.id
         if (item.token) {
           return (
@@ -199,7 +248,7 @@ export function CBTListPage() {
                 size="icon"
                 className="h-7 w-7 text-muted-foreground hover:text-foreground"
                 title="Salin Token"
-                onClick={() => handleCopyToken(item.token)}
+                onClick={() => handleCopyToken(item.token || "")}
               >
                 <Copy className="h-3.5 w-3.5" />
               </Button>
@@ -316,7 +365,7 @@ export function CBTListPage() {
       await fetchCbts()
       setFormDialogOpen(false)
       setEditingItem(null)
-    } catch (err) {
+    } catch {
       toast.error("Gagal menyimpan CBT")
     } finally {
       setIsLoading(false)
@@ -333,7 +382,7 @@ export function CBTListPage() {
       await fetchCbts()
       setDeleteDialogOpen(false)
       setDeletingItem(null)
-    } catch (err) {
+    } catch {
       toast.error("Gagal menghapus CBT")
     } finally {
       setIsLoading(false)
@@ -362,14 +411,14 @@ export function CBTListPage() {
           <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Mapel" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Mapel</SelectItem>
-            {mapelOptions.map((m: any) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+            {mapelOptions.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={kelasFilter === "semua" ? undefined : kelasFilter} onValueChange={(v) => { if (v) { setKelasFilter(v); setPage(1) } }}>
           <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="Kelas" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="semua">Kelas</SelectItem>
-            {kelasOptions.map((k: any) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
+            {kelasOptions.map((k) => <SelectItem key={k} value={k}>{k}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={statusFilter === "semua" ? undefined : statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(1) } }}>
@@ -381,15 +430,15 @@ export function CBTListPage() {
         </Select>
       </div>
 
-      <DataTable
+      <DataTable<CBTExam>
         page={page}
         perPage={perPage}
         total={filteredData.length}
         onPageChange={setPage}
-        data={paginatedData as unknown as Record<string, unknown>[]}
+        data={paginatedData}
         columns={columns}
         emptyMessage="Tidak ada ujian CBT ditemukan"
-        onRowClick={(row) => router.push(`/guru/cbt/${(row as unknown as CBTExam).id}`)}
+        onRowClick={(row) => router.push(`/guru/cbt/${row.id}`)}
       />
 
       <CBTFormDialog

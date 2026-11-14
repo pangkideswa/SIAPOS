@@ -125,7 +125,7 @@ export function PaketSoalPrintDialog({
                   {/* Center Text */}
                   <div className="flex-1 text-center space-y-0.5">
                     <p className="text-[11px] sm:text-xs uppercase tracking-wider font-bold text-muted-foreground">
-                      SISTEM INFORMASI ADMINISTRASI & PEMBELAJARAN ONLINE SEKOLAH
+                      SISTEM INTEGRASI AKADEMIK DAN PEMBELAJARAN ONLINE SEKOLAH
                     </p>
                     <h2 className="text-sm sm:text-base font-extrabold tracking-wide text-foreground">
                       SIAPOS EDUCATION OPERATING SYSTEM

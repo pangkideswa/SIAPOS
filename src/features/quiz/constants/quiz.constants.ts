@@ -48,6 +48,7 @@ export const EMPTY_QUIZ_FORM: QuizFormData = {
   judul: "",
   deskripsi: "",
   paket_soal_id: 0,
+  teaching_class_id: null,
   kelas: "",
   tanggal_mulai: "",
   tanggal_berakhir: "",
@@ -56,5 +57,5 @@ export const EMPTY_QUIZ_FORM: QuizFormData = {
   acak_urutan_soal: false,
   acak_urutan_jawaban: false,
   tampilkan_nilai: true,
-  status: "Draft",
+  status: "Publish",
 }

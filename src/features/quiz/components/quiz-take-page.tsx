@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { ArrowLeft, ArrowRight, Clock, CheckCircle2, Monitor, Maximize, ShieldAlert, AlertTriangle, Bookmark, BookmarkCheck, Flag, Menu, X } from "lucide-react"
+import { ArrowLeft, ArrowRight, Clock, CheckCircle2, Monitor, Maximize, ShieldAlert, AlertTriangle, Bookmark, BookmarkCheck, Flag, Menu, X, Sparkles, BookOpenCheck } from "lucide-react"
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
@@ -42,15 +42,22 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
         const json = await res.json()
         if (json.data || json.success) {
           const payload = json.data || json;
-          setQuiz(payload.exam)
+          const loadedExam = payload.exam
+          setQuiz(loadedExam)
           setParticipant(payload.participant)
           
-          let items = payload.exam?.paket_soal?.items?.map((i: any) => i.bank_soal) || []
-          if (payload.exam?.acak_urutan_soal) {
+          let items: any[] = []
+          if (Array.isArray(loadedExam?.soal_items) && loadedExam.soal_items.length > 0) {
+            items = loadedExam.soal_items
+          } else if (loadedExam?.paket_soal?.items) {
+            items = loadedExam.paket_soal.items.map((i: any) => i.bank_soal || i)
+          }
+
+          if (loadedExam?.acak_urutan_soal && !loadedExam?.soal_items) {
              items = [...items].sort(() => Math.random() - 0.5)
           }
           setSoalList(items)
-          setTimeLeft((payload.exam?.durasi_menit || 60) * 60)
+          setTimeLeft(payload.remaining_seconds ?? ((loadedExam?.durasi_menit || 60) * 60))
           
           // Load previous answers
           if (payload.participant?.answers) {
@@ -121,7 +128,16 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
     return () => clearInterval(timer)
   }, [timeLeft, isStarted, isFinished])
 
-  const startExam = () => {
+  const startExam = async () => {
+    try {
+      await fetch(`/api/exams/${id}/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ start: true }),
+      })
+    } catch (e) {
+      console.error(e)
+    }
     setIsStarted(true)
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen().catch(console.error)
@@ -219,13 +235,24 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
   }
 
   if (isLoading) {
-    return <div className="flex h-[60vh] items-center justify-center">Memuat Quiz...</div>
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
+        <div className="relative flex items-center justify-center w-16 h-16">
+          <div className="absolute inset-0 rounded-full border-2 border-purple-500/20" />
+          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-purple-600 border-r-purple-600 animate-spin" />
+          <div className="relative flex items-center justify-center w-8 h-8 rounded-xl bg-card border border-purple-500/20 p-1 shadow-sm">
+            <Sparkles className="w-4 h-4 text-purple-600" />
+          </div>
+        </div>
+        <p className="text-xs font-bold text-muted-foreground tracking-wide">Menyiapkan Soal Kuis Harian...</p>
+      </div>
+    )
   }
 
   if (!quiz || soalList.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <p className="text-muted-foreground">Quiz tidak ditemukan atau soal kosong.</p>
+        <p className="text-muted-foreground">Kuis tidak ditemukan atau butir soal masih kosong.</p>
         <Button variant="outline" onClick={() => router.push("/siswa/quiz")}>Kembali</Button>
       </div>
     )
@@ -235,46 +262,51 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
     return (
       <div className="max-w-2xl mx-auto space-y-6 py-8 px-4">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="flex items-center justify-center w-20 h-20 rounded-full bg-primary/10">
-            <Monitor className="h-10 w-10 text-primary" />
+          <div className="flex items-center justify-center w-20 h-20 rounded-3xl bg-purple-500/10 border border-purple-500/20 shadow-md shadow-purple-500/10">
+            <Sparkles className="h-10 w-10 text-purple-600" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold">Konfirmasi Kesiapan Quiz</h2>
-            <p className="text-muted-foreground mt-1">{quiz.judul}</p>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 text-xs font-bold mb-2">
+              Ujian Harian & Tes Kemampuan
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">{quiz.judul}</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-md mx-auto">
+              Asesmen formatif untuk menguji pemahaman materi harian dan mengasah kompetensi mandiri siswa.
+            </p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-lg border p-4 text-center">
-            <p className="text-sm text-muted-foreground">Total Soal</p>
-            <p className="text-2xl font-bold">{soalList.length}</p>
+          <div className="rounded-2xl border border-border/80 bg-card p-4 text-center shadow-xs">
+            <p className="text-xs text-muted-foreground font-semibold">Total Soal</p>
+            <p className="text-2xl font-black text-foreground mt-0.5">{soalList.length}</p>
           </div>
-          <div className="rounded-lg border p-4 text-center">
-            <p className="text-sm text-muted-foreground">Durasi Quiz</p>
-            <p className="text-2xl font-bold">{quiz.durasi_menit || 60} Menit</p>
+          <div className="rounded-2xl border border-border/80 bg-card p-4 text-center shadow-xs">
+            <p className="text-xs text-muted-foreground font-semibold">Durasi Kuis</p>
+            <p className="text-2xl font-black text-foreground mt-0.5">{quiz.durasi_menit || 60} Menit</p>
           </div>
         </div>
 
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 text-sm space-y-2">
-          <p className="font-semibold flex items-center gap-2">
-            <ShieldAlert className="h-4 w-4" />
-            Perhatian & Tata Tertib
+        <div className="bg-purple-500/5 border border-purple-500/20 text-foreground rounded-2xl p-5 text-sm space-y-2.5">
+          <p className="font-bold flex items-center gap-2 text-purple-700 dark:text-purple-400">
+            <BookOpenCheck className="h-4 w-4" />
+            Petunjuk & Tata Tertib Kuis Harian
           </p>
-          <ul className="list-disc list-inside space-y-1 ml-1">
-            <li>Pastikan koneksi internet Anda stabil sebelum memulai.</li>
-            <li>Quiz akan berjalan dalam mode <strong>Layar Penuh (Fullscreen)</strong>.</li>
-            <li>Sistem akan mendeteksi jika Anda keluar dari layar penuh, membuka tab baru, atau meminimalkan browser. Tindakan tersebut akan dicatat sebagai <strong>Pelanggaran</strong>.</li>
-            <li>Waktu quiz akan otomatis dimulai ketika Anda menekan tombol di bawah.</li>
+          <ul className="list-disc list-inside space-y-1.5 text-xs text-muted-foreground leading-relaxed">
+            <li>Kuis difungsikan untuk evaluasi harian dan mengukur daya serap materi pembelajaran.</li>
+            <li>Kerjakan secara mandiri dan cermat tanpa membuka catatan atau bantuan luar.</li>
+            <li>Kuis berjalan dalam mode fokus penuh demi menjamin keaslian pemahaman Anda.</li>
+            <li>Waktu akan langsung berjalan otomatis begitu Anda menekan tombol di bawah.</li>
           </ul>
         </div>
 
-        <div className="flex gap-3 justify-center pt-4">
-          <Button variant="outline" onClick={() => router.push("/siswa/quiz")}>
+        <div className="flex flex-wrap sm:flex-nowrap gap-3 justify-center pt-2">
+          <Button variant="outline" className="w-full sm:w-auto h-11 px-5 rounded-2xl" onClick={() => router.push("/siswa/quiz")}>
             Kembali
           </Button>
-          <Button onClick={startExam} className="bg-primary hover:bg-primary/90 text-white">
-            <Maximize className="mr-2 h-4 w-4" />
-            Mulai Quiz Sekarang
+          <Button onClick={startExam} className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold h-11 px-6 rounded-2xl shadow-md shadow-purple-600/25">
+            <Sparkles className="mr-2 h-4 w-4" />
+            Mulai Kuis Sekarang
           </Button>
         </div>
       </div>
@@ -388,7 +420,13 @@ export function QuizTakePage({ id }: QuizTakePageProps) {
                 <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setIsMobileMenuOpen(true)}>
                   <Menu className="h-4 w-4" />
                 </Button>
-                <h2 className="font-semibold text-sm line-clamp-1">{quiz.judul}</h2>
+                <div className="flex items-center gap-2">
+                  <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 shrink-0">
+                    <Sparkles className="h-3 w-3" />
+                    Kuis Harian
+                  </span>
+                  <h2 className="font-bold text-sm line-clamp-1">{quiz.judul}</h2>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />

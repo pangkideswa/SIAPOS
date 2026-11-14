@@ -21,6 +21,7 @@ import { STATUS_TUGAS_COLORS } from "@/features/tugas/constants/tugas.constants"
 import { useAssignment } from "@/hooks/use-assignments"
 import { useSubmissions } from "@/hooks/use-submissions"
 import type { PengumpulanTugas } from "@/features/pengumpulan/types/pengumpulan"
+import { formatDateTimeWIB } from "@/lib/date-utils"
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("id-ID", {
@@ -31,13 +32,7 @@ function formatDate(dateStr: string) {
 }
 
 function formatDateTime(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+  return formatDateTimeWIB(dateStr)
 }
 
 function InfoRow({

@@ -5,7 +5,11 @@ export interface Quiz {
   judul: string
   deskripsi: string
   paket_soal_id: number
+  paket_soal_judul?: string
+  mata_pelajaran?: string
+  teaching_class_id?: number | null
   kelas: string
+  guru_nama?: string
   tanggal_mulai: string
   tanggal_berakhir: string
   durasi: number

@@ -4,6 +4,21 @@ import { examService } from "@/services/exam.service"
 import { ok, apiError } from "@/lib/api-utils"
 import { requireApiUser, getStudentProfile } from "@/auth/api-authorization"
 
+interface QuestionOption {
+  id: number
+  teks: string
+}
+
+interface QuestionItem {
+  id: number
+  nomor_urut: number
+  bobot: number
+  pertanyaan: string
+  tipe_soal: string
+  lampiran: unknown
+  options: QuestionOption[]
+}
+
 // Deterministic Pseudo-Random Number Generator (LCG)
 function seededRandom(seed: number) {
   let s = seed % 2147483647
@@ -42,14 +57,18 @@ export async function POST(
     if (!exam) return apiError(new Error("Ujian tidak ditemukan"), 404)
 
     // 2. Validate Exam Status
-    if (exam.status !== "PUBLISH") {
+    if (exam.tipe !== "QUIZ" && exam.status !== "PUBLISH" && exam.status !== "SELESAI") {
       return apiError(new Error("Ujian ini belum dipublikasikan oleh Guru"), 403)
     }
 
     // 3. Check or Enroll Participant
-    let participant = (await examService.getParticipant(examId, student.id)) as any
+    let participant = await examService.getParticipant(examId, student.id)
     if (!participant) {
-      participant = (await examService.enrollStudent(examId, student.id)) as any
+      await examService.enrollStudent(examId, student.id)
+      participant = await examService.getParticipant(examId, student.id)
+    }
+    if (!participant) {
+      return apiError(new Error("Gagal mendaftarkan peserta ujian"), 500)
     }
 
     const now = new Date()
@@ -82,11 +101,14 @@ export async function POST(
 
     // Start exam timestamp when student explicitly starts
     if (participant.status === "BELUM_MULAI" && isExplicitStart) {
-      participant = (await examService.startExam(participant.id)) as any
+      await examService.startExam(participant.id)
     }
 
     // Refresh participant with answers
-    participant = (await examService.getParticipant(examId, student.id)) as any
+    participant = await examService.getParticipant(examId, student.id)
+    if (!participant) {
+      return apiError(new Error("Data peserta ujian tidak ditemukan"), 404)
+    }
 
     // 4. Calculate accurate remaining time (Server-side truth)
     const durationMinutes = exam.durasi_menit || 60
@@ -105,25 +127,30 @@ export async function POST(
 
       // If time has completely expired and participant has not submitted yet, auto-submit
       if (remainingSeconds <= 0) {
-        participant = await examService.submitExam(participant.id)
+        await examService.submitExam(participant.id)
+        participant = await examService.getParticipant(examId, student.id)
       }
     }
 
+    if (!participant) {
+      return apiError(new Error("Data peserta tidak ditemukan"), 404)
+    }
+
     // 5. Sanitize questions & options (NEVER leak is_correct or pembahasan)
-    let rawItems =
-      exam.paket_soal?.items?.map((item: any) => ({
+    let rawItems: QuestionItem[] =
+      (exam.paket_soal?.items || []).map((item) => ({
         id: item.bank_soal.id,
         nomor_urut: item.nomor_urut,
         bobot: item.bobot,
         pertanyaan: item.bank_soal.pertanyaan,
         tipe_soal: item.bank_soal.tipe_soal,
         lampiran: item.bank_soal.lampiran,
-        options: (item.bank_soal.options || []).map((opt: any) => ({
+        options: (item.bank_soal.options || []).map((opt) => ({
           id: opt.id,
           teks: opt.teks,
           // CRITICAL: is_correct is strictly omitted!
         })),
-      })) || []
+      }))
 
     // 6. Deterministic Shuffle per participant
     if (exam.acak_urutan_soal) {
@@ -131,7 +158,7 @@ export async function POST(
     }
 
     if (exam.acak_urutan_jawaban) {
-      rawItems = rawItems.map((q: any) => ({
+      rawItems = rawItems.map((q) => ({
         ...q,
         options: q.options ? shuffleWithSeed(q.options, participant.id * 997 + q.id) : [],
       }))
@@ -151,6 +178,23 @@ export async function POST(
       waktu_selesai: exam.waktu_selesai,
       has_token: !!(exam.token && exam.token.trim() !== ""),
       soal_items: rawItems,
+      paket_soal: {
+        id: exam.paket_soal?.id,
+        judul: exam.paket_soal?.judul,
+        mata_pelajaran: exam.paket_soal?.mata_pelajaran,
+        items: rawItems.map((r) => ({
+          bank_soal_id: r.id,
+          nomor_urut: r.nomor_urut,
+          bobot: r.bobot,
+          bank_soal: {
+            id: r.id,
+            pertanyaan: r.pertanyaan,
+            tipe_soal: r.tipe_soal,
+            lampiran: r.lampiran,
+            options: r.options,
+          },
+        })),
+      },
     }
 
     return ok({

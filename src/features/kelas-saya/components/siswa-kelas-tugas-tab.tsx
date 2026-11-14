@@ -33,6 +33,8 @@ import type { Tugas } from "@/features/tugas/types/tugas"
 import type { Siswa } from "@/features/siswa/types/siswa"
 import type { KelasMengajar } from "@/features/kelas-mengajar/types/kelas-mengajar"
 
+import { formatDateTimeWIB } from "@/lib/date-utils"
+
 interface SiswaKelasTugasTabProps {
   kelasMengajar: KelasMengajar
   siswa: Siswa
@@ -55,13 +57,7 @@ function formatDeadline(dateStr: string, jam?: string | null) {
 }
 
 function formatWaktu(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+  return formatDateTimeWIB(dateStr)
 }
 
 function isDeadlinePassed(dateStr: string, jam?: string | null): boolean {

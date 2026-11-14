@@ -17,6 +17,10 @@ export interface CBTExam {
   izinkan_kembali: boolean
   auto_submit: boolean
   status: StatusCBT
+  paket_soal_judul?: string
+  mata_pelajaran?: string
+  guru_nama?: string
+  token?: string | null
   created_at: string
   updated_at: string
 }

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { ArrowLeft, Clock, Users, Calendar } from "lucide-react"
+import { formatDateTimeWIB } from "@/lib/date-utils"
 
 interface QuizDetailPageProps {
   id: string
@@ -191,7 +192,7 @@ export function QuizDetailPage({ id }: QuizDetailPageProps) {
                 <div>
                   <p className="text-xs text-muted-foreground">Periode</p>
                   <p className="text-sm font-medium">
-                    {exam.waktu_mulai ? new Date(exam.waktu_mulai).toLocaleDateString("id-ID") : "—"} — {exam.waktu_selesai ? new Date(exam.waktu_selesai).toLocaleDateString("id-ID") : "—"}
+                    {exam.waktu_mulai ? formatDateTimeWIB(exam.waktu_mulai) : "—"} — {exam.waktu_selesai ? formatDateTimeWIB(exam.waktu_selesai) : "—"}
                   </p>
                 </div>
               </div>
