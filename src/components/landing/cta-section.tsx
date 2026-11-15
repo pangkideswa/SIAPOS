@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Sparkles, Mail, MessageCircle } from "lucide-react"
+import { Sparkles, Mail, MessageCircle } from "lucide-react"
 import { motion } from "framer-motion"
 
 export function CtaSection() {
@@ -19,17 +19,17 @@ export function CtaSection() {
           y: [0, -30, 0],
         }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-24 -left-24 w-96 h-96 bg-white/20 rounded-full blur-3xl pointer-events-none"
+        className="absolute -top-24 -left-24 w-96 h-96 bg-white/20 rounded-full blur-3xl pointer-events-none hidden md:block"
       />
       <motion.div
         animate={{
-          scale: [1.2, 1, 1.2],
+          scale: [1, 1.2, 1],
           opacity: [0.2, 0.4, 0.2],
           x: [0, -40, 0],
           y: [0, 30, 0],
         }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute -bottom-24 -right-24 w-96 h-96 bg-orange/30 rounded-full blur-3xl pointer-events-none"
+        className="absolute -bottom-24 -right-24 w-96 h-96 bg-orange/30 rounded-full blur-3xl pointer-events-none hidden md:block"
       />
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -39,7 +39,7 @@ export function CtaSection() {
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.5 }}
         >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-white border border-white/20 text-xs font-semibold mb-6 backdrop-blur-sm shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-white border border-white/20 text-xs font-semibold mb-6 backdrop-blur-sm shadow-sm whitespace-nowrap max-w-full">
             <Sparkles className="h-3.5 w-3.5 text-amber-300" />
             Transformasi Digital Sekolah Sekarang
           </div>

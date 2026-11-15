@@ -85,13 +85,13 @@ export function StatsSection() {
               </p>
 
               {/* Label */}
-              <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm font-bold text-foreground/80 line-clamp-1">
+              <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm font-bold text-foreground/80 whitespace-nowrap">
                 {stat.label}
               </p>
 
               {/* Pill Badge */}
-              <span className="mt-2.5 sm:mt-3 inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold px-2 sm:px-2.5 py-0.5 rounded-full bg-muted/80 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                <CheckCircle2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              <span className="mt-2.5 sm:mt-3 inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold px-2 sm:px-2.5 py-0.5 rounded-full bg-muted/80 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors whitespace-nowrap">
+                <CheckCircle2 className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0" />
                 <span>{stat.pill}</span>
               </span>
             </motion.div>

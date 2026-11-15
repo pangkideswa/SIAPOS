@@ -169,3 +169,47 @@
 .rich-text-content li {
   margin: 0.125rem 0;
 }
+
+/* Lightweight GPU-accelerated Keyframes for Mobile & Desktop Performance */
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+@keyframes float-reverse {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, 6px, 0);
+  }
+}
+
+@keyframes progress-shimmer {
+  0%, 100% {
+    transform: scaleX(0.45);
+  }
+  50% {
+    transform: scaleX(0.85);
+  }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-float-reverse {
+  animation: float-reverse 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-progress-smooth {
+  animation: progress-shimmer 7s ease-in-out infinite;
+  transform-origin: left;
+  will-change: transform;
+}

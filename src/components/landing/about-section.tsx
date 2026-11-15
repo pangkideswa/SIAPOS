@@ -60,7 +60,7 @@ export function AboutSection() {
             transition={{ duration: 0.5 }}
             className="lg:col-span-6"
           >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-semibold mb-5 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-semibold mb-5 shadow-sm whitespace-nowrap">
               Mengenal SIAPOS Lebih Dekat
             </div>
 
@@ -94,13 +94,13 @@ export function AboutSection() {
             transition={{ duration: 0.5, delay: 0.15 }}
             className="lg:col-span-6"
           >
-            <div className="rounded-3xl bg-card/80 backdrop-blur-xl border border-border/80 p-6 sm:p-7 shadow-xl shadow-black/5 space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-border/60">
-                <div>
+            <div className="rounded-3xl bg-card/80 backdrop-blur-xl border border-border/80 p-5 sm:p-7 shadow-xl shadow-black/5 space-y-4">
+              <div className="flex items-start sm:items-center justify-between gap-3 pb-3 border-b border-border/60">
+                <div className="min-w-0">
                   <h3 className="text-base font-bold text-foreground">3 Peran Utama Pengguna</h3>
                   <p className="text-xs text-muted-foreground">Dirancang selaras dengan alur kerja sekolah</p>
                 </div>
-                <span className="text-xs font-bold font-mono px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+                <span className="text-xs font-bold font-mono px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 whitespace-nowrap shrink-0">
                   Role-Based
                 </span>
               </div>
@@ -123,16 +123,16 @@ export function AboutSection() {
                       }}
                       className={`p-4 sm:p-5 rounded-2xl bg-card/90 border ${r.border} shadow-sm hover:shadow-md transition-all group`}
                     >
-                      <div className="flex items-start gap-4">
+                      <div className="flex items-start gap-3.5 sm:gap-4">
                         <div className={`w-11 h-11 rounded-xl ${r.bg} ${r.color} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-inner`}>
                           <Icon className="h-5 w-5" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
-                            <h4 className={`text-base font-bold ${r.color}`}>
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 mb-1.5">
+                            <h4 className={`text-base font-bold ${r.color} whitespace-nowrap`}>
                               {r.title}
                             </h4>
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                            <span className="self-start sm:self-auto text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground whitespace-nowrap">
                               {r.badge}
                             </span>
                           </div>

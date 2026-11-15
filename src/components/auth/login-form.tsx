@@ -114,7 +114,7 @@ export function LoginForm() {
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Kembali ke Beranda</span>
         </Link>
-        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 whitespace-nowrap">
           SIAPOS v2.0
         </span>
       </div>
@@ -142,10 +142,10 @@ export function LoginForm() {
 
         {/* Role Login Guide Pills */}
         <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5 text-[11px]">
-          <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
+          <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium whitespace-nowrap">
             👨‍🏫 <strong>Guru:</strong> NIP / Email
           </span>
-          <span className="px-2.5 py-1 rounded-full bg-orange/10 text-orange border border-orange/20 font-medium">
+          <span className="px-2.5 py-1 rounded-full bg-orange/10 text-orange border border-orange/20 font-medium whitespace-nowrap">
             🎓 <strong>Siswa:</strong> NISN
           </span>
         </div>

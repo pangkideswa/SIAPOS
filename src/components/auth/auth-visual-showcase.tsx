@@ -104,14 +104,14 @@ export function AuthVisualShowcase() {
       <div className="relative z-10 flex items-center justify-between w-full">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white/90 hover:text-white border border-white/20 text-xs font-semibold backdrop-blur-md transition-all active:scale-95 group shadow-sm"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 text-white/90 hover:text-white border border-white/20 text-xs font-semibold backdrop-blur-md transition-all active:scale-95 group shadow-sm whitespace-nowrap"
         >
-          <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
+          <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5 shrink-0" />
           <span>Kembali ke Beranda</span>
         </Link>
 
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-semibold text-white/80 backdrop-blur-sm">
-          <span className="relative flex h-2 w-2">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-semibold text-white/80 backdrop-blur-sm whitespace-nowrap shrink-0">
+          <span className="relative flex h-2 w-2 shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
           </span>
@@ -166,7 +166,7 @@ export function AuthVisualShowcase() {
                 SIAPOS Smart CBT Engine
               </span>
             </div>
-            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 whitespace-nowrap shrink-0">
               Live Ready
             </span>
           </div>

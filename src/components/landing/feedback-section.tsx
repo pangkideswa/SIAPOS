@@ -103,7 +103,7 @@ export function FeedbackSection() {
           y: [0, -20, 0],
         }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-10 left-[-5%] w-[450px] h-[450px] bg-emerald-500/15 rounded-full blur-[100px] pointer-events-none"
+        className="absolute top-10 left-[-5%] w-[450px] h-[450px] bg-emerald-500/15 rounded-full blur-[100px] pointer-events-none hidden md:block"
       />
       <motion.div
         animate={{
@@ -113,7 +113,7 @@ export function FeedbackSection() {
           y: [0, 30, 0],
         }}
         transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute bottom-10 right-[-5%] w-[500px] h-[500px] bg-primary/15 rounded-full blur-[110px] pointer-events-none"
+        className="absolute bottom-10 right-[-5%] w-[500px] h-[500px] bg-primary/15 rounded-full blur-[110px] pointer-events-none hidden md:block"
       />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -125,7 +125,7 @@ export function FeedbackSection() {
           transition={{ duration: 0.5 }}
           className="text-center max-w-3xl mx-auto mb-14"
         >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold mb-4 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold mb-4 shadow-sm whitespace-nowrap">
             <Sparkles className="h-3.5 w-3.5" />
             Kotak Aspirasi & Umpan Balik Pengguna
           </div>
@@ -180,7 +180,7 @@ export function FeedbackSection() {
                         key={r.id}
                         type="button"
                         onClick={() => setPeran(r.id)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                           isSelected
                             ? "bg-emerald-600 text-white shadow-sm shadow-emerald-600/30 font-semibold"
                             : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/60"
@@ -214,7 +214,7 @@ export function FeedbackSection() {
                         }`}
                       >
                         <Icon className={`h-4 w-4 shrink-0 ${isSelected ? "text-emerald-600" : "text-muted-foreground"}`} />
-                        <span className="truncate">{cat.label}</span>
+                        <span className="truncate whitespace-nowrap">{cat.label}</span>
                       </button>
                     )
                   })}

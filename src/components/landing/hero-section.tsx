@@ -6,10 +6,8 @@ import {
   ArrowRight,
   BookOpen,
   GraduationCap,
-  Laptop,
   ShieldCheck,
   Sparkles,
-  Users,
   CheckCircle2,
   Clock,
   Award,
@@ -19,89 +17,35 @@ import { motion } from "framer-motion"
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-transparent">
-      {/* Background Animated Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:linear-gradient(to_bottom,white,transparent)]" />
+      {/* Background Subtle Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808010_1px,transparent_1px),linear-gradient(to_bottom,#80808010_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none" />
 
-      {/* Decorative Continuous Ambient Glowing Blobs */}
-      <motion.div
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.3, 0.6, 0.3],
-          x: [0, 50, 0],
-          y: [0, -35, 0],
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-0 left-[-10%] w-[520px] h-[520px] bg-primary/20 rounded-full blur-[110px] pointer-events-none"
-      />
-      <motion.div
-        animate={{
-          scale: [1.2, 1, 1.2],
-          opacity: [0.25, 0.55, 0.25],
-          x: [0, -45, 0],
-          y: [0, 45, 0],
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute bottom-[-10%] right-[-5%] w-[620px] h-[620px] bg-orange/20 rounded-full blur-[120px] pointer-events-none"
-      />
-      <motion.div
-        animate={{
-          scale: [1, 1.4, 1],
-          opacity: [0.15, 0.4, 0.15],
-          x: [-20, 20, -20],
-        }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-emerald-500/15 rounded-full blur-[130px] pointer-events-none"
-      />
+      {/* Mobile-optimized Instant Ambient Glow (0% CPU, clean radial gradient) */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[500px] h-[320px] bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.12),transparent_70%)] pointer-events-none md:hidden" />
 
-      {/* Ambient Floating Sparkles / Particles */}
-      {[
-        { top: "15%", left: "12%", delay: 0, duration: 4 },
-        { top: "25%", right: "18%", delay: 1, duration: 5 },
-        { top: "65%", left: "8%", delay: 2, duration: 4.5 },
-        { top: "75%", right: "12%", delay: 0.5, duration: 3.8 },
-      ].map((p, idx) => (
-        <motion.div
-          key={idx}
-          animate={{
-            y: [-12, 12, -12],
-            opacity: [0.3, 0.9, 0.3],
-            scale: [0.8, 1.2, 0.8],
-          }}
-          transition={{
-            duration: p.duration,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: p.delay,
-          }}
-          style={{ top: p.top, left: (p as any).left, right: (p as any).right }}
-          className="absolute w-2 h-2 rounded-full bg-primary/50 blur-[1px] hidden md:block pointer-events-none"
-        />
-      ))}
+      {/* Desktop Continuous Gentle Ambient Bloom */}
+      <div className="absolute top-6 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[110px] pointer-events-none hidden md:block" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[550px] h-[550px] bg-orange/10 rounded-full blur-[120px] pointer-events-none hidden md:block" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 sm:pt-32 sm:pb-24 md:pt-36 md:pb-32 lg:pb-36">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-14 items-center">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           {/* Left Column: Heading, description, CTA */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             className="lg:col-span-6 text-center lg:text-left"
           >
             {/* Live Status Pill with Ping Animation */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1, duration: 0.4 }}
-              className="inline-flex items-center gap-2.5 bg-card/80 border border-primary/20 backdrop-blur-md text-foreground px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold mb-6 shadow-sm shadow-primary/10"
-            >
-              <span className="relative flex h-2.5 w-2.5">
+            <div className="inline-flex items-center gap-2 sm:gap-2.5 bg-card/90 border border-primary/20 text-foreground px-3.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold mb-6 shadow-sm shadow-primary/10 max-w-full">
+              <span className="relative flex h-2.5 w-2.5 shrink-0">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
               </span>
-              <span className="text-primary font-bold">SIAPOS 2.0</span>
-              <span className="text-muted-foreground/80">•</span>
-              <span className="text-muted-foreground">Platform Asesmen & CBT Terpadu</span>
-            </motion.div>
+              <span className="text-primary font-bold whitespace-nowrap shrink-0">SIAPOS 2.0</span>
+              <span className="text-muted-foreground/80 shrink-0">•</span>
+              <span className="text-muted-foreground whitespace-nowrap">Platform Asesmen & CBT Terpadu</span>
+            </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight text-foreground leading-[1.12]">
               Belajar Lebih{" "}
@@ -116,7 +60,7 @@ export function HeroSection() {
               </span>
             </h1>
 
-            <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
               Ekosistem digital terpadu untuk sekolah masa kini. Manajemen kelas, materi interaktif, bank soal kurikulum, serta ujian online <strong>CBT dengan proteksi anti-cheat cerdas</strong> dalam satu tempat.
             </p>
 
@@ -131,7 +75,7 @@ export function HeroSection() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="px-7 h-12 border-border/80 bg-card/70 hover:bg-card active:bg-primary/10 active:text-primary active:border-primary/40 active:scale-[0.97] text-foreground backdrop-blur-sm w-full sm:w-auto font-semibold gap-2 transition-all"
+                  className="px-7 h-12 border-border/80 bg-card hover:bg-muted active:bg-primary/10 active:text-primary active:border-primary/40 active:scale-[0.97] text-foreground w-full sm:w-auto font-semibold gap-2 transition-all shadow-xs"
                 >
                   <Sparkles className="h-4 w-4 text-amber-500" />
                   <span>Jelajahi Fitur</span>
@@ -140,44 +84,33 @@ export function HeroSection() {
             </div>
 
             {/* Quick Live Stats Pill */}
-            <div className="mt-10 pt-6 border-t border-border/60 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+            <div className="mt-8 pt-6 border-t border-border/60 flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2 whitespace-nowrap">
+                <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
                 <span>100% Bebas Biaya</span>
               </div>
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-primary" />
+              <div className="flex items-center gap-2 whitespace-nowrap">
+                <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
                 <span>Anti-Cheat 3x Proteksi</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-amber-500" />
+              <div className="flex items-center gap-2 whitespace-nowrap">
+                <Sparkles className="h-4 w-4 text-amber-500 shrink-0" />
                 <span>Koreksi AI Real-time</span>
               </div>
             </div>
           </motion.div>
 
-          {/* Right Column: Dynamic Interactive Showcase with Continuous Idle Floating Motion */}
-          <div className="lg:col-span-6 relative flex items-center justify-center">
-            {/* Main Showcase Container with Continuous Gentle Float */}
-            <motion.div
-              animate={{
-                y: [-8, 8, -8],
-                rotate: [-0.6, 0.6, -0.6],
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="relative w-full max-w-[460px]"
-            >
+          {/* Right Column: Dynamic Interactive Showcase with Lightweight GPU CSS Float */}
+          <div className="lg:col-span-6 relative flex items-center justify-center pt-4 sm:pt-0">
+            {/* Main Showcase Container with Hardware-Accelerated Gentle Float */}
+            <div className="relative w-full max-w-[460px] animate-float-gentle">
               {/* Vibrant Glow Backdrop */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-primary/30 via-emerald-500/20 to-orange/30 blur-2xl opacity-70" />
+              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-tr from-primary/25 via-emerald-500/15 to-orange/20 blur-xl opacity-65 pointer-events-none" />
 
               {/* Main Simulated Interactive Dashboard Card */}
-              <div className="relative rounded-3xl bg-card/90 dark:bg-card/95 border border-white/60 dark:border-border/80 p-6 sm:p-7 shadow-2xl shadow-primary/10 backdrop-blur-xl space-y-5">
+              <div className="relative rounded-3xl bg-card/95 border border-border/80 p-5 sm:p-7 shadow-xl shadow-primary/5 space-y-4 sm:space-y-5 transition-all">
                 {/* Simulated Header */}
-                <div className="flex items-center justify-between pb-4 border-b border-border/60">
+                <div className="flex items-center justify-between pb-3.5 border-b border-border/60">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shadow-inner">
                       <GraduationCap className="h-5 w-5 text-primary" />
@@ -202,19 +135,9 @@ export function HeroSection() {
                     <span className="text-primary font-bold font-mono">Soal 8 / 10</span>
                   </div>
 
-                  {/* Dynamic looping progress bar */}
+                  {/* Dynamic looping progress bar (CSS ScaleX - zero layout reflow) */}
                   <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
-                    <motion.div
-                      animate={{
-                        width: ["40%", "85%", "40%"],
-                      }}
-                      transition={{
-                        duration: 7,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                      className="h-full bg-gradient-to-r from-primary to-emerald-500 rounded-full"
-                    />
+                    <div className="h-full w-full bg-gradient-to-r from-primary to-emerald-500 rounded-full animate-progress-smooth" />
                   </div>
 
                   <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-1">
@@ -230,7 +153,7 @@ export function HeroSection() {
 
                 {/* Simulated Quick Action Modules */}
                 <div className="grid grid-cols-2 gap-3 pt-1">
-                  <div className="p-3 rounded-xl bg-primary/5 border border-primary/15 flex items-center gap-3">
+                  <div className="p-3 rounded-xl bg-primary/5 border border-primary/15 flex items-center gap-2.5 sm:gap-3">
                     <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center text-primary shrink-0">
                       <BookOpen className="h-4 w-4" />
                     </div>
@@ -240,7 +163,7 @@ export function HeroSection() {
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-orange/5 border border-orange/15 flex items-center gap-3">
+                  <div className="p-3 rounded-xl bg-orange/5 border border-orange/15 flex items-center gap-2.5 sm:gap-3">
                     <div className="w-8 h-8 rounded-lg bg-orange/15 flex items-center justify-center text-orange shrink-0">
                       <Award className="h-4 w-4" />
                     </div>
@@ -252,73 +175,37 @@ export function HeroSection() {
                 </div>
               </div>
 
-              {/* Floating Badge 1: Anti-Cheat Shield (Top Left Float) */}
-              <motion.div
-                animate={{
-                  y: [-10, 8, -10],
-                  x: [-4, 4, -4],
-                }}
-                transition={{
-                  duration: 4.8,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 0.2,
-                }}
-                className="absolute -top-5 -left-4 sm:-left-8 inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-card/95 border border-emerald-500/30 shadow-xl shadow-black/10 backdrop-blur-md"
-              >
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                  <ShieldCheck className="h-4 w-4" />
+              {/* Floating Badge 1: Anti-Cheat Shield (Top Left Counter-Float) */}
+              <div className="absolute -top-3 left-1 sm:-top-5 sm:-left-8 inline-flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-card/95 border border-emerald-500/30 shadow-lg shadow-black/5 animate-float-reverse whitespace-nowrap">
+                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                  <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-foreground leading-tight">Anti-Cheat 3x</p>
-                  <p className="text-[10px] text-muted-foreground">Proteksi Tab & Window</p>
+                  <p className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">Anti-Cheat 3x</p>
+                  <p className="text-[10px] text-muted-foreground whitespace-nowrap">Proteksi Tab & Window</p>
                 </div>
-              </motion.div>
+              </div>
 
-              {/* Floating Badge 2: AI Evaluation (Bottom Right Float) */}
-              <motion.div
-                animate={{
-                  y: [8, -10, 8],
-                  x: [4, -4, 4],
-                }}
-                transition={{
-                  duration: 5.4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 0.8,
-                }}
-                className="absolute -bottom-5 -right-4 sm:-right-6 inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-card/95 border border-primary/30 shadow-xl shadow-black/10 backdrop-blur-md"
-              >
-                <div className="w-7 h-7 rounded-lg bg-primary/15 flex items-center justify-center text-primary">
-                  <Sparkles className="h-4 w-4 text-amber-500" />
+              {/* Floating Badge 2: AI Evaluation (Bottom Right Counter-Float) */}
+              <div className="absolute -bottom-3 right-1 sm:-bottom-5 sm:-right-6 inline-flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-card/95 border border-primary/30 shadow-lg shadow-black/5 animate-float-gentle whitespace-nowrap">
+                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-primary/15 flex items-center justify-center text-primary shrink-0">
+                  <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-500" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-foreground leading-tight">Analisis AI Guru</p>
-                  <p className="text-[10px] text-muted-foreground">Koreksi Esai Presisi</p>
+                  <p className="text-xs font-bold text-foreground leading-tight whitespace-nowrap">Analisis AI Guru</p>
+                  <p className="text-[10px] text-muted-foreground whitespace-nowrap">Koreksi Esai Presisi</p>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Floating Badge 3: Siswa Online (Top Right Float) */}
-              <motion.div
-                animate={{
-                  y: [-6, 6, -6],
-                  rotate: [1, -1, 1],
-                }}
-                transition={{
-                  duration: 4.2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 0.5,
-                }}
-                className="absolute top-16 -right-6 sm:-right-10 hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card/95 border border-border shadow-lg shadow-black/5 backdrop-blur-md"
-              >
-                <span className="relative flex h-2 w-2">
+              <div className="absolute top-12 -right-1 sm:top-16 sm:-right-10 inline-flex items-center gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-card/95 border border-border shadow-md shadow-black/5 animate-float-reverse whitespace-nowrap">
+                <span className="relative flex h-2 w-2 shrink-0">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                 </span>
-                <span className="text-[11px] font-semibold text-foreground">500+ Siswa Aktif</span>
-              </motion.div>
-            </motion.div>
+                <span className="text-[11px] font-semibold text-foreground whitespace-nowrap">500+ Siswa Aktif</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

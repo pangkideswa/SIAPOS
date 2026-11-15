@@ -85,7 +85,7 @@ export function FeaturesSection() {
           x: [0, 30, 0],
         }}
         transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-20 -left-20 w-[400px] h-[400px] bg-primary/15 rounded-full blur-[100px] pointer-events-none"
+        className="absolute -top-20 -left-20 w-[400px] h-[400px] bg-primary/15 rounded-full blur-[100px] pointer-events-none hidden md:block"
       />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -96,7 +96,7 @@ export function FeaturesSection() {
           transition={{ duration: 0.5 }}
           className="text-center max-w-2xl mx-auto mb-14"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-4 whitespace-nowrap">
             <Sparkles className="h-3.5 w-3.5" />
             Fitur Andalan
           </div>
